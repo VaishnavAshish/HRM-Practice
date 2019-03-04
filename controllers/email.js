@@ -11,8 +11,8 @@ exports.sendMail = (req, res, next) => {
       //     pass: 'ggeekkoo11' // Your password
       // },
       auth: {
-          user: 'webtestmail@athenalogics.com', // Your email id
-          pass: 'athenalogics@123' // Your password
+          user: 'krowtesting@athenalogics.com', // Your email id
+          pass: 'athenalogics' // Your password
       },
       tls: {
           // do not fail on invalid certs
