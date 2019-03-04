@@ -6,9 +6,13 @@ exports.sendMail = (req, res, next) => {
       host: 'smtp.gmail.com',
       port: 465,
       secure: true,
+      // auth: {
+      //     user: 'noreply@krowsoftware.com', // Your email id
+      //     pass: 'ggeekkoo11' // Your password
+      // },
       auth: {
-          user: 'noreply@krowsoftware.com', // Your email id
-          pass: 'ggeekkoo11' // Your password
+          user: 'webtestmail@athenalogics.com', // Your email id
+          pass: 'athenalogics@123' // Your password
       },
       tls: {
           // do not fail on invalid certs
@@ -21,7 +25,7 @@ exports.sendMail = (req, res, next) => {
       subject: "Hello " + req.body.email,
       text: 'Hello ' + req.body.email + '✔',
       html: "<p>Hello " + req.body.email + " </p>",
-      
+
     };*/
     // console.log('transpoter');
     // console.log(req.mailOptions);
@@ -35,6 +39,6 @@ exports.sendMail = (req, res, next) => {
             next(null,info);
             /*res.status(200).json({"success": true,"message":"success" });*/
         }
-    });        
+    });
 
 };
