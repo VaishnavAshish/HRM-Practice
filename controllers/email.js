@@ -12,7 +12,7 @@ exports.sendMail = (req, res, next) => {
       // },
       auth: {
           user: 'krowtesting@athenalogics.com', // Your email id
-          pass: 'athenalogics' // Your password
+          pass: 'athenalogics123@' // Your password
       },
       tls: {
           // do not fail on invalid certs

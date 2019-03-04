@@ -560,7 +560,7 @@ sendEmail = (req, res, next) => {
   // console.log("Inside send mail " + req.body);
   const mailOptions = {
     to: req.body.adminEmail,
-    from: 'noreply@springcx.com',
+    from: 'krowtesting@athenalogics.com',
     subject: "Confirmation of "+req.body.orgName+" on krow timesheet app",
     html : html
   };
