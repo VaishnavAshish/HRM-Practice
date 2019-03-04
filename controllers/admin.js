@@ -75,7 +75,7 @@ exports.getResourceDetail = (req, res) => {
             console.error(err);
             handleResponse.shouldAbort(err, client, done);
             handleResponse.responseToPage(res,'pages/resource-details',{resource: {},userRoleList:[], isSuperAdmin: req.session.passport.user.user_role.contains('SUPER_ADMIN'), company: req.query.comp_name,user:req.session.passport.user, error:err},"error","Server Error: Error in finding user");
-            
+
           } else {
             client.query('SELECT user_role FROM SETTING WHERE company_id=$1', [resource.rows[0].company_id], function (err, userRoleList) {
             if (err) {
@@ -173,7 +173,7 @@ exports.getCompanyDetail = (req, res) => {
                       }
 
                   })
-                
+
               }
 
             })
@@ -274,7 +274,7 @@ exports.getAllCompanyResources = (req, res) => {
               /*let resList=resourceList.rows;*/
               let totalCount,activeCount,archivedCount;
               totalCount=activeCount=archivedCount=0;
-              
+
               if(resourceList.rows.length>0){
                 /*userList=resList.filter(user => user.archived==false);*/
                 resourceList.rows.forEach(function (data) {
@@ -300,14 +300,14 @@ exports.getAllCompanyResources = (req, res) => {
               // console.log('totalCount'+resourceList.rows);
               done();
               handleResponse.responseToPage(res,'pages/resources-listing',{resources: resourceList.rows, userRoleList:userRole , totalCount:totalCount ,activeCount:activeCount, archivedCount:(totalCount-activeCount), user: req.session.passport.user },"success","Successfully rendered");
-             
+
               }
           })
         }
 
       })
     })
-  
+
 };
 
 
@@ -346,7 +346,7 @@ exports.postAddCompany = (req, res) => {
     pool.connect((err, client, done) => {
       client.query('BEGIN', (err) => {
         if (err) {
-          handleResponse.shouldAbort(err, client, done); 
+          handleResponse.shouldAbort(err, client, done);
           handleResponse.handleError(res, err, 'Server Error: Error in connecting to database.');
         } else {
           client.query('SELECT * FROM COMPANY where domain = $1', [req.body.domain], function (err, existingDomain) {
@@ -560,7 +560,7 @@ sendEmail = (req, res, next) => {
   // console.log("Inside send mail " + req.body);
   const mailOptions = {
     to: req.body.adminEmail,
-    from: 'noreply@krowsoftware.com',
+    from: 'ruchika.mittal@athenalogics.com',
     subject: "Confirmation of "+req.body.orgName+" on krow timesheet app",
     html : html
   };
@@ -603,7 +603,7 @@ sendEmail = (req, res, next) => {
             }
             done();
             handleResponse.sendSuccess(res,'Company searched successfully',{companies: companies.rows});
-          
+
         }
       });
     })
@@ -654,7 +654,7 @@ exports.findCompanyByCriteria = (req, res) => {
             handleResponse.sendSuccess(res,'Companies searched successfully',{companies: companies.rows,count:searchCount});
         }
       });
-      
+
     })
 };
 
@@ -666,7 +666,7 @@ exports.getCompany = (req, res) => {
         handleResponse.responseToPage(res,'pages/org-listing',{compnies: [], totalCount:0,activeCount:0, archivedCount:0,user:req.session.passport.user, error:err},"error"," Error in finding company setting");
         /*handleResponse.handleError(res, err, 'Server Error: error in finding company setting');*/
       }else{
-       
+
         companyDefaultTimezone=result.timezone;
         // console.log('companyDefaultTimezone');
         // console.log(companyDefaultTimezone);
@@ -698,7 +698,7 @@ exports.getCompany = (req, res) => {
             }
           });
         })
-      } 
+      }
     });
 };
 
@@ -796,13 +796,13 @@ exports.updateCompany = (req, res) => {
     res.redirect('/domain');
   }
 
-}; 
+};
 
 exports.postActivate = (req,res) =>{
   // console.log('Archived object and its id is-------------' + req.body.id+' '+req.body.object);
   pool.connect((err, client, done) => {
     client.query('UPDATE '+req.body.object+' SET archived = $1 WHERE id=$2',[false, req.body.id], function(err, unarchivedObject) {
-        if (err) { 
+        if (err) {
           console.error(err);
           handleResponse.shouldAbort(err, client, done);
           handleResponse.handleError(res, err, 'Server Error: Error in activating object.');
@@ -814,5 +814,5 @@ exports.postActivate = (req,res) =>{
         }
       })
     });
-        
+
 }
