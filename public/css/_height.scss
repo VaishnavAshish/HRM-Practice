@@ -1,0 +1,8 @@
+@each $size in $minheights{
+  .min-h-#{$size} {
+    min-height: #{$size}px;
+  }
+}
+.min-h-full-vh{
+  min-height: 100vh;  
+}

@@ -1,0 +1,59 @@
+<script>
+function updateUser(userId){
+		clearError("#email");
+		console.log('user id is '+userId);
+		let userData={};
+		userData.id=userId;
+		userData.email=$("#email").text().trim();
+		userData.first_name=$("#first_name").val();
+		userData.last_name=$("#last_name").val();
+		userData.phone=$("#phone").val();
+		userData.mobile=$("#mobile").val();
+		userData.user_role=$("#userRole").val();
+		/*userData.profile_role=$("#profile_role").val();*/
+		/*userData.team=$("#team").val();
+*/
+		if(userData.email==""||userData.email==null||userData.email==undefined){
+			addError("#email","Please enter user email id");
+		}else{
+			clearError("#email");
+			showLoader('#globalLoader');
+			$.ajax({
+		      type: 'POST',
+		      url : '/updateResource',
+		      contentType: 'application/json',
+		      dataType: 'json',
+		      data:JSON.stringify(userData),
+		       success : function(response){
+					   console.log(response);
+					   setTimeout(() => {
+						   hideLoader('#globalLoader');
+						   showGlobalToast('#globalToast', 'success', 'Profile updated successfully', 4000);
+					   }, 2000);
+
+		        },
+		       error: function(response){
+
+		            console.log('error is : '+response);
+	                hideLoader('#globalLoader');
+	                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+		            //showGlobalToast('#globalToast', 'error', 'error in validating domain', 4000);
+		        }
+		    });
+
+		}
+	}
+function uploadUserPicture(input){
+	var url = input.value;
+    var ext = url.substring(url.lastIndexOf('.') + 1).toLowerCase();
+    if (input.files && input.files[0]&& (ext == "gif" || ext == "png" || ext == "jpeg" || ext == "jpg")) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+        	console.log(e.target.result);
+        	$('#userimg').attr('src', e.target.result);
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+</script>

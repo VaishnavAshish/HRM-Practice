@@ -1,0 +1,221 @@
+<!-- modal add new project resource start-->        
+        <div id="modalAddNewProResource" modal-div>
+            <section role="dialog" tabindex="-1" class="slds-modal">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="closeModal('#modalAddNewProResource');">
+                            <span class="slds-button__icon">
+                                <i class="fa fa-times text-size-21"></i>
+                            </span>
+                        </button>
+                        <h2  class="slds-text-heading_medium slds-hyphenate">Add New Resource</h2>
+                    </header>
+                    <div class="slds-modal__content">
+                        <form id="add-new-project-user-form">
+                            <div class="slds-theme_shade slds-p-around_medium">
+                                <div class="slds-form-element slds-m-bottom_medium">
+                                    <label class="slds-form-element__label">
+                                        Select Resource
+                                        <abbr class="slds-required" title="required">*</abbr>
+                                    </label>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-select_container">
+                                            <select class="slds-select" required="" getFormData name="project_user" id="project_user" onchange="updateAssignRole(this);setBillCostRate(this, 'resource')">
+                                                <% if(userList.length > 0) { %>
+                                                    <option value=""> Please Select</option>
+                                                    <% userList.forEach(function(userData) { %>
+                                                        <option role="<%= userData.role %>" value="<%= userData.id %>"><%= userData.email %></option>
+                                                    <% }) %>
+                                                <% } else { %>
+                                                    <option value=""> </option>
+                                                <% } %>
+                                                    
+                                            </select>
+                                        </div>
+                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+    
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-m-bottom_medium">
+                                    <label class="slds-form-element__label">
+                                        Select Resource Role
+                                        <abbr class="slds-required" title="required">*</abbr>
+                                    </label>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-select_container">
+                                            <select class="slds-select" required="" getFormData name="user_role" id="project_user_role" onchange="checkProjectAssignment(this)">
+                                                <option value=""></option>
+                                                <% if(userRoleList.length>0) { %>
+                                                    <% userRoleList.forEach(function(userRole) { %>
+                                                        <option value="<%= userRole %>"><%= userRole %></option>
+                                                    <% }); %>  
+                                                <% } %>
+                                            </select>
+                                        </div>
+                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+    
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-grid slds-wrap slds-gutters">
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                        <div class="slds-form-element slds-m-bottom_medium">
+                                            <label class="slds-form-element__label" for="res_bill_rate" >Billable Rate</label>
+                                            <div class="slds-form-element__control slds-input-has-fixed-addon">
+                                                <span class="slds-form-element__addon lmr-0" id="">USD</span>
+                                                <input type="text" bill-rate id="res_bill_rate" getFormData name="res_bill_rate" class="slds-input" placeholder="0.00">
+    
+                                                <span class="slds-form-element__addon slds-no-flex" id="">/hr</span>
+                                            </div>
+                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                        <div class="slds-form-element slds-m-bottom_medium">
+                                            <label class="slds-form-element__label" for="res_cost_rate">Cost Rate</label>
+                                            <div class="slds-form-element__control slds-input-has-fixed-addon">
+                                                <span class="slds-form-element__addon lmr-0" id="">USD</span>
+                                                <input type="text" cost-rate id="res_cost_rate" getFormData name="res_cost_rate" class="slds-input" placeholder="0.00">
+    
+                                                <span class="slds-form-element__addon slds-no-flex" id="">/hr</span>
+                                            </div>
+                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- <div class="slds-p-around_medium">
+                                <div class="slds-grid slds-wrap slds-gutters">
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                        <div class="text-dull text-uppercase slds-m-bottom_small slds-p-bottom_xx-small line-bottom">
+                                            Timesheet Permissions
+                                        </div>
+                                        <div class="slds-form-element slds-m-bottom_small">
+                                            <div class="slds-form-element__control">
+                                                <span class="slds-checkbox">
+                                                    <input type="checkbox" name="options" id="abc1" value="abc1">
+                                                    <label class="slds-checkbox__label" for="abc1">
+                                                        <span class="slds-checkbox_faux"></span>
+                                                        <span class="slds-form-element__label">Timesheet approval required</span>
+                                                    </label>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form-element slds-m-bottom_small">
+                                            <div class="slds-form-element__control">
+                                                <span class="slds-checkbox">
+                                                    <input type="checkbox" name="options" id="abc2" value="abc2">
+                                                    <label class="slds-checkbox__label" for="abc2">
+                                                        <span class="slds-checkbox_faux"></span>
+                                                        <span class="slds-form-element__label">Other</span>
+                                                    </label>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                        <div class="text-dull text-uppercase slds-m-bottom_small slds-p-bottom_xx-small line-bottom">
+                                            Project Permissions
+                                        </div>
+                                        <div class="slds-form-element slds-m-bottom_small">
+                                            <div class="slds-form-element__control">
+                                                <span class="slds-checkbox">
+                                                    <input type="checkbox" name="options" id="abc4" value="abc4">
+                                                    <label class="slds-checkbox__label" for="abc4">
+                                                        <span class="slds-checkbox_faux"></span>
+                                                        <span class="slds-form-element__label">Project Manager</span>
+                                                    </label>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form-element slds-m-bottom_small">
+                                            <div class="slds-form-element__control">
+                                                <span class="slds-checkbox">
+                                                    <input type="checkbox" name="options" id="abc5" value="abc5">
+                                                    <label class="slds-checkbox__label" for="abc5">
+                                                        <span class="slds-checkbox_faux"></span>
+                                                        <span class="slds-form-element__label">Project Timesheet approver</span>
+                                                    </label>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        
+                                        
+                                    </div>
+                                </div>
+                                <div class="slds-p-top_medium">
+                                    <div class="text-dull text-uppercase slds-m-bottom_small slds-p-bottom_xx-small line-bottom">
+                                        Edit Task Permissions
+                                    </div>
+                                    <div class="slds-grid slds-wrap slds-gutters">
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                            <div class="slds-form-element slds-m-bottom_small">
+                                                <div class="slds-form-element__control">
+                                                    <span class="slds-checkbox">
+                                                        <input type="checkbox" name="options" id="abc7" value="abc7" checked="">
+                                                        <label class="slds-checkbox__label" for="abc7">
+                                                            <span class="slds-checkbox_faux"></span>
+                                                            <span class="slds-form-element__label">Create</span>
+                                                        </label>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-m-bottom_small">
+                                                <div class="slds-form-element__control">
+                                                    <span class="slds-checkbox">
+                                                        <input type="checkbox" name="options" id="abc8" value="abc8" checked="">
+                                                        <label class="slds-checkbox__label" for="abc8">
+                                                            <span class="slds-checkbox_faux"></span>
+                                                            <span class="slds-form-element__label">Update</span>
+                                                        </label>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+    
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                            <div class="slds-form-element slds-m-bottom_small">
+                                                <div class="slds-form-element__control">
+                                                    <span class="slds-checkbox">
+                                                        <input type="checkbox" name="options" id="abc9" value="abc9" checked="">
+                                                        <label class="slds-checkbox__label" for="abc9">
+                                                            <span class="slds-checkbox_faux"></span>
+                                                            <span class="slds-form-element__label">Delete</span>
+                                                        </label>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-m-bottom_small">
+                                                <div class="slds-form-element__control">
+                                                    <span class="slds-checkbox">
+                                                        <input type="checkbox" name="options" id="abc10" value="abc10" checked="">
+                                                        <label class="slds-checkbox__label" for="abc10">
+                                                            <span class="slds-checkbox_faux"></span>
+                                                            <span class="slds-form-element__label">Comment</span>
+                                                        </label>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                            </div> -->
+                        </form>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" onclick="closeModal('#modalAddNewProResource');">Cancel</button>
+                        <button class="slds-button slds-button_brand" onclick="addNewUserToProject('<%= project.id %>', '#add-new-project-user-form', '#modalAddNewProResource', '<%= project.account_id %>');">Add</button>
+                        <!-- dummyAddItem('#modalAddNewProResource', 'Resource Added Successfully') -->
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop"></div>
+        </div>
+<!-- modal add new project resource end-->   

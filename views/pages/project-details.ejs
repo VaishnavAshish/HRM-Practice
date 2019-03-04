@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="en">
+
+<% include ../layouts/head %>
+
+<body class="kw">
+
+    <% include ../layouts/nav %>
+    <% include ../layouts/sideNav %>
+
+    <main class="main-body-space tpd-60 bpd-100">
+        <div>
+            <div class="slds-p-around_small">
+                <!-- breadcrumb start -->
+                <div class="slds-p-bottom_small">
+                    <div id="pageRecordNo" style="display:none;"><%= process.env.PAGE_RECORD_NO %></div>
+                    <div id="filterCriteria" style="display:none;" ></div>
+                    <div id="totalRecordCount" style="display:none;"></div>
+                    <div id="offset" style="display:none;">0</div>
+                    <nav role="navigation" aria-label="Breadcrumbs" >
+                        <ol class="slds-breadcrumb slds-list_horizontal slds-wrap">
+                            <li class="slds-breadcrumb__item "><a href="/projects-listing">Projects</a></li>
+                            <li class="slds-breadcrumb__item "><a href="javascript:void(0);"><%= project.name %></a></li>
+                        </ol>
+                    </nav>
+                </div>
+                <!-- breadcrumb end -->
+                <div class="">
+                    <div class="slds-tabs_default bg-none">
+                        <!-- header start end -->
+                        <div class="slds-card">
+                            <div class="slds-grid slds-wrap slds-p-horizontal_small slds-p-top_small">
+                                <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                    <div class="slds-grid">
+                                        <div class="slds-no-flex slds-p-right_x-small">
+                                            <span class="slds-icon_container slds-icon-standard-template">
+                                                <i class="fa fa-folder-open text-size-24 text-white slds-icon slds-icon_large"></i>
+                                            </span>
+                                        </div>
+                                        <div class="slds-has-flexi-truncate">
+                                            <div class="text-size-18 text-height-1">
+                                                <strong>
+                                                    <%= project.name %>
+                                                </strong>
+                                            </div>
+                                            <div class="max-w-300">
+                                                <div class="">
+                                                    <div class="slds-grid slds-p-vertical_xx-small text-size-11">
+                                                        <div class="slds-has-flexi-truncate">
+                                                            <span>
+                                                            <% if(project.status == "Not Started") { %>
+                                                                <i class="fa fa-ban text-dull"></i>
+                                                            <% } else if(project.status == "In Progress") { %>
+                                                                <i class="fa fa-spinner text-orange"></i>
+                                                            <% } else if(project.status == "At Risk") { %>
+                                                                <i class="fa fa-exclamation-circle text-red"></i>
+                                                            <% } else if(project.status == "Completed") { %>
+                                                                <i class="fa fa-check-circle text-green"></i>
+                                                            <% } %>
+                                                                <%= project.status %>
+                                                            </span>
+                                                        </div>
+                                                        <div class="slds-no-flex">
+                                                                <%= project.percent_completed %>%
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-progress-bar slds-progress-bar_small slds-progress-bar_circular">
+                                                        <span class="slds-progress-bar__value slds-progress-bar__value_success" style="width:<%= project.percent_completed %>%;">
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                    <div class="text-right sm-tpd-15">
+                                        <button class="slds-button slds-button_brand slds-align-top" onclick="updateProjectDetails('<%= project.id %>', '#edit-project');">
+                                                <!-- updateProjectDetails('<%= project.id %>', '#edit-project') -->
+                                            Save Changes
+                                        </button>
+                                        <!-- <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top" title="Export CSV">
+                                            <span class="slds-button__icon">
+                                                <i class=" fa fa-file-export text-blue" aria-hidden="true"></i>
+                                            </span>
+                                        </button> -->
+                                        <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteProject(\'<%= project.id %>\')');">
+                                                <!-- updateProjectDetails('<%= project.id %>', '#edit-project') -->
+                                            Delete
+                                        </button>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-p-top_x-small">
+                                <ul class="slds-tabs_default__nav radius-4 scroll-x-auto bpd-2 text-size-14">
+                                    <li data-navigation="settings" class="slds-tabs_default__item slds-is-active" onclick="openTab(this, 'project-settings')">
+                                        <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="-1">
+                                            Settings
+                                        </a>
+                                    </li>
+                                    <li data-navigation="tasks" class="slds-tabs_default__item" onclick="openTab(this, 'project-tasks')">
+                                        <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="0">
+                                            Tasks (<%= taskTotalCount %>)
+                                        </a>
+                                    </li>
+                                    <!-- <li class="slds-tabs_default__item" onclick="openTab(this, 'project-files')">
+                                        <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="-1">
+                                            Files (3)
+                                        </a>
+                                    </li>
+                                    <li class="slds-tabs_default__item" onclick="openTab(this, 'project-analytics')">
+                                        <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="-1">
+                                            Analytics
+                                        </a>
+                                    </li> -->
+                                </ul>
+                            </div>
+
+                        </div>
+                        <!-- header end -->
+                        <div>
+
+                            <!-- tasks tab start -->
+                            <div class="slds-tabs_default__content hide" target-tab="project-tasks">
+                                <div class=" slds-card ">
+                                    <!-- task header start -->
+                                    <div class="slds-p-around_small">
+                                        <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                            <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_5-of-12 slds-p-horizontal_small">
+                                                <div class="slds-grid">
+
+                                                    <!-- <div class="slds-p-right_medium sm-hide">
+                                                        <div class="slds-grid">
+                                                            <div class="slds-no-flex">
+                                                                <label class="slds-form-element__label slds-p-top_x-small" for="">
+                                                                    Sort :
+                                                                </label>
+                                                            </div>
+                                                            <div class="">
+                                                                <div class="slds-select_container">
+                                                                    <select class="slds-select">
+                                                                        <option value="">Recent</option>
+                                                                        <option>Other</option>
+                                                                        <option>Other</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div> -->
+                                                   <!--  <div class="slds-no-flex slds-p-right_small">
+                                                        <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top" title="filter">
+                                                            <span class="slds-button__icon">
+                                                                <i class=" fa fa-filter" aria-hidden="true"></i>
+                                                            </span>
+                                                        </button>
+                                                    </div> -->
+                                                    <div class="sm-slds-grow">
+                                                        <div class="slds-form-element">
+                                                            <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
+                                                                <input type="text" class="slds-input" placeholder="Search task by name" id="searchTaskName" searchFunc="findTaskByName()" onkeypress="handle(event,this);">
+                                                                <div class="slds-input__icon-group slds-input__icon-group_right">
+                                                                    <button class="slds-input__icon slds-input__icon_right slds-button slds-button_icon" title="Clear" onclick="clearSearchBox(this);findTaskByName();">
+                                                                    <i class="fa fa-times-circle"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-no-flex slds-p-left_small">
+                                                        <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top" title="Search" onclick="findTaskByName();">
+                                                        <span class="slds-button__icon">
+                                                            <i class=" fa fa-search" aria-hidden="true"></i>
+                                                        </span>
+                                                        </button>
+                                                    </div>
+                                                    <!-- <div class="sm-slds-grow">
+                                                        <div class="slds-form-element">
+                                                            <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_left-right slds-input-has-icon_group-right">
+                                                                <span class=" slds-input__icon_left slds-input__icon">
+                                                                    <i class="fa fa-search"></i>
+                                                                </span>
+                                                                <input type="text" class="slds-input" placeholder="Search">
+                                                                <div class="slds-input__icon-group slds-input__icon-group_right">
+                                                                    <button class="slds-input__icon slds-input__icon_right slds-button slds-button_icon" title="Clear">
+                                                                        <i class="fa fa-times-circle"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div> -->
+
+                                                </div>
+                                            </div>
+                                            <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_7-of-12 slds-p-horizontal_small">
+                                                <div class="text-right sm-tpd-15">
+                                                    <button class="slds-button slds-button_brand slds-align-top" onclick="openModal('#modalAddNewTask', true)">
+                                                        <i class="fa fa-plus"></i>
+                                                        <span class="">Add Task</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- task header end -->
+                                    <div class="slds-p-horizontal_small slds-p-bottom_small" id="taskCardView">
+                                        <% if(tasks.length > 0) { %>
+                                            <% tasks.forEach(function(task) {%>
+                                                <!-- row start -->
+                                                    <div class=" slds-m-bottom_medium slds-p-around_small line-around">
+                                                        <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                                            <div class="slds-size_1-of-1 slds-medium-size_1-of-1  slds-large-size_5-of-12 slds-p-horizontal_small">
+                                                                <div class="text-size-11 text-dull text-uppercase slds-p-bottom_xx-small">
+                                                                    <%= task.record_id %>
+                                                                    <span class="slds-badge slds-m-left_small">
+                                                                        <% if(task.billable) { %>
+                                                                            Billable
+                                                                        <% } else { %>
+                                                                            Non Billable
+                                                                        <% } %>
+                                                                    </span>
+                                                                </div>
+                                                                <div class="sm-bpd-15">
+                                                                    <a href="/task-details?taskId=<%= task.id %>#details">
+                                                                        <%= task.name %>
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="slds-size_1-of-1 slds-medium-size_1-of-1  slds-large-size_7-of-12 slds-p-horizontal_small">
+                                                                <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                                                    <div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-p-horizontal_small">
+                                                                        <div class="slds-grid slds-grid_pull-padded">
+                                                                            <div class="slds-size_1-of-2 slds-p-horizontal_small">
+                                                                                <div class="slds-truncate text-dull slds-p-bottom_xx-small text-size-11 text-uppercase">
+                                                                                    Start Date
+                                                                                </div>
+                                                                                <div>
+
+                                                                                    <%= task.startDateFormatted %>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="slds-size_1-of-2 slds-p-horizontal_small">
+                                                                                <div class="slds-truncate text-dull slds-p-bottom_xx-small text-size-11 text-uppercase">
+                                                                                    End Date
+                                                                                </div>
+                                                                                <div>
+                                                                                    <%= task.endDateFormatted %>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="slds-size_1-of-1 slds-medium-size_3-of-12 slds-p-horizontal_small sm-tpd-15">
+                                                                        <div class="slds-truncate text-dull slds-p-bottom_xx-small text-size-11 text-uppercase">
+                                                                            Status
+                                                                        </div>
+                                                                        <div>
+                                                                            <% if(task.status == 'Not Started') {%>
+                                                                                <i class="fa fa-ban text-dull"></i>
+                                                                            <% } else if(task.status == 'In Progress') {%>
+                                                                                <i class="fa fa-spinner text-orange"></i>
+                                                                            <% } else if(task.status == 'At Risk') {%>
+                                                                                <i class="fa fa-exclamation-circle text-red"></i>
+                                                                            <% } else if(task.status == 'Completed') {%>
+                                                                                <i class="fa fa-check-circle text-green"></i>
+                                                                            <% } %>
+                                                                            <%= task.status %>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="slds-size_1-of-1 slds-medium-size_3-of-12 slds-p-horizontal_small sm-tpd-15">
+                                                                        <div class="slds-grid">
+                                                                            <div class="slds-has-flexi-truncate">
+                                                                                <div class="slds-truncate text-dull slds-p-bottom_xx-small text-size-11 text-uppercase">
+Assign
+                                                                                </div>
+                                                                                <div>
+                                                                                    <span class="slds-avatar slds-avatar_small slds-avatar_circle cursor-pointer">
+                                                                                        <img alt="Person name" src="/getUserPicture/<%= task.user_id %>" title="<%= task.user_email %>(<%= task.user_role %>)">
+                                                                                    </span>
+                                                                                </div>
+
+                                                                            </div>
+                                                                            <div class="slds-col--bump-left slds-p-left_x-small">
+                                                                                <a href="/task-details?taskId=<%= task.id %>" class="slds-button slds-button_icon" title="Edit">
+                                                                                    <i class="fa fa-edit text-blue fs-lg text-size-18"></i>
+                                                                                </a>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                <!-- row end -->
+                                             <% }); %>
+                                        <% } %>
+
+                                    </div>
+                                    <div class="slds-text-align_center slds-p-vertical_medium">
+                                        <button class="slds-button" loadItemId="loadMoreBtn" onclick="loadMoreTask()">&nbsp;</button>
+                                    </div>
+                                    <% if(tasks.length <= 0) { %>
+                                        <div class="slds-p-around_small text-center" title="" id="noTaskFound" >
+                                            No task found.
+                                        </div>
+                                    <% }  else { %>
+                                        <div class="slds-p-around_small text-center slds-hide" title="" id="noTaskFound" >
+                                            No task found.
+                                        </div>
+                                    <% } %>
+                                </div>
+                            </div>
+                            <!-- tasks tab end -->
+
+                            <!-- settings tab start -->
+                            <div class="slds-tabs_default__content" target-tab="project-settings">
+                                <div class=" slds-card slds-p-around_large sm-pd-10">
+                                    <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                        <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_6-of-12 slds-p-horizontal_small">
+                                            <div class="slds-p-bottom_x-small line-bottom">
+                                                <div class="text-uppercase ">
+                                                    Settings
+                                                </div>
+                                            </div>
+                                            <form id="edit-project">
+                                                <div class="slds-p-top_large">
+                                                    <div>
+                                                        <div class="slds-form-element slds-m-bottom_medium">
+                                                            <label class="slds-form-element__label">
+                                                                Project Title
+                                                                <abbr class="slds-required" title="required">*</abbr>
+                                                            </label>
+                                                            <div class="slds-form-element__control">
+                                                                <input type="text" id="project_title" name="project_title" class="slds-input" getFormData='' placeholder="" value="<%= project.name %>" required="">
+                                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-form-element slds-m-bottom_medium">
+                                                            <label class="slds-form-element__label" for="">Note</label>
+                                                            <div class="slds-form-element__control">
+                                                                <textarea id="" class="slds-textarea" getFormData='' name="project_desc" placeholder=""><%= project.description %></textarea>
+                                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-form-element slds-m-bottom_medium">
+                                                            <label class="slds-form-element__label">
+                                                                Clients/Accounts
+                                                            </label>
+                                                            <div class="slds-form-element__control">
+                                                                <div class="slds-select_container">
+                                                                    <select class="slds-select" getFormData='' name="account" id="account">
+                                                                        <% if(accounts.length > 0) { %>
+                                                                            <option value=""> </option>
+                                                                            <% accounts.forEach(function(account) { %>
+                                                                                <option value="<%= account.id %>"><%= account.name %></option>
+                                                                            <% }); %>
+                                                                        <% } else { %>
+                                                                            <option value=""> </option>
+                                                                        <% } %>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-grid slds-wrap slds-gutters">
+                                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                                    <label class="slds-form-element__label">
+                                                                        Start Date
+                                                                    </label>
+                                                                    <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
+                                                                        <span class="slds-input__icon slds-input__icon_right">
+                                                                            <i class="fa fa-calendar"></i>
+                                                                        </span>
+                                                                        <input type="date" id="pr_start_date"  class="slds-input open-date-pik" getFormData='' name="start_date" value="<%= project.startDateFormatted %>" />
+                                                                    </div>
+                                                                    <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                                    <label class="slds-form-element__label">
+                                                                        End Date
+                                                                    </label>
+                                                                    <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
+                                                                        <span class="slds-input__icon slds-input__icon_right">
+                                                                            <i class="fa fa-calendar"></i>
+                                                                        </span>
+                                                                        <input type="date"  class="slds-input open-date-pik" getFormData='' name="end_date" value="<%= project.endDateFormatted %>" />
+                                                                    </div>
+                                                                    <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="slds-grid slds-wrap slds-gutters">
+
+                                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                                    <label class="slds-form-element__label">
+                                                                        Status
+                                                                    </label>
+                                                                    <div class="slds-form-element__control">
+                                                                        <div class="slds-select_container">
+                                                                            <select class="slds-select" getFormData='' name="project_status" id="project_status">
+                                                                                <option value="Not Started" selected="selected">Not Started</option>
+                                                                                <option value="In Progress">In Progress</option>
+                                                                                <option value="At Risk">At Risk</option>
+                                                                                <option value="Completed">Completed</option>
+                                                                            </select>
+                                                                        </div>
+                                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+                                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                                    <div class="slds-form-element__control">
+                                                                        <label class="slds-form-element__label">
+                                                                            Complete Percetage
+                                                                        </label>
+                                                                        <div class="slds-form-element__control">
+                                                                            <input type="text" name="project_complete_per" id="project_complete_per" maxlength="3" class="slds-input" getFormData='' placeholder="" value="<%= project.percent_completed %>" >
+                                                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-grid slds-wrap slds-gutters">
+                                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                                    <label class="slds-form-element__label">
+                                                                        Project Type
+                                                                    </label>
+                                                                    <div class="slds-form-element__control">
+                                                                        <div class="slds-select_container">
+                                                                            <select class="slds-select" getFormData='' name="project_type" id="project_type"  onchange="isProjectFixedFee(this);">
+                                                                                <option value="time_and_material">Time and Material</option>
+                                                                                <option value="milestone">Milestone</option>
+                                                                                <option value="fixed_fee">Fixed Fee</option>
+                                                                            </select>
+                                                                        </div>
+                                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+                                                                    <div class="slds-form-element slds-m-bottom_medium">
+                                                                    <label class="slds-form-element__label">Project Cost</label>
+                                                                    <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
+                                                                        <% if(project.type == "fixed_fee") { %>
+                                                                            <input type="text" class="slds-input" name="project_cost" getFormData id="project-cost" project-cost value="<%= project.project_cost %>">
+                                                                        <% } else { %>
+                                                                            <input type="text" class="slds-input" name="project_cost" getFormData id="project-cost" project-cost disabled="" value="<%= project.project_cost %>">
+                                                                        <% } %>
+                                                                    </div>
+                                                                    <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+                                                                <div class="slds-grid slds-grid_vertical-align-center slds-m-top_large">
+                                                                    <div class="slds-col--bump-left slds-p-horizontal_medium">
+                                                                        <div class="slds-form-element">
+                                                                            <label class="slds-checkbox_toggle slds-grid">
+                                                                                <% if(project.billable == false) { %>
+                                                                                    <input type="checkbox" name="billable" getFormData='' id="bill1" value="bill1">
+                                                                                <% } else { %>
+                                                                                    <input type="checkbox" getFormData='' name="billable" checked id="bill1" value="bill1">
+                                                                                <% } %>
+                                                                                <!-- <input type="checkbox" `+checkedval+` onchange="setModified(this);"> -->
+                                                                                <span id="checkbox-toggle-3" class="slds-checkbox_faux_container">
+                                                                                    <span class="slds-checkbox_faux"></span>
+                                                                                </span>
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="slds-has-flexi-truncate">
+                                                                        <span>
+                                                                            <% if (project.billable) { %>
+                                                                                Billable
+                                                                            <% } else { %>
+                                                                                Non Billable
+                                                                            <% } %>
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                                <!-- <div class="slds-form-element slds-m-bottom_medium">
+                                                                    <div class="slds-form-element__control">
+                                                                        <span class="slds-checkbox">
+                                                                            <label class="slds-checkbox__label" for="bill1">
+                                                                                <span class="slds-checkbox_faux"></span>
+                                                                                <span class="slds-form-element__label">Billable</span>
+                                                                            </label>
+                                                                        </span>
+                                                                    </div>
+                                                                </div> -->
+                                                            </div>
+                                                            <!-- <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                                    <div class="slds-form-element__control">
+                                                                        <span class="slds-checkbox">
+                                                                            <% if(project.global_project == false) { %>
+                                                                                <input type="checkbox" getFormData='' name="global_project" id="glob1" value="glob1">
+                                                                            <% } else { %>
+                                                                                <input type="checkbox" getFormData='' checked name="global_project" id="glob1" value="glob1">
+                                                                            <% } %>
+                                                                            <label class="slds-checkbox__label" for="glob1">
+                                                                                <span class="slds-checkbox_faux"></span>
+                                                                                <span class="slds-form-element__label">Global Project</span>
+                                                                            </label>
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div> -->
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_6-of-12 slds-p-horizontal_small">
+                                            <div class="slds-p-bottom_x-small line-bottom">
+                                                <div class="slds-grid slds-grid_vertical-align-center">
+                                                    <div class="slds-has-flexi-truncate">
+                                                        <div class="text-uppercase ">
+                                                            Resources <span>(<%= resUsers.length %>)</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-no-flex slds-p-left_medium">
+                                                        <button class="slds-button slds-button_neutral slds-align-top" onclick="openModal('#modalAddNewProResource');">
+                                                            <i class="fa fa-plus"></i>
+                                                            <span class="sm-hide">Add New</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="">
+                                                <% if(resUsers.length > 0) { %>
+                                                <ul class="first-li-line-top-0">
+                                                    <% resUsers.forEach(function(resUser) { %>
+                                                    <li class="line-top slds-p-vertical_small">
+                                                        <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                                            <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_4-of-12 slds-p-horizontal_small">
+                                                                <div class="slds-grid">
+                                                                    <div class="slds-no-flex slds-p-right_x-small">
+                                                                        <span class="slds-avatar slds-avatar_circle cursor-pointer">
+                                                                            <img alt="Person name" src="/getUserPicture/<%= resUser.id %>" title="<%= resUser.email %>">
+                                                                        </span>
+                                                                    </div>
+                                                                    <div class="slds-has-flexi-truncate">
+                                                                        <div>
+                                                                                    <%= resUser.first_name %> <%= resUser.last_name %><BR>
+                                                                        </div>
+                                                                        <div class="slds-truncate text-size-11 text-dull">
+                                                                          <a href="/resource-details?userid=<%= resUser.id %>">
+                                                                            <%= resUser.email %>
+                                                                          </a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_8-of-12 slds-p-horizontal_small">
+
+                                                                <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                                                    <div class="slds-size_5-of-12 slds-p-horizontal_small">
+                                                                        <div class="slds-truncate text-size-11 text-dull">
+                                                                            Role
+                                                                        </div>
+                                                                        <div class="max-w-200">
+                                                                            <%= resUser.role %>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="slds-size_3-of-12 slds-p-horizontal_small">
+                                                                        <div class="slds-truncate text-size-11 text-dull">
+                                                                            Cost Rate
+                                                                        </div>
+                                                                        <div>
+                                                                            USD <%= resUser.cost_rate %>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="slds-size_4-of-12 slds-p-horizontal_small">
+                                                                        <div class="slds-grid">
+                                                                            <div class="slds-has-flexi-truncate">
+                                                                                <div class="slds-truncate text-size-11 text-dull">
+                                                                                    Billing Rate
+                                                                                </div>
+                                                                                <div>
+                                                                                    USD <%= resUser.bill_rate %>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="slds-no-flex slds-p-left_small">
+                                                                                <div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">
+                                                                                    <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" title="Show More">
+                                                                                        <span class="slds-button__icon">
+                                                                                            <i class=" fa fa-caret-down" aria-hidden="true"></i>
+                                                                                        </span>
+                                                                                        <span class="slds-assistive-text">Show More</span>
+                                                                                    </button>
+                                                                                    <div class="slds-dropdown slds-dropdown_right slds-dropdown_actions">
+                                                                                        <ul class="slds-dropdown__list" role="menu">
+                                                                                            <!-- <li class="slds-dropdown__item" role="presentation">
+                                                                                                <a href="javascript:void(0);" role="menuitem" tabindex="0">
+                                                                                                    <span class="slds-truncate" title="">
+                                                                                                        Edit
+                                                                                                    </span>
+                                                                                                </a>
+                                                                                            </li> -->
+
+                                                                                            <li class="slds-dropdown__item" role="presentation">
+                                                                                                <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteProjectRes(\'<%= resUser.id %>\', \'<%= project.id %>\', \'<%= resUser.role %>\', \'<%= resUser.assinment_id %>\')');">
+                                                                                                    <span class="slds-truncate text-red" title="">
+                                                                                                        Remove
+                                                                                                    </span>
+                                                                                                </a>
+                                                                                            </li>
+                                                                                        </ul>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </li>
+                                                    <% }) %>
+
+                                                    <!-- <li class="line-top slds-p-around_small">
+                                                        <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                                            <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_5-of-12 slds-p-horizontal_small">
+                                                                <div class="slds-grid">
+                                                                    <div class="slds-no-flex slds-p-right_x-small">
+                                                                        <span class="slds-avatar slds-avatar_circle cursor-pointer">
+                                                                            <img alt="Person name" src="img/avatar1.jpg" title="User avatar">
+                                                                        </span>
+                                                                    </div>
+                                                                    <div class="slds-has-flexi-truncate">
+                                                                        <div>
+                                                                            User Name
+                                                                        </div>
+                                                                        <div class="slds-truncate text-size-11 text-dull">
+                                                                            user@email.com
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_7-of-12 slds-p-horizontal_small">
+                                                                <div class="slds-grid slds-gutters">
+                                                                    <div class="slds-col">
+                                                                        <div class="slds-truncate text-size-11 text-dull">
+                                                                            Role
+                                                                        </div>
+                                                                        <div class="max-w-200">
+                                                                            Developer
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="slds-col">
+                                                                        <div class="slds-truncate text-size-11 text-dull">
+                                                                            Cost Rate
+                                                                        </div>
+                                                                        <div>
+                                                                            USD 5
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="slds-col">
+                                                                        <div class="slds-truncate text-size-11 text-dull">
+                                                                            Billing Rate
+                                                                        </div>
+                                                                        <div>
+                                                                            USD 10
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="slds-no-flex">
+                                                                        <div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">
+                                                                            <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" title="Show More">
+                                                                                <span class="slds-button__icon">
+                                                                                    <i class=" fa fa-caret-down" aria-hidden="true"></i>
+                                                                                </span>
+                                                                                <span class="slds-assistive-text">Show More</span>
+                                                                            </button>
+                                                                            <div class="slds-dropdown slds-dropdown_right slds-dropdown_actions">
+                                                                                <ul class="slds-dropdown__list" role="menu">
+                                                                                    <li class="slds-dropdown__item" role="presentation">
+                                                                                        <a href="javascript:void(0);" role="menuitem" tabindex="0">
+                                                                                            <span class="slds-truncate" title="">
+                                                                                                Edit
+                                                                                            </span>
+                                                                                        </a>
+                                                                                    </li>
+
+                                                                                    <li class="slds-dropdown__item" role="presentation">
+                                                                                        <a href="javascript:void(0);" role="menuitem" tabindex="-1">
+                                                                                            <span class="slds-truncate text-red" title="">
+                                                                                                Remove
+                                                                                            </span>
+                                                                                        </a>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </li>
+
+                                                    <li class="line-top slds-p-around_small">
+                                                        <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                                            <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_5-of-12 slds-p-horizontal_small">
+                                                                <div class="slds-grid">
+                                                                    <div class="slds-no-flex slds-p-right_x-small">
+                                                                        <span class="slds-avatar slds-avatar_circle cursor-pointer">
+                                                                            <img alt="Person name" src="img/avatar1.jpg" title="User avatar">
+                                                                        </span>
+                                                                    </div>
+                                                                    <div class="slds-has-flexi-truncate">
+                                                                        <div>
+                                                                            User Name
+                                                                        </div>
+                                                                        <div class="slds-truncate text-size-11 text-dull">
+                                                                            user@email.com
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_7-of-12 slds-p-horizontal_small">
+                                                                <div class="slds-grid slds-gutters">
+                                                                    <div class="slds-col">
+                                                                        <div class="slds-truncate text-size-11 text-dull">
+                                                                            Role
+                                                                        </div>
+                                                                        <div class="max-w-200">
+                                                                            Developer
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="slds-col">
+                                                                        <div class="slds-truncate text-size-11 text-dull">
+                                                                            Cost Rate
+                                                                        </div>
+                                                                        <div>
+                                                                            USD 5
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="slds-col">
+                                                                        <div class="slds-truncate text-size-11 text-dull">
+                                                                            Billing Rate
+                                                                        </div>
+                                                                        <div>
+                                                                            USD 10
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="slds-no-flex">
+                                                                        <div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">
+                                                                            <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" title="Show More">
+                                                                                <span class="slds-button__icon">
+                                                                                    <i class=" fa fa-caret-down" aria-hidden="true"></i>
+                                                                                </span>
+                                                                                <span class="slds-assistive-text">Show More</span>
+                                                                            </button>
+                                                                            <div class="slds-dropdown slds-dropdown_right slds-dropdown_actions">
+                                                                                <ul class="slds-dropdown__list" role="menu">
+                                                                                    <li class="slds-dropdown__item" role="presentation">
+                                                                                        <a href="javascript:void(0);" role="menuitem" tabindex="0">
+                                                                                            <span class="slds-truncate" title="">
+                                                                                                Edit
+                                                                                            </span>
+                                                                                        </a>
+                                                                                    </li>
+
+                                                                                    <li class="slds-dropdown__item" role="presentation">
+                                                                                        <a href="javascript:void(0);" role="menuitem" tabindex="-1">
+                                                                                            <span class="slds-truncate text-red" title="">
+                                                                                                Remove
+                                                                                            </span>
+                                                                                        </a>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </li> -->
+                                                </ul>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- settings tab end -->
+                        </div>
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% include ../modals/modal-add-new-task %>
+        <% include ../modals/modal-add-new-project %>
+        <% include ../modals/modal-add-new-project-resource %>
+        <% include ../layouts/footer %>
+    </main>
+
+    <% include ../layouts/scripts %>
+    <% include ../layouts/project-detail-script %>
+    <% include ../layouts/task-script %>
+    <% include ../layouts/task-listing-script %>
+
+    <% include ../layouts/common-project-script %>
+
+    <script>
+        $(document).ready(function(){
+            /* $('#taskDescription').summernote({
+                placeholder: 'Comment',
+                height: 100,
+                toolbar: [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['font', ['strikethrough', 'superscript', 'subscript']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    //['insert', ['picture', 'link', 'video', 'table', 'hr']],
+                ]
+              }); */
+        });
+    </script>
+
+</body>
+
+</html>

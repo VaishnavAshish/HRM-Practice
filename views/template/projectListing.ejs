@@ -1,0 +1,69 @@
+<% data.forEach(function(key, val) { %>
+<tr class="">
+    <th scope="row" tabindex="0">
+        <div class="slds-truncate" title="">
+            <a href="javascript:void(0);" tabindex="-1">
+                <% data %>
+                <span>
+                    <i class="fa fa-paperclip text-dull"></i>
+                </span>
+            </a>
+        </div>
+    </th>
+    <td role="gridcell">
+        <div class="slds-truncate" title="">
+            06/6/2018
+        </div>
+    </td>
+    <td role="gridcell">
+        <div class="slds-truncate" title="">
+                <% data %>
+        </div>
+    </td>
+    <td role="gridcell">
+        <div class="slds-truncate" title="">
+            <i class="fa fa-edit text-blue"></i>
+            Started
+        </div>
+
+    </td>
+    <td role="gridcell">
+        <div class="slds-truncate" title="">
+            <span class="slds-p-bottom_xx-small view-inline">0%</span>
+        </div>
+    </td>
+
+    <td role="gridcell">
+        <div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">
+            <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" title="Show More">
+                <span class="slds-button__icon">
+                    <i class=" fa fa-caret-down" aria-hidden="true"></i>
+                </span>
+                <span class="slds-assistive-text">Show More</span>
+            </button>
+            <div class="slds-dropdown slds-dropdown_right slds-dropdown_actions">
+                <ul class="slds-dropdown__list" role="menu">
+                    <li class="slds-dropdown__item" role="presentation">
+                        <a href="javascript:void(0);" role="menuitem" tabindex="0">
+                            <span class="slds-truncate" title="">
+                                <i class="fa fa-eye"></i> &nbsp;
+                                View Details
+                            </span>
+                        </a>
+                    </li>
+
+                    <li class="slds-has-divider_top-space" role="separator"></li>
+                    <li class="slds-dropdown__item" role="presentation">
+                        <a href="javascript:void(0);" role="menuitem" tabindex="-1">
+                            <span class="slds-truncate sf-text-red" title="">
+                                <i class="fa fa-trash text-red"></i> &nbsp;
+                                Archive
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </td>
+</tr>
+<% } %>

@@ -1,0 +1,298 @@
+/* ----------------------theme start--------------------- */
+    @import 'theme';
+/* ----------------------theme end--------------------- */
+
+.kw:not(html), .kw body{
+	overflow-x:hidden;
+	background: #eee;
+}
+
+.scroll-hide{
+    overflow: hidden;
+}
+/* -----------date picker style start----------------- */
+	@import 'date-picker';
+/* -----------date picker style end----------------- */
+
+.kw{
+
+.x-working{
+	position: relative;
+}
+.x-working::before{
+	content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255,255,255,.7);
+    background-size:50px auto;
+}
+.x-working::after{
+	content: 'Working...';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    color: orange;
+    transform: translate(-50%, -50%);
+}
+
+.top-bar-space{
+	height: 3.5rem;
+}
+
+.side-nav-outer{
+    width: 200px;
+    height: 100%;
+    z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    box-shadow: 2px 0 3px rgba(0,0,0,.1);
+    transition: all ease .25s;
+    background:white;
+}
+
+.main-body-space, .top-bar-space{
+	padding-left:200px;
+}
+
+.side-nav-outer.collapse{
+    width: 50px;
+}
+.side-nav-outer.collapse .side-nav-text{ 
+    display:none;
+}
+
+.main-body-space.take-space, .top-bar-space.take-space{
+	padding-left:50px;
+}
+.main-body-space.shift-right, .top-bar-space.shift-right{
+    transform: translateX(200px);
+}
+.slds-backdrop.side-menu-backdrop{
+    z-index: 999;
+}
+.side-nav-outer.collapse:hover{
+	width: 200px;
+}
+.side-nav-outer.collapse:hover .side-nav-text{
+	display: block;
+}
+
+/* -----------global taost style----------------- */
+.toast {
+    display: block;
+    width:100%;
+    .slds-notify_toast{
+		min-width: auto;
+		display: flex;
+	}
+}
+.toast-top{
+    position: fixed;
+    z-index: 7001;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+}
+/* -----------invoice details item style----------------- */
+.invoice-row .invoice-col:nth-child(1),
+.invoice-row .invoice-col:nth-child(6){
+    width: 15%;
+}
+.invoice-row .invoice-col:nth-child(2){
+    width: 22%;
+}
+.invoice-row .invoice-col:nth-child(3),
+.invoice-row .invoice-col:nth-child(4),
+.invoice-row .invoice-col:nth-child(5){
+    width: 10%;
+}
+.invoice-row .invoice-col:nth-child(7){
+    width: 10%;
+}
+.invoice-row .invoice-col:nth-child(8){
+    width: 7%;
+}
+
+/* -----------notification panel style----------------- */
+.noti-panel-outer{
+    position: fixed; 
+    top:0; 
+    bottom:0; 
+    right:0; 
+    z-index: 11; 
+    padding-top: 60px;  
+    width: 500px; 
+    box-shadow: 0 0 10px rgba(0,0,0,.2);
+    transform: translateX(100%);
+    transition: all ease .3s;
+}
+.noti-panel-outer.active{
+    transform: translateX(0);
+}
+.noti-panel-body{
+    height: 100%; 
+    overflow-y: auto;
+    position: relative;
+}
+
+/* -----------tooltip style----------------- */
+.tip-nib{
+    width: 1rem;
+    height: 1rem;
+    position: fixed;
+    transform: rotate(45deg);
+    background-color: #16325c;
+    margin-left: -0.5rem;
+    margin-top: -0.5rem;
+    display: inline-block;
+}
+
+/* -----------kw lookup style----------------- */
+.kwlookup-li-infocus .slds-listbox__option{
+    background-color: #f3f2f2;
+    text-decoration: none;
+}
+
+/* -----------timesheet weekly input style----------------- */
+.tsheet-week-grid > .slds-col{
+    width: 14.28%;
+}
+.tsheet-week-time{
+    position: relative;
+    border-radius: 4px;
+    border: 1px solid $border;
+    background: $bgDull;
+    cursor: pointer;
+    text-align: center;
+    height: 32px;
+    line-height: 32px;
+    margin-right: 2px;
+    margin-left: 2px;
+}
+.tsheet-week-time::after{
+    content: "\f304";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    line-height: 32px;
+    padding: 0 5px;
+    font-family: "Font Awesome 5 Free";
+    font-variant: normal;
+    font-style: normal;
+    font-weight: 900;
+    color: $txtBlue;
+    font-size: 11px;
+    opacity: 0;
+    transition: all ease .25s;
+}
+.tsheet-week-time:hover{
+    border-color: $txtBlue;
+}
+.tsheet-week-time:hover::after {
+    opacity: 1;
+}
+
+.btn-is-on{
+	background: $bgDull;
+    box-shadow: inset 0 0 5px rgba(0,0,0,.2);
+    color: inherit;
+}
+
+
+/* -----------override style start--------------*/
+	@import 'override';
+/* ----------override style start--------------*/
+
+/* ----------------link style start-------------------*/
+    @import 'link';
+/* ----------------link style end------------------- */
+
+/* ----------------cursor style start----------------- */
+    @import 'cursor';
+/* ----------------cursor style end----------------- */
+
+/* ---------------scroll style start----------------- */
+    @import 'scroll';
+/* ---------------scroll style end----------------- */
+
+
+/* ---------------display style start--------------- */
+    @import 'display';
+/* ---------------display style end--------------- */
+
+
+/* -------------text style start------------------- */
+	@import 'typography';
+/* -------------text style end-------------------- */
+
+
+
+/* -----------background style start----------------- */
+    @import 'background';
+/* -----------background style end----------------- */
+
+
+
+/* -----------radius style start----------------- */
+    @import 'radius';
+/* -----------radius style end----------------- */
+
+
+/* -----------width style start----------------- */
+    @import 'width';
+/* -----------width style end----------------- */
+
+
+/* -----------min height style start----------------- */
+    @import 'height';
+/* -----------min height style end------------------- */
+
+
+/* -----------border style start----------------- */
+    @import 'border';
+/* -----------border style end----------------- */
+
+/* ---------------space style start----------- */
+    @import 'space';
+/* ---------------space style end------------- */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* -----------media query 1190px start----------------- */
+	@import 'media1190';
+/* -----------media query 1190px end----------------- */
+
+
+	
+
+/* -----------media query 767px start----------------- */
+	@import 'media767';
+/* -----------media query 767px end----------------- */
+
+}

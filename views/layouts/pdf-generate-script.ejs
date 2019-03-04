@@ -1,0 +1,11 @@
+<script>
+function generatePdfFromHtml(){
+	let invoiceDetails=<%- JSON.stringify(invoiceDetails) %>
+	let lineItems=<%- JSON.stringify(lineItems) %>
+	console.log(invoiceDetails);
+	let url=window.location.href;
+	let invId=url.substring(url.lastIndexOf('/')+1);
+    window.location.href='/generatePdfFromHtml/'+invId;
+
+}
+</script>

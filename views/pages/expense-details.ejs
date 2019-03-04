@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="en">
+
+<% include ../layouts/head %>
+
+<body class="kw">
+
+    <% include ../layouts/nav %>
+    <% include ../layouts/sideNav %>
+    <main class="main-body-space tpd-60 bpd-100">
+        <div>
+            <div class="slds-p-around_small">
+                <!-- breadcrumb start -->
+                <div class="slds-p-bottom_small">
+                    <nav role="navigation" aria-label="Breadcrumbs" >
+                        <ol class="slds-breadcrumb slds-list_horizontal slds-wrap">
+                            <li class="slds-breadcrumb__item "><a href="/expenses-listing/<%= expense.user_id %>#default">Expenses</a></li>
+                            <li class="slds-breadcrumb__item "><a href="javascript:void(0);"><%= expense.record_id%></a></li>
+                        </ol>
+                    </nav>
+                </div>
+                <!-- breadcrumb end -->
+                <div class="">
+                    <!-- header start end -->
+                    <div class="slds-card slds-m-bottom_medium">
+                        <div class="slds-grid slds-wrap slds-p-around_small">
+                            <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                <div class="slds-grid">
+                                    <div class="slds-no-flex slds-p-right_x-small">
+                                        <span class="slds-icon_container slds-icon-standard-reward">
+                                            <i class="fa fa-dollar-sign text-size-21 text-white slds-icon"></i>
+                                        </span>
+                                    </div>
+                                    <div class="slds-has-flexi-truncate">
+                                        <div class="text-size-18 text-height-1">
+                                            <strong>
+                                                <%= expense.record_id %>
+                                            </strong>
+                                        </div>
+                                            <div class="slds-text-body_small tpd-2">
+                                            Last Modify: <%= expense.modified_date %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                <div class="text-right sm-tpd-15">
+                                    <button class="slds-button slds-button_brand slds-align-top" onclick="updateExpense('<%= expense.id %>')">
+                                        Save Changes
+                                    </button>
+
+                                    <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteExpense(\'<%= expense.id %>\')')">
+                                        Delete
+                                    </button>
+
+
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <!-- header end -->
+
+
+
+                    <!-- expense details start -->
+
+                    <div class=" slds-card slds-p-around_large sm-pd-10">
+                        <div class="slds-grid slds-wrap slds-gutters">
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_8-of-12">
+                                <div class="">
+                                    <div class="slds-grid slds-wrap slds-gutters">
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                            <div class="slds-form-element slds-m-bottom_medium">
+                                                <label class="slds-form-element__label">
+                                                    Date
+                                                </label>
+                                                <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
+                                                    <span class="slds-input__icon slds-input__icon_right">
+                                                        <i class="fa fa-calendar"></i>
+                                                    </span>
+                                                    <input type="date" id="expense_date" class="slds-input open-date-pik" value="<%= expense.expense_date%>">
+                                                </div>
+                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                            <div class="slds-form-element slds-m-bottom_medium">
+                                                <label class="slds-form-element__label">
+                                                    Category
+
+                                                </label>
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-select_container">
+
+                                                        <select class="slds-select" required="" id="category" value="<%= expense.category%>">
+                                                            <option value=""></option>
+                                                            <% if(expCatList.length>0) { %>
+                                                                <% expCatList.forEach(function(expCat) { %>
+                                                                    <option value="<%= expCat %>"><%= expCat %></option>
+                                                                <% }); %>
+                                                            <% } %>
+                                                        </select>
+                                                    </div>
+                                                    <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-grid slds-wrap slds-gutters">
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                            <div class="slds-form-element slds-m-bottom_medium">
+                                                <label class="slds-form-element__label">
+                                                    Currency
+
+                                                </label>
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-select_container">
+                                                        <select id="currency" class="slds-select" required="" value="INR" value="<%= expense.currency%>">
+                                                          <% currencyWithSymbolArray.forEach(function(currency){ %>
+                                                              <option value="<%= currency.name %>"><%= currency.name %></option>
+                                                          <% }) %>
+                                                        </select>
+                                                    </div>
+                                                    <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                            <div class="slds-form-element slds-m-bottom_medium">
+                                                <label class="slds-form-element__label">
+                                                    Amount
+
+                                                </label>
+                                                <div class="slds-form-element__control">
+                                                    <input type="text" id="amount" class="slds-input" placeholder="" required="" value="<%= expense.amount%>">
+                                                    <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="slds-grid slds-wrap slds-gutters">
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                            <div class="slds-form-element slds-m-bottom_medium">
+                                                <label class="slds-form-element__label">
+                                                    Tax
+                                                </label>
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-select_container">
+                                                        <select id="tax" class="slds-select" value="<%= expense.tax%>">
+                                                            <option value=""> </option>
+                                                            <option value="GST">GST</option>
+                                                            <option value="VAT">VAT</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                            <div class="slds-form-element slds-m-bottom_medium">
+                                                <label class="slds-form-element__label">
+                                                    Tax Amount
+                                                </label>
+                                                <div class="slds-form-element__control">
+                                                    <input type="text" id="tax_no" class="slds-input" value="<%= expense.tax_amount%>">
+                                                    <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="slds-form-element slds-m-bottom_medium">
+                                        <label class="slds-form-element__label">Note</label>
+                                        <div class="slds-form-element__control">
+                                            <textarea class="slds-textarea" id="note" placeholder="Placeholder Text" ><%= expense.note%></textarea>
+                                        </div>
+                                    </div>
+                                    <!--  <div class="slds-form-element slds-m-bottom_medium">
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-file-selector slds-file-selector_files">
+                                                <div class="">
+                                                    <input type="file" class="slds-file-selector__input slds-assistive-text" accept="image/png" id="file-upload-input-01" aria-labelledby="file-selector-primary-label file-selector-secondary-label">
+                                                    <label class="slds-file-selector__body" for="file-upload-input-01" id="file-selector-secondary-label">
+                                                        <span class="slds-file-selector__button slds-button slds-button_neutral">
+                                                            <i class="fa fa-paperclip rpd-10"></i>
+                                                            Attachments
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> -->
+                                    <!-- <div class="">
+                                        <div>
+                                            <ul>
+                                                <li class="line-top slds-p-vertical_xx-small">
+                                                    <div class="slds-grid">
+                                                        <div class="slds-has-flexi-truncate">
+                                                            <a href="" class="slds-truncate view-inline">
+                                                                file-name.txt
+                                                            </a>
+                                                        </div>
+                                                        <div class="slds-no-flex slds-p-horizontal_small">
+                                                            <span class="text-dull text-uppercase">(98 kb)</span>
+                                                        </div>
+                                                        <div class="slds-no-flex">
+                                                            <button class="slds-button slds-button_icon" title="Remove" onclick="">
+                                                                <i class="fa fa-times-circle text-red"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="line-top slds-p-vertical_xx-small">
+                                                    <div class="slds-grid">
+                                                        <div class="slds-has-flexi-truncate">
+                                                            <a href="" class="slds-truncate view-inline">
+                                                                file-name.txt
+                                                            </a>
+                                                        </div>
+                                                        <div class="slds-no-flex slds-p-horizontal_small">
+                                                            <span class="text-dull text-uppercase">(98 kb)</span>
+                                                        </div>
+                                                        <div class="slds-no-flex">
+                                                            <button class="slds-button slds-button_icon" title="Remove" onclick="">
+                                                                <i class="fa fa-times-circle text-red"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div> -->
+                                </div>
+                            </div>
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+                                <div class="">
+                                    <!-- <div class="slds-form-element slds-m-bottom_medium">
+                                        <label class="slds-form-element__label">
+                                            Account
+                                        </label>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-select_container">
+                                                <select id="account" class="slds-select" value="<%= expense.account_id%>" onChange="getAccountProject(this)">
+                                                    <option value=""> </option>
+                                                    <% if(accounts.length > 0) { %>
+                                                        <% accounts.forEach(function(account) { %>
+                                                            <option value="<%= account.id%>"><%= account.name%></option>
+                                                            <% }); %>
+                                                    <% } %>
+                                                </select>
+                                            </div>
+                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" id="err-msg-account">
+
+                                            </div>
+                                        </div>
+                                    </div> -->
+
+                                    <div class="slds-form-element slds-m-bottom_medium">
+                                        <label class="slds-form-element__label">
+                                            Project
+                                            <abbr class="slds-required" title="required">*</abbr>
+                                        </label>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-select_container">
+                                                <select class="slds-select" id="project" value="<%= expense.project_id%>" onchange="setCurrencyOfAccount()">
+                                                    <option value=""> </option>
+                                                    <% if(projects.length > 0) { %>
+                                                        <% projects.forEach(function(project) { %>
+                                                            <option value="<%= project.id%>" accountId="<%= project.account_id%>"><%= project.name%></option>
+                                                          <% }); %>
+                                                    <% } %>
+                                                </select>
+                                            </div>
+                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" id="err-msg-project">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- <div class="slds-form-element slds-m-bottom_medium">
+                                        <div class="slds-form-element__control">
+                                            <span class="slds-checkbox">
+                                                <% if(expense.billable == false) { %>
+                                                    <input type="checkbox" name="billable" id="bill1" value="bill1">
+                                                <% } else { %>
+                                                    <input type="checkbox" name="billable" checked id="bill1" value="bill1">
+                                                <% } %>
+                                                <label class="slds-checkbox__label" for="bill1">
+                                                    <span class="slds-checkbox_faux"></span>
+                                                    <span class="slds-form-element__label">Billable</span>
+                                                </label>
+                                            </span>
+                                        </div>
+
+                                    </div> -->
+                                    <div class="slds-grid slds-grid_vertical-align-center slds-p-top_large">
+                                        <div class="slds-col--bump-left slds-p-right_medium">
+                                            <div class="slds-form-element ">
+                                                <label class="slds-checkbox_toggle slds-grid">
+                                                        <% if(expense.billable == false) { %>
+                                                            <input type="checkbox" name="billable" id="bill1" value="bill1">
+                                                        <% } else { %>
+                                                            <input type="checkbox" name="billable" checked id="bill1" value="bill1">
+                                                        <% } %>
+                                                    <span id="checkbox-toggle-3" class="slds-checkbox_faux_container">
+                                                        <span class="slds-checkbox_faux"></span>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="slds-has-flexi-truncate">
+                                            <% if(expense.billable == false) { %>
+                                                <span>Non Billable</span>
+                                            <% } else { %>
+                                                <span>Billable</span>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- expense details end -->
+
+
+                </div>
+            </div>
+        </div>
+        <% include ../modals/modal-add-new-project %>
+        <% include ../layouts/footer %>
+    </main>
+
+    <% include ../layouts/scripts %>
+    <% include ../layouts/expense-detail-script %>
+</body>
+
+</html>

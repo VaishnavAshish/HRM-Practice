@@ -1,0 +1,113 @@
+<!-- modal edit timesheet week view time entry start-->        
+<div id="modalEditTsheetTime">
+    <section role="dialog" tabindex="-1" class="slds-modal">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="closeModal('#modalEditTsheetTime');">
+                    <span class="slds-button__icon">
+                        <i class="fa fa-times text-size-21"></i>
+                    </span>
+                </button>
+               
+                <div class=" text-left">
+                    <div class="slds-text-heading_medium slds-p-bottom_xx-small">
+                        <strong id="week-day-edit-modal"></strong>
+                        <span id="week-date-edit-modal"></span> 
+                    </div>
+                    <div class="text-gray">
+                        <i class="fa fa-folder-open"></i>
+                        <span class="text-uppercase text-size-11" id="week-project-edit-modal">
+                            
+                        </span>
+                    </div>
+                    <div class="text-size-16 text-thick" id="week-task-edit-modal">
+                        
+                    </div>
+                </div>
+            </header>
+            <div class="slds-modal__content">
+                
+                
+                <div class="slds-p-around_small bg-dull" remove-on-other-user>
+                    <form id="add-record-weekly-timesheet-form">
+                        <div class="slds-grid slds-wrap">
+                               <div class="slds-size_1-of-1 slds-medium-size_5-of-12">
+                                   <div class="slds-form-element">
+                                       <div class="slds-form-element__control">
+                                           <textarea class="slds-textarea" placeholder="Note" rows="1" getFormData name="day_note" reset='value'></textarea>
+                                       </div>
+                                   </div>
+                               </div>
+   
+                               <div class="slds-size_1-of-1 slds-medium-size_3-of-12">
+                                   <div class="slds-grid slds-grid_vertical-align-center slds-p-top_xx-small">
+                                       <div class="slds-col--bump-left slds-p-horizontal_medium">
+                                           <div class="slds-form-element">
+                                               <label class="slds-checkbox_toggle slds-grid">
+                                                   <input type="checkbox" checked getFormData name="day_category" reset-checked='true'>
+                                                   <span id="checkbox-toggle-3" class="slds-checkbox_faux_container">
+                                                       <span class="slds-checkbox_faux"></span>
+                                                   </span>
+                                               </label>
+                                           </div>
+                                       </div>
+                                       <div class="slds-has-flexi-truncate">
+                                           <span>Billable</span>
+                                       </div>
+                                   </div>
+                               </div>
+                               <div class="slds-size_1-of-1 slds-medium-size_4-of-12">
+                                   <div class="slds-grid">
+                                       <div class="slds-p-horizontal_small slds-has-flexi-truncate">
+                                           <div class="slds-form-element">
+                                               <div class="slds-form-element__control">
+                                                   <input type="text" class="slds-input time-hhmm" placeholder="0:00" getFormData name="day_time" reset='value'>
+                                                   <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                   </div>
+                                               </div>
+                                           </div>
+                                       </div>
+                                       <div class="slds-no-flex">
+                                           <button class="slds-button slds-button_neutral" type="button" onclick="addRecordToWeeklyTimesheet(this, '#add-record-weekly-timesheet-form');">Add</button>
+                                       </div>
+                                   </div>
+                               </div>
+                           </div> 
+                    </form>
+                </div>
+                <div>
+                    <div class="text-dull text-size-11 text-uppercase slds-p-around_x-small" remove-on-other-user>
+                        Other Entries
+                    </div>
+                    <form id="update-existing-weekly-data-form">
+                        <div id="week-data-row">
+                            <!-- row --> 
+    
+                        </div>
+                    </form>
+                    
+                    
+                </div>
+            </div>
+            <div class="hide" id="updateWeeklyTimesheetLoader">
+                <% include ../layouts/local-loader %>
+            </div>
+            <footer class="slds-modal__footer">
+                <div class="slds-grid" remove-on-other-user>
+                    <div class="slds-has-flexi-truncate">
+                        <div class="text-left">
+                        <button class="slds-button slds-button_brand" id="btn-submit-week-timesheet" onclick="submitWeeklyDayTimesheet(this);">Submit</button>    
+                        </div>
+                    </div>
+                    <div class="slds-no-flex">
+                        <button class="slds-button slds-button_neutral" onclick="closeModal('#modalEditTsheetTime');">Cancel</button>
+                        <button class="slds-button slds-button_brand" onclick="udpateWeeklyTimesheetData('#modalEditTsheetTime')">Update</button>
+                        <!-- dummyAddItem('#modalEditTsheetTime', 'Save Successfully') -->
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop"></div>
+</div>
+<!-- modal edit timesheet week view time entry end-->   

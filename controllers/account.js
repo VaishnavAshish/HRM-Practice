@@ -1,0 +1,475 @@
+const pg = require("pg");
+var pool = require('./../config/dbconfig');
+var handleResponse = require('./page-error-handle');
+const moment = require('moment-timezone');
+var setting = require('./company-setting');
+let companyDefaultTimezone;
+/*handleError=(res, reason, message, code) =>{
+  // console.log("ERROR: " + reason);
+  res.status(code || 500).json({"success":false,"message": message});
+}
+shouldAbort = (err, client, done) => {
+  if (err) {
+    console.error('Error in transaction', err.stack)
+    client.query('ROLLBACK', (err) => {
+      if (err) {
+        console.error('Error rolling back client', err.stack)
+      }
+      // release the client back to the pool
+      done();
+    })
+  }
+  return !!err
+}*/
+
+function dateFormat(gDate) {
+  var sDate = new Date(gDate);
+  var date = sDate.getDate();
+  var month = sDate.getMonth() + 1;
+  var year = sDate.getFullYear();
+  var formatedDate = '';
+  if (month < 10) {
+    if(date<10){
+      formatedDate = year + '-0' + month + '-0' + date;
+    }else{
+      formatedDate = year + '-0' + month + '-' + date;
+    }
+  } else {
+    if(date<10){
+      formatedDate = year + '-' + month + '-0' + date;
+    }else{
+      formatedDate = year + '-' + month + '-' + date;
+    }
+
+  }
+  // console.log(formatedDate);
+  return formatedDate;
+}
+
+
+/*exports.findAccountByName = (req, res) => {
+  // console.log("findAccountByName----------------------------------"+req.body.searchText);
+  pool.connect((err, client, done) => {
+      let queryToExec='SELECT * FROM account WHERE '+req.body.searchField+' like $1 AND company_id=$2 AND archived=false';
+      // console.log('queryToExec '+queryToExec);
+      client.query(queryToExec,[req.body.searchText+'%',req.user.company_id], function (err, accounts) {
+        if (err) {
+          handleResponse.shouldAbort(err, client, done);
+          handleResponse.handleError(res, err, 'Server Error: Error in finding account data');
+        }
+        else{
+            // console.log(JSON.stringify(accounts.rows));
+            if (accounts.rows.length > 0) {
+              accounts.rows.forEach(function (data) {
+                let created_date = dateFormat(data.created_date);
+                let modified_date = dateFormat(data.modified_date);
+                data["created_date"] = created_date;
+                data["modified_date"] = modified_date;
+              })
+            }
+            done();
+            handleResponse.sendSuccess(res,'Accounts searched successfully',{accounts: accounts.rows});
+        }
+      });
+    })
+};*/
+
+exports.findAccountByCriteria = (req, res) => {
+  // console.log("findAccountByCriteria----------------------------------"+req.body.searchField);
+  pool.connect((err, client, done) => {
+      let searchCriteriaVal=[req.user.company_id];
+      let whereClause='WHERE company_id=$1 ';
+      if(req.body.searchField.length>0){
+        let searchField=req.body.searchField;
+        searchField.forEach((search,index)=>{
+            whereClause+='AND '+search.fieldName+' $'+(index+2)+' ';
+            searchCriteriaVal.push(search.fieldValue);
+        });
+        /*let queryToExec='SELECT * FROM account WHERE '+req.body.searchField+' like $1 AND company_id=$2';*/
+      }
+      let offset=0;
+      if(req.body.offset){
+        offset=req.body.offset;
+      }
+      let queryToExec='SELECT a.*,(select count(*) from ACCOUNT '+whereClause+') as searchCount FROM ACCOUNT a '+whereClause+' ORDER BY id Desc OFFSET '+offset+'LIMIT '+process.env.PAGE_RECORD_NO;
+      // console.log('queryToExec '+queryToExec);
+      client.query(queryToExec,searchCriteriaVal, function (err, accounts) {
+        if (err) {
+          handleResponse.shouldAbort(err, client, done);
+          handleResponse.handleError(res, err, 'Server Error: Error in finding account data');
+        }
+        else{
+            let searchCount=0;
+            // console.log(JSON.stringify(accounts.rows));
+            if (accounts.rows.length > 0) {
+              accounts.rows.forEach(function (data) {
+                let created_date = dateFormat(moment.tz(data.created_date, companyDefaultTimezone).format());
+                let modified_date = dateFormat(moment.tz(data.modified_date, companyDefaultTimezone).format());
+                data["created_date"] = created_date;
+                data["modified_date"] = modified_date;
+              })
+              searchCount=accounts.rows[0].searchcount;
+            }
+            done();
+            handleResponse.sendSuccess(res,'Accounts searched successfully',{accounts: accounts.rows,count:searchCount});
+        }
+      });
+
+    })
+};
+
+getAccountQuery = (req,client,next) =>{
+    client.query('SELECT a.*,(select count(*) from ACCOUNT where company_id=$1) as totalCount,(select count(*) from ACCOUNT where company_id=$1 AND archived=$2) as activeCount FROM ACCOUNT a WHERE company_id=$1 ORDER BY id DESC OFFSET 0 LIMIT '+process.env.PAGE_RECORD_NO,[req.user.company_id,false], function(err, account) {
+        if (err) {
+            next(err,null);
+        }else{
+            next(null,account);
+        }
+    });
+}
+
+exports.getAccount = (req, res) => {
+  /*let archived=false;*/
+  setting.getCompanySetting(req, res ,(err,result)=>{
+      if(err==true){
+        // console.log('error in setting');
+        // console.log(err);
+        handleResponse.responseToPage(res,'pages/accounts-listing',{accounts:[], totalCount:0,activeCount:0, archivedCount:0 ,user:req.session.passport.user,error:err},"error","Server Error: error in finding company setting");
+        /*handleResponse.handleError(res, err, 'Server Error: error in finding company setting');*/
+      }else{
+
+        companyDefaultTimezone=result.timezone;
+        // console.log('companyDefaultTimezone');
+        // console.log(companyDefaultTimezone);
+          pool.connect((err, client,done) => {
+            getAccountQuery(req,client,(err,account) => {
+              if (err) {
+                handleResponse.shouldAbort(err, client, done);
+                handleResponse.responseToPage(res,'pages/accounts-listing',{accounts:[], totalCount:0,activeCount:0, archivedCount:0 ,user:req.session.passport.user,error:err},"error","Error in finding account.Please Restart.");
+              } else {
+
+                    /*// console.log('sub 8 days '+adjustDays(8));
+                    // console.log('sub 1 days '+adjustDays(1));
+                    // console.log('sub 8 days with moment'+moment.tz(adjustDays(8), companyDefaultTimezone).format());
+                    // console.log('sub 1 days with moment'+moment.tz(adjustDays(1), companyDefaultTimezone).format());*/
+                    // console.log("----------account.rows-------------");
+                    // console.log(account.rows);
+
+                    let accList=account.rows;
+                    let totalCount=0,activeCount=0;
+                    if(account.rows.length>0){
+
+                      accList.forEach(function (data) {
+                        // console.log('dates according to timezone are');
+                        // console.log(moment.tz(data.created_date, companyDefaultTimezone).format());
+                        // console.log(moment.tz(data.modified_date, companyDefaultTimezone).format());
+                        data["created_date"] = dateFormat(moment.tz(data.created_date, companyDefaultTimezone).format());
+                        data["modified_date"] = dateFormat(moment.tz(data.modified_date, companyDefaultTimezone).format());
+
+                      })
+
+                      totalCount=accList[0].totalcount;
+                      activeCount=accList[0].activecount;
+                    }
+                    // console.log(account.rows);
+                    done();
+                    handleResponse.responseToPage(res,'pages/accounts-listing',{accounts:accList, totalCount:totalCount,activeCount:activeCount, archivedCount:(totalCount-activeCount) ,user:req.session.passport.user},"success","Successfully rendered");
+
+              }
+            });
+          });
+        }
+      });
+
+};
+
+exports.getAccountDetail = (req, res) => {
+  if(req.user){
+    // console.log('getAccountDetail-------------' + req.query.accountId);
+    let accountId=req.query.accountId;
+    if(accountId==''||accountId==null||accountId==undefined){
+        handleResponse.responseToPage(res,'pages/account-details',{account:{}, projects:[], invoices:[], projectTotalCount:0,invoiceTotalCount:0,user:req.session.passport.user, error:err},"error","Error in finding account.Please Restart.");
+    }else{
+        pool.connect((err, client, done) => {
+          client.query('SELECT * FROM ACCOUNT where id=$1 AND company_id=$2',[req.query.accountId, req.user.company_id], function(err, account) {
+            if (err) {
+              // console.log('err in account')
+              console.error(err);
+              handleResponse.shouldAbort(err, client, done);
+              handleResponse.responseToPage(res,'pages/account-details',{account:{}, projects:[], invoices:[], projectTotalCount:0,invoiceTotalCount:0,user:req.session.passport.user, error:err},"error","Error in finding account.Please Restart.");
+              /*handleResponse.handleError(res, err, 'Server Error: Error in finding account');*/
+            } else {
+              console.error('getAccount>>>>>>>>>>>>>');
+              // console.log(account.rows);
+
+              client.query('SELECT p.*,(SELECT count(*) FROM PROJECT where company_id=$1 AND account_id=$2 AND archived=$3)as total FROM PROJECT p where company_id=$1 AND account_id=$2 AND archived=$3 ORDER BY id DESC OFFSET 0 LIMIT '+process.env.PAGE_RECORD_NO,[req.user.company_id, req.query.accountId,false], function(err, projectList) {
+                if (err) {
+                  // console.log('err in project')
+                  console.error(err);
+                  handleResponse.shouldAbort(err, client, done);
+                  handleResponse.responseToPage(res,'pages/account-details',{account:{}, projects:[], invoices:[], projectTotalCount:0,invoiceTotalCount:0,user:req.session.passport.user, error:err},"error","Error in finding projects.Please Restart.");
+                  /*handleResponse.handleError(res, err, 'Server Error: Error in finding projects');*/
+                } else {
+                    let projectIdArr=[];
+                      if(projectList.rows.length>0){
+                        projectIdArr = projectList.rows.map(function (ele) {
+                            return ele.id;
+                        });
+                      }
+                    client.query('SELECT i.*,(SELECT count(*) FROM INVOICE where company_id=$1 AND account_id=$2 AND archived=$3) as total FROM INVOICE i where company_id=$1 AND account_id=$2 AND archived=$3 ORDER BY id DESC OFFSET 0 LIMIT '+process.env.PAGE_RECORD_NO,[req.user.company_id, req.query.accountId,false], function(err, invoiceList) {
+                    if (err) {
+                      // console.log('err in invoice');
+                      console.error(err);
+                      handleResponse.shouldAbort(err, client, done);
+                      handleResponse.responseToPage(res,'pages/account-details',{account:{}, projects:[], invoices:[], projectTotalCount:0,invoiceTotalCount:0,user:req.session.passport.user, error:err},"error","Error in finding invoices.Please Restart.");
+                    } else {
+
+                        console.error('getAllProjects>>>>>>>>>>>>>');
+                        // console.log(projectList.rows);
+                        console.error('getAllInvoices>>>>>>>>>>>>>');
+                        // console.log(invoiceList.rows);
+                        let projectTotalCount=0,invoiceTotalCount=0;
+                        if(account.rows.length>0){
+                          let startDateFormatted = '';
+                            let endDateFormatted = '';
+                            if(account.rows[0].start_date != null) {
+                              startDateFormatted = dateFormat(moment.tz(account.rows[0].created_date, companyDefaultTimezone).format());
+                            }
+                            if(account.rows[0].end_date != null) {
+                              endDateFormatted = dateFormat(moment.tz(account.rows[0].modified_date, companyDefaultTimezone).format());
+                            }
+
+                            account.rows[0]["created_date"] = startDateFormatted;
+                            account.rows[0]["modified_date"] = endDateFormatted;
+                        }
+                        if(projectList.rows.length>0){
+                          projectList.rows.forEach(function (data) {
+                            let startDateFormatted = '';
+                            let endDateFormatted = '';
+                            if(data.start_date != null) {
+                              startDateFormatted = dateFormat(moment.tz(data.start_date, companyDefaultTimezone).format());
+                            }
+                            if(data.end_date != null) {
+                              endDateFormatted = dateFormat(moment.tz(data.end_date, companyDefaultTimezone).format());
+                            }
+                            data["start_date"] = startDateFormatted;
+                            data["end_date"] = endDateFormatted;
+                            /*data["percent_completed"] =data.total_hours/data.estimated_hours*100;*/
+                          });
+                          projectTotalCount=projectList.rows[0].total;
+                        }
+                        let invoiceListArr=[];
+                        if(invoiceList.rows.length>0){
+                          invoiceList.rows.forEach(function (invoice) {
+                              // console.log(projectIdArr+'='+invoice.project_id);
+                              if(invoice.project_id==null||projectIdArr.includes(invoice.project_id)){
+                                invoice['start_date'] = invoice.start_date == null ? '' : dateFormat(moment.tz(invoice.start_date, companyDefaultTimezone).format());
+                                invoice['due_date'] = invoice.due_date == null ? '' : dateFormat(moment.tz(invoice.due_date, companyDefaultTimezone).format());
+                                invoiceListArr.push(invoice);
+                              }
+                          });
+                          invoiceTotalCount=invoiceList.rows[0].total;
+                        }
+                        // console.log("**********<<<<<<<<<<< project filteration  >>>>>>>>>>>>>*********");
+                        // console.log(invoiceList.rows);
+                        done();
+                        handleResponse.responseToPage(res,'pages/account-details',{account:account.rows[0], projects:projectList.rows, invoices:invoiceListArr, projectTotalCount:projectTotalCount,invoiceTotalCount:invoiceTotalCount, user:req.session.passport.user},"success","Successfully rendered");
+
+                     }
+                  })
+                }
+              })
+            }
+          })
+        });
+      }
+    } else{
+      done();
+      res.redirect('/domain');
+    }
+};
+
+
+exports.postEditAccount = (req, res) => {
+  // console.log(req.body);
+  if(req.user){
+        // console.log(req.body.accountId);
+        // console.log(req.user.company_id);
+        req.assert('name', 'Account name cannot be blank').notEmpty();
+        req.assert('email', 'Contact email cannot be blank').notEmpty();
+
+        const errors = req.validationErrors();
+
+        if (errors) {
+          if(errors.length>0){
+            // console.log(errors[0].msg);
+            handleResponse.handleError(res, errors, "Server Error :"+errors[0].msg);
+          }else{
+             handleResponse.handleError(res, errors, "Server Error : Error in validating data.");
+          }
+
+        }else{
+          let modified_date=moment.tz(new Date(), companyDefaultTimezone).format();
+          // console.log('modified_date  ' +modified_date);
+          pool.connect((err, client, done) => {
+            client.query('SELECT * FROM ACCOUNT where id=$1 AND company_id=$2',[req.body.accountId, req.user.company_id], function(err, account) {
+              if (err) {
+                console.error(err);
+                handleResponse.shouldAbort(err, client, done);
+                handleResponse.handleError(res, err, 'Server Error: Error in finding account');
+              } else {
+                // console.log('getAccount>>>>>>>>>>>>>');
+                // console.log(account.rows[0]);
+                client.query('UPDATE ACCOUNT SET name=$1, first_name=$2, last_name=$3, email=$4, modified_date =$5,street=$6,city=$7,state=$8,country=$9,zip_code=$10,currency=$11 WHERE id=$12 AND company_id=$13',[req.body.name, req.body.first_name, req.body.last_name, req.body.email, modified_date,req.body.street,req.body.city,req.body.state,req.body.country,req.body.zip_code,req.body.currency,req.body.accountId, req.user.company_id], function(err, updatedData) {
+                  // console.log('Error >>>>>>>>>>>>>');
+                  // console.log(err);
+                  if (err) {
+                    console.error(err);
+                    handleResponse.shouldAbort(err, client, done);
+                    handleResponse.handleError(res, err, 'Server Error: Error in updating account');
+                  } else {
+                    // console.log('Updated account >>>>>>>>>>>>>');
+                    // console.log(updatedData);
+                    done();
+                    handleResponse.sendSuccess(res,'Account updated successfully',{});
+                    /*res.status(200).json({"success": true,"message":"success" });*/
+                  }
+                });
+              }
+            })
+          });
+        }
+  } else{
+      done();
+      res.redirect('/domain');
+    }
+
+};
+function adjustDays (days) {
+ var dat = new Date();
+ dat.setTime(dat.getTime() -  (days * 24 * 60 * 60 * 1000));
+ return dat;
+}
+
+exports.postAddAccount = (req, res) => {
+  // console.log("Inside add account post method");
+  // console.log(req.body);
+  if(req.user){
+        let account_name = req.body.name;
+
+        req.assert('name', 'Account name cannot be blank').notEmpty();
+        req.assert('email', 'Contact email cannot be blank').notEmpty();
+
+        const errors = req.validationErrors();
+
+        if (errors) {
+          if(errors.length>0){
+            // console.log(errors[0].msg);
+            handleResponse.handleError(res, errors, "Server Error :"+errors[0].msg);
+          }else{
+             handleResponse.handleError(res, errors, "Server Error : Error in validating data.");
+          }
+        } else {
+          let first_name = req.body.first_name;
+          let last_name = req.body.last_name;
+          let email = req.body.email;
+          /*setting.getCompanySetting(req, res ,(err,result)=>{
+              if(err==true){
+                // console.log('error in setting');
+                // console.log(err);
+                handleResponse.handleError(res, err, 'Server Error: error in finding company setting');
+              }else{
+
+                companyDefaultTimezone=result.timezone;*/
+                  // console.log('companyDefaultTimezone');
+                  // console.log(companyDefaultTimezone);
+                  /*let currenctDate=new Date();*/
+                  var createdDate=moment.tz(new Date(), companyDefaultTimezone).format();
+                  /*dateFormat(new Date(Date.now()));*/
+                  // console.log('createdDate '+createdDate);
+
+                  // console.log(moment.tz(new Date(), companyDefaultTimezone).format());
+                  // console.log(new Date())
+                  pool.connect((err, client, done) => {
+                    client.query('BEGIN', (err) => {
+                      if (err){
+                        handleResponse.shouldAbort(err, client, done);
+                        handleResponse.handleError(res, err, 'Server Error: error in connecting to database');
+                      } else {
+                        client.query('SELECT * FROM ACCOUNT where company_id = $1 AND name = $2',[req.session.passport.user.company_id, account_name], function(err, existingAccount) {
+                          if (err){
+                            handleResponse.shouldAbort(err, client, done);
+                            handleResponse.handleError(res, err, 'Server Error: Error in finding accounts');
+                          } else {
+                            // console.log("existingAccount-----------");
+                            // console.log(existingAccount);
+
+                            if (existingAccount.rows.length>0) {
+                              done();
+                              handleResponse.handleError(res,'Account adding error', 'Account with this name already exists.');
+                            }else{
+                              client.query('Insert INTO ACCOUNT (name,first_name,last_name, email,created_date,modified_date,currency,company_id) values ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id',[account_name,first_name,last_name,email,createdDate,createdDate,req.body.currency, req.session.passport.user.company_id], function(err, insertedAccount) {
+                                  if (err){
+                                    handleResponse.shouldAbort(err, client, done);
+                                    handleResponse.handleError(res, err, 'Server Error: Error in adding account');
+                                  } else {
+                                    client.query('COMMIT', (err) => {
+                                      if (err) {
+                                        console.error('Error committing transaction', err.stack)
+                                        handleResponse.shouldAbort(err, client, done);
+                                        handleResponse.handleError(res, err, 'Server Error: Error in committing transaction');
+                                      } else {
+                                        done();
+                                        handleResponse.sendSuccess(res,'Account added successfully',{});
+                                        /*res.status(200).json({"success": true,"message":"success"});*/
+                                      }
+                                    });
+                                  }
+                              });
+                            }
+                          }
+                        });
+                      }
+                    });
+                  });
+             /* }
+          })*/
+        }
+    } else{
+      done();
+      res.redirect('/domain');
+    }
+};
+
+
+exports.deleteAccount = (req,res) =>{
+  // console.log('Archived Account-------------' + req.body.accountId);
+  if(req.user){
+    let accountId=req.body.accountId;
+    if(accountId==""||accountId==null||accountId==undefined){
+      handleResponse.handleError(res, "incorrect account id", "account id is not correct");
+    }else{
+          pool.connect((err, client, done) => {
+            client.query('UPDATE ACCOUNT SET archived = $1 WHERE id=$2',[true, req.body.accountId], function(err, archivedAccount) {
+              if (err) {
+                console.error(err);
+                handleResponse.shouldAbort(err, client, done);
+                handleResponse.handleError(res, err, 'Server Error: Error in deleting account.');
+              } else {
+                console.error('Affected ID>>>>>>>>>>>>>');
+                // console.log(archivedAccount.rows[0]);
+                done();
+                handleResponse.sendSuccess(res,'Account deleted successfully',{});
+                /*res.status(200).json({"success": true,"message":"success"});*/
+              }
+            })
+          });
+        }
+    } else{
+      done();
+      res.redirect('/domain');
+    }
+}
+
+
+ 

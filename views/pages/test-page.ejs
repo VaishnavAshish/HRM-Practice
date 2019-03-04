@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="en">
+
+    <% include ../layouts/head %>
+
+    <body class="kw">
+        <main class="tpd-60 bpd-100">
+            <h1>Test Page</h1>
+
+            <table class="slds-table slds-table_bordered slds-table_fixed-layout slds-table_cell-buffer" role="grid">
+                <thead>
+                    <tr class="slds-text-title_caps">
+                        <th class="slds-is-sortable" scope="col" width="25%">
+                            <span class="slds-truncate" title="Project Title">Name</span>
+                        </th>
+                        <th class="slds-is-sortable " scope="col">
+                            <span class="slds-truncate" title="Status">Domain name</span>
+                        </th>
+                        <th class="slds-is-sortable" scope="col">
+                            <span class="slds-truncate" title="Start Date">Create Date</span>
+                        </th>
+                        <th class=" " scope="col" style="width: 3.25rem;">
+
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="orgListTBody">
+
+
+                </tbody>
+            </table>
+        </main>
+        <% include ../layouts/footer %>
+        <% include ../layouts/scripts %>
+
+        <script>
+            // let c = [];
+            let people = "{name: 'Harsh', id: 123, company:'abc' }";
+            // c.push(people);
+            let htm = ejs.render(`<%= include('./../template/companyRow.ejs', {company:'` + people + `'}) %>`);
+            var h = $.parseHTML(htm);
+            $('#orgListTBody').html(h[0].data);
+        </script>
+    </body>
+
+</html>

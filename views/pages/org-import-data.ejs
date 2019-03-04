@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="en">
+
+<% include ../layouts/head %>
+
+<body class="kw">
+
+    <% include ../layouts/nav %>
+    <% include ../layouts/sideNav %>
+    <main class="main-body-space tpd-60 bpd-100">
+        <div>
+            <div class="slds-p-around_small">
+                
+                <div class="">
+                    
+                        <!-- header start end -->
+                        <div class="slds-card slds-m-bottom_medium">
+                            <div class="slds-grid slds-wrap slds-p-around_small">
+                                <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                    <div class="slds-grid">
+                                        <div class="slds-no-flex slds-p-right_x-small">
+                                            <span class="slds-icon_container slds-icon-custom-custom88">
+                                                <i class="fa fa-file-import text-size-21 text-white slds-icon"></i>
+                                            </span>
+                                        </div>
+                                        <div class="slds-has-flexi-truncate">
+                                        <div class="slds-text-body_small text-height-normal">
+                                            Company Settings
+                                        </div>
+                                        <h1 class="slds-page-header__title slds-p-right_x-small text-height-normal">
+                                            <div class="slds-dropdown-trigger slds-dropdown-trigger_click cursor-pointer" aria-haspopup="true" title="" onclick="openDropdown(this, event, true);">
+                                                <div class="slds-grid slds-has-flexi-truncate slds-grid_vertical-align-center">
+                                                    <span class="slds-truncate" title="">Import Data</span>
+                                                    <i class="fa fa-caret-down lpd-5"></i>
+                                                </div>
+                                                <div class="slds-dropdown slds-dropdown_left text-normal slds-dropdown_x-small">
+                                                    <ul class="slds-dropdown__list">
+                                                        <li class="slds-dropdown__item">
+                                                            <a href="/org-settings-general" tabindex="0" class="slds-grid_vertical-align-center">
+                                                                General
+                                                            </a>
+                                                        </li>
+                                                        <li class="slds-dropdown__item">
+                                                            <a href="/org-import-data" tabindex="0" class="slds-grid_vertical-align-center">
+                                                                Import Data
+                                                            </a>
+                                                        </li>
+                                                        <li class="slds-dropdown__item">
+                                                            <a href="/org-settings-timesheet" tabindex="0" class="slds-grid_vertical-align-center">
+                                                                Timesheet
+                                                            </a>
+                                                        </li>
+                                                        <li class="slds-dropdown__item">
+                                                            <a href="javascript:void(0);" tabindex="0" class="slds-grid_vertical-align-center">
+                                                                Invoice
+                                                            </a>
+                                                        </li>
+                                                        <li class="slds-dropdown__item">
+                                                            <a href="javascript:void(0);" tabindex="0" class="slds-grid_vertical-align-center">
+                                                                Expense
+                                                            </a>
+                                                        </li>
+                                                        <li class="slds-dropdown__item">
+                                                            <a href="javascript:void(0);" tabindex="0" class="slds-grid_vertical-align-center">
+                                                                Email
+                                                            </a>
+                                                        </li>
+                                                        <li class="slds-dropdown__item">
+                                                            <a href="javascript:void(0);" tabindex="0" class="slds-grid_vertical-align-center">
+                                                                Tax
+                                                            </a>
+                                                        </li>
+                                                        <li class="slds-dropdown__item">
+                                                            <a href="javascript:void(0);" tabindex="0" class="slds-grid_vertical-align-center">
+                                                                Integration
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </h1>
+                                    </div>
+                                    </div>
+                                </div>
+
+                                <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                    <!-- <div class="text-right sm-tpd-15">
+                                        <button class="slds-button slds-button_brand slds-align-top" onclick="dummySave()">
+                                            Save Changes
+                                        </button>
+                                    </div> -->
+                                </div>
+                            </div>
+                            
+
+                        </div>
+                        <!-- header end -->
+
+
+
+                        <!-- body start -->
+                        <div class="slds-p-bottom_large">
+                            
+                        
+                            <div class="slds-vertical-tabs">
+                                <ul class="slds-vertical-tabs__nav sm-hide">
+                                    <li class="slds-vertical-tabs__nav-item slds-is-active" onclick="openTabVertical(this, 'import-accounts')">
+                                            <a class="slds-vertical-tabs__link" href="javascript:void(0)" tabindex="0">
+                                            <div class="text-size-16">
+                                                Import Accounts
+                                            </div>
+                                            <div class="text-size-11 text-dull">
+                                                Import via CSV file.
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li class="slds-vertical-tabs__nav-item" onclick="openTabVertical(this, 'import-users')">
+                                            <a class="slds-vertical-tabs__link" href="javascript:void(0)" tabindex="-1">
+                                            <div class="text-size-16">
+                                                Import Users
+                                            </div>
+                                            <div class="text-size-11 text-dull">
+                                                Import via CSV file.
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li class="slds-vertical-tabs__nav-item" onclick="openTabVertical(this, 'import-projects')">
+                                            <a class="slds-vertical-tabs__link" href="javascript:void(0)" tabindex="-1">
+                                            <div class="text-size-16">
+                                                Import Projects
+                                            </div>
+                                            <div class="text-size-11 text-dull">
+                                                Import via CSV file.
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li class="slds-vertical-tabs__nav-item" onclick="openTabVertical(this, 'import-tasks')">
+                                            <a class="slds-vertical-tabs__link" href="javascript:void(0)" tabindex="-1">
+                                            <div class="text-size-16">
+                                                Import Tasks
+                                            </div>
+                                            <div class="text-size-11 text-dull">
+                                                Import via CSV file.
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li class="slds-vertical-tabs__nav-item" onclick="openTabVertical(this, 'import-timesheets')">
+                                            <a class="slds-vertical-tabs__link" href="javascript:void(0)" tabindex="-1">
+                                            <div class="text-size-16">
+                                                Import Timesheets
+                                            </div>
+                                            <div class="text-size-11 text-dull">
+                                                Import via CSV file.
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li class="slds-vertical-tabs__nav-item" onclick="openTabVertical(this, 'import-expenses')">
+                                            <a class="slds-vertical-tabs__link" href="javascript:void(0)" tabindex="-1">
+                                            <div class="text-size-16">
+                                                Import Expenses
+                                            </div>
+                                            <div class="text-size-11 text-dull">
+                                                Import via CSV file.
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
+                                <div class="slds-vertical-tabs__content" target-tab="import-accounts">
+                                    <% include ../import-tabs/tab-import-accounts %>
+                                </div>
+                                <div class="slds-vertical-tabs__content hide" target-tab="import-users">
+                                    <% include ../import-tabs/tab-import-users %>
+                                </div>
+                                <div class="slds-vertical-tabs__content hide" target-tab="import-projects">
+                                    <% include ../import-tabs/tab-import-projects %>
+                                </div>
+                                <div class="slds-vertical-tabs__content hide" target-tab="import-tasks">
+                                    <% include ../import-tabs/tab-import-tasks %>
+                                </div>
+                                <div class="slds-vertical-tabs__content hide" target-tab="import-timesheets">
+                                    <% include ../import-tabs/tab-import-timesheets %>
+                                </div>
+                                <div class="slds-vertical-tabs__content hide" target-tab="import-expenses">
+                                    <% include ../import-tabs/tab-import-expenses %>
+                                </div>
+                                
+                                
+                            </div>
+                        </div>
+                       
+                           
+                        
+                        <!-- body end -->
+
+                      
+
+                        
+
+
+
+
+
+
+                  
+
+                </div>
+            </div>
+        </div>
+        
+        <% include ../layouts/footer %>
+    </main>
+
+
+
+
+    <% include ../layouts/scripts %>
+
+</body>
+
+</html>

@@ -1,0 +1,194 @@
+<script>
+    var projectId,projectName,projectBillable;
+    $(document).ready(function(){
+		var url_string = window.location.href;
+        // var url = new URL(url_string);
+        // projectId = url.searchParams.get("projectId");
+        projectId = getURLParameter("projectId");
+        var status = '<%= project.status %>';
+        var type = '<%= project.type %>';
+        projectName= '<%= project.name %>';
+        projectBillable='<%= project.billable %>';
+        $('#project_status').val(status);
+        $('#project_type').val(type);
+        $('#account').val('<%= project.account_id %>');
+        console.log(status+' '+projectName);
+    });
+    function setBillCostRate(ele, fromModal){
+        var billRate = 0.0;
+        var costRate = 0.0;
+        if(fromModal == "task") {
+            billRate = $("option:selected", ele).attr('billrate');
+            costRate = $("option:selected", ele).attr('costrate');
+        } else {
+            let selectedResource=$("#project_user option:selected").val();
+            let userList=<%- JSON.stringify(userList) %>;
+            let selectedRes= userList.filter(resource=>resource.id==selectedResource);
+            if(selectedRes.length>0){
+                billRate = selectedRes[0].bill_rate;
+                costRate = selectedRes[0].cost_rate;
+            }
+        }
+
+        $(ele).closest('div[modal-div]').find('input[bill-rate]').val(billRate);
+        $(ele).closest('div[modal-div]').find('input[cost-rate]').val(costRate);
+    }
+
+    function updateAssignRole(ele) {
+        var defaultRole = $("option:selected", ele).attr('role');
+        var userId = $("option:selected" ,ele).val();
+        console.log(defaultRole);
+        var projectAssginmentUser =  <%- JSON.stringify(resUsers) %>
+        var assginedUserWithRole=projectAssginmentUser.filter(assignedUser=>{
+             return ((assignedUser.id==userId)&&(assignedUser.role==defaultRole));
+        });
+        console.log(assginedUserWithRole);
+        if(assginedUserWithRole.length>0){
+            $(ele).closest('div[modal-div]').find('select[name="user_role"]').val('');
+        }else{
+            $(ele).closest('div[modal-div]').find('select[name="user_role"]').val(defaultRole);
+        }
+    }
+    function checkProjectAssignment(ele){
+        var userRole=$("option:selected", ele).val();
+        var userId=$("#project_user option:selected").val();
+        var projectAssginmentUser =  <%- JSON.stringify(resUsers) %>
+        var assginedUserWithRole=projectAssginmentUser.filter(assignedUser=>{
+            return ((assignedUser.id==userId)&&(assignedUser.role==userRole));
+        });
+        console.log(assginedUserWithRole);
+        if(assginedUserWithRole.length>0){
+            $(ele).val('');
+        }
+    }
+    function updateProjectDetails(projectId, formId) {
+        var projectData = createJSONForFormData(formId);
+        console.log(projectData);
+        checkFormValidation(formId);
+        var project_cost = parseInt(projectData.project_cost);
+        if(project_cost.toString().toLowerCase() == "nan") {
+            projectData.project_cost = 0;
+        }
+        if(!$(formId).hasClass('has-error')) {
+            showLoader('#globalLoader');
+            $.ajax({
+                type: 'POST',
+                url : '/editProject',
+                contentType: 'application/json',
+                dataType: 'json',
+                data : JSON.stringify({"projectData":projectData, "projectId": projectId}),
+                success : function(response){
+                    console.log(response);
+                    if(response.success == true) {
+                        setTimeout( function () {
+                            hideLoader('#globalLoader')
+                            // showGlobalToast('#globalToast', 'success', response.message, 4000);
+                            location.reload();
+                        },2000);
+                    } else {
+                        hideLoader('#globalLoader');
+                        showGlobalToast('#globalToast', 'error', response.message, 4000);
+                    }
+                },
+                error: function(response){
+                        console.log(response);
+                        hideLoader('#globalLoader');
+                        showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+                }
+            });
+        }
+
+
+    }
+
+    function addNewUserToProject(projectId, formId, modalId, accountId) {
+        var projectResData = createJSONForFormData(formId);
+        if(projectResData.project_user == '' || projectResData.project_user == undefined || projectResData.project_user == null) {
+            addError('#project_user', 'Select resource');
+        } else {
+            clearError('#project_user');
+            if(projectResData.user_role == '' || projectResData.user_role == undefined || projectResData.user_role == null) {
+                addError('#project_user_role', 'Select resource role');
+            } else {
+                clearError('#project_user_role');
+                showLoader('#globalLoader');
+                projectResData.projectId = projectId;
+                projectResData.accountId = accountId;
+
+                $.ajax({
+                    type: 'POST',
+                    url : '/addProjectResource',
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    data : JSON.stringify(projectResData),
+                    success : function(response){
+                        console.log(response);
+                        if(response.success == true) {
+                            hideLoader('#globalLoader');
+                            showGlobalToast('#globalToast', 'success', response.message, 4000);
+                            //window.location.href = '/projects-listing'
+                            location.reload();
+                            // dummySave();
+                        } else {
+                            hideLoader('#globalLoader');
+                            showGlobalToast('#globalToast', 'error', response.message, 4000);
+                            closeModal(modalId);
+                        }
+                    },
+                    error: function(response){
+                            console.log(response);
+                            hideLoader('#globalLoader');
+                            showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+                    }
+                });
+            }
+        }
+    }
+
+    /*function getAndValidatePer(ele) {
+        var complete_per = $(ele).val();
+        if(parseInt(complete_per) > 100 && complete_per.length > 2 && parseInt(complete_per) !== 100) {
+            $(ele).val('0');
+            $('#project_status').val("Not Started");
+        } else if(parseInt(complete_per) < 0) {
+            $(ele).val('0');
+            $('#project_status').val("Not Started");
+        } else if(parseInt(complete_per) === 100) {
+            $('#project_status').val("Completed");
+        } else if(parseInt(complete_per) === 0) {
+            $('#project_status').val("Not Started");
+        } else {
+            $('#project_status').val("In Progress");
+        }
+    }*/
+
+    function deleteProjectRes(userId, projectId, user_role, assignment_id) {
+        showLoader('#globalLoader');
+        $.ajax({
+            type: 'POST',
+            url : '/deleteProjectResource',
+            contentType: 'application/json',
+            dataType: 'json',
+            data : JSON.stringify({"userId":userId, "projectId":projectId, "user_role": user_role, "assignment_id": assignment_id}),
+            success : function(response){
+                console.log(response);
+                if(response.success == true) {
+                    hideLoader('#globalLoader');
+                    showGlobalToast('#globalToast', 'success', response.message, 4000);
+                    //window.location.href = '/projects-listing'
+                    location.reload();
+                    // dummySave();
+                } else {
+                    hideLoader('#globalLoader');
+                    showGlobalToast('#globalToast', 'error', response.message, 4000);
+                    closeModal(modalId);
+                }
+            },
+            error: function(response){
+                    console.log(response);
+                    hideLoader('#globalLoader');
+                    showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+            }
+        });
+    }
+</script>

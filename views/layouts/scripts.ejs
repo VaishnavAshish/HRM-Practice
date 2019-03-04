@@ -1,0 +1,186 @@
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.21/moment-timezone.min.js">
+
+</script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.16/moment-timezone-with-data.min.js"></script>
+<!-- <script src="/js/summernote-lite.js"></script> -->
+<!-- <script src="./../../node_modules/ejs/ejs.min.js"></script> -->
+
+<script src="/js/util.js"></script>
+
+<script src="/js/flatpickr.min.js"></script>
+
+<script src="https://npmcdn.com/ejs@1.0.0/ejs.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/money.js/0.2.0/money.min.js"></script>
+
+<script>
+    
+    function minuteToHours(min) {
+        var num = min;
+        var hours = (num / 60);
+        var rhours = Math.floor(hours);
+        var minutes = (hours - rhours) * 60;
+        var rminutes = Math.round(minutes);
+        rminutes = rminutes < 10 ? '0'+rminutes : rminutes;
+        return rhours + ":" + rminutes;
+    }
+
+    function hoursToMinutes(hours) {
+        console.log("Hours: " + typeof(hours));
+        console.log("Hours: " + hours);
+        if(!hours.includes('.') && !hours.includes(':')){
+            hours = hours + '.0'
+        }
+        console.log(hours);
+        var hoursArr = hours.includes('.') ? hours.split('.') : hours.split(':');
+        if(hoursArr[1] > 60) {
+            hoursArr[1] = Math.round((hoursArr[1] * 60) / 100);
+        }
+        var minutes = (+hoursArr[0]) * 60 + (+hoursArr[1]);
+        console.log(minutes);
+        return minutes;
+    }
+
+    function createJSONForFormData(formId) {
+        console.log(formId + " [getFormData='']");
+        var formData = {};
+        $(formId + " [getFormData='']").each(function () {
+            var eleType = $(this).prop('nodeName');
+            var fieldName = $(this).attr('name');
+            if (eleType == 'SELECT') {
+                formData[fieldName] = $('option:selected', this).val();
+            } else if (eleType == 'INPUT') {
+                var fieldType = $(this).prop('type');
+                if (fieldType == 'text' || fieldType == 'email' || fieldType == 'password' || fieldType == 'hidden') {
+                    formData[fieldName] = $(this).val();
+                } else if (fieldType == 'checkbox' || fieldType == 'radio') {
+                    formData[fieldName] = $(this).prop('checked');
+                } else if (fieldType == 'date') {
+                    formData[fieldName] = $(this).val();
+                }
+            } else if (eleType == 'TEXTAREA') {
+                formData[fieldName] = $(this).val();
+            } else {
+                console.log(eleType);
+                console.log(fieldName);
+                formData[fieldName] = $(this).html();
+                console.log($(this).html());
+            }
+        });
+        return formData;
+    }
+
+    /* function resetForm(formId) {
+        $(formId).find('input, textarea, select').each(function () {
+            $(this).val("");
+        });
+        return true;
+    } */
+
+    function addError(id, msg) {
+        $(id).closest('.slds-form-element').addClass('slds-has-error');
+        $(id).closest('.slds-form-element').find('.slds-text-color_error').html(msg);
+    }
+
+    function clearError(id) {
+        $(id).closest('.slds-form-element').removeClass('slds-has-error');
+        $(id).closest('.slds-form-element').find('.slds-text-color_error').html('');
+    }
+    function clearSearchBox(obj){
+        $(obj).closest('div').siblings('input').val('');
+    }
+    function checkFormValidation(formId) {
+        console.log(formId + " [required='']");
+        $(formId + " [required='']").each(function(){
+            var eleType = $(this).prop('nodeName');
+            if($(this).val() == null || $(this).val().trim() == ''){
+                // console.log("Inside If", '#'+$(this).attr('id'));
+                if(eleType == 'SELECT'){
+                    addError('#'+$(this).attr('id'), "select any option")
+                    $(formId).addClass('has-error');
+                    return false;
+                }
+                else{
+                    // console.log("Inside If-else");
+                    addError('#'+$(this).attr('id'), "");
+                    $(formId).addClass('has-error');
+                    return false;
+                }
+            } else {
+                // console.log("Inside else");
+                clearError('#'+$(this).attr('id'));
+                $(formId).removeClass('has-error');
+                return true;
+            }
+        });
+    }
+    function handle(e,obj){
+        if(e.keyCode === 13){
+            e.preventDefault();
+            console.log("Enter was pressed was presses");
+            eval($(obj).attr('searchFunc'));
+
+        }
+    }
+
+    function deleteBeforeConfirm(modalId, methodName) {
+        console.log(methodName);
+        $('p[alert-message]',modalId).text('Are you sure you want to delete this item?');
+        openModal(modalId);
+        $('[btn-confirm]', modalId).attr('method', methodName);
+    }
+
+    function confirmDeleteItem(ele) {
+        closeModal('#globalAlert');
+        eval($(ele).attr('method'));
+    }
+
+    function activateBeforeConfirm(modalId, methodName) {
+        console.log(methodName);
+        $('p[alert-message]',modalId).text('Are you sure you want to activate this item?');
+        openModal(modalId);
+        $('[btn-confirm]', modalId).attr('method', methodName);
+
+    }
+
+    function activate(id,objectName){
+        console.log('id is '+id+' object is'+objectName);
+        showLoader('#globalLoader');
+        $.ajax({
+          type: 'POST',
+          url : '/activate',
+          contentType: 'application/json',
+          dataType: 'json',
+          data:JSON.stringify({"id":id,"object":objectName}),
+           success : function(response){
+                console.log(response);
+                hideLoader('#globalLoader');
+                showGlobalToast('#globalToast', 'success', response.message, 4000);
+
+               location.reload();
+
+            },
+           error: function(response){
+                console.log('error is : '+JSON.stringify(response));
+                hideLoader('#globalLoader');
+                console.log(response.responseJSON.message);
+                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+
+            }
+        });
+    }
+
+    function validateEmail(sEmail) {
+          var reEmail = /^(?:[\w\!\#\$\%\&\'\*\+\-\/\=\?\^\`\{\|\}\~]+\.)*[\w\!\#\$\%\&\'\*\+\-\/\=\?\^\`\{\|\}\~]+@(?:(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-](?!\.)){0,61}[a-zA-Z0-9]?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9\-](?!$)){0,61}[a-zA-Z0-9]?)|(?:\[(?:(?:[01]?\d{1,2}|2[0-4]\d|25[0-5])\.){3}(?:[01]?\d{1,2}|2[0-4]\d|25[0-5])\]))$/;
+          if(!sEmail.match(reEmail)) {
+            /*alert("Invalid email address");*/
+            return false;
+          }
+          return true;
+    }
+</script>

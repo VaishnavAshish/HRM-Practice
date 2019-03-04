@@ -1,0 +1,42 @@
+@each $side in $sides{
+  .line-#{$side} {
+    border-#{$side}: 1px solid #eee;
+  }
+}
+
+@each $side in $sides{
+  .line-semi-white-#{$side} {
+    border-#{$side}: 1px solid rgba(255,255,255,.5);
+  }
+}
+
+@each $side in $sides{
+  .line-semi-black-#{$side} {
+    border-#{$side}: 1px solid rgba(0,0,0,.2);
+  }
+}
+.line-around{
+	border:1px solid #eee;
+}
+.line-none{
+	border:none;
+}
+.first-li-line-top-0 > li:first-child{
+	border-top: none;
+}
+.first-li-p-top-0 > li:first-child{
+	padding-top: 0;
+}
+.first-li--m-top-0 > li:first-child{
+	margin-top: 0;
+}
+
+.last-li-line-bottom-0 > li:last-child{
+	border-bottom: none;
+}
+.last-li-p-bottom-0 > li:last-child{
+	padding-bottom: 0;
+}
+.last-li--m-bottom-0 > li:last-child{
+	margin-bottom: 0;
+}

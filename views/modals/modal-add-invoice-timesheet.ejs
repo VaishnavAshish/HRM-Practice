@@ -1,0 +1,111 @@
+<!-- modal add invoice timesheet start-->
+<div id="modalAddInvoiceTsheet">
+    <section role="dialog" tabindex="-1" class="slds-modal">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="closeModal('#modalAddInvoiceTsheet');">
+                    <span class="slds-button__icon">
+                        <i class="fa fa-times text-size-21"></i>
+                    </span>
+                </button>
+                <h2  class="slds-text-heading_medium slds-hyphenate">Add Timesheet Hour</h2>
+            </header>
+            <div class="slds-modal__content slds-p-around_medium" modal-body>
+                <div>
+
+                    <div class="slds-form-element slds-m-bottom_medium" reset='errorclass'>
+                        <label class="slds-form-element__label">
+                            Project
+                            <abbr class="slds-required" title="required">*</abbr>
+                        </label>
+                        <div class="slds-form-element__control">
+                            <div class="slds-select_container">
+                                <select class="slds-select" id="invoice-time-project" reset='value'>
+                                    <% if(projects.length >0) {%>
+                                        <option value=""> </option>
+                                        <% projects.forEach(function(project) { %>
+                                            <option pr_type="<%= project.type %>" pr_id="<%= project.id %>" value="<%= project.id %>"><%= project.name %></option>
+                                        <% }); %>
+                                    <% } else { %>
+                                        <option value=""> </option>
+                                    <% } %>
+                                </select>
+                            </div>
+                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset='errmsg'>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slds-form-element slds-m-bottom_medium">
+                        <div class="slds-form-element__control">
+                            <span class="slds-radio">
+                                <input type="radio" id="time_all_expense" value="All uninvoiced billable hours" for="all" name="time_invoice_gen_cat"  checked="" onchange="isDateRangeDisabled(this);" reset-checked='true'/>
+                                <label class="slds-radio__label" for="time_all_expense">
+                                    <span class="slds-radio_faux"></span>
+                                    <span class="slds-form-element__label">All uninvoiced billable hours</span>
+                                </label>
+                            </span>
+
+                        </div>
+                    </div>
+
+                    <div class="slds-form-element slds-m-bottom_medium">
+                        <div class="slds-form-element__control">
+                            <span class="slds-radio">
+                                <input type="radio" id="time_specific_range" value="Specific date range" name="time_invoice_gen_cat" for="date" onchange="isDateRangeDisabled(this);"/>
+                                <label class="slds-radio__label" for="time_specific_range">
+                                    <span class="slds-radio_faux"></span>
+                                    <span class="slds-form-element__label">Specific date range:</span>
+                                </label>
+                            </span>
+                        </div>
+                    </div>
+
+
+                    <div class="slds-grid slds-wrap slds-gutters">
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                            <div class="slds-form-element slds-m-bottom_medium">
+                                <label class="slds-form-element__label">
+                                    Start Date
+                                </label>
+                                <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
+                                    <span class="slds-input__icon slds-input__icon_right">
+                                        <i class="fa fa-calendar"></i>
+                                    </span>
+                                    <input type="date" class="slds-input open-date-pik" id="time_start_date" disabled reset-disabled='true' reset='value'>
+                                </div>
+                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                            <div class="slds-form-element slds-m-bottom_medium">
+                                <label class="slds-form-element__label">
+                                    End Date
+                                </label>
+                                <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
+                                    <span class="slds-input__icon slds-input__icon_right">
+                                        <i class="fa fa-calendar"></i>
+                                    </span>
+                                    <input type="date" class="slds-input open-date-pik" id="time_end_date" disabled reset-disabled='true' reset='value'>
+                                </div>
+                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <footer class="slds-modal__footer">
+                <button class="slds-button slds-button_neutral" onclick="closeModal('#modalAddInvoiceTsheet');">Cancel</button>
+                <button class="slds-button slds-button_brand" onclick="addTimeInvoiceItem('#modalAddInvoiceTsheet')">Add</button>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop"></div>
+</div>
+<!-- modal add invoice timesheet end-->

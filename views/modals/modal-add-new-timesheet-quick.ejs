@@ -1,0 +1,161 @@
+<!-- modal add new timesheet quick start-->
+<div id="modalAddNewTsheetQuick">
+    <section role="dialog" tabindex="-1" class="slds-modal">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="closeModal('#modalAddNewTsheetQuick');">
+                    <span class="slds-button__icon">
+                        <i class="fa fa-times text-size-21"></i>
+                    </span>
+                </button>
+                <h2  class="slds-text-heading_medium slds-hyphenate">Submit entry for the time logged( <span id="logSubmittedDate"></span>)</h2>
+            </header>
+            <div class="slds-modal__content slds-p-around_medium">
+                <form id="addNewLineItemForm">
+                    <div>
+                        <div class="slds-form-element slds-m-bottom_medium">
+                            <label class="slds-form-element__label">
+                                Select Project
+                                <abbr class="slds-required" title="required">*</abbr>
+                            </label>
+                            <div class="slds-form-element__control">
+                                <div class="slds-select_container">
+                                    <select class="slds-select" required="" id="globalProjectForTimesheet" name="day_project" getFormData onchange="getProjectTask(this,'#globalTaskForTimesheet')">
+                                        <option value=""> </option>
+                                    </select>
+                                </div>
+                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-wrap slds-grid_vertical-align-end slds-grid_pull-padded">
+                            <div class=" slds-size_1-of-1 slds-medium-size_6-of-12 slds-p-horizontal_small">
+                                <div class="slds-form-element slds-m-bottom_medium">
+                                    <label class="slds-form-element__label">
+                                        Task
+                                        <abbr class="slds-required" title="required">*</abbr>
+                                    </label>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-select_container">
+                                            <select class="slds-select" required="" id="globalTaskForTimesheet" name="day_task" getFormData onchange="getTaskBillValue(this,'#globalTaskBill')">
+                                                <option value=""> </option>
+                                            </select>
+                                        </div>
+                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <!-- <div class="slds-grid slds-wrap slds-gutters">
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_8-of-12">
+                                <div class="slds-form-element slds-m-bottom_medium">
+                                    <label class="slds-form-element__label">
+                                        <abbr class="slds-required" title="required">*</abbr>
+                                        Task
+                                    </label>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-select_container">
+                                            <select class="slds-select" required="" id="globalTaskForTimesheet" name="day_task" getFormData>
+                                                <option value=""> </option>
+                                            </select>
+                                        </div>
+                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> -->
+                            <div class=" slds-size_1-of-1 slds-medium-size_3-of-12 slds-p-horizontal_small">
+                                <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_large">
+                                    <div class="slds-col--bump-left slds-p-right_medium">
+                                        <div class="slds-form-element ">
+                                          <label class="slds-checkbox_toggle slds-grid">
+                                              <input type="checkbox" checked="" id="globalTaskBill" name="day_category" getFormData>
+                                              <span id="checkbox-toggle-3" class="slds-checkbox_faux_container">
+                                                  <span class="slds-checkbox_faux"></span>
+                                              </span>
+                                          </label>
+                                        </div>
+                                    </div>
+                                    <div class="slds-has-flexi-truncate">
+                                        <span category-isBillable>Billable</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class=" slds-size_1-of-1 slds-medium-size_3-of-12 slds-p-horizontal_small">
+                                <div class="slds-form-element slds-m-bottom_medium">
+                                    <label class="slds-form-element__label">
+                                        Time
+                                    </label>
+                                    <div class="slds-form-element__control">
+                                          <input type="text" class="slds-input time-hhmm" placeholder="HH:MM" id="syncTimer" name="day_time" getFormData>
+                                          <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                          </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+                                <div class="slds-form-element slds-m-bottom_medium">
+                                    <label class="slds-form-element__label">
+                                        Time
+                                    </label>
+                                    <div class="slds-form-element__control">
+                                        <input type="text" class="slds-input" placeholder="" id="syncTimer" name="day_time" getFormData>
+                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> -->
+                        </div>
+                        <!-- <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_large">
+                            <div class="slds-col--bump-left slds-p-right_medium">
+                                <div class="slds-form-element ">
+                                    <label class="slds-checkbox_toggle slds-grid">
+                                        <input type="checkbox" checked="" id="globalTaskBill" name="day_category" getFormData>
+                                        <span id="checkbox-toggle-3" class="slds-checkbox_faux_container">
+                                            <span class="slds-checkbox_faux"></span>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="slds-has-flexi-truncate">
+                                <span>Billable</span>
+                            </div>
+                        </div> -->
+                        <div class="slds-form-element slds-m-bottom_medium">
+                            <label class="slds-form-element__label">
+                                Select Role
+                                <abbr class="slds-required" title="required">*</abbr>
+                            </label>
+                            <div class="slds-form-element__control">
+                                <div class="slds-select_container">
+                                    <select class="slds-select" required="" getFormData name="user_role" id="globalUserRole">
+
+                                    </select>
+                                </div>
+                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-m-bottom_medium">
+                            <label class="slds-form-element__label">Note</label>
+                            <div class="slds-form-element__control">
+                                <textarea class="slds-textarea" placeholder="Placeholder Text" id="note" name="day_note" getFormData></textarea>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+            <footer class="slds-modal__footer">
+                <button class="slds-button slds-button_neutral" onclick="closeGlobalTimesheet('#modalAddNewTsheetQuick');">Cancel</button>
+                <button class="slds-button slds-button_brand" onclick="addTimeLogEntry('#modalAddNewTsheetQuick','#addNewLineItemForm')">Add</button>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop"></div>
+</div>
+<!-- modal add new timesheet quick end-->

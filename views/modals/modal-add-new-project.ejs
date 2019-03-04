@@ -1,0 +1,153 @@
+<!-- modal add new organization start-->        
+            <div id="modalAddNewProject">
+                <section role="dialog" tabindex="-1" class="slds-modal">
+                    <div class="slds-modal__container">
+                        <header class="slds-modal__header">
+                            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="closeModal('#modalAddNewProject');">
+                                <span class="slds-button__icon">
+                                    <i class="fa fa-times text-size-21"></i>
+                                </span>
+                            </button>
+                            <h2  class="slds-text-heading_medium slds-hyphenate">Add New Project</h2>
+                        </header>
+                        <div class="slds-modal__content slds-p-around_medium">
+                            <div>
+                                <div class="slds-form-element slds-m-bottom_medium" reset='errorclass'>
+                                    <label class="slds-form-element__label">
+                                        Project Title
+                                        <abbr class="slds-required" title="required">*</abbr>
+                                    </label>
+                                    <div class="slds-form-element__control">
+                                        <input type="text" id="new-project-title" name="new-project-title" class="slds-input" placeholder="" required="" reset='value'/>
+                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset='errmsg'>
+                                                   
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-m-bottom_medium" reset='errorclass'>
+                                        <label class="slds-form-element__label">
+                                            Account
+                                            <abbr class="slds-required" title="required">*</abbr>
+                                        </label>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-select_container">
+                                                <select class="slds-select" id="new-project-account" reset='value'>
+                                                        <% if(accounts.length >0) {%>
+                                                            <option value=""> </option>
+                                                            <% accounts.forEach(function(account) { %>
+                                                                <option ac_id="<%= account.id %>" value="<%= account.name %>"><%= account.name %></option>
+                                                            <% }); %>
+                                                        <% } else { %>
+                                                            <option value=""> </option>
+                                                        <% } %> 
+                                                </select>
+                                            </div>
+                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" id="err-msg-account" reset='errmsg'>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                <div class="slds-form-element slds-m-bottom_medium">
+                                    <label class="slds-form-element__label" for="">Description</label>
+                                    <div class="slds-form-element__control">
+                                        <textarea id="new-project-desc" class="slds-textarea" placeholder="" reset='value'></textarea>
+                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                   
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-grid slds-wrap slds-gutters">
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                        <div class="slds-form-element slds-m-bottom_medium">
+                                            <label class="slds-form-element__label">
+                                                Project Type
+                                            </label>
+                                            <div class="slds-form-element__control">
+                                                <div class="slds-select_container">
+                                                    <select class="slds-select" id="new-project-type" default-val="time_and_material" reset='default' onchange="isProjectFixedFee(this);">
+                                                        <option value="time_and_material">Time and Material</option>
+                                                        <option value="milestone">Milestone</option>
+                                                        <option value="fixed_fee">Fixed Fee</option>
+                                                    </select>
+                                                </div>
+                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                            
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+                                        <div class="slds-form-element slds-m-bottom_medium">
+                                            <label class="slds-form-element__label">Project Cost</label>
+                                            <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
+                                                <input type="text" class="slds-input" id="project-cost" project-cost disabled value="0"  reset='number' reset-disabled='true'>
+                                            </div>
+                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+                                        <div class="slds-grid slds-grid_vertical-align-center slds-m-top_large">
+                                            <div class="slds-col--bump-left slds-p-right_medium">
+                                                <div class="slds-form-element ">
+                                                    <label class="slds-checkbox_toggle slds-grid">
+                                                        <input type="checkbox" checked="" id="new-project-isBillable" getformdata="" reset-checked='true'>
+                                                        <span id="checkbox-toggle-3" class="slds-checkbox_faux_container">
+                                                            <span class="slds-checkbox_faux"></span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="slds-has-flexi-truncate">
+                                                <span>Billable</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-grid slds-wrap slds-gutters">
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                        <div class="slds-form-element slds-m-bottom_medium">
+                                            <label class="slds-form-element__label">
+                                                Start Date
+                                            </label>
+                                            <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
+                                                <span class="slds-input__icon slds-input__icon_right">
+                                                    <i class="fa fa-calendar"></i>
+                                                </span>
+                                                <input type="date"  class="slds-input open-date-pik" id="new-project-start-date" reset='value'/>
+                                            </div>
+                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                        <div class="slds-form-element slds-m-bottom_medium">
+                                            <label class="slds-form-element__label">
+                                                End Date
+                                            </label>
+                                            <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
+                                                <span class="slds-input__icon slds-input__icon_right">
+                                                    <i class="fa fa-calendar"></i>
+                                                </span>
+                                                <input type="date"  class="slds-input open-date-pik" id="new-project-end-date" reset='value'/>
+                                            </div>
+                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <button class="slds-button slds-button_neutral" onclick="closeModal('#modalAddNewProject');">Cancel</button>
+                            <button class="slds-button slds-button_brand" onclick="addProject('#modalAddNewProject');">Add and Setup</button>
+                            <!-- dummyAddItem('#modalAddNewProject', 'Project Added Successfully'); -->
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop"></div>
+            </div>
+          <!-- modal add new organization start-->   

@@ -1,0 +1,137 @@
+<!-- dummy import form start-->        
+<div>
+    
+    <div class="slds-form-element slds-m-bottom_medium">
+        <label class="slds-form-element__label">
+            Select CSV File:
+            <abbr class="slds-required" title="required">*</abbr>
+        </label>
+        <div class="slds-form-element__control">
+            <input type="file" accept="" name="file" id="dummyFileInput" onchange="dummyEnableImpBtn(this, '#importBtn');">
+            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+            </div>
+        </div>
+    </div>
+    <div class="slds-m-bottom_medium">
+        <button class="slds-button slds-button_brand slds-align-top" id="importBtn" disabled="" onclick="dummyImport(this, '#dummyImpProgress', '#dummyImpSummary', '#dummyFileInput');">
+            Import Data
+        </button>
+        <div class="hide" id="dummyImpProgress">
+            <div class="slds-grid">
+                <div class="slds-has-flexi-truncate">
+                    <span record-counts>0</span>/100 Records
+                </div>
+                <div class="slds-no-flex">
+                    <span percent-progress>0</span>%
+                </div>
+            </div>
+            <div class="slds-progress-bar slds-progress-bar_circular">
+                <span class="slds-progress-bar__value" progress-bar style="width: 0;">
+                </span>
+            </div>
+        </div>
+        <div class="hide" id="dummyImpSummary">
+            <div class="  slds-m-top_large">
+                <div class="text-uppercase slds-p-around_x-small slds-theme_shade">
+                    Import Summary
+                </div>
+                <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                    <div class="slds-size_1-of-1 slds-medium-size_1-of-3 slds-p-horizontal_small">
+                        <div class="slds-p-vertical_x-small">
+                            <div class="slds-truncate text-size-11 text-dull">
+                                Records Added
+                            </div>
+                            <div class="text-size-16">
+                                93
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-size_1-of-1 slds-medium-size_1-of-3 slds-p-horizontal_small">
+                        <div class="slds-p-vertical_x-small">
+                            <div class="slds-truncate text-size-11 text-dull">
+                                Records Updated
+                            </div>
+                            <div class="text-size-16">
+                                0
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-size_1-of-1 slds-medium-size_1-of-3 slds-p-horizontal_small">
+                        <div class="slds-p-vertical_x-small">
+                            <div class="slds-truncate text-size-11 text-dull">
+                                Records Skipped
+                            </div>
+                            <div class="text-size-16">
+                                3
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="text-uppercase slds-p-around_x-small line-top">
+                    <span class="text-red">Line Error (3)</span>
+                </div>
+                <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked">
+
+                    <tbody>
+                        <tr>
+                            <th scope="row">
+                                <div>
+                                    <strong class="text-uppercase">Line 71</strong>
+                                </div>
+                            </th>
+                            <td data-label="Error">
+                                <div>
+                                    No primary email address found
+                                </div>
+                            </td>
+                            <td data-label="Action">
+                                <div>
+                                    Record Skipped
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                <div>
+                                    <strong class="text-uppercase">Line 72</strong>
+                                </div>
+                            </th>
+                            <td data-label="Error">
+                                <div>
+                                    No primary email address found
+                                </div>
+                            </td>
+                            <td data-label="Action">
+                                <div>
+                                    Record Skipped
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                <div>
+                                    <strong class="text-uppercase">Line 73</strong>
+                                </div>
+                            </th>
+                            <td data-label="Error">
+                                <div>
+                                    No primary email address found
+                                </div>
+                            </td>
+                            <td data-label="Action">
+                                <div>
+                                    Record Skipped
+                                </div>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- dummy import form end-->   

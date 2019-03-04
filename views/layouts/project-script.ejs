@@ -1,0 +1,521 @@
+<script>
+function addProject(modalId) {
+    let projectData = {};
+    projectData.title = $("#new-project-title").val();
+    projectData.accountId = $("#new-project-account option:selected").attr('ac_id');
+    projectData.description = $("#new-project-desc").val();
+    projectData.type = $("#new-project-type option:selected").val();
+    projectData.project_cost = 0;
+    if(projectData.type == "fixed_fee") {
+        projectData.project_cost = $.trim($("#project-cost").val()).length > 0 ? parseFloat($("#project-cost").val()) : 0;
+    }
+    projectData.isBillable = $("#new-project-isBillable").prop('checked');
+    projectData.startDate = new Date($('#new-project-start-date').val());
+    projectData.endDate = new Date($('#new-project-end-date').val());
+    console.log(projectData);
+    if(!projectData.title) {
+        addError("#new-project-title", "Please enter project title");
+    } else {
+        if(projectData.accountId == "" || projectData.accountId == null || projectData.accountId == undefined) {
+            clearError('#new-project-title');
+            addError("#new-project-account", "Select any account"); 
+        } else {
+            clearError('#new-project-account');
+            showLoader('#globalLoader');
+                $.ajax({
+                    type: 'POST',
+                    url : '/addProject',
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    data:JSON.stringify(projectData),
+                    success : function(response){
+                        if(response.success == true) {
+                            console.log(response)
+                            window.location.href="/project-details?projectId="+response.projectId;
+                        } else {
+                            hideLoader('#globalLoader');
+                            closeModal(modalId);
+                            showGlobalToast('#globalToast', 'error', response.message, 4000);
+                        }
+
+                    },
+                    error: function(response){
+                        console.log(response);
+                        hideLoader('#globalLoader');
+                        closeModal(modalId);
+                        showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+
+                    }
+                });
+                //dummyAddItem('#modalAddNewProject', 'Project Added Successfully');
+        }
+    }
+}
+
+function renderProjectList(){
+    $.ajax({
+    type: 'GET',
+    url : '/project',
+    headers : {'Content-Type' : 'application/json'},
+        success : function(response){
+            let projList = response;
+            console.log(projList);
+            // renderHandleBar('projectList', 'projectListTBody', projList);
+            // let source   = document.getElementById("").innerHTML;
+            // let template = Handlebars.compile(source);
+            // let html    = template(projList);
+            // document.getElementById("projectListTBody").innerHTML = html;
+
+            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+            // renderHandleBar('projectCardList', 'projectCardView', projList);
+            renderProjects('projectCardView', projList);
+            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+            // source   = document.getElementById("projectCardList").innerHTML;
+            // template = Handlebars.compile(source);
+            // html    = template(projList);
+            // document.getElementById("projectCardView").innerHTML = html;
+        },
+        error: function(response){
+                    console.log(response);
+        }
+    });
+}
+
+$(document).ready(function(){
+
+    $("#offset").text(parseInt($("#pageRecordNo").text()));
+    let noOfRecord=parseInt($("#offset").text());
+    let searchFilter=$("#selectedFilter").text();
+
+    if(searchFilter.trim()=="All"){
+        if((<%= totalCount %>) >parseInt($("#offset").text())){
+            $("#totalRecordCount").text(<%= totalCount %>);
+        }
+    }else if(searchFilter.trim()=="Not Started".trim()){
+        if((<%= notStartedCount %>)>parseInt($("#offset").text())){
+            $("#totalRecordCount").text(<%= notStartedCount %>);
+        }
+    }else if(searchFilter.trim()=="In Progress".trim()){
+        if((<%= inProgressCount %>)>parseInt($("#offset").text())){
+            $("#totalRecordCount").text(<%= inProgressCount %>);
+        }
+    }else if(searchFilter.trim()=="At Risk".trim()){
+        if((<%= atRiskCount %>)>parseInt($("#offset").text())){
+            $("#totalRecordCount").text(<%= atRiskCount %>);
+        }
+    }else if(searchFilter.trim()=="Completed".trim()){
+        if((<%= completedCount %>)>parseInt($("#offset").text())){
+            $("#totalRecordCount").text(<%= completedCount %>);
+        }
+    }
+    if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
+        $(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
+    }else{
+        $(".slds-button[loadItemId]").hide();
+    }
+
+});
+
+function renderProjects(destinationId, data) {
+
+    var templ = document.getElementById('projectList').innerHTML;
+    console.log(data.length);
+    var html = ejs.compile(templ)(data);
+
+    console.log('Rendered HTML:');
+
+}
+function loadMoreProject(){
+
+    let offset=$("#offset").text();
+    showLoader('#globalLoader');
+    let searchField=[];
+    let searchCriteria={"fieldName":"archived = ","fieldValue":false};
+    searchField.push(searchCriteria);
+    searchCriteria={"fieldName":"isGlobal = ","fieldValue":false};
+    searchField.push(searchCriteria);
+    let filterCriteria=$("#selectedFilter").text();
+    if(filterCriteria.trim()=="Not Started".trim()){
+        searchCriteria={"fieldName":"status ilike ","fieldValue":'%'+'Not Started'+'%'};
+        searchField.push(searchCriteria);
+    }else if(filterCriteria.trim()=="In Progress".trim()){
+        searchCriteria={"fieldName":"status ilike ","fieldValue":'%'+'In Progress'+'%'};
+        searchField.push(searchCriteria);
+    }else if(filterCriteria.trim()=="At Risk".trim()){
+        searchCriteria={"fieldName":"status ilike ","fieldValue":'%'+'At Risk'+'%'};
+        searchField.push(searchCriteria);
+    }else if(filterCriteria.trim()=="Completed".trim()){
+        searchCriteria={"fieldName":"status ilike ","fieldValue":'%'+'Completed'+'%'};
+        searchField.push(searchCriteria);
+    }
+    console.log(searchField);
+
+    $.ajax({
+          type: 'POST',
+          url : '/findProjectByCriteria',
+          contentType: 'application/json',
+          dataType: 'json',
+          data:JSON.stringify({"searchField":searchField,"offset":offset}),
+           success : function(response){
+               if(response.success){
+                    hideLoader('#globalLoader');
+                    console.log(response.projects);
+                    if(response.projects.length>0){
+                            /*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
+                            response.projects.forEach(function(project){
+                                setDataToTable(project);
+                                setDataToCard(project);
+                            })
+                        $("#offset").text(parseInt($("#offset").text())+parseInt($("#pageRecordNo").text()));
+                        let noOfRecord=parseInt($("#offset").text());
+                        if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
+                            $(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
+                        }else{
+                            $(".slds-button[loadItemId]").hide();
+                        }
+
+                    }else{
+                        hideLoader('#globalLoader');
+                        showGlobalToast('#globalToast', 'error','No project found with this search crieteria', 4000);
+                    }
+               }else {
+                   hideLoader('#globalLoader');
+                   showGlobalToast('#globalToast', 'error','No project found with this search crieteria', 4000);
+                }
+
+            },
+           error: function(response){
+                console.log('error is : '+response);
+                hideLoader('#globalLoader');
+                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+            }
+        });
+}
+
+function searchProject(filter,obj){
+    $("div[title=noProjectFound]").addClass('slds-hide');
+    showLoader('#globalLoader');
+
+    $(".slds-button[loadItemId]").show();
+    $("#offset").text("0");
+
+    let searchField=[];
+    let searchCriteria={"fieldName":"archived = ","fieldValue":false};
+    searchField.push(searchCriteria);
+    searchCriteria={"fieldName":"isGlobal = ","fieldValue":false};
+    searchField.push(searchCriteria);
+    if(filter.trim()=="Not Started"){
+        searchCriteria={"fieldName":"status ilike ","fieldValue":'%'+'Not Started'+'%'};
+        searchField.push(searchCriteria);
+    }else if(filter.trim()=="In Progress"){
+        searchCriteria={"fieldName":"status ilike ","fieldValue":'%'+'In Progress'+'%'};
+        searchField.push(searchCriteria);
+    }else if(filter.trim()=="At Risk"){
+        searchCriteria={"fieldName":"status ilike ","fieldValue":'%'+'At Risk'+'%'};
+        searchField.push(searchCriteria);
+    }else if(filter.trim()=="Completed"){
+        searchCriteria={"fieldName":"status ilike ","fieldValue":'%'+'Completed'+'%'};
+        searchField.push(searchCriteria);
+    }
+    console.log(searchField);
+    $("#projectListTBody").html('');
+    $("#projectCardView").html('');
+    $.ajax({
+          type: 'POST',
+          url : '/findProjectByCriteria',
+          contentType: 'application/json',
+          dataType: 'json',
+          data:JSON.stringify({"searchField":searchField}),
+           success : function(response){
+               if(response.success){
+                    hideLoader('#globalLoader');
+                    console.log(response.projects);
+                    if(response.projects.length>0){
+                            /*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
+                            response.projects.forEach(function(project){
+                                setDataToTable(project);
+                                setDataToCard(project);
+                            })
+                        $(obj).closest('div[title="filterDropDown"]').find('#selectedFilter').text(filter);
+                        $(obj).closest('div[title="filterDropDown"]').removeClass('slds-is-open');
+                        $("#totalRecordCount").text(response.count);
+                        $("#offset").text(parseInt($("#offset").text())+parseInt($("#pageRecordNo").text()));
+                        let noOfRecord=parseInt($("#offset").text());
+                        if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
+                            $(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
+                        }else{
+                            $(".slds-button[loadItemId]").hide();
+                        }
+
+                    }else{
+                        $("div[title=noProjectFound]").removeClass('slds-hide').text('No project found with this search crieteria');
+                        $(obj).closest('div[title="filterDropDown"]').find('#selectedFilter').text(filter);
+                        $(obj).closest('div[title="filterDropDown"]').removeClass('slds-is-open');
+                        hideLoader('#globalLoader');
+                        /*showGlobalToast('#globalToast', 'error','No project found with this search crieteria', 4000);*/
+                    }
+               }
+
+            },
+           error: function(response){
+                console.log('error is : '+response);
+                hideLoader('#globalLoader');
+                $("div[title=noProjectFound]").removeClass('slds-hide').text(response.responseJSON.message);
+                /*showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);*/
+            }
+        });
+}
+function findProjectByName(){
+        $("div[title=noProjectFound]").addClass('slds-hide');
+        showLoader('#globalLoader');
+
+        $(".slds-button[loadItemId]").show();
+        $("#offset").text("0");
+
+        let searchText=$("#searchProjectName").val();
+        let filterCriteria=$("#selectedFilter").text().trim();
+        let requestbody={"searchText":searchText,"searchField":"name"}
+        if(filterCriteria.trim()=="Not Started".trim()){
+            requestbody.status='%'+'Not Started'+'%';
+        } else if(filterCriteria.trim()=="In Progress".trim()){
+            requestbody.status='%'+'In Progress'+'%';
+        } else if(filterCriteria.trim()=="At Risk".trim()){
+            requestbody.status='%'+'At Risk'+'%';
+        } else if(filterCriteria.trim()=="Completed".trim()){
+            requestbody.status='%'+'Completed'+'%';
+        }
+        console.log(requestbody);
+        $("#projectListTBody").html('');
+        $("#projectCardView").html('');
+        $.ajax({
+              type: 'POST',
+              url : '/findProjectByName',
+              contentType: 'application/json',
+              dataType: 'json',
+              data:JSON.stringify(requestbody),
+               success : function(response){
+                   if(response.success){
+                        hideLoader('#globalLoader');
+                        console.log(response.projects);
+                        if(response.projects.length>0){
+                            /*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
+                            response.projects.forEach(function(project){
+                                setDataToTable(project);
+                                setDataToCard(project);
+                            })
+
+                        }else{
+                            $("div[title=noProjectFound]").removeClass('slds-hide').text('No project found with this search crieteria');
+                            hideLoader('#globalLoader');
+                            /*showGlobalToast('#globalToast', 'error','No project found with this search crieteria', 4000);*/
+                        }
+                        $("#totalRecordCount").text(response.count);
+                        $("#offset").text(parseInt($("#offset").text())+parseInt($("#pageRecordNo").text()));
+                        let noOfRecord=parseInt($("#offset").text());
+                        if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
+                            $(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
+                        }else{
+                            $(".slds-button[loadItemId]").hide();
+                        }
+                   }
+
+                },
+               error: function(response){
+                    console.log('error is : '+response);
+                    hideLoader('#globalLoader');
+                    $("div[title=noProjectFound]").removeClass('slds-hide').text(response.responseJSON.message);
+                    /*showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);*/
+                }
+            });
+
+    }
+    function setDataToCard(project){
+        let icon = '';
+        if(project.status == "Not Started") {
+        icon = `<i class="fa fa-ban text-dull"></i>`;
+        } else if(project.status == "In Progress") {
+        icon = `<i class="fa fa-spinner text-orange"></i>`;
+        } else if(project.status == "At Risk") {
+        icon = `<i class="fa fa-exclamation-circle text-red"></i>`;
+        } else if(project.status == "Completed") {
+        icon = `<i class="fa fa-check-circle text-green"></i>`;
+        }
+        let projectCard=`<div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_3-of-12 slds-p-horizontal_small">
+                            <div class=" slds-m-bottom_medium slds-card">
+                                <div class="line-bottom  slds-p-around_x-small">
+                                    <div class="slds-grid">
+                                        <div class="slds-has-flexi-truncate slds-p-horizontal_x-small">
+                                            <div class="slds-truncate">
+                                                <a href="/project-details?projectId=`+project.id+`" class="text-size-16">`+project.name+`</a>
+                                            </div>
+                                            <div class="slds-truncate text-dull text-size-8">
+                                                    #<a href="/project-details?projectId=`+project.id+`" class="text-size-6">`+project.record_id+` </a>
+                                            </div>
+                                        </div>
+                                        <div class="slds-no-flex">
+                                            <div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">
+                                                <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" title="Show More">
+                                                    <span class="slds-button__icon">
+                                                        <i class=" fa fa-caret-down" aria-hidden="true"></i>
+                                                    </span>
+                                                    <span class="slds-assistive-text">Show More</span>
+                                                </button>
+                                                <div class="slds-dropdown slds-dropdown_right slds-dropdown_actions">
+                                                    <ul class="slds-dropdown__list" role="menu">
+                                                        <li class="slds-dropdown__item" role="presentation">
+                                                            <a href="/project-details?projectId=`+project.id+`" role="menuitem" tabindex="0">
+                                                                <span class="slds-truncate" title="">
+                                                                    <i class="fa fa-eye"></i> &nbsp;
+                                                                    View Details
+                                                                </span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="slds-has-divider_top-space" role="separator"></li>
+                                                        <li class="slds-dropdown__item" role="presentation">
+                                                            <a href="javascript:void(0);" role="menuitem" tabindex="-1"  onclick="deleteBeforeConfirm('#globalAlert', 'deleteProject(\'`+project.id+`\')');">
+                                                                <span class="slds-truncate sf-text-red" title="">
+                                                                    <i class="fa fa-trash text-red"></i> &nbsp;
+                                                                    Delete
+                                                                </span>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="line-bottom slds-p-around_small">
+                                    <div class="slds-p-bottom_x-small slds-truncate">
+                                        <i class="fa fa-id-card-alt text-dull rpd-5 fa-fw"></i>
+                                        `+project.account_name+`
+                                    </div>
+                                    <div class="slds-grid slds-p-top_x-small">
+                                        <div class="slds-has-flexi-truncate">
+                                            `+icon+`
+                                            `+project.status+`
+                                        </div>
+                                        <div class="slds-col--bump-left">
+                                                `+project.percent_completed+`%
+                                        </div>
+                                    </div>
+                                    <div class="slds-p-vertical_small">
+                                        <div class="slds-progress-bar slds-progress-bar_small slds-progress-bar_circular">
+                                            <span class="slds-progress-bar__value slds-progress-bar__value_success" style="width: `+project.percent_completed+`%;">
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-p-around_small">
+                                    <div class="slds-grid">
+                                        <div class="slds-col">
+                                            <div class="text-size-11 text-dull">
+                                                Start Date
+                                            </div>
+                                            <div>
+                                                <time>`+project.start_date+`<BR></time>
+                                            </div>
+                                        </div>
+                                        <div class="slds-col text-right">
+                                            <div class="text-size-11 text-dull">
+                                                End Date
+                                            </div>
+                                            <div>
+                                                <time>`+project.end_date+`<BR></time>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+        $("#projectCardView").append(projectCard);
+    }
+    function setDataToTable(project){
+        let project_status;
+         if(project.status == "Not Started") {
+            project_status='<i class="fa fa-ban text-dull"></i>';
+         } else if(project.status == "In Progress") {
+            project_status='<i class="fa fa-spinner text-orange"></i>';
+         } else if(project.status == "At Risk") {
+            project_status='<i class="fa fa-exclamation-circle text-red"></i>';
+         } else if(project.status == "Completed") {
+            project_status='<i class="fa fa-check-circle text-green"></i>';
+         } %>
+        let projectTr='<tr class="">'+
+                            '<th scope="row" tabindex="0">'+
+                                '<div class="slds-truncate" title="">'+
+                                    '<a href="/project-details?projectId='+project.id +'" tabindex="-1">'+
+                                        project.record_id+
+                                    '</a>'+
+                                '</div>'+
+                            '</th>'+
+                            '<th scope="row" tabindex="0">'+
+                                '<div class="slds-truncate" title="">'+
+                                    '<a href="/project-details?projectId='+project.id +'" tabindex="-1">'+
+                                        project.name+
+                                    '</a>'+
+                                '</div>'+
+                            '</th>'+
+                            '<td role="gridcell">'+
+                                '<div class="slds-truncate" title="">'+
+                                    project.start_date+
+                                '</div>'+
+                            '</td>'+
+                            '<td role="gridcell">'+
+                                '<div class="slds-truncate" title="">'+
+                                    project.end_date+
+                                '</div>'+
+                            '</td>'+
+                            '<td role="gridcell">'+
+                                '<div class="slds-truncate" title="">'+
+                                    project.account_name+
+                                '</div>'+
+                            '</td>'+
+                            '<td role="gridcell">'+
+                                '<div class="slds-truncate" title="">'+
+                                    project_status+
+                                    ' ' +project.status+
+                                '</div>'+
+                            '</td>'+
+                            '<td role="gridcell">'+
+                                '<div class="slds-truncate" title="">'+
+                                    '<span class="slds-p-bottom_xx-small view-inline">'+project.percent_completed+' %</span>'+
+                                '</div>'+
+                            '</td>'+
+                            '<td role="gridcell">'+
+                                '<div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">'+
+                                    '<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" title="Show More">'+
+                                    '<span class="slds-button__icon">'+
+                                        '<i class=" fa fa-caret-down" aria-hidden="true"></i>'+
+                                    '</span>'+
+                                    '<span class="slds-assistive-text">Show More</span>'+
+                                    '</button>'+
+                                    '<div class="slds-dropdown slds-dropdown_right slds-dropdown_actions">'+
+                                        '<ul class="slds-dropdown__list" role="menu">'+
+                                            '<li class="slds-dropdown__item" role="presentation">'+
+                                                '<a href="/project-details?projectId='+project.id+'" role="menuitem" tabindex="0">'+
+                                                    '<span class="slds-truncate" title="">'+
+                                                        '<i class="fa fa-eye"></i> &nbsp; View Details'+
+                                                    '</span>'+
+                                                '</a>'+
+                                            '</li>'+
+                                            '<li class="slds-has-divider_top-space" role="separator"></li>'+
+                                            '<li class="slds-dropdown__item" role="presentation">'+
+                                                '<a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick=\'deleteBeforeConfirm("#globalAlert", "deleteProject('+project.id+')")\'>'+
+                                                    '<span class="slds-truncate " title="">'+
+                                                        '<i class="fa fa-trash text-red"></i> &nbsp; Delete'+
+                                                    '</span>'+
+                                                '</a>'+
+                                            '</li>'+
+                                        '</ul>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</td>'+
+                        '</tr>';
+
+        $("#projectListTBody").append(projectTr);
+    }
+
+</script>

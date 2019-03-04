@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="en">
+<% include ../layouts/head %>
+<body class="kw">
+    <% include ../layouts/nav %>
+    <% include ../layouts/sideNav %>
+    <main class="main-body-space tpd-60 bpd-100">
+        <div>
+            <div class="slds-p-around_small">
+                <div class="">
+
+                    <% let currency_symbols = currencyWithSymbolArray.filter(function(currency){
+                        return currency.name == invoiceDetails.currency;
+                    }) %>
+                    <div class="slds-container slds-container_large slds-container_center" >
+                        <div class="slds-p-vertical_small">
+                            <a href="/invoice-details?invoiceId=<%= invoiceDetails.id %>" class="slds-button slds-align-top">
+                                <i class="fa fa-arrow-left"></i>
+                                <span class="">Back</span>
+                            </a>
+                        </div>
+                        <!-- header start end -->
+                        <div class="slds-card slds-p-around_small slds-m-bottom_medium">
+                            <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                <div class="slds-size_1-of-1 slds-medium-size_3-of-12 slds-p-horizontal_small sm-text-center">
+                               <!--      <div class="slds-badge slds-badge_inverse text-size-13 slds-p-around_x-small text-center view-inline min-w-200">Status: <%= invoiceDetails.status %></div> -->
+                                </div>
+                                <div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-p-horizontal_small">
+                                    <div class="text-center text-size-21 sm-tpd-15">
+                                        <span>
+                                            Amount:
+                                        </span>
+                                        <strong>
+                                           <%= currency_symbols[0].symbol %>  <%= invoiceDetails.total_amount %>
+                                        </strong>
+                                    </div>
+                                </div>
+                                <div class="slds-size_1-of-1 slds-medium-size_3-of-12 slds-p-horizontal_small">
+                                    <div class="text-right">
+                                        <button class="slds-button slds-button_brand slds-align-top" onclick="generatePdfFromHtml()" >
+                                            <i class="fa fa-print"></i>
+                                            <span class="sm-hide">PDF</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- header end -->
+                        <div class="slds-card min-h-800">
+                            <div class="slds-p-horizontal_small slds-p-top_large">
+                                <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                    <div class="slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_5-of-12 slds-p-horizontal_small">
+                                        <div class="slds-p-left_medium slds-m-bottom_x-large sm-text-center sm-lpd-0">
+                                            <img src="/getCompanyLogo" alt="" class="max-w-150">
+                                        </div>
+                                    </div>
+                                    <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_2-of-12 slds-p-horizontal_small md-hide">
+                                    </div>
+                                    <div class="slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_5-of-12 slds-p-horizontal_small">
+                                        <div class="slds-m-bottom_x-large">
+
+                                        <div class="slds-p-bottom_small">
+                                            <h1 class="text-size-30">
+                                                <strong class="text-uppercase">
+                                                    Invoice
+                                                </strong>
+                                            </h1>
+                                        </div>
+                                        <table class="slds-table slds-no-row-hover">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="">
+                                                        <strong >Invoice No.</strong>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate">
+                                                            <%= invoiceDetails.record_id %>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="">
+                                                        <strong >Date Issued</strong>
+                                                    </td>
+                                                    <td>
+                                                        <%= invoiceDetails.startDateFormatted %>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="">
+                                                        <strong >Due Date</strong>
+                                                    </td>
+                                                    <td>
+                                                        <%= invoiceDetails.dueDateFormatted %>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="">
+                                                        <strong >Currency</strong>
+                                                    </td>
+                                                    <td>
+                                                        <%= invoiceDetails.currency %>
+                                                    </td>
+                                                </tr>
+                                                <!-- <tr>
+                                                    <td class="">
+                                                        <strong>PO Number</strong>
+                                                    </td>
+                                                    <td>
+                                                        888 888 8888
+                                                    </td>
+                                                </tr> -->
+                                            </tbody>
+                                        </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-p-around_small">
+                                <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                    <div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_5-of-12 slds-p-horizontal_small">
+                                        <div class="slds-m-bottom_large">
+                                            <table class="slds-table slds-table_fixed-layout slds-no-row-hover">
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="" valign="top" width="20%">
+                                                            <strong >To</strong>
+                                                        </td>
+                                                        <td class="slds-cell-wrap">
+                                                            <div>
+                                                                <b><%= accountDetails.name %></b>
+                                                                <br />
+                                                                <%= accountDetails.street %>
+                                                                <% if(accountDetails.city && accountDetails.city.length > 0 && accountDetails.state && accountDetails.state.length > 0) { %>
+                                                                    <br />
+                                                                    <%= accountDetails.city %><% if(accountDetails.city && accountDetails.city.length > 0) { %>, <% } %> <%= accountDetails.state %> 
+                                                                <% } %>
+                                                                <br />
+                                                                <%= accountDetails.country %><% if(accountDetails.country && accountDetails.country.length > 0) { %>, <% } %> <%= accountDetails.zip_code %>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_2-of-12 slds-p-horizontal_small md-hide">
+                                    </div>
+                                    <div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_5-of-12 slds-p-horizontal_small">
+                                        <div class="slds-m-bottom_large">
+                                            <table class="slds-table slds-table_fixed-layout slds-no-row-hover">
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="" valign="top" width="20%">
+                                                            <strong >From</strong>
+                                                        </td>
+                                                        <td class="slds-cell-wrap">
+                                                            <div>
+                                                                <b> <%= companyName %></b>
+                                                                <br />
+                                                                <%= companySetting.street %>
+                                                                <br />
+                                                                <%= companySetting.city %><% if(companySetting.city && companySetting.city.length > 0) { %>, <%} %><%= companySetting.state %>
+                                                                <br />
+                                                                <%= companySetting.country %><% if(companySetting.country && companySetting.country.length > 0) { %>, <%} %> <%= companySetting.zip_code %>
+
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="">
+                                <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked-horizontal slds-no-row-hover">
+                                    <thead class="tbl-head-blue">
+                                        <tr class="slds-text-title_caps">
+                                            <th scope="col" class="">
+                                                <div class="slds-p-vertical_x-small slds-truncate" title="Type">
+                                                    Type
+                                                </div>
+                                            </th>
+                                            <th scope="col" class="">
+                                                <div class="slds-p-vertical_x-small slds-truncate" title="Description">
+                                                    Description
+                                                </div>
+                                            </th>
+                                            <th scope="col" class="">
+                                                <div class="slds-p-vertical_x-small slds-truncate" title="Qty / Hr">
+                                                    Qty / Hr
+                                                </div>
+                                            </th>
+                                            <th scope="col" class="">
+                                                <div class="slds-p-vertical_x-small slds-truncate" title="Unit Price">
+                                                    Unit Price
+                                                </div>
+                                            </th>
+                                            <th scope="col" class="">
+                                                <div class="slds-p-vertical_x-small slds-truncate slds-text-align_right" title="Amount">
+                                                    Amount
+                                                </div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% var sumOfTotalAmount = 0.0; %>
+                                        <% if(lineItems.length > 0) {%>
+                                        <% lineItems.forEach(function(invLineDetails) { %>
+                                            <% projectObj = projects.filter(project => {
+                                                return invLineDetails.project_id == project.id;
+                                            })%>
+                                            <% sumOfTotalAmount += parseFloat(invLineDetails.total_amount); %>
+
+                                            <tr>
+                                                <td data-label="Type">
+                                                    <div>
+                                                        <%= invLineDetails.type %>
+                                                    </div>
+                                                </td>
+                                                <td data-label="Description" class="slds-cell-wrap">
+                                                    <div>
+                                                             Project: <%= projectObj[0].name %>
+                                                            <br> Note: <%= invLineDetails.note %>
+
+                                                    </div>
+                                                </td>
+                                                <td data-label="Qty / Hr">
+                                                    <div>
+                                                        <%= invLineDetails.inv_qauntity %>
+                                                    </div>
+                                                </td>
+                                                <td data-label="Unit Price">
+                                                    <div>
+                                                      <%= currency_symbols[0].symbol %>
+                                                        <%= invLineDetails.unit_price %>
+                                                    </div>
+                                                </td>
+                                                <td data-label="Description" class="slds-cell-wrap">
+                                                    <div class="slds-text-align_right">
+                                                        <%= currency_symbols[0].symbol %>
+                                                        <%= invLineDetails.total_amount %>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <% }); %>
+                                        <% } else { %>
+                                        <% } %>
+
+                                            <!-- <tr>
+                                            <td data-label="Type">
+                                                <div>
+                                                    Timesheet
+                                                </div>
+                                            </td>
+                                            <td data-label="Description" class="slds-cell-wrap">
+                                                <div>
+                                                    Lorem ipsum dolor sit amet
+                                                </div>
+                                            </td>
+                                            <td data-label="Qty / Hr">
+                                                <div>
+                                                    10
+                                                </div>
+                                            </td>
+                                            <td data-label="Unit Price">
+                                                <div>
+                                                    50
+                                                </div>
+                                            </td>
+                                            <td data-label="Description" class="slds-cell-wrap">
+                                                <div class="slds-text-align_right">
+                                                    USD 500.00
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td data-label="Type">
+                                                <div>
+                                                    Timesheet
+                                                </div>
+                                            </td>
+                                            <td data-label="Description" class="slds-cell-wrap">
+                                                <div>
+                                                    Lorem ipsum dolor sit amet
+                                                </div>
+                                            </td>
+                                            <td data-label="Qty / Hr">
+                                                <div>
+                                                    10
+                                                </div>
+                                            </td>
+                                            <td data-label="Unit Price">
+                                                <div>
+                                                    50
+                                                </div>
+                                            </td>
+                                            <td data-label="Description" class="slds-cell-wrap">
+                                                <div class="slds-text-align_right">
+                                                    USD 500.00
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td data-label="Type">
+                                                <div>
+                                                    Timesheet
+                                                </div>
+                                            </td>
+                                            <td data-label="Description" class="slds-cell-wrap">
+                                                <div>
+                                                    Lorem ipsum dolor sit amet
+                                                </div>
+                                            </td>
+                                            <td data-label="Qty / Hr">
+                                                <div>
+                                                    10
+                                                </div>
+                                            </td>
+                                            <td data-label="Unit Price">
+                                                <div>
+                                                    50
+                                                </div>
+                                            </td>
+                                            <td data-label="Description" class="slds-cell-wrap">
+                                                <div class="slds-text-align_right">
+                                                    USD 500.00
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td data-label="Type">
+                                                <div>
+                                                    Timesheet
+                                                </div>
+                                            </td>
+                                            <td data-label="Description" class="slds-cell-wrap">
+                                                <div>
+                                                    Lorem ipsum dolor sit amet
+                                                </div>
+                                            </td>
+                                            <td data-label="Qty / Hr">
+                                                <div>
+                                                    10
+                                                </div>
+                                            </td>
+                                            <td data-label="Unit Price">
+                                                <div>
+                                                    50
+                                                </div>
+                                            </td>
+                                            <td data-label="Description" class="slds-cell-wrap">
+                                                <div class="slds-text-align_right">
+                                                    USD 500.00
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td data-label="Type">
+                                                <div>
+                                                    Timesheet
+                                                </div>
+                                            </td>
+                                            <td data-label="Description" class="slds-cell-wrap">
+                                                <div>
+                                                    Lorem ipsum dolor sit amet
+                                                </div>
+                                            </td>
+                                            <td data-label="Qty / Hr">
+                                                <div>
+                                                    10
+                                                </div>
+                                            </td>
+                                            <td data-label="Unit Price">
+                                                <div>
+                                                    50
+                                                </div>
+                                            </td>
+                                            <td data-label="Description" class="slds-cell-wrap">
+                                                <div class="slds-text-align_right">
+                                                    USD 500.00
+                                                </div>
+                                            </td>
+                                        </tr> -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="slds-p-bottom_xx-large">
+                                <div class="slds-has-divider_top">
+                                    <table class="slds-table slds-table_fixed-layout slds-no-row-hover text-size-16 slds-table_cell-buffer">
+                                        <tbody>
+                                            <tr>
+                                                <td class=" slds-text-align_right" valign="top">
+                                                    Subtotal
+                                                </td>
+                                                <td class="slds-cell-wrap slds-text-align_right" width="160px">
+                                                    <%= currency_symbols[0].symbol %> <%= sumOfTotalAmount.toFixed(2) %>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class=" slds-text-align_right" valign="top">
+                                                    + TAX
+                                                </td>
+                                                <td class="slds-cell-wrap slds-text-align_right" width="160px">
+                                                    <% var tax = invoiceDetails.tax;
+                                                       var taxAmount =  (sumOfTotalAmount*tax) / 100;
+                                                       var totalAmount = sumOfTotalAmount + taxAmount;
+                                                    %>
+                                                       <%= currency_symbols[0].symbol %> <%= taxAmount %>
+                                                </td>
+                                            </tr>
+                                            <!-- <tr>
+                                                <td class=" slds-text-align_right" valign="top" width="160px">
+                                                    - Discount
+                                                </td>
+                                                <td class="slds-cell-wrap slds-text-align_right">
+                                                    10.00
+                                                </td>
+                                            </tr> -->
+                                            <tr class="slds-is-selected">
+                                                <td class=" slds-text-align_right" valign="top" width="160px">
+                                                    <div class="text-size-18 slds-p-vertical_x-small">
+                                                        Total Amount
+                                                    </div>
+                                                </td>
+                                                <td class="slds-cell-wrap slds-text-align_right">
+                                                    <div class="text-size-18 slds-p-vertical_x-small">
+                                                        <strong>
+                                                            <%= currency_symbols[0].symbol %> <%= totalAmount.toFixed(2) %>
+                                                        </strong>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- <div>
+                                <div class="slds-p-horizontal_large slds-p-bottom_xx-large">
+                                    <strong class="text-uppercase">
+                                        Note
+                                    </strong>
+                                    <div>
+                                       <%= invoiceDetails.description %>
+
+                                    </div>
+                                </div>
+                            </div> -->
+                            <div class="slds-p-vertical_large slds-p-left_large">
+                                <!-- <span class="text-dull slds-p-right_small"> -->
+                                    <%= invoiceDetails.description %>
+                                <!-- </span> -->
+                                <!-- <img src="../img/krow-logo.png" alt="" width="50"> -->
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+        <% include ../layouts/footer %>
+    </main>
+    <% include ../layouts/scripts %>
+    <% include ../layouts/pdf-generate-script %>
+
+</body>
+
+</html>

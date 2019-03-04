@@ -1,0 +1,128 @@
+<script>
+	$(document).ready(function(){
+		let url = new URL(window.location.href);
+		let companyId=parseInt(getURLParameter("companyid"));
+		// let companyId=parseInt(url.searchParams.get("companyid"));
+		let currUserComId = parseInt('<%- user.company_id %>');
+		if(companyId != currUserComId){
+			$('[notSuperAdmin]').remove();
+		}else{
+			$('[notAuthorized]').remove();
+
+		}
+
+	});
+	/*var companyId;
+	var company;
+	$(document).ready(function(){
+		var queryVars=getUrlVars();
+        console.log('id '+queryVars.id);
+        companyId=queryVars.id;
+		showOrgDetails();
+	});
+	function getUrlVars()
+	{
+	    var vars = [], hash;
+	    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+	    for(var i = 0; i < hashes.length; i++)
+	    {
+	        hash = hashes[i].split('=');
+	        vars.push(hash[0]);
+	        vars[hash[0]] = hash[1];
+	    }
+	    return vars;
+	}
+	function showOrgDetails(){
+	    $.ajax({
+	      type: 'GET',
+	      url : '/companyDetail?id='+companyId,
+	      headers : {'Content-Type' : 'application/json'},
+	       success : function(response){
+	            console.log(response);
+	            company=response.company;
+	            $("#comp_name").text(company.name);
+	            $("#name").html('<strong >'+company.name+'</strong>');
+	            $("#company_name").val(company.name);
+	            $("#company_domain").val(company.domain);
+
+	        },
+	       error: function(response){
+                console.log(response);
+	        }
+	    });
+	}*/
+$(document).ready(function(){
+	$("#offset").text(parseInt($("#pageRecordNo").text()));
+	let noOfRecord=parseInt($("#offset").text());
+	let searchFilter=$("#selectedFilter").text();
+	if((<%= count %>) >parseInt($("#offset").text())){
+		$("#totalRecordCount").text(<%= count %>);
+	}
+	if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
+		$(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
+	}else{
+		$(".slds-button[loadItemId]").hide();
+	}
+})
+
+function deleteCompany(companyId){
+	showLoader('#globalLoader');
+	console.log('company id is '+companyId);
+	$.ajax({
+      type: 'POST',
+      url : '/deleteCompany',
+      contentType: 'application/json',
+      dataType: 'json',
+      data:JSON.stringify({"companyId":companyId}),
+       success : function(response){
+       		console.log(response);
+       		hideLoader('#globalLoader');
+       		window.location.href="/org-listing";
+       		//showGlobalToast('#globalToast', 'success', 'company added successfully', 4000);
+
+        },
+       error: function(response){
+       		hideLoader('#globalLoader');
+            console.log(response.responseJSON.message);
+            showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+        }
+    });
+}
+function updateCompany(companyId){
+		showLoader('#globalLoader');
+		console.log('company id is '+companyId);
+		let companyData={};
+		companyData.id=companyId;
+		companyData.name=$("#company_name").val();
+		companyData.domain=$("#company_domain").val();
+		companyData.street=$("#street").val();
+		companyData.city=$("#city").val();
+		companyData.state=$("#state").val();
+		companyData.country=$("#country").val();
+		companyData.zip_code=$("#zipcode").val();
+
+		$.ajax({
+	      type: 'POST',
+	      url : '/updateCompany',
+	      contentType: 'application/json',
+	      dataType: 'json',
+	      data:JSON.stringify(companyData),
+	       success : function(response){
+	       		console.log(response);
+	       		hideLoader('#globalLoader');
+	       		window.location.href="/org-listing";
+	       		/*location.reload();*/
+	       		//showGlobalToast('#globalToast', 'success', 'company added successfully', 4000);
+
+	        },
+	       error: function(response){
+
+	            console.log('error is : '+response);
+                hideLoader('#globalLoader');
+                showGlobalToast('#globalToast', 'error', 'company not updated', 4000);
+	            //showGlobalToast('#globalToast', 'error', 'error in validating domain', 4000);
+	        }
+	    });
+	}
+
+</script>

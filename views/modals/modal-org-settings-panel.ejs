@@ -1,0 +1,339 @@
+<!-- modal org settings panel start-->        
+<div id="modalOrgSettings">
+    <section role="dialog" tabindex="-1" class="slds-modal slds-modal_medium">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="closeModal('#modalOrgSettings');">
+                    <span class="slds-button__icon">
+                        <i class="fa fa-times text-size-21"></i>
+                    </span>
+                </button>
+                <h2  class="slds-text-heading_medium slds-hyphenate">Settings</h2>
+            </header>
+            <div class="slds-modal__content slds-p-around_medium min-h-500">
+                <div>
+                    <ul class="slds-grid slds-grid_pull-padded slds-wrap">
+                        <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <a href="/org-settings-general" class="slds-app-launcher__tile slds-text-link_reset slds-m-vertical_medium ">
+                                <div class="slds-no-flex slds-p-around_small">
+                                    <span class="slds-icon_container">
+                                        <i class="fa fa-wrench text-size-24  text-blue slds-icon slds-icon_large"></i>
+                                    </span>
+                                </div>
+                                <div class="slds-has-flexi-truncate slds-app-launcher__tile-body">
+                                    <div class="">
+                                        <div>
+                                            <strong class="text-size-18">
+                                                General 
+                                            </strong>
+                                        </div>
+                                        <div class="slds-truncate text-dull">
+                                            Lorem ipsum dolor sit amet
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <a href="/org-import-data" class="slds-app-launcher__tile slds-text-link_reset slds-m-vertical_medium ">
+                                <div class="slds-no-flex slds-p-around_small">
+                                    <span class="slds-icon_container">
+                                        <i class="fa fa-file-import text-size-24  text-blue slds-icon slds-icon_large"></i>
+                                    </span>
+                                </div>
+                                <div class="slds-has-flexi-truncate slds-app-launcher__tile-body">
+                                    <div class="">
+                                        <div>
+                                            <strong class="text-size-18">
+                                                Import Data 
+                                            </strong>
+                                        </div>
+                                        <div class="slds-truncate text-dull">
+                                            Lorem ipsum dolor sit amet
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <a href="/org-settings-timesheet" class="slds-app-launcher__tile slds-text-link_reset slds-m-vertical_medium ">
+                                <div class="slds-no-flex slds-p-around_small">
+                                    <span class="slds-icon_container">
+                                        <i class="far fa-clock text-size-24  text-blue slds-icon slds-icon_large"></i>
+                                    </span>
+                                </div>
+                                <div class="slds-has-flexi-truncate slds-app-launcher__tile-body">
+                                    <div class="">
+                                        <div>
+                                            <strong class="text-size-18">
+                                                Timesheet 
+                                            </strong>
+                                        </div>
+                                        <div class="slds-truncate text-dull">
+                                            Lorem ipsum dolor sit amet
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <a href="javascript:void(0);" class="slds-app-launcher__tile slds-text-link_reset slds-m-vertical_medium x-working">
+                                <div class="slds-no-flex slds-p-around_small">
+                                    <span class="slds-icon_container">
+                                        <i class="fa fa-receipt text-size-24  text-blue slds-icon slds-icon_large"></i>
+                                    </span>
+                                </div>
+                                <div class="slds-has-flexi-truncate slds-app-launcher__tile-body">
+                                    <div class="">
+                                        <div>
+                                            <strong class="text-size-18">
+                                                Invoice 
+                                            </strong>
+                                        </div>
+                                        <div class="slds-truncate text-dull">
+                                            Lorem ipsum dolor sit amet
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <a href="javascript:void(0);" class="slds-app-launcher__tile slds-text-link_reset slds-m-vertical_medium x-working">
+                                <div class="slds-no-flex slds-p-around_small">
+                                    <span class="slds-icon_container">
+                                        <i class="fa fa-dollar-sign text-size-24  text-blue slds-icon slds-icon_large"></i>
+                                    </span>
+                                </div>
+                                <div class="slds-has-flexi-truncate slds-app-launcher__tile-body">
+                                    <div class="">
+                                        <div>
+                                            <strong class="text-size-18">
+                                                Expense 
+                                            </strong>
+                                        </div>
+                                        <div class="slds-truncate text-dull">
+                                            Lorem ipsum dolor sit amet
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <a href="javascript:void(0);" class="slds-app-launcher__tile slds-text-link_reset slds-m-vertical_medium x-working">
+                                <div class="slds-no-flex slds-p-around_small">
+                                    <span class="slds-icon_container">
+                                        <i class="far fa-envelope text-size-24  text-blue slds-icon slds-icon_large"></i>
+                                    </span>
+                                </div>
+                                <div class="slds-has-flexi-truncate slds-app-launcher__tile-body">
+                                    <div class="">
+                                        <div>
+                                            <strong class="text-size-18">
+                                                Email 
+                                            </strong>
+                                        </div>
+                                        <div class="slds-truncate text-dull">
+                                            Lorem ipsum dolor sit amet
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <a href="javascript:void(0);" class="slds-app-launcher__tile slds-text-link_reset slds-m-vertical_medium x-working">
+                                <div class="slds-no-flex slds-p-around_small">
+                                    <span class="slds-icon_container">
+                                        <i class="fa fa-money-check-alt text-size-24  text-blue slds-icon slds-icon_large"></i>
+                                    </span>
+                                </div>
+                                <div class="slds-has-flexi-truncate slds-app-launcher__tile-body">
+                                    <div class="">
+                                        <div>
+                                            <strong class="text-size-18">
+                                                Tax 
+                                            </strong>
+                                        </div>
+                                        <div class="slds-truncate text-dull">
+                                            Lorem ipsum dolor sit amet
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <a href="javascript:void(0);" class="slds-app-launcher__tile slds-text-link_reset slds-m-vertical_medium x-working">
+                                <div class="slds-no-flex slds-p-around_small">
+                                    <span class="slds-icon_container">
+                                        <i class="fa fa-puzzle-piece text-size-24  text-blue slds-icon slds-icon_large"></i>
+                                    </span>
+                                </div>
+                                <div class="slds-has-flexi-truncate slds-app-launcher__tile-body">
+                                    <div class="">
+                                        <div>
+                                            <strong class="text-size-18">
+                                                Integrations 
+                                            </strong>
+                                        </div>
+                                        <div class="slds-truncate text-dull">
+                                            Lorem ipsum dolor sit amet
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <!-- <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <a href="/org-import-data" class="slds-card slds-grid slds-text-link_reset slds-m-vertical_medium">
+                                <div class="slds-no-flex slds-p-around_small">
+                                    <span class="slds-icon_container">
+                                        <i class="fa fa-file-import text-size-24  text-blue slds-icon slds-icon_large"></i>
+                                    </span>
+                                </div>
+                                <div class="slds-has-flexi-truncate line-left">
+                                    <div class="slds-p-around_small">
+                                        <div>
+                                            <strong class="text-size-18">
+                                                Import Data 
+                                            </strong>
+                                        </div>
+                                        <div class="slds-truncate text-gray">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <a href="javascript:void(0);" class="slds-card slds-grid slds-text-link_reset slds-m-vertical_medium">
+                                <div class="slds-no-flex slds-p-around_small">
+                                    <span class="slds-icon_container">
+                                        <i class="far fa-clock text-size-24  text-blue slds-icon slds-icon_large"></i>
+                                    </span>
+                                </div>
+                                <div class="slds-has-flexi-truncate line-left">
+                                    <div class="slds-p-around_small">
+                                        <div>
+                                            <strong class="text-size-18">
+                                                Timesheet 
+                                            </strong>
+                                        </div>
+                                        <div class="slds-truncate text-gray">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <a href="javascript:void(0);" class="slds-card slds-grid slds-text-link_reset slds-m-vertical_medium">
+                                <div class="slds-no-flex slds-p-around_small">
+                                    <span class="slds-icon_container">
+                                        <i class="fa fa-receipt text-size-24  text-blue slds-icon slds-icon_large"></i>
+                                    </span>
+                                </div>
+                                <div class="slds-has-flexi-truncate line-left">
+                                    <div class="slds-p-around_small">
+                                        <div>
+                                            <strong class="text-size-18">
+                                                Invoice
+                                            </strong>
+                                        </div>
+                                        <div class="slds-truncate text-gray">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <a href="javascript:void(0);" class="slds-card slds-grid slds-text-link_reset slds-m-vertical_medium">
+                                <div class="slds-no-flex slds-p-around_small">
+                                    <span class="slds-icon_container">
+                                        <i class="fa fa-dollar-sign text-size-24  text-blue slds-icon slds-icon_large"></i>
+                                    </span>
+                                </div>
+                                <div class="slds-has-flexi-truncate line-left">
+                                    <div class="slds-p-around_small">
+                                        <div>
+                                            <strong class="text-size-18">
+                                                Expense
+                                            </strong>
+                                        </div>
+                                        <div class="slds-truncate text-gray">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <a href="javascript:void(0);" class="slds-card slds-grid slds-text-link_reset slds-m-vertical_medium">
+                                <div class="slds-no-flex slds-p-around_small">
+                                    <span class="slds-icon_container">
+                                        <i class="far fa-envelope text-size-24  text-blue slds-icon slds-icon_large"></i>
+                                    </span>
+                                </div>
+                                <div class="slds-has-flexi-truncate line-left">
+                                    <div class="slds-p-around_small">
+                                        <div>
+                                            <strong class="text-size-18">
+                                                Email 
+                                            </strong>
+                                        </div>
+                                        <div class="slds-truncate text-gray">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <a href="javascript:void(0);" class="slds-card slds-grid slds-text-link_reset slds-m-vertical_medium">
+                                <div class="slds-no-flex slds-p-around_small">
+                                    <span class="slds-icon_container">
+                                        <i class="fa fa-money-check-alt text-size-24  text-blue slds-icon slds-icon_large"></i>
+                                    </span>
+                                </div>
+                                <div class="slds-has-flexi-truncate line-left">
+                                    <div class="slds-p-around_small">
+                                        <div>
+                                            <strong class="text-size-18">
+                                                Tax 
+                                            </strong>
+                                        </div>
+                                        <div class="slds-truncate text-gray">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <a href="javascript:void(0);" class="slds-card slds-grid slds-text-link_reset slds-m-vertical_medium">
+                                <div class="slds-no-flex slds-p-around_small">
+                                    <span class="slds-icon_container">
+                                        <i class="fa fa-puzzle-piece text-size-24  text-blue slds-icon slds-icon_large"></i>
+                                    </span>
+                                </div>
+                                <div class="slds-has-flexi-truncate line-left">
+                                    <div class="slds-p-around_small">
+                                        <div>
+                                            <strong class="text-size-18">
+                                                Integrations 
+                                            </strong>
+                                        </div>
+                                        <div class="slds-truncate text-gray">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li> -->
+                    </ul>
+                </div>
+            </div>
+            
+        </div>
+    </section>
+    <div class="slds-backdrop"></div>
+</div>
+<!-- modal org settings panel end-->   

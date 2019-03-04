@@ -1,0 +1,57 @@
+<script>
+$(document).ready(function(){
+	<% if (setting!=undefined) { %>
+		let setting=<%- JSON.stringify(setting) %>;
+		console.log(setting);
+		let expenseCat='',userRole='',address='';
+	
+		$("#companyStreet").val(setting.street);
+		$("#companyCity").val(setting.city);
+		$("#companyState").val(setting.state);
+		$("#companyCountry").val(setting.country);
+		$("#companyZip").val(setting.zip_code);
+		$("#companyCurrency").val(setting.currency);
+		$("#timezone").val(setting.timezone);
+		
+	<% } %>
+
+	
+})
+function addNewExpenseCat(){
+
+	let expenseCategory=$("#expenseCategoryInput").val().trim();
+	if(expenseCategory!=''){
+		$("#expenseCatDiv").val($("#expenseCatDiv").val()+expenseCategory+"\n");
+		/*$("#expenseCatDiv").append('\n');*/
+		$("#expenseCategoryInput").val('');
+	}
+
+}
+
+function saveCompanyGeneralSetting(){
+	showLoader('#globalLoader');
+	let settingData = createJSONForFormData('#orgSettingGeneral');
+	console.log(settingData);
+	$.ajax({
+	      type: 'POST',
+	      url : '/editCompanySetting', 
+	      contentType: 'application/json',
+	      dataType: 'json',
+	      data:JSON.stringify(settingData),
+	       success : function(response){
+			   if(response.success){
+					setTimeout(function(){
+						hideLoader('#globalLoader');
+						showGlobalToast('#globalToast', 'success', response.message, 4000);
+					},2000);
+			   }
+	        },
+	       error: function(response){
+                console.log('error is : '+JSON.stringify(response));
+                hideLoader('#globalLoader');
+                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+	        }
+	    });
+
+}
+</script>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="en">
+
+<% include ../layouts/head %>
+
+<body class="kw">
+
+    <% include ../layouts/nav %>
+    <% include ../layouts/sideNav %>
+    <main class="main-body-space tpd-60 bpd-100">
+        <div>
+            <div class="slds-p-around_small">
+                
+                <div class="">
+                    
+                        <!-- header start end -->
+                        <div class="slds-card slds-m-bottom_medium">
+                            <div class="slds-grid slds-wrap slds-p-around_small">
+                                <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                    <div class="slds-grid">
+                                        <div class="slds-no-flex slds-p-right_x-small">
+                                            <span class="slds-icon_container slds-icon-custom-custom88">
+                                                <i class="fa fa-dollar-sign text-size-21 text-white slds-icon"></i>
+                                            </span>
+                                        </div>
+                                        <div class="slds-has-flexi-truncate">
+                                        <div class="slds-text-body_small text-height-normal">
+                                            Company Settings
+                                        </div>
+                                        <h1 class="slds-page-header__title slds-p-right_x-small text-height-normal">
+                                            <div class="slds-dropdown-trigger slds-dropdown-trigger_click cursor-pointer" aria-haspopup="true" title="" onclick="openDropdown(this, event, true);">
+                                                <div class="slds-grid slds-has-flexi-truncate slds-grid_vertical-align-center">
+                                                    <span class="slds-truncate" title="">User Role</span>
+                                                    <i class="fa fa-caret-down lpd-5"></i>
+                                                </div>
+                                                <% include ../layouts/org-settings-dropdown %>
+                                            </div>
+                                        </h1>
+                                    </div>
+                                    </div>
+                                </div>
+
+                                <!-- <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                    <div class="text-right sm-tpd-15">
+                                        <button class="slds-button slds-button_brand slds-align-top" onclick="saveCompanyUserRole()">
+                                            Save Changes
+                                        </button>
+                                    </div>
+                                </div> -->
+                            </div>
+                            <div class=""> 
+                                
+                            
+                                <ul class="slds-tabs_default__nav radius-4 scroll-x-auto bpd-2 text-size-14">
+                                    <!-- <li class="slds-tabs_default__item slds-is-active" onclick="openTab(this, 'org-sett-general')">
+                                        <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="0">
+                                            General
+                                        </a>
+                                    </li> -->
+                                    <li class="slds-tabs_default__item slds-is-active" onclick="openTab(this, 'org-sett-user-role')">
+                                        <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="-1">
+                                            User Role
+                                        </a>
+                                    </li>
+                                    <!-- <li class="slds-tabs_default__item" onclick="openTab(this, 'org-sett-expense')">
+                                        <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="-1">
+                                            Expenses
+                                        </a>
+                                    </li>
+                                    <li class="slds-tabs_default__item" onclick="openTab(this, 'org-sett-invoice')">
+                                        <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="-1">
+                                            Invoice
+                                        </a>
+                                    </li> -->
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- header end -->
+
+
+
+                        <!-- body start -->
+                        <div class="slds-grid slds-wrap slds-grid_pull-padded" target-tab="org-sett-user-role">
+                            <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_12-of-12 slds-p-horizontal_small">
+                                <div class="slds-card slds-p-around_medium sm-pd-10 slds-m-bottom_large">
+                                    <div class="slds-p-bottom_x-small line-bottom">
+                                        <div class="slds-grid slds-grid_vertical-align-center">
+                                            <div class="slds-has-flexi-truncate">
+                                                <div class="text-uppercase ">
+                                                    User Roles <span id="userRoleLength"></span>
+                                                </div>
+                                            </div>
+                                            <div class="slds-no-flex slds-p-left_medium">
+                                                <button class="slds-button slds-button_neutral slds-align-top" onclick="openModal('#modalAddNewUserRole', true)">
+                                                    <i class="fa fa-plus"></i>
+                                                    <span class="sm-hide">Add New</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="">
+                                        <ul class="first-li-line-top-0" id="userRoleList">
+                                            <!-- <li class="line-top slds-p-vertical_small">
+                                                <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                                    <div class="slds-size_1-of-1 slds-medium-size_8-of-12 slds-p-horizontal_small sm-bpd-15">
+                                                        <div class="slds-truncate text-size-11 text-dull">
+                                                            Category Name
+                                                        </div>
+                                                        <div class="max-w-200">
+                                                            <a href="javascript:void(0);" onclick="openModal('#modalEditExpCate')">Food</a>
+                                                        </div>
+                                                    </div>
+                                                   
+                                                    <div class="slds-size_1-of-1 slds-medium-size_4-of-12 slds-p-horizontal_small">
+                                                        <div class="slds-grid">
+                                                            <div class="slds-has-flexi-truncate">
+                                                                <div class="slds-truncate text-size-11 text-dull">
+                                                                    Enable
+                                                                </div>
+                                                                <div>
+                                                                    Yes
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-no-flex slds-p-left_small">
+                                                                <div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">
+                                                                    <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" title="Show More">
+                                                                        <span class="slds-button__icon">
+                                                                            <i class=" fa fa-caret-down" aria-hidden="true"></i>
+                                                                        </span>
+                                                                        <span class="slds-assistive-text">Show More</span>
+                                                                    </button>
+                                                                    <div class="slds-dropdown slds-dropdown_right slds-dropdown_actions" style="">
+                                                                        <ul class="slds-dropdown__list" role="menu">
+                                                                            <li class="slds-dropdown__item" role="presentation">
+                                                                                <a href="javascript:void(0);" role="menuitem" tabindex="0" onclick="openModal('#modalEditExpCate')">
+                                                                                    <span class="slds-truncate" title="">
+                                                                                        Edit
+                                                                                    </span>
+                                                                                </a>
+                                                                            </li>
+
+                                                                            <li class="slds-dropdown__item" role="presentation">
+                                                                                <a href="javascript:void(0);" role="menuitem" tabindex="-1">
+                                                                                    <span class="slds-truncate text-red" title="">
+                                                                                        Archive
+                                                                                    </span>
+                                                                                </a>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="line-top slds-p-vertical_small">
+                                                <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                                    <div class="slds-size_1-of-1 slds-medium-size_8-of-12 slds-p-horizontal_small sm-bpd-15">
+                                                        <div class="slds-truncate text-size-11 text-dull">
+                                                            Category Name
+                                                        </div>
+                                                        <div class="max-w-200">
+                                                            <a href="javascript:void(0);" onclick="openModal('#modalEditExpCate')">Travel</a>
+                                                        </div>
+                                                    </div>
+                                                   
+                                                    <div class="slds-size_1-of-1 slds-medium-size_4-of-12 slds-p-horizontal_small">
+                                                        <div class="slds-grid">
+                                                            <div class="slds-has-flexi-truncate">
+                                                                <div class="slds-truncate text-size-11 text-dull">
+                                                                    Enable
+                                                                </div>
+                                                                <div>
+                                                                    Yes
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-no-flex slds-p-left_small">
+                                                                <div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">
+                                                                    <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" title="Show More">
+                                                                        <span class="slds-button__icon">
+                                                                            <i class=" fa fa-caret-down" aria-hidden="true"></i>
+                                                                        </span>
+                                                                        <span class="slds-assistive-text">Show More</span>
+                                                                    </button>
+                                                                    <div class="slds-dropdown slds-dropdown_right slds-dropdown_actions" style="">
+                                                                        <ul class="slds-dropdown__list" role="menu">
+                                                                            <li class="slds-dropdown__item" role="presentation">
+                                                                                <a href="javascript:void(0);" role="menuitem" tabindex="0" onclick="openModal('#modalEditExpCate')">
+                                                                                    <span class="slds-truncate" title="">
+                                                                                        Edit
+                                                                                    </span>
+                                                                                </a>
+                                                                            </li>
+
+                                                                            <li class="slds-dropdown__item" role="presentation">
+                                                                                <a href="javascript:void(0);" role="menuitem" tabindex="-1">
+                                                                                    <span class="slds-truncate text-red" title="">
+                                                                                        Archive
+                                                                                    </span>
+                                                                                </a>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li> -->
+                                           
+                                           
+
+                                            
+                                        </ul>
+
+                                    </div>
+
+                                   
+
+                                </div>
+                            </div>
+                        </div>
+                       
+                           
+                        
+                        <!-- body end -->
+
+                      
+
+                        
+
+
+
+
+
+
+                  
+
+                </div>
+            </div>
+        </div>
+        
+        <% include ../modals/modal-add-new-user-role %>
+        <% include ../modals/modal-edit-user-role %>
+        <% include ../layouts/footer %>
+    </main>
+
+    <% include ../layouts/scripts %>
+    <% include ../layouts/setting-script-userrole %>
+
+</body>
+
+</html>

@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="en">
+
+<% include ../layouts/head %>
+<head>
+    <style>
+
+        .disabled {
+            pointer-events:none;
+            opacity:0.6;
+        }
+       .kw .invoice-row .invoice-col:nth-child(1){
+           width: 15%;
+       }
+       .kw .invoice-row .invoice-col:nth-child(2),
+       .kw .invoice-row .invoice-col:nth-child(3),
+       .kw .invoice-row .invoice-col:nth-child(5) {
+           width: 22%;
+       }
+       .kw .invoice-row .invoice-col:nth-child(4){
+           width: 12%;
+       }
+       .kw .invoice-row .invoice-col:nth-child(6) {
+           width: 7%;
+       }
+
+    </style>
+</head>
+<body class="kw">
+
+    <% include ../layouts/nav %>
+    <% include ../layouts/sideNav %>
+
+    <main class="main-body-space tpd-60 bpd-100">
+        <div>
+            <div class="slds-p-around_small">
+                <!-- breadcrumb start -->
+                <div class="slds-p-bottom_small">
+                    <nav role="navigation" aria-label="Breadcrumbs" >
+                        <ol class="slds-breadcrumb slds-list_horizontal slds-wrap">
+                            <li class="slds-breadcrumb__item "><a href="/invoices-listing">Invoices</a></li>
+                            <li class="slds-breadcrumb__item "><a href="javascript:void(0);"><%= invoiceDetails.record_id %></a></li>
+                        </ol>
+                    </nav>
+                </div>
+                <!-- breadcrumb end -->
+                <div class="">
+
+                        <!-- header start end -->
+                        <div class="slds-card slds-m-bottom_medium">
+                            <div class="slds-grid slds-wrap slds-p-around_small">
+                                <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                    <div class="slds-grid">
+                                        <div class="slds-no-flex slds-p-right_x-small">
+                                            <span class="slds-icon_container slds-icon-standard-action-list-component">
+                                                <i class="fa fa-receipt text-size-21 text-white slds-icon"></i>
+                                            </span>
+                                        </div>
+                                        <div class="slds-has-flexi-truncate">
+                                         <div class="text-size-18 text-height-1">
+                                                <strong>
+                                                    <%= invoiceDetails.record_id %>
+                                                </strong>
+                                            </div>
+                                             <div class="slds-text-body_small tpd-2">
+                                                For: <a href=""><%= invoiceDetails.account_name %></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                    <div class="text-right sm-tpd-15">
+
+                                        <button class="slds-button slds-button_brand slds-align-top" onclick="updateInvoiceDetails('<%= invoiceDetails.id %>', '#invoice-details-form')">
+                                            Save Invoice
+                                        </button>
+
+
+                                            <button class="slds-button slds-button_neutral" onclick="window.location.href='/invoice-html-view/<%= invoiceDetails.id %>'">
+                                                <!-- <i class=" fa fa-envelope" aria-hidden="true"></i> -->
+                                                Invoice Web View
+
+                                            </button>
+                                            <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteInvoice(\'<%= invoiceDetails.id %>\')')">
+                                                Delete
+                                            </button>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <!-- header end -->
+
+                        <!-- details start -->
+
+                        <!-- <div class="slds-p-bottom_small">
+                            <div class="slds-badge slds-badge_inverse text-size-13 slds-p-around_x-small max-w-250 text-center">Status: Draft</div>
+                        </div> -->
+                        <div class=" slds-card slds-p-around_large sm-pd-10 slds-m-bottom_large">
+                            <form id="invoice-details-form">
+                                <div class="slds-grid slds-wrap slds-gutters">
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_8-of-12">
+                                        <div class="rpd-100 md-rpd-0">
+                                            <div class="slds-grid slds-wrap slds-gutters">
+                                                <!-- <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                    <div class="slds-form-element slds-m-bottom_medium">
+                                                        <label class="slds-form-element__label">
+                                                            Payment Term
+                                                        </label>
+                                                        <div class="slds-form-element__control">
+                                                            <div class="slds-select_container">
+                                                                <select class="slds-select" name="currency" getFormData>
+                                                                    <option value=""> </option>
+                                                                    <option value="">option</option>
+                                                                    <option value="">option</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div> -->
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                    <div class="slds-form-element slds-m-bottom_medium">
+                                                        <label class="slds-form-element__label">
+                                                            Currency
+                                                        </label>
+                                                        <div class="slds-form-element__control">
+                                                            <div class="slds-select_container">
+                                                                <select class="slds-select" name="currency" id="currency" getFormData>
+                                                                  <% currencyWithSymbolArray.forEach(function(currency){ %>
+                                                                      <option value="<%= currency.name %>"><%= currency.name %></option>
+                                                                  <% }) %>
+                                                                </select>
+                                                            </div>
+                                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                    <div class="slds-form-element slds-m-bottom_medium">
+                                                        <label class="slds-form-element__label">
+                                                            Due Date
+                                                        </label>
+                                                        <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
+                                                            <span class="slds-input__icon slds-input__icon_right">
+                                                                <i class="fa fa-calendar"></i>
+                                                            </span>
+                                                            <input type="date" name="due_date" getFormData value="<%= invoiceDetails.dueDateFormatted %>" class="slds-input open-date-pik">
+                                                        </div>
+                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- <div class="slds-grid slds-wrap slds-gutters">
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                    <div class="slds-form-element slds-m-bottom_medium">
+                                                        <label class="slds-form-element__label">
+                                                            Currency
+                                                        </label>
+                                                        <div class="slds-form-element__control">
+                                                            <div class="slds-select_container">
+                                                                <select class="slds-select" name="currency" getFormData>
+                                                                    <option value=""> </option>
+                                                                    <option value="">option</option>
+                                                                    <option value="">option</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                    <div class="slds-form-element slds-m-bottom_medium">
+                                                        <label class="slds-form-element__label">
+                                                            Tax
+                                                        </label>
+                                                        <div class="slds-form-element__control">
+                                                            <div class="slds-select_container">
+                                                                <select class="slds-select" name="tax" getFormData >
+                                                                    <option value="">GST</option>
+                                                                    <option value="">VAT</option>
+                                                                    <option value="">NoTax</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div> -->
+                                            <div class="slds-grid slds-wrap slds-gutters">
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                    <div class="slds-form-element slds-m-bottom_medium">
+                                                        <label class="slds-form-element__label">
+                                                            Tax %
+                                                        </label>
+                                                        <div class="slds-form-element__control">
+                                                            <input type="number" max="100" min="0" class="slds-input" placeholder="" id="inv-tax-per" onchange="calculateTax(this)" onkeyup="calculateTax(this)" value="<%= invoiceDetails.tax %>">
+                                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+                                        <div class="">
+                                            <!-- <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label">
+                                                        Account Contact
+                                                    </label>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-select_container">
+                                                            <select class="slds-select">
+                                                                <option value="">account@email.com</option>
+                                                                <option value="">option</option>
+                                                                <option value="">option</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                        </div>
+                                                    </div>
+                                                </div> -->
+
+                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                        <label class="slds-form-element__label">Note</label>
+                                                        <div class="slds-form-element__control">
+                                                            <textarea class="slds-textarea" id="invoice_note" name="description" getFormData placeholder=""><%= invoiceDetails.description %></textarea>
+                                                        </div>
+                                                </div>
+                                                <!-- <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label">
+                                                        Invoice Template
+                                                    </label>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-select_container">
+                                                            <select class="slds-select">
+                                                                <option value="">Default</option>
+                                                                <option value="">option</option>
+                                                                <option value="">option</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                        </div>
+                                                    </div>
+                                                </div> -->
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- details end -->
+                        <!-- invoice items start -->
+                        <div class="slds-card slds-p-around_large sm-pd-10 slds-m-bottom_large">
+                                    <div class="slds-p-bottom_small ">
+                                        <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                            <div class="slds-size_1-of-1 slds-medium-size_1-of-2 slds-p-horizontal_small">
+                                                <div class="text-uppercase ">
+                                                    Invoice Item Details
+                                                </div>
+                                            </div>
+                                            <div class="slds-size_1-of-1 slds-medium-size_1-of-2 slds-p-horizontal_small">
+                                                <div class="text-right sm-tpd-15">
+                                                    <button class="slds-button slds-button_outline-brand" onclick="openModal('#modalAddInvoiceTsheet', true);">Add Timesheet</button>
+                                                    <button class="slds-button slds-button_outline-brand" onclick="openModal('#modalAddInvoiceExpenses', true);">Add Expenses</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <!-- header start-->
+                                        <div class="slds-theme_shade slds-p-vertical_x-small">
+                                            <div class="slds-grid slds-grid_pull-padded invoice-row sm-hide">
+                                                <div class="slds-no-flex slds-p-horizontal_small invoice-col">
+                                                    <strong class="text-uppercase text-size-11 slds-p-left_x-small">
+                                                        Type
+                                                    </strong>
+                                                </div>
+                                                <div class="slds-no-flex slds-p-horizontal_small invoice-col" style="width:45%">
+                                                    <strong class="text-uppercase text-size-11">
+                                                        Description
+                                                    </strong>
+                                                </div>
+                                                <div class="slds-no-flex slds-p-horizontal_small invoice-col" style="width:10%">
+                                                    <strong class="text-uppercase text-size-11">
+                                                        Qty/hr
+                                                    </strong>
+                                                </div>
+                                                <div class="slds-no-flex slds-p-horizontal_small invoice-col">
+                                                    <strong class="text-uppercase text-size-11">
+                                                        Unit Price
+                                                    </strong>
+                                                </div>
+                                                <!-- <div class="slds-no-flex slds-p-horizontal_small invoice-col">
+                                                    <strong class="text-uppercase text-size-11">
+                                                        %Disc
+                                                    </strong>
+                                                </div>
+                                                <div class="slds-no-flex slds-p-horizontal_small invoice-col">
+                                                    <strong class="text-uppercase text-size-11">
+                                                        Tax
+                                                    </strong>
+                                                </div> -->
+                                                <div class="slds-no-flex slds-p-horizontal_small invoice-col" style="width:10%">
+                                                    <strong class="text-uppercase text-size-11">
+                                                        Amount
+                                                    </strong>
+                                                </div>
+                                                <div class="slds-no-flex slds-p-horizontal_small invoice-col">
+
+                                                </div>
+                                            </div>
+                                            <div class="hide sm-show">
+                                                <div class="slds-grid slds-grid_pull-padded slds-p-horizontal_small">
+                                                    <div class="slds-size_8-of-12 slds-p-horizontal_small">
+                                                        <strong class="text-uppercase text-size-11">
+                                                            Description
+                                                        </strong>
+                                                    </div>
+                                                    <div class="slds-size_4-of-12 slds-p-horizontal_small text-right">
+                                                        <strong class="text-uppercase text-size-11">
+                                                            Amount
+                                                        </strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- header start-->
+
+                                        <ul class="last-li-line-bottom-0" id="invoiceLineItem">
+                                            <% if(invoiceItems.length > 0) { %>
+                                            <% invoiceItems.forEach(function(item) { %>
+
+
+                                           <!--  <li class="line-bottom slds-p-top_small">
+                                                <div class="slds-grid slds-grid_pull-padded invoice-row sm-hide">
+                                                    <div class="slds-no-flex slds-p-horizontal_small invoice-col">
+                                                        <div class="slds-form-element slds-m-bottom_small">
+                                                            <div class="slds-form-element__control">
+                                                                <div class="slds-select_container">
+                                                                    <select class="slds-select">
+                                                                        <option value="">Timesheet</option>
+                                                                        <option value="">Expense</option>
+                                                                        <option value="">Other</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class=" slds-no-flex slds-p-horizontal_small invoice-col">
+                                                        <div class="slds-form-element slds-m-bottom_small">
+                                                            <div class="slds-form-element__control">
+                                                                <textarea class="slds-textarea" rows="1"></textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-no-flex slds-p-horizontal_small invoice-col">
+                                                        <div class="slds-form-element slds-m-bottom_small">
+                                                            <div class="slds-form-element__control">
+                                                                <input type="text" class="slds-input" placeholder="">
+                                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-no-flex slds-p-horizontal_small invoice-col">
+                                                        <div class="slds-form-element slds-m-bottom_small">
+                                                            <div class="slds-form-element__control">
+                                                                <input type="text" class="slds-input" placeholder="">
+                                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-no-flex slds-p-horizontal_small invoice-col">
+                                                        <div class="slds-form-element slds-m-bottom_small">
+                                                            <div class="slds-form-element__control">
+                                                                <input type="text" class="slds-input" placeholder="">
+                                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-no-flex slds-p-horizontal_small invoice-col">
+                                                        <div class="slds-form-element slds-m-bottom_small">
+                                                            <div class="slds-form-element__control">
+                                                                <div class="slds-select_container">
+                                                                    <select class="slds-select">
+                                                                        <option value="">GST</option>
+                                                                        <option value="">VAT</option>
+                                                                        <option value="">Other</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-no-flex slds-p-horizontal_small invoice-col">
+                                                        <div class="tpd-5">
+                                                            1000.00
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-no-flex slds-p-horizontal_small invoice-col">
+                                                        <div class="text-center tpd-5">
+                                                            <button class="slds-button slds-button_icon" title="Remove">
+                                                                <i class="fa fa-times text-red"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="hide sm-show">
+                                                    <div class="slds-grid slds-grid_pull-padded slds-p-bottom_small">
+                                                        <div class="slds-size_8-of-12 slds-p-horizontal_small">
+                                                            <div class="text-size-11 text-dull">
+                                                                <span>Timesheet</span>
+                                                            </div>
+                                                            <div>
+                                                                Description Lorem ipsum dolor sit amet,
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-size_4-of-12 slds-p-horizontal_small">
+                                                            <div class="text-right tpd-10">
+                                                                10000.00
+                                                            </div>
+                                                            <div class="text-right">
+                                                                <button class="slds-button slds-button_icon" title="Edit" onclick="openModal('#modalEditInvItem');">
+                                                                    <i class="fa fa-edit text-blue"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li> -->
+                                            <!-- row start -->
+                                            <li class="line-bottom slds-p-top_small" id="<%= item.id %>" data-editable="true">
+                                                    <div class="slds-grid slds-grid_pull-padded invoice-row sm-hide">
+                                                        <div class="slds-no-flex slds-p-horizontal_small invoice-col">
+                                                            <div class="slds-form-element slds-m-bottom_small">
+                                                                <div class="slds-form-element__control">
+                                                                    <div class="slds-form-element__control text-center">
+                                                                        <input type="text" class="slds-input" disabled value="<%= item.type %>" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <%
+                                                            var userObj = userList.filter(user => {
+                                                                return parseInt(user.id) == parseInt(item.user_id);
+                                                            });
+
+                                                            var projectObj = projects.filter(project => {
+                                                                return parseInt(item.project_id) == parseInt(project.id);
+                                                            });
+                                                        %>
+                                                        <div class=" slds-no-flex slds-p-horizontal_small invoice-col" style="width:45%">
+                                                            <div class="slds-form-element slds-m-bottom_small">
+                                                                <div class="slds-form-element__control">
+                                                                    <textarea class="slds-textarea" disabled rows="1">Project: <%= projectObj[0].name %> &#13;&#10; Resource: <%= userObj[0].email %> <% if(item.user_role.length > 0) {%> (<%= item.user_role %>) <% } %> &#13;&#10; Note: <%= item.note %></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-no-flex slds-p-horizontal_small invoice-col" style="width:10%">
+                                                            <div class="slds-form-element slds-m-bottom_small">
+                                                                <div class="slds-form-element__control">
+                                                                    <input type="text" class="slds-input" disabled placeholder="" value="<%= item.inv_qauntity %>">
+                                                                    <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-no-flex slds-p-horizontal_small invoice-col">
+                                                            <div class="slds-form-element slds-m-bottom_small">
+                                                                <div class="slds-form-element__control">
+                                                                    <input type="text" class="slds-input" disabled placeholder="" value="<%= item.unit_price %>">
+                                                                    <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <!-- <div class="slds-no-flex slds-p-horizontal_small invoice-col"  style="width:25%">
+                                                            <div class="slds-form-element slds-m-bottom_small">
+                                                                <div class="slds-form-element__control">
+
+                                                                    <input type="text" class="slds-input" disabled value="" />
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class=" slds-no-flex slds-p-horizontal_small invoice-col" style="width:15%">
+                                                            <div class="slds-form-element slds-m-bottom_small">
+                                                                <div class="slds-form-element__control">
+                                                                    <input type="text" class="slds-input" disabled value="" />
+                                                                </div>
+                                                            </div>
+                                                        </div> -->
+
+
+                                                        <!-- <div class="slds-no-flex slds-p-horizontal_small invoice-col"  style="width:10%">
+                                                            <div class="slds-form-element slds-m-bottom_small">
+                                                                <div class="slds-form-element__control">
+                                                                    <input type="text" class="slds-input" disabled value="" />
+                                                                </div>
+                                                            </div>
+                                                        </div> -->
+                                                        <!-- <div class=" slds-no-flex slds-p-horizontal_small invoice-col"  style="width:12%">
+                                                            <div class="slds-form-element slds-m-bottom_small">
+                                                                <div class="slds-form-element__control">
+                                                                    <input type="text" class="slds-input" disabled value="<%= item.bill_rate %>" />
+                                                                </div>
+                                                            </div>
+                                                        </div> -->
+                                                        <div class=" slds-no-flex slds-p-horizontal_small invoice-col" style="width:10%">
+                                                            <div class="tpd-5">
+                                                              <% var currency_symbols = currencyWithSymbolArray.filter(function(currency){
+                                                                  return currency.name == item.currency;
+                                                              })%>
+                                                                <%=  currency_symbols[0].symbol %>
+
+                                                                <%= item.total_amount %>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-no-flex slds-p-horizontal_small invoice-col">
+                                                            <div class="text-center tpd-5">
+                                                                <button class="slds-button slds-button_icon" title="Remove" onclick="deleteBeforeConfirm('#globalAlert', 'deleteInvoiceItem(this,\'<%= item.id %>\', \'<%= item.timesheet_id %>\', \'<%= item.expense_id %>\', \'<%= item.type %>\')')">
+                                                                    <i class="fa fa-times text-red"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="hide sm-show">
+                                                        <div class="slds-grid slds-grid_pull-padded slds-p-bottom_small">
+                                                            <div class="slds-size_8-of-12 slds-p-horizontal_small">
+                                                                <div class="text-size-11 text-dull">
+                                                                    <span><%= item.type %></span>
+                                                                </div>
+                                                                <div>
+
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-size_4-of-12 slds-p-horizontal_small">
+                                                                <div class="text-right tpd-10">
+                                                                    <%= item.total_amount %>
+                                                                </div>
+                                                                <div class="text-right">
+                                                                    <button class="slds-button slds-button_icon" title="Edit" onclick="openModal('#modalEditInvItem');">
+                                                                        <i class="fa fa-edit text-blue"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+
+                                            <% }); %>
+                                        <% } %>
+
+
+                                            <!-- row end -->
+
+
+
+                                        </ul>
+                                        <div class="slds-p-top_small line-top">
+                                            <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                                <div class="slds-size_1-of-1 slds-medium-size_1-of-2 slds-p-horizontal_small">
+                                                    <div class="sm-hide">
+                                                        <div class="text-dull text-size-12"><abbr class="slds-required" title="required">*</abbr> Note: Total amount may vary according to different bill rate and cost rate from project assignment.</div>
+                                                    </div>
+                                                    <!-- <div class="sm-hide">
+                                                        <button class="slds-button slds-button_neutral" onclick="addInvoiceItem()">
+                                                            <i class="fa fa-plus"></i>
+                                                            Save Invoice Details
+                                                        </button>
+                                                    </div> -->
+
+                                                </div>
+                                                <div class="slds-size_1-of-1 slds-medium-size_1-of-2 slds-p-horizontal_small">
+                                                    <div class="text-right">
+                                                      <% var currency_symbols = currencyWithSymbolArray.filter(function(currency){
+                                                          return currency.name == invoiceDetails.currency;
+                                                      })%>
+                                                        Subtotal : <%= currency_symbols[0].symbol %> <span id="invoice_amount">0.00</span>
+                                                    </div>
+                                                    <!-- <div class="text-right">
+                                                        Discount : <span id="invoice-discount">100.00</span>
+                                                    </div> -->
+
+                                                    <div class="text-right">
+                                                        Tax : <span id="invoice-tax">0.00</span>
+                                                    </div>
+                                                    <div class="text-right text-size-18 tpd-5">
+                                                        <strong class="line-top tpd-5">
+                                                            Total : <%= currency_symbols[0].symbol %> <span id="invoice_total_amount">0.00</span>
+                                                        </strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                       <!--  <div class="slds-m-top_medium slds-p-top_small line-top">
+                                            <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                                <div class="slds-size_1-of-1 slds-medium-size_1-of-2 slds-p-horizontal_small">
+                                                    <div class="slds-form-element slds-m-bottom_medium">
+                                                        <div class="slds-form-element__control">
+                                                            <div class="slds-file-selector slds-file-selector_files">
+                                                                <div class="">
+                                                                    <input type="file" class="slds-file-selector__input slds-assistive-text" accept="image/png" id="file-upload-input-01" aria-labelledby="file-selector-primary-label file-selector-secondary-label">
+                                                                    <label class="slds-file-selector__body" for="file-upload-input-01" id="file-selector-secondary-label">
+                                                                        <span class="slds-file-selector__button slds-button slds-button_neutral">
+                                                                            <i class="fa fa-paperclip rpd-10"></i>
+                                                                            Attachments
+                                                                        </span>
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                            <div class="max-w-500">
+                                                <ul>
+                                                    <li class="line-top slds-p-vertical_xx-small">
+                                                        <div class="slds-grid">
+                                                            <div class="slds-has-flexi-truncate">
+                                                                <a href="" class="slds-truncate view-inline">
+                                                                    file-name.txt
+                                                                </a>
+                                                            </div>
+                                                            <div class="slds-no-flex slds-p-horizontal_small">
+                                                                <span class="text-dull text-uppercase">(98 kb)</span>
+                                                            </div>
+                                                            <div class="slds-no-flex">
+                                                                <button class="slds-button slds-button_icon" title="Remove" onclick="">
+                                                                    <i class="fa fa-times-circle text-red"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li class="line-top slds-p-vertical_xx-small">
+                                                        <div class="slds-grid">
+                                                            <div class="slds-has-flexi-truncate">
+                                                                <a href="" class="slds-truncate view-inline">
+                                                                    file-name.txt
+                                                                </a>
+                                                            </div>
+                                                            <div class="slds-no-flex slds-p-horizontal_small">
+                                                                <span class="text-dull text-uppercase">(98 kb)</span>
+                                                            </div>
+                                                            <div class="slds-no-flex">
+                                                                <button class="slds-button slds-button_icon" title="Remove" onclick="">
+                                                                    <i class="fa fa-times-circle text-red"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                                </div>
+                                                <div class="slds-size_1-of-1 slds-medium-size_1-of-2 slds-p-horizontal_small">
+                                                    <div class="slds-form-element slds-m-bottom_medium">
+                                                        <label class="slds-form-element__label">Note</label>
+                                                        <div class="slds-form-element__control">
+                                                            <textarea class="slds-textarea" placeholder=""></textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div> -->
+
+                                    </div>
+                                </div>
+                        <!-- invoice items end -->
+
+
+
+
+
+            </div>
+        </div>
+        <% include ../modals/modal-edit-invoice-item %>
+        <% include ../modals/modal-add-new-invoice-item %>
+        <% include ../modals/modal-add-invoice-timesheet %>
+        <% include ../modals/modal-add-invoice-expenses %>
+        <% include ../layouts/footer %>
+    </main>
+
+
+
+
+    <% include ../layouts/scripts %>
+    <% include ../layouts/invoice-script %>
+    <% include ../layouts/invoice-det-script %>
+</body>
+
+</html>

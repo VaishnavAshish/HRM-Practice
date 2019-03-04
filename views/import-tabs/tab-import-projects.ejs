@@ -1,0 +1,154 @@
+<!-- tab import users start-->        
+<div>
+    <div class="slds-p-bottom_x-small slds-m-bottom_small line-bottom">
+        <div class="slds-grid">
+            <div class="slds-no-flex slds-p-right_x-small">
+                <span class="slds-icon_container slds-icon-standard-template">
+                    <i class="fa fa-folder-open text-size-21 text-white slds-icon"></i>
+                </span>
+            </div>
+            <div class="slds-has-flexi-truncate">
+                <div class="text-size-18">
+                    Import Projects
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div class="slds-grid slds-wrap slds-grid_pull-padded">
+            <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_6-of-12 slds-p-horizontal_small">
+                <div class="slds-p-bottom_large">
+                    <p>
+                        Organise your projects data in a CSV (Comma separated values) file.
+                    </p>
+                    <p>
+                        The column header row is ignored during import.
+                    </p>
+                </div>
+                <div class="slds-p-bottom_xx-large">
+                    <div class="slds-p-bottom_small">
+                        <p class="text-size-16">
+                            We recommend you use this <a href="">sample file</a> to get started.
+                        </p>
+
+                        <p class="text-dull">
+                            The file should contain all the following columns in order:
+                        </p>
+                    </div>
+                    <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                        <tbody>
+                            <tr>
+                                <th scope="row">
+                                    <div>
+                                        <strong class="text-uppercase">Title</strong>
+                                    </div>
+                                </th>
+                                <td>
+                                    <div>
+                                        <span class="text-red text-size-16">*</span>
+                                        Required
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">
+                                    <div>
+                                        <strong class="text-uppercase">Email</strong>
+                                    </div>
+                                </th>
+                                <td>
+                                    <div>
+                                        <span class="text-red text-size-16">*</span>
+                                        Required
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">
+                                    <div>
+                                        <strong class="text-uppercase">First Name</strong>
+                                    </div>
+                                </th>
+                                <td>
+                                    <div>
+                                        <span class="text-red text-size-16">*</span>
+                                        Required
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">
+                                    <div>
+                                        <strong class="text-uppercase">Last Name</strong>
+                                    </div>
+                                </th>
+                                <td>
+                                    <div>
+                                        <span class="text-red text-size-16">*</span>
+                                        Required
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">
+                                    <div>
+                                        <strong class="text-uppercase">Currency</strong>
+                                    </div>
+                                </th>
+                                <td>
+                                    <div>
+                                        Optional
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">
+                                    <div>
+                                        <strong class="text-uppercase">Projects</strong>
+                                    </div>
+                                </th>
+                                <td>
+                                    <div>
+                                        Optional
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_6-of-12 slds-p-horizontal_small">
+                <div>
+                    <div class="slds-form-element slds-m-bottom_medium">
+                        <div class="slds-form-element__control">
+                            <span class="slds-radio">
+                                <input type="radio" id="ProjOp1" value="" name="ProjOP" checked="">
+                                <label class="slds-radio__label" for="ProjOp1">
+                                    <span class="slds-radio_faux"></span>
+                                    <span class="slds-form-element__label">
+                                        Update Existing Records
+                                    </span>
+                                </label>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-m-bottom_medium">
+                        <div class="slds-form-element__control">
+                            <span class="slds-radio">
+                                <input type="radio" id="ProjOp2" value="" name="ProjOP">
+                                <label class="slds-radio__label" for="ProjOp2">
+                                    <span class="slds-radio_faux"></span>
+                                    <span class="slds-form-element__label">
+                                        Skip Existing Records
+                                    </span>
+                                </label>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <% include ../import-tabs/dummy-import-form %>
+            </div>
+        </div>
+    </div> 
+</div>
+<!-- tab import users end-->   

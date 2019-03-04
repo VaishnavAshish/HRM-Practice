@@ -1,0 +1,33 @@
+CREATE TABLE "shared".Users (
+  Id uniqueidentifier NOT NULL,
+  Email varchar(100) NOT NULL,
+  Password varchar(100) NOT NULL,
+  DedicatedSchema varchar(100) NOT NULL,
+  CONSTRAINT Users_PK PRIMARY KEY (Id)
+);
+CREATE TABLE "shared".Users (
+  Id int uniqueidentifier NOT NULL,
+  Email varchar(100) NOT NULL,
+  Password varchar(100) NOT NULL,
+  DedicatedSchema varchar(100) NOT NULL,
+  CONSTRAINT Users_PK PRIMARY KEY (Id)
+);
+CREATE TABLE "shared".Users (
+  Id int primary key NOT NULL,
+  Email varchar(100) NOT NULL,
+  Password varchar(100) NOT NULL,
+  DedicatedSchema varchar(100) NOT NULL,
+  CONSTRAINT Users_PK PRIMARY KEY (Id)
+);
+create table session(sid char,sess json,expire timestamp(6),"session_pkey" PRIMARY KEY, btree (sid))
+;
+create table session(sid char,sess json,expire timestamp(6),"session_pkey" PRIMARY KEY, btree (sid))
+create table session(sid char,sess json,expire timestamp(6),constraint "session_pkey" PRIMARY KEY, btree (sid));
+create table session(sid char,sess json,expire timestamp(6),constraint "session_pkey" PRIMARY KEY, btree (sid));
+create table session(sid char,sess json,expire timestamp(6),constraint "session_pkey" PRIMARY KEY (sid));
+delete from session;
+delete from session;
+select * from krowsoftwarecom_users;
+ALTER TABLE users ALTER COLUMN password DROP NOT NULL;
+\d users
+\s project;

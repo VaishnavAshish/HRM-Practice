@@ -1,0 +1,18 @@
+<script>
+
+$(document).ready(function(){
+	let userRole='<%= resource.role %>';
+	$("#user_role").val(userRole);
+	let url = new URL(window.location.href);
+	let companyId=parseInt(getURLParameter("companyid"));
+	let currUserComId = parseInt('<%- user.company_id %>');
+	if(parseInt('999999999999999') == currUserComId){
+		$('[notSuperAdmin]').remove();
+	}
+});
+
+ function isPermissionModified(ele) {
+	 $(ele).attr("permission-modified", true);
+ }
+
+</script>

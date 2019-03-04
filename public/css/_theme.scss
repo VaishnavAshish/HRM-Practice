@@ -1,0 +1,34 @@
+$white: #ffffff;
+
+// text color
+$txtBlue:#0070d2;
+$txtDarkBlue:#16325c;
+$txtGreen:#04844b;
+$txtOrange:#f2ac57;
+$txtDefault:#3e3e3c;
+$txtGray:#5876a3;
+$txtDull:#999;
+$txtWeak:#706e6b;
+$txtRed:#ff0000;
+$txtSFred:#c23934;
+
+// background color
+$bgDull:#f3f2f2;
+$bgGreen:#12123a;
+$bgOrange:#ffb75d;
+$bgGray:#12123a;
+$bgSFred:#12123a;
+
+// border color
+
+$border:#dddbda;
+
+
+
+$spaceamounts: (0, 2, 3, 5, 8, 10, 15, 20, 24, 30, 40, 50, 60, 75, 100, 150, 200); // Adjust this to include the pixel amounts you need.
+$textsizes: (9, 10, 11, 12, 13, 14, 16, 18, 21, 24, 28, 30, 36, 40, 48);
+$radiussizes: (0, 4, 8, 10, 16, 500);
+$maxwidths: (100, 150, 200, 250, 300, 350, 400, 450, 500, 600, 800, 1000);
+$minwidths: (50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 600);
+$minheights: (50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 600, 800);
+$sides: (top, bottom, left, right);

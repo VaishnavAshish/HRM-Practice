@@ -1,0 +1,735 @@
+<script>
+function addResource(modalId){
+	// let url = new URL(window.location.href);
+	// let companyId=url.searchParams.get("companyid");
+	companyId=getURLParameter("companyid");
+	console.log(companyId);
+	clearError('#email');
+	let email=$("#email").val();
+	if(email===""||email===null||email===undefined){
+		addError('#email', "Please enter user email");
+	}else if(!(validateEmail(email))){
+			addError("#email","Please enter correct email id");
+		}else{
+
+		userRole = $('#project_user_role').val();
+		if(companyId!=null){
+				userRole = 'Manager';
+		}
+		if(userRole === "" || userRole  === null || userRole  === undefined) {
+			clearError('#email');
+			addError('#project_user_role', "Please select user role");
+		} else {
+			clearError('#project_user_role');
+			showLoader('#globalLoader');
+			let userData={};
+			userData.email=$("#email").val();
+			userData.first_name=$("#first_name").val();
+			userData.last_name=$("#last_name").val();
+			userData.phone=$("#phone").val();
+			userData.mobile=$("#mobile").val();
+			userData.team=$("#team").val();
+			userData.company=$("#companyId").val();
+			userData.permissions=[];
+			if(companyId!=null){
+				userData.user_role='Manager';
+				userData.bill_rate="0.00";
+				userData.cost_rate="0.00";
+			}else{
+
+				userData.user_role=$("#project_user_role").val();
+				userData.bill_rate=($("#billRate").val()=='')?"0.00":$("#billRate").val();
+				userData.cost_rate=($("#costRate").val()=='')?"0.00":$("#costRate").val();
+				$("input[name=permissions]:checked").each( function () {
+				   userData.permissions.push($(this).val());
+				   });
+			}
+			console.log(userData);
+			$.ajax({
+			  type: 'POST',
+			  url : '/addResource',
+			  contentType: 'application/json',
+			  dataType: 'json',
+			  data:JSON.stringify(userData),
+			   success : function(response){
+				   if(response.success){
+						hideLoader('#globalLoader');
+						closeModal(modalId);
+						showGlobalToast('#globalToast', 'success', response.message, 4000);
+						   location.reload();
+				   }
+
+				},
+			   error: function(response){
+					console.log('error is : '+response);
+					console.log(response);
+					// response
+					hideLoader('#globalLoader');
+					closeModal(modalId);
+					showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+				}
+			});
+		}
+	}
+}
+function deleteResource(resourceId){
+		console.log('resource id is '+resourceId);
+		showLoader('#globalLoader');
+		$.ajax({
+	      type: 'POST',
+	      url : '/deleteResource',
+	      contentType: 'application/json',
+	      dataType: 'json',
+	      data:JSON.stringify({"resourceId":resourceId}),
+	       success : function(response){
+	       		console.log(response);
+	       		hideLoader('#globalLoader');
+	       		/*window.location.href="/org-details?companyid="+companyId;*/
+	       		 /*window.history.back();*/
+	       		showGlobalToast('#globalToast', 'success', response.message, 4000);
+       		    location.reload();
+	       		 /*window.location.href = document.referrer;*/
+
+	        },
+	       error: function(response){
+				console.log(response.responseJSON.message);
+				closeModal('#globalAlert')
+	            hideLoader('#globalLoader');
+	            showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+	        }
+	    });
+	}
+function updateUser(userId){
+		let userCompanyId='<%= user.company_id %>';
+
+		console.log('user id is '+userId);
+		let userData={};
+		userData.id=userId;
+		userData.email=$("#email").val();
+		userData.first_name=$("#first_name").val();
+		userData.last_name=$("#last_name").val();
+		userData.phone=$("#phone").val();
+		userData.mobile=$("#mobile").val();
+		userData.permissions=[];
+		if(userCompanyId=='999999999999999'){
+			userData.user_role='Manager';
+			userData.bill_rate="0.00";
+			userData.cost_rate="0.00";
+
+		}else{
+			userData.bill_rate=($("#billRate").val()=='')?"0.00":$("#billRate").val();
+			userData.cost_rate=($("#costRate").val()=='')?"0.00":$("#costRate").val();
+			userData.user_role=$("#user_role").val();
+			$("input[name=permissions]:checked").each( function () {
+		       userData.permissions.push($(this).val());
+		   	});
+
+		}
+		userData.team=$("#team").val();
+		if(userData.email==""||userData.email==null||userData.email==undefined){
+			addError("#email","Please enter email id");
+		}else{
+			showLoader('#globalLoader');
+			$.ajax({
+		      type: 'POST',
+		      url : '/updateResource',
+		      contentType: 'application/json',
+		      dataType: 'json',
+		      data:JSON.stringify(userData),
+		       success : function(response){
+		       		console.log(response);
+		       		if($('[permission-modified]').length < 1) {
+						   setTimeout(() => {
+								hideLoader('#globalLoader');
+								showGlobalToast('#globalToast', 'success', "User details updated successfully", 4000);
+						   }, 2000);
+					} else {
+						showGlobalToast('#globalToast', 'success', "User details updated successfully", 4000);
+						setTimeout(() => {
+							location.reload();
+						}, 2000);
+					}
+
+		       		/*showGlobalToast('#globalToast', 'success', response.message, 4000);*/
+
+		        },
+		       error: function(response){
+
+		            console.log('error is : '+response);
+	                hideLoader('#globalLoader');
+
+	                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+		            //showGlobalToast('#globalToast', 'error', 'error in validating domain', 4000);
+		        }
+		    });
+		}
+	}
+
+function searchResource(filter,obj){
+	$("div[title=noResourceFound]").addClass('slds-hide');
+	showLoader('#globalLoader');
+	$(".slds-button[loadItemId]").show();
+	$("#offset").text("0");
+
+	let searchField=[];
+	if(filter=="Archive"){
+		let searchCriteria={"fieldName":"archived = ","fieldValue":true};
+		searchField.push(searchCriteria);
+	}else if(filter=="Active"){
+		let searchCriteria={"fieldName":"archived = ","fieldValue":false};
+		searchField.push(searchCriteria);
+	}
+	$.ajax({
+	      type: 'POST',
+	      url : '/findResourceByCriteria',
+	      contentType: 'application/json',
+	      dataType: 'json',
+	      data:JSON.stringify({"searchField":searchField}),
+	       success : function(response){
+			   if(response.success){
+					hideLoader('#globalLoader');
+					console.log(response.accounts);
+					$("#resourceTableTbody").html('');
+					$("#resourceCardView").html('');
+					if(response.resources.length>0){
+							/*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
+							response.resources.forEach(function(resource){
+								setDataToTableResource(resource);
+								setDataToCard(resource);
+							})
+						$(obj).closest('div[title="filterDropDown"]').find('#selectedFilter').text(filter);
+						$(obj).closest('div[title="filterDropDown"]').removeClass('slds-is-open');
+						$("#totalRecordCount").text(response.count);
+						$("#offset").text(parseInt($("#offset").text())+parseInt($("#pageRecordNo").text()));
+						/*let searchFilter=$("#selectedFilter").text();*/
+						let noOfRecord=parseInt($("#offset").text());
+						if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
+							$(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
+						}else{
+							$(".slds-button[loadItemId]").hide();
+						}
+
+					}else{
+						$(obj).closest('div[title="filterDropDown"]').find('#selectedFilter').text(filter);
+						$(obj).closest('div[title="filterDropDown"]').removeClass('slds-is-open');
+						$("div[title=noResourceFound]").removeClass('slds-hide').text('No resource found with this search crieteria');
+						showGlobalToast('#globalToast', 'error','No resource found with this search crieteria', 4000);
+					}
+
+			   }
+
+	        },
+	       error: function(response){
+                console.log('error is : '+response);
+                hideLoader('#globalLoader');
+                $("div[title=noResourceFound]").removeClass('slds-hide').text(response.responseJSON.message);
+                /*showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);*/
+	        }
+	    });
+}
+function loadMoreResource(){
+	let offset=$("#offset").text();
+	showLoader('#globalLoader');
+	let searchField=[];
+	let searchText=$("#searchUserEmail").val();
+	companyId=getURLParameter("companyid");
+	// let url = new URL(window.location.href);
+  //   let companyId=url.searchParams.get("companyid");
+	let filterCriteria=$("#selectedFilter").text();
+	if(searchText!=""){
+		let searchCriteria={"fieldName":"email ilike ","fieldValue":'%'+searchText+'%'};
+		searchField.push(searchCriteria);
+	}if(filterCriteria=="Active"){
+		let searchCriteria={"fieldName":"archived = ","fieldValue":false};
+		searchField.push(searchCriteria);
+	} else if(filterCriteria=="Archive"){
+		let searchCriteria={"fieldName":"archived = ","fieldValue":true};
+		searchField.push(searchCriteria);
+	}
+	$.ajax({
+      type: 'POST',
+      url : '/findResourceByCriteria',
+      contentType: 'application/json',
+      dataType: 'json',
+      data:JSON.stringify({"searchField":searchField,"company_id":companyId ,"offset":offset}),
+	  success : function(response){
+		   if(response.success){
+
+				console.log(response.resources);
+				if($("#resourceTable").length>0){
+					if(response.resources.length>0){
+						/*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
+						response.resources.forEach(function(resource){
+							setDataToTable(resource,response.company);
+						})
+					}else{
+						showGlobalToast('#globalToast', 'error','No resource found with this search crieteria', 4000);
+					}
+				}else{
+					if(response.resources.length>0){
+						/*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
+						response.resources.forEach(function(resource){
+							setDataToTableResource(resource);
+							setDataToCard(resource);
+						})
+					}else{
+						showGlobalToast('#globalToast', 'error','No resource found with this search crieteria', 4000);
+					}
+
+				}
+				$("#offset").text(parseInt($("#offset").text())+parseInt($("#pageRecordNo").text()));
+				let noOfRecord=parseInt($("#offset").text());
+				if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
+					$(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
+				}else{
+					$(".slds-button[loadItemId]").hide();
+				}
+				hideLoader('#globalLoader');
+		   }
+
+        },
+       error: function(response){
+            console.log('error is : '+response);
+            showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+            hideLoader('#globalLoader');
+        }
+    });
+}
+function findUserByEmail(){
+	$("div[title=noResourceFound]").addClass('slds-hide');
+	showLoader('#globalLoader');
+	$(".slds-button[loadItemId]").show();
+	$("#offset").text("0");
+
+	let searchField=[];
+	let searchText=$("#searchUserEmail").val();
+	companyId=getURLParameter("companyid");
+	// let url = new URL(window.location.href);
+  //   let companyId=url.searchParams.get("companyid");
+	let filterCriteria=$("#selectedFilter").text();
+	if(searchText!=""){
+		let searchCriteria={"fieldName":"email ilike ","fieldValue":'%'+searchText+'%'};
+		searchField.push(searchCriteria);
+	}if(filterCriteria=="Active"){
+		let searchCriteria={"fieldName":"archived = ","fieldValue":false};
+		searchField.push(searchCriteria);
+	} else if(filterCriteria=="Archive"){
+		let searchCriteria={"fieldName":"archived = ","fieldValue":true};
+		searchField.push(searchCriteria);
+	}
+	$.ajax({
+      type: 'POST',
+      url : '/findResourceByCriteria',
+      contentType: 'application/json',
+      dataType: 'json',
+      data:JSON.stringify({"searchField":searchField,"company_id":companyId}),
+	  success : function(response){
+		   if(response.success){
+				hideLoader('#globalLoader');
+				console.log(response.resources);
+				if($("#resourceTable").length>0){
+					$("#resourceTable").html('');
+					if(response.resources.length>0){
+						/*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
+						response.resources.forEach(function(resource){
+							setDataToTable(resource,response.company);
+						})
+					}else{
+						$("div[title=noResourceFound]").removeClass('slds-hide').text('No resource found with this search crieteria');
+						/*showGlobalToast('#globalToast', 'error','No resource found with this search crieteria', 4000);*/
+					}
+				}else{
+					$("#resourceTableTbody").html('');
+					$("#resourceCardView").html('');
+					if(response.resources.length>0){
+						/*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
+						response.resources.forEach(function(resource){
+							setDataToTableResource(resource);
+							setDataToCard(resource);
+						})
+					}else{
+						$("div[title=noResourceFound]").removeClass('slds-hide').text('No resource found with this search crieteria');
+						/*showGlobalToast('#globalToast', 'error','No resource found with this search crieteria', 4000);*/
+					}
+				}
+				$("#totalRecordCount").text(response.count);
+				$("#offset").text(parseInt($("#offset").text())+parseInt($("#pageRecordNo").text()));
+				/*let searchFilter=$("#selectedFilter").text();*/
+				let noOfRecord=parseInt($("#offset").text());
+				if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
+					$(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
+				}else{
+					$(".slds-button[loadItemId]").hide();
+				}
+		   }
+
+        },
+       error: function(response){
+            console.log('error is : '+response);
+            hideLoader('#globalLoader');
+            $("div[title=noResourceFound]").removeClass('slds-hide').text(response.responseJSON.message);
+            /*showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);*/
+        }
+    });
+}
+/*function findUserByEmail(){
+	showLoader('#globalLoader');
+	let searchText=$("#searchUserEmail").val();
+	let url = new URL(window.location.href);
+    let companyId=url.searchParams.get("companyid");
+	$.ajax({
+	      type: 'POST',
+	      url : '/findUserByEmail',
+	      contentType: 'application/json',
+	      dataType: 'json',
+	      data:JSON.stringify({"searchText":searchText,"company_id":companyId,"searchField":"email"}),
+	       success : function(response){
+			   if(response.success){
+					hideLoader('#globalLoader');
+					console.log(response.resources);
+					if($("#resourceTable").length>0){
+						$("#resourceTable").html('');
+						if(response.resources.length>0){
+							showGlobalToast('#globalToast', 'success',response.message, 4000);
+							response.resources.forEach(function(resource){
+								setDataToTable(resource,response.company);
+							})
+						}else{
+							showGlobalToast('#globalToast', 'error','No resource found with this search crieteria', 4000);
+						}
+					}else{
+						$("#resourceTableTbody").html('');
+						$("#resourceCardView").html('');
+						if(response.resources.length>0){
+							showGlobalToast('#globalToast', 'success',response.message, 4000);
+							response.resources.forEach(function(resource){
+								setDataToTableResource(resource);
+								setDataToCard(resource);
+							})
+						}else{
+							showGlobalToast('#globalToast', 'error','No resource found with this search crieteria', 4000);
+						}
+					}
+			   }
+
+	        },
+	       error: function(response){
+	            console.log('error is : '+response);
+	            hideLoader('#globalLoader');
+
+	            showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+	        }
+	    });
+
+}*/
+function setDataToTableResource(resource){
+	let span = '';
+	if(resource.user_status == "Active") {
+		span = `<span class="text-green">`;
+	} else if(resource.user_status == "Invited") {
+		span = `<span class="text-orange">`;
+	} else {
+		span = `<span class="text-red">`;
+	}
+	/*let resStatus=(resource.archived==true)?'Archive':'Active';*/
+	let resourceArchived;
+	if(resource.archived==true){
+		resourceArchived=`<li class="slds-dropdown__item" role="presentation" onclick="activateBeforeConfirm('#globalAlert', 'activate(`+resource.id+`,&quot;users&quot;)')">
+													<a href="javascript:void(0);" role="menuitem" tabindex="-1">
+															<span class="slds-truncate sf-text-red" title="">
+																	<i class="fa fa-check-circle text-green"></i> &nbsp;
+																	Activate
+															</span>
+													</a>
+											</li>`;
+	}else{
+		resourceArchived=`<li class="slds-dropdown__item" role="presentation" onclick="deleteBeforeConfirm('#globalAlert', 'deleteResource(`+resource.id+`)')">
+													<a href="javascript:void(0);" role="menuitem" tabindex="-1">
+															<span class="slds-truncate sf-text-red" title="">
+																	<i class="fa fa-trash text-red"></i> &nbsp;
+																	Deactivate
+															</span>
+													</a>
+											</li>`;
+	}
+	let resourceRowHTML='<tr class="">'+
+							'<th scope="row" tabindex="0">'+
+						        '<div class="slds-truncate" title="">'+
+						            '<a href="/resource-details?userid='+resource.id+'" tabindex="-1">'+
+						                resource.record_id+
+						            '</a>'+
+						        '</div>'+
+						    '</th>'+
+						    '<th scope="row" tabindex="0">'+
+						        '<div class="slds-truncate" title="">'+
+						            '<a href="javascript:void(0);" tabindex="-1">'+
+						                '<span class="slds-avatar slds-avatar_circle cursor-pointer">'+
+						                    '<img alt="'+resource.first_name+' '+ resource.last_name+'" src="/img/avatar1.jpg" title="'+ resource.first_name+' '+resource.last_name+'">'+
+						                '</span>'+
+						            '</a> '+
+														resource.first_name+' '+resource.last_name+
+						        '</div>'+
+						    '</th>'+
+						    '<th scope="row" tabindex="0">'+
+						        '<div class="slds-truncate" title="">'+
+						            '<a href="/resource-details?userid='+resource.id+'" tabindex="-1">'+
+						                resource.email+
+						            '</a>'+
+						        '</div>'+
+						    '</th>'+
+						    '<td role="gridcell">'+
+						        '<div class="slds-truncate slds-text-title_caps" title="">'+
+									 resource.role +
+						        '</div>'+
+						    '</td>'+
+						    '<td role="gridcell">'+
+						        '<div class="slds-truncate" title="">'+
+						            resource.created_date+
+						        '</div>'+
+						    '</td>'+
+						    '<td role="gridcell">'+
+								'<div class="slds-truncate" title="">'+
+									span+
+										resource.user_status+
+									'</span>'+
+						        '</div>'+
+						    '</td>'+
+						    '<td role="gridcell">'+
+						        '<div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">'+
+						            '<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" title="Show More">'+
+						            '<span class="slds-button__icon">'+
+						                '<i class=" fa fa-caret-down" aria-hidden="true"></i>'+
+						            '</span>'+
+						            '<span class="slds-assistive-text">Show More</span>'+
+						            '</button>'+
+						            '<div class="slds-dropdown slds-dropdown_right slds-dropdown_actions">'+
+						                '<ul class="slds-dropdown__list" role="menu">'+
+						                    '<li class="slds-dropdown__item" role="presentation">'+
+						                        '<a href="/resource-details?userid='+resource.id+'" role="menuitem" tabindex="0">'+
+						                            '<span class="slds-truncate" title="">'+
+						                                '<i class="fa fa-eye"></i> &nbsp;'+
+						                                'View Details'+
+						                            '</span>'+
+						                        '</a>'+
+						                    '</li>'+
+
+						                    '<li class="slds-has-divider_top-space" role="separator"></li>'+
+						                    resourceArchived+
+						                '</ul>'+
+						            '</div>'+
+						        '</div>'+
+						    '</td>'+
+						'</tr>';
+	$("#resourceTableTbody").append(resourceRowHTML);
+}
+function setDataToCard(resource){
+	let span = '';
+	if(resource.user_status == "Active") {
+		span = `<span class="text-green">`;
+	} else if(resource.user_status == "Invited") {
+		span = `<span class="text-orange">`;
+	} else {
+		span = `<span class="text-red">`;
+	}
+	let resStatus=(resource.archived==true)?"Deactivate":"Activate";
+	let phone=`<BR>`;
+	if(resource.phone!=null&&resource.phone!=undefined&&resource.phone!=''){
+			phone=`<i class="fa fa-phone fa-rotate-90 text-dull rpd-5 fa-fw"></i>
+					<a href="callto:${resource.phone}" class="">${resource.phone}</a>`;
+	}
+	let resourceArchived;
+	if(resource.archived==true){
+		resourceArchived=`<li class="slds-dropdown__item" role="presentation" onclick="activateBeforeConfirm('#globalAlert', 'activate(`+resource.id+`,&quot;users&quot;)')">
+													<a href="javascript:void(0);" role="menuitem" tabindex="-1">
+															<span class="slds-truncate sf-text-red" title="">
+																	<i class="fa fa-check-circle text-green"></i> &nbsp;
+																	Activate
+															</span>
+													</a>
+											</li>`;
+	}else{
+		resourceArchived=`<li class="slds-dropdown__item" role="presentation" onclick="deleteBeforeConfirm('#globalAlert', 'deleteResource(`+resource.id+`)')">
+													<a href="javascript:void(0);" role="menuitem" tabindex="-1">
+															<span class="slds-truncate sf-text-red" title="">
+																	<i class="fa fa-trash text-red"></i> &nbsp;
+																	Deactivate
+															</span>
+													</a>
+											</li>`;
+	}
+	let resourceCard='<div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_3-of-12 slds-p-horizontal_small">'+
+						    '<div class=" slds-m-bottom_medium slds-card">'+
+						        '<div class="line-bottom  slds-p-around_x-small">'+
+						            '<div class="slds-grid">'+
+						                '<div class="slds-no-flex">'+
+						                    '<a href="javascript:void(0);" tabindex="-1">'+
+						                        '<span class="slds-avatar slds-avatar_circle">'+
+						                            '<img alt="Person name" src="img/avatar1.jpg" title="">'+
+						                        '</span>'+
+						                    '</a>'+
+						                '</div>'+
+						                '<div class="slds-has-flexi-truncate slds-p-horizontal_x-small">'+
+						                    '<div class="slds-truncate">'+
+						                        '<a href="/resource-details?userid='+resource.id+'" class="text-size-16">'+resource.email+'</a>'+
+						                    '</div>'+
+						                    '<div class="slds-truncate text-dull text-size-8">'+
+												'#<a href="/resource-details?userid='+resource.id+'" class="text-size-6">'+resource.record_id+'</a>'+
+						                    '</div>'+
+						                '</div>'+
+						                '<div class="slds-no-flex">'+
+						                    '<div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">'+
+						                        '<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" title="Show More">'+
+						                        '<span class="slds-button__icon">'+
+						                            '<i class=" fa fa-caret-down" aria-hidden="true"></i>'+
+						                        '</span>'+
+						                        '<span class="slds-assistive-text">Show More</span>'+
+						                        '</button>'+
+						                        '<div class="slds-dropdown slds-dropdown_right slds-dropdown_actions">'+
+						                            '<ul class="slds-dropdown__list" role="menu">'+
+						                                '<li class="slds-dropdown__item" role="presentation">'+
+						                                    '<a href="/resource-details?userid='+resource.id+'" role="menuitem" tabindex="0">'+
+						                                        '<span class="slds-truncate" title="">'+
+						                                            '<i class="fa fa-eye"></i> &nbsp;'+
+						                                            'View Details'+
+						                                        '</span>'+
+						                                    '</a>'+
+						                                '</li>'+
+						                                '<li class="slds-has-divider_top-space" role="separator"></li>'+
+						                                resourceArchived+
+						                            '</ul>'+
+						                        '</div>'+
+						                    '</div>'+
+						                '</div>'+
+						            '</div>'+
+						        '</div>'+
+						        '<div class="line-bottom slds-p-around_small">'+
+						            '<div class="slds-p-bottom_x-small slds-truncate">'+
+						                phone+
+						            '</div>'+
+						            '<div class="slds-p-bottom_x-small slds-truncate">'+
+						                '<i class="fa fa-envelope text-dull rpd-5 fa-fw"></i>'+
+						                resource.email+
+						            '</div>'+
+									'<div class="slds-truncate">' +
+										'<i class="fa fa-id-card-alt text-dull rpd-5 fa-fw"></i>'+
+										resource.role +
+									'</div>'+
+						        '</div>'+
+						        '<div class="slds-p-around_small">'+
+						            '<div class="slds-grid">'+
+						                '<div class="slds-col text-right">'+
+						                    '<div class="text-size-11 text-dull">'+
+						                        'Status'+
+						                    '</div>'+
+						                    '<div>'+
+						                        span+
+						                            resource.user_status+
+						                        '</span>'+
+						                    '</div>'+
+						                '</div>'+
+						            '</div>'+
+						        '</div>'+
+						    '</div>'+
+						'</div>';
+	$("#resourceCardView").append(resourceCard);
+}
+function setDataToTable(resource,companyName){
+	let resourceRowHTML='<tr class="">'+
+					    '<th scope="row" tabindex="0">'+
+					        '<div class="slds-truncate" title="">'+
+					            '<a href="javascript:void(0);" tabindex="-1">'+
+					                '<span class="slds-avatar slds-avatar_circle cursor-pointer">'+
+					                    '<img alt="'+resource.first_name+' '+resource.last_name+'" src="/getUserPicture/'+resource.id+'" title="resource.first_name resource.last_name">'+
+					                '</span>'+
+					            '</a>'+
+					        '</div>'+
+					    '</th>'+
+					    '<th scope="row" tabindex="0">'+
+					        '<div class="slds-truncate" title="">'+
+					            '<a href="/resource-details?userid='+resource.id+'&comp_name='+companyName+'" tabindex="-1">'+
+					                resource.email+
+					            '</a>'+
+					        '</div>'+
+					    '</th>'+
+					    '<td role="gridcell">'+
+					        '<div class="slds-truncate" title="">'+
+					            resource.first_name+' '+resource.last_name+
+					        '</div>'+
+					    '</td>'+
+					    '<td role="gridcell">'+
+					        '<div class="slds-truncate" title="">'+
+					             resource.role+
+					        '</div>'+
+					    '</td>'+
+					    '<td role="gridcell">'+
+					        '<div class="slds-truncate" title="">'+
+					            resource.modified_date+
+					        '</div>'+
+					    '</td>'+
+					    '<td role="gridcell">'+
+					        '<div class="slds-truncate" title="">'+
+					            resource.created_date+
+					        '</div>'+
+					    '</td>'+
+					    '<td role="gridcell">'+
+					        '<div class="slds-truncate" title="">'+
+					            resource.archived+
+					        '</div>'+
+					    '</td>'+
+					    '<td role="gridcell">'+
+					        '<div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">'+
+					            '<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" title="Show More">'+
+					            '<span class="slds-button__icon">'+
+					                '<i class=" fa fa-caret-down" aria-hidden="true"></i>'+
+					            '</span>'+
+					            '<span class="slds-assistive-text">Show More</span>'+
+					            '</button>'+
+					            '<div class="slds-dropdown slds-dropdown_right slds-dropdown_actions">'+
+					                '<ul class="slds-dropdown__list" role="menu">'+
+					                    '<li class="slds-dropdown__item" role="presentation">'+
+					                        '<a href="/resource-details?userid='+resource.id+'&comp_name='+companyName+'" role="menuitem" tabindex="0">'+
+					                            '<span class="slds-truncate" title="">'+
+					                                '<i class="fa fa-eye"></i> &nbsp;'+
+					                                'View Details'+
+					                            '</span>'+
+					                        '</a>'+
+					                    '</li>'+
+					                    '<li class="slds-has-divider_top-space" role="separator"></li>'+
+
+					                '</ul>'+
+					            '</div>'+
+					        '</div>'+
+					    '</td>'+
+					'</tr>';
+	$("#resourceTable").append(resourceRowHTML);
+}
+/*function addError(id, msg) {
+    $(id).closest('.slds-form-element').addClass('slds-has-error');
+    $(id).siblings('.slds-text-color_error').html(msg);
+}
+
+function clearError(id) {
+    $(id).closest('.slds-form-element').removeClass('slds-has-error');
+    $(id).siblings('.slds-text-color_error').html('');
+}*/
+function selectTimesheetEntry(obj){
+		let timehseetApproverSelected=$(obj).is(':checked');
+		if(timehseetApproverSelected==true){
+			$("#timesheetEntry").prop('checked',true);
+			$("#timesheetEntry").prop('disabled',true);
+		}else{
+			// $("#timesheetEntry").prop('checked',false);
+			$("#timesheetEntry").prop('disabled',false);
+		}
+}
+function  selectExpenseManager(obj){
+		let expenseApproverSelected=$(obj).is(':checked');
+		if(expenseApproverSelected==true){
+				$("#expenseManager").prop('checked',true);
+				$("#expenseManager").prop('disabled',true);
+		}else{
+				$("#expenseManager").prop('checked',false);
+				$("#expenseManager").prop('disabled',false);
+		}
+}
+</script>

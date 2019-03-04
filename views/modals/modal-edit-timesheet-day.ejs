@@ -1,0 +1,140 @@
+<!-- modal edit timesheet by day start-->        
+<div id="modalEditTsheetDay">
+    <section role="dialog" tabindex="-1" class="slds-modal">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="closeModal('#modalEditTsheetDay');">
+                    <span class="slds-button__icon">
+                        <i class="fa fa-times text-size-21"></i>
+                    </span>
+                </button>
+                <h2  class="slds-text-heading_medium slds-hyphenate">Edit Timesheet Entry</h2>
+            </header>
+            <div class="slds-modal__content slds-p-around_medium">
+                <form id="edit-timesheet-day-form">
+                    <div>
+                        <div class="slds-form-element slds-m-bottom_medium">
+                            <label class="slds-form-element__label">
+                                Select Project
+                                <abbr class="slds-required" title="required">*</abbr>
+                            </label>
+                            <div class="slds-form-element__control">
+                                <div class="slds-select_container">
+                                    <select class="slds-select" disabled required="" getFormData name="project_name" id="project_name">
+                                                                                
+                                    </select>
+                                </div>
+                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+    
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slds-grid slds-wrap slds-grid_vertical-align-end slds-grid_pull-padded">
+                            <div class=" slds-size_1-of-1 slds-medium-size_6-of-12 slds-p-horizontal_small">
+                                <div class="slds-form-element slds-m-bottom_medium">
+                                    <label class="slds-form-element__label">
+                                        Task
+                                        <abbr class="slds-required" title="required">*</abbr>
+                                    </label>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-select_container">
+                                            <select class="slds-select" name="task_name" id="task_name" getFormData onchange="getTaskBillValue(this,'#category')">
+                                                <option value=""> </option>
+                                            </select>
+                                        </div>
+                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+    
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    
+                            <div class=" slds-size_1-of-1 slds-medium-size_3-of-12 slds-p-horizontal_small">
+                                <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_large text-center">
+                                    <!-- <div class="slds-col--bump-left slds-p-right_medium">
+                                        <div class="slds-form-element ">
+                                            <label class="slds-checkbox_toggle slds-grid">
+                                                    <input type="checkbox" getformdata="" name="category" id="category">
+                                                <span id="checkbox-toggle-3" class="slds-checkbox_faux_container">
+                                                    <span class="slds-checkbox_faux"></span>
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </div> -->
+                                    <div class="slds-has-flexi-truncate">
+                                        <span id="category">Billable</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class=" slds-size_1-of-1 slds-medium-size_3-of-12 slds-p-horizontal_small">
+                                <div class="slds-form-element slds-m-bottom_medium">
+                                    <label class="slds-form-element__label">
+                                        Time
+                                    </label>
+                                    <div class="slds-form-element__control">
+                                        <input type="text" class="slds-input time-hhmm" id="total_work_hours_formatted" name="total_work_hours_formatted" getFormData placeholder="">
+                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+    
+                        <div class="slds-form-element slds-m-bottom_medium">
+                            <label class="slds-form-element__label">
+                                Select Assignment
+                                <abbr class="slds-required" title="required">*</abbr>
+                            </label>
+                            <div class="slds-form-element__control">
+                                <div class="slds-select_container">
+                                    <select class="slds-select" required="" getFormData name="user_role" id="day_project_user_role" disabled>
+                                        <!-- userRoles -->
+                                        <% if(userRoles.length > 0) { %>
+                                            <% userRoles.forEach(function(role) { %>
+                                                <option value="<%= role %>"><%= role %></option>
+                                            <% }); %>
+                                        <% } else { %>                                        
+                                            <option value=""> </option>
+                                        <% } %>       
+                                    </select>
+                                </div>
+                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-m-bottom_medium">
+                            <label class="slds-form-element__label">Note</label>
+                            <div class="slds-form-element__control">
+                                <textarea class="slds-textarea" name="description" id="description" getFormData placeholder="Placeholder Text"></textarea>
+                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                </div>
+                            </div>
+                        </div>
+        
+                    </div>
+                </form>
+            </div>
+            <footer class="slds-modal__footer">
+                <div class="slds-grid">
+                    <div class="slds-has-flexi-truncate">
+                        <div class="text-left">
+                        <button class="slds-button slds-button_destructive" id="btn-delete-row-modal" onclick="deleteDayTimesheet(this)">Delete</button>    
+                        </div>
+                    </div>
+                    <div class="slds-no-flex">
+                        <button class="slds-button slds-button_neutral" onclick="closeModal('#modalEditTsheetDay');">Cancel</button>
+                        <button class="slds-button slds-button_brand" id="btn-update-data" onclick="updateDayTimesheetData(this, '#edit-timesheet-day-form', '#modalEditTsheetDay');">Update</button>
+                        <!-- updateDayTimesheetData(this, '#edit-timesheet-day-form', '#modalEditTsheetDay') -->
+                        <!-- dummyAddItem('#modalEditTsheetDay', 'Timesheet Added Successfully') -->
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop"></div>
+</div>
+<!-- modal edit timesheet by day end-->   

@@ -1,0 +1,98 @@
+@each $size in $textsizes {
+  .text-size-#{$size} {
+    font-size: #{$size}px;
+  }
+}
+
+.text-center{
+    text-align: center;
+}
+.text-left{
+    text-align: left;
+}
+.text-right{
+    text-align: right;
+}
+.text-justify{
+    text-align: justify;
+}
+.text-uppercase {
+    text-transform: uppercase;
+}
+.text-break-word {
+    white-space: normal;
+    word-break: break-word;
+}
+.text-break-all {
+    white-space: normal;
+    word-break: break-all;
+}
+
+
+.text-thin {
+    font-weight: 300;
+}
+.text-thick {
+    font-weight: 600;
+}
+.text-normal{
+    font-weight: normal;
+}
+
+
+.text-default {
+    color: $txtDefault;
+}
+.text-dark-blue {
+    color: $txtDarkBlue;
+}
+.text-gray {
+    color: $txtGray;
+}
+.text-weak {
+    color: $txtWeak; 
+}
+.text-blue {
+    color: $txtBlue;
+}
+.text-orange {
+    color: $txtOrange;
+}
+.text-red {
+    color: $txtSFred;
+}
+.text-green {
+    color: $txtGreen;
+}
+.text-dull {
+    color: $txtDull;
+}
+.text-white {
+    color: $white;
+}
+
+.text-size-normal {
+    font-size: normal;
+}
+.text-size-inherit {
+    font-size: inherit;
+}
+
+
+
+.text-height-1 {
+    line-height: 1;
+}
+
+.text-height-2x {
+    line-height: 1.5em;
+}
+.text-height-3x {
+    line-height: 2em;
+}
+.text-height-4x {
+    line-height: 3em;
+}
+.text-height-normal {
+    line-height: normal;
+}

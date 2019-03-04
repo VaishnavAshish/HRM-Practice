@@ -1,0 +1,193 @@
+<!-- views/layouts/side-nav.ejs -->
+
+<aside class="side-nav-outer">
+    <div class="slds-text-align_center slds-p-around_small">
+    	<a href="/">
+            <img src="/img/krow-logo.png" alt="" title="KROW PSA" class="side-nav-logo">
+        </a>
+    </div>
+    <nav class="slds-nav-vertical" aria-label="Sub page">
+        <div class="slds-p-around_small hide sm-show line-bottom" >
+          <% if(user.permissions.includes("timesheetEntry")){ %>
+
+            <div title="Start Timer" name="globalStart" start-timer class="cursor-pointer"  onclick="startKwTimerGlobally(this,'[name=kwTimer]');" timerDiv>
+                <div class="bg-dull vpd-5 hpd-15 radius-500 " name="" >
+                  <div class="slds-grid">
+                    <div class="cursor-pointer">
+                          <i class="fa fa-play text-blue fa-fw"></i>
+                    </div>
+                      <div class="slds-no-flex slds-p-horizontal_x-small">
+                          <time name="kwTimer">
+                              Start
+                          </time>
+                      </div>
+                      <div class="lpd-5 line-semi-black-left slds-col--bump-left">
+                          <i class="far fa-clock"></i>
+                      </div>
+                  </div>
+              </div>
+            </div>
+
+            <div title="Stop Timer" name="globalStop" stop-timer class="cursor-pointer hide" onclick="stopKwTimerGlobally(this, '[name=kwTimer]', '#syncTimer', '#modalAddNewTsheetQuick');" timerDiv>
+                <div class="bg-dull vpd-5 hpd-15 radius-500 " name="" >
+                  <div class="slds-grid">
+                    <div class="cursor-pointer">
+                          <i class="fa fa-stop text-red"></i>
+                      </div>
+                      <div class="slds-no-flex slds-p-horizontal_x-small">
+                          <time name="kwTimer">0:00:01</time>
+                      </div>
+                      <div class="lpd-5 line-semi-black-left slds-col--bump-left">
+                          <i class="far fa-clock"></i>
+                      </div>
+                  </div>
+              </div>
+            </div>
+      <% } %>
+    </div>
+    	<div class="slds-nav-vertical__section">
+			<ul>
+				<% for(var i=0; i<user.pages.length; i++) { %>
+					<li class="slds-nav-vertical__item">
+						<a href="<%=user.pages[i].url %>#default" class="slds-nav-vertical__action" onclick=<%=user.pages[i].onclick %>>
+							<div class="slds-grid">
+								<div class="slds-no-flex rpd-10">
+								<% if(user.pages[i].url == '/org-listing'){ %>
+									<i class="fa fa-building text-blue fa-fw"></i>
+								<% } %>
+								<% if(user.pages[i].url == '/accounts-listing'){ %>
+									<i class="fa fa-user-tie text-blue fa-fw"></i>
+								<% } %>
+								<% if(user.pages[i].url == '/resources-listing'){ %>
+									<i class="fa fa-users text-blue fa-fw"></i>
+								<% } %>
+								<% if(user.pages[i].url == '/projects-listing'){ %>
+									<i class="fa fa-folder-open text-blue fa-fw"></i>
+								<% } %>
+								<% if(user.pages[i].url == '/timesheet/'+user.id){ %>
+									<i class="fa fa-clock text-blue fa-fw"></i>
+								<% } %>
+								<% if(user.pages[i].url == '/expenses-listing/'+user.id){ %>
+									<i class="fa fa-dollar-sign text-blue fa-fw"></i>
+								<% } %>
+								<% if(user.pages[i].url == '/invoices-listing'){ %>
+									<i class="fa fa-receipt text-blue fa-fw"></i>
+								<% } %>
+								<% if(user.pages[i].url == '/org-settings'){ %>
+									<i class="fa fa-wrench text-blue fa-fw"></i>
+
+								<% } %>
+								</div>
+								<div class="slds-has-flexi-truncate side-nav-text">
+									<%=user.pages[i].label %>
+								</div>
+							</div>
+						</a>
+					</li>
+				<% } %>
+
+				<!-- <li class="slds-nav-vertical__item">
+					<a href="javascript:void(0);" class="slds-nav-vertical__action" onclick="openModal('#modalOrgSettings');">
+						<div class="slds-grid">
+							<div class="slds-no-flex rpd-10">
+								<i class="fa fa-cog text-blue"></i>
+							</div>
+							<div class="slds-has-flexi-truncate side-nav-text">
+								Settings
+							</div>
+						</div>
+					</a>
+				</li> -->
+				<!-- <li class="slds-nav-vertical__item">
+					<a href="/org-listing" class="slds-nav-vertical__action">
+						<div class="slds-grid">
+							<div class="slds-no-flex rpd-10">
+								<i class="fa fa-building text-blue"></i>
+							</div>
+							<div class="slds-has-flexi-truncate side-nav-text">
+								Companies
+							</div>
+						</div>
+					</a>
+				</li>
+				<li class="slds-nav-vertical__item">
+					<a href="/accounts-listing" class="slds-nav-vertical__action">
+						<div class="slds-grid">
+							<div class="slds-no-flex rpd-10">
+								<i class="fa fa-user-tie text-blue"></i>
+							</div>
+							<div class="slds-has-flexi-truncate side-nav-text">
+								Clients/Accounts
+							</div>
+						</div>
+					</a>
+				</li>
+				<li class="slds-nav-vertical__item">
+					<a href="/resources-listing" class="slds-nav-vertical__action">
+						<div class="slds-grid">
+							<div class="slds-no-flex rpd-10">
+								<i class="fa fa-users text-blue"></i>
+							</div>
+							<div class="slds-has-flexi-truncate side-nav-text">
+								Team
+							</div>
+						</div>
+					</a>
+				</li>
+				<li class="slds-nav-vertical__item">
+					<a href="/projects-listing" class="slds-nav-vertical__action">
+						<div class="slds-grid">
+							<div class="slds-no-flex rpd-10">
+								<i class="fa fa-folder-open text-blue"></i>
+							</div>
+							<div class="slds-has-flexi-truncate side-nav-text">
+								Projects
+							</div>
+						</div>
+					</a>
+				</li>
+
+				<li class="slds-nav-vertical__item">
+					<a href="/" class="slds-nav-vertical__action">
+						<div class="slds-grid">
+							<div class="slds-no-flex rpd-10">
+								<i class="fa fa-clock text-blue"></i>
+							</div>
+							<div class="slds-has-flexi-truncate side-nav-text">
+								Timesheets
+							</div>
+						</div>
+					</a>
+				</li>
+
+				<li class="slds-nav-vertical__item">
+					<a href="" class="slds-nav-vertical__action">
+						<div class="slds-grid">
+							<div class="slds-no-flex rpd-10">
+								<i class="fa fa-dollar-sign text-blue"></i>
+							</div>
+							<div class="slds-has-flexi-truncate side-nav-text">
+								Expenses
+							</div>
+						</div>
+					</a>
+				</li>
+
+				<li class="slds-nav-vertical__item">
+					<a href="/invoices-listing" class="slds-nav-vertical__action">
+						<div class="slds-grid">
+							<div class="slds-no-flex rpd-10">
+								<i class="fa fa-receipt text-blue"></i>
+							</div>
+							<div class="slds-has-flexi-truncate side-nav-text">
+								Invoices
+							</div>
+						</div>
+					</a>
+				</li> -->
+
+			</ul>
+		</div>
+    </nav>
+
+</aside>

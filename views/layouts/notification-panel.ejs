@@ -1,0 +1,93 @@
+
+<!-- notification panel start -->
+<section class="bg-white noti-panel-outer" id="kwNotiPanel">
+	<div class="slds-p-around_small line-bottom">
+		<div class="slds-grid">
+			<div class="slds-no-flex slds-p-right_small">
+				<i class="fa fa-bell fa-2x text-gray" title="Notifications"></i>
+			</div>
+			<div class="slds-has-flexi-truncate">
+				<div class="text-size-18">
+					Notifications
+				</div>
+			</div>
+			<div class="slds-no-flex slds-p-left_small">
+				<button class="slds-button slds-button_icon" title="Remove" onclick="hideNotification('#kwNotiPanel', '#kwNotiLoader');">
+                        <i class="fa fa-times fa-2x"></i>
+                </button>
+			</div>
+		</div>
+	</div>
+	<div class="noti-panel-body ">
+		<!-- notification loader start-->
+		    <div class="" id="kwNotiLoader">
+			    <div class="slds-spinner_container">
+			        <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+			            <span class="slds-assistive-text">Loading</span>
+			            <div class="slds-spinner__dot-a"></div>
+			            <div class="slds-spinner__dot-b"></div>
+			        </div>
+			    </div>
+		    </div>
+    	<!-- notification loader end-->
+		<ul class="first-li-line-top-0">
+            <!-- row -->
+            <li class="cursor-pointer line-top slds-p-vertical_x-small slds-p-horizontal_medium">
+				<div class="slds-grid">
+					<div class="slds-no-flex slds-p-right_small">
+						<i class="fa fa-envelope fa-2x text-gray"></i>
+					</div>
+					<div class="slds-has-flexi-truncate">
+						<div class="">
+							<strong><a href="">[Invoice-24]</a> Created By <a href="">User Name</a> </strong>
+						</div>
+						<div class="text-dull text-size-11">
+							For : Account Name 
+						</div>
+						<div class="text-height-1">
+							<small>
+								<span>
+									03/06/2018
+								</span>
+								<time class="lpd-20">
+									23:00
+								</time>
+							</small>
+						</div>
+					</div>
+				</div>
+			</li>
+			<!-- row -->
+            <li class="cursor-pointer line-top slds-p-vertical_x-small slds-p-horizontal_medium bg-dull">
+				<div class="slds-grid">
+					<div class="slds-no-flex slds-p-right_small">
+						<i class="far fa-envelope-open fa-2x text-gray"></i>
+					</div>
+					<div class="slds-has-flexi-truncate">
+						<div class="">
+							<strong><a href="">[TASK-24]</a> : Assign to you </strong>
+						</div>
+						<div class="text-dull text-size-11">
+							For : Project Name 
+						</div>
+						<div class="text-height-1">
+							<small>
+								<span>
+									03/06/2018
+								</span>
+								<time class="lpd-20">
+									23:00
+								</time>
+							</small>
+						</div>
+					</div>
+				</div>
+			</li>
+		</ul>
+		<div class="slds-p-around_small text-center">
+			<button class="slds-button">Load More</button>
+		</div>
+		
+	</div>
+</section>
+<!-- notification panel end -->

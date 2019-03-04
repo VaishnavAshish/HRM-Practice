@@ -1,0 +1,22 @@
+<script>
+$(document).ready(function(){
+
+	$("#offsetProject").text(parseInt($("#pageRecordNo").text()));
+	$("#offsetInvoice").text(parseInt($("#pageRecordNo").text()));
+	let noOfRecord=parseInt($("#offsetProject").text());
+	$("#totalRecordProject").text(<%= projectTotalCount %>);
+	$("#totalRecordInvoice").text(<%= invoiceTotalCount %>);
+	if(parseInt($("#totalRecordProject").text())>parseInt($("#offsetProject").text())){
+		$("#loadMoreProject").text('Load More ('+noOfRecord+'/'+$("#totalRecordProject").text()+')');
+	}else{
+		$("#loadMoreProject").hide();
+	}
+	if(parseInt($("#totalRecordInvoice").text())>parseInt($("#offsetInvoice").text())){
+		$("#loadMoreInvoice").text('Load More ('+noOfRecord+'/'+$("#totalRecordInvoice").text()+')');
+	}else{
+		$("#loadMoreInvoice").hide();
+	}
+
+	$("#currency").val('<%= account.currency %>');
+})
+</script>

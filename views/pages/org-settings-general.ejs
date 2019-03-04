@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="en">
+
+<% include ../layouts/head %>
+
+<body class="kw">
+
+    <% include ../layouts/nav %>
+    <% include ../layouts/sideNav %>
+    <main class="main-body-space tpd-60 bpd-100">
+        <div>
+            <div class="slds-p-around_small">
+
+                <div class="">
+
+                        <!-- header start end -->
+                        <div class="slds-card slds-m-bottom_medium">
+                            <div class="slds-grid slds-wrap slds-p-around_small">
+                                <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                    <div class="slds-grid">
+                                        <div class="slds-no-flex slds-p-right_x-small">
+                                            <span class="slds-icon_container slds-icon-custom-custom88">
+                                                <i class="fa fa-wrench text-size-21 text-white slds-icon"></i>
+                                            </span>
+                                        </div>
+                                        <div class="slds-has-flexi-truncate">
+                                        <div class="slds-text-body_small text-height-normal">
+                                            Company Settings
+                                        </div>
+                                        <h1 class="slds-page-header__title slds-p-right_x-small text-height-normal">
+                                            <div class="slds-dropdown-trigger slds-dropdown-trigger_click cursor-pointer" aria-haspopup="true" title="" onclick="openDropdown(this, event, true);">
+                                                <div class="slds-grid slds-has-flexi-truncate slds-grid_vertical-align-center">
+                                                    <span class="slds-truncate" title="">General</span>
+                                                    <i class="fa fa-caret-down lpd-5"></i>
+                                                </div>
+                                                <% include ../layouts/org-settings-dropdown %>
+                                            </div>
+                                        </h1>
+                                    </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            <div class="">
+
+
+                                <ul class="slds-tabs_default__nav radius-4 scroll-x-auto bpd-2 text-size-14">
+                                    <li class="slds-tabs_default__item slds-is-active" onclick="openTab(this, 'org-sett-general')">
+                                        <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="0">
+                                            Setting
+                                        </a>
+                                    </li>
+                                    <!-- <li class="slds-tabs_default__item" onclick="openTab(this, 'org-sett-user-role')">
+                                        <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="-1">
+                                            User Role
+                                        </a>
+                                    </li>
+                                    <li class="slds-tabs_default__item" onclick="openTab(this, 'org-sett-expense')">
+                                        <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="-1">
+                                            Expenses
+                                        </a>
+                                    </li>
+                                    <li class="slds-tabs_default__item" onclick="openTab(this, 'org-sett-invoice')">
+                                        <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="-1">
+                                            Invoice
+                                        </a>
+                                    </li> -->
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- header end -->
+
+
+                        <!-- body start -->
+                        <form id="orgSettingGeneral">
+                        <div class=" slds-card slds-p-around_large sm-pd-10" target-tab="org-sett-general">
+                                <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                    <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_6-of-12 slds-p-horizontal_small">
+                                        <div class="slds-p-bottom_x-small line-bottom">
+                                            <div class="text-uppercase ">
+                                                Details
+                                            </div>
+                                        </div>
+                                        <div class="slds-p-top_large">
+                                            <div>
+                                                <!-- <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label ">
+                                                        Contact Email
+                                                    </label>
+                                                    <div class="slds-form-element__control">
+                                                        <input type="email" class="slds-input" placeholder="" required="" readonly="" value="company@email.com">
+                                                    </div>
+                                                </div> -->
+                                                <!-- <div class="slds-grid slds-wrap slds-gutters">
+                                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                        <div class="slds-form-element slds-m-bottom_medium">
+                                                            <label class="slds-form-element__label ">
+                                                                <abbr class="slds-required" title="required">*</abbr>
+                                                                Organization Title
+                                                            </label>
+                                                            <div class="slds-form-element__control">
+                                                                <input type="text" class="slds-input" placeholder="" required="">
+                                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                        <div class="slds-form-element slds-m-bottom_medium">
+                                                            <label class="slds-form-element__label ">
+                                                                <abbr class="slds-required" title="required">*</abbr>
+                                                                Domain Name
+                                                            </label>
+                                                            <div class="slds-form-element__control">
+                                                                <input type="text" class="slds-input" placeholder="" required="">
+                                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div> -->
+
+                                                <!-- <div class="slds-grid slds-wrap slds-gutters">
+                                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                        <div class="slds-form-element slds-m-bottom_medium">
+                                                            <label class="slds-form-element__label">
+                                                                <abbr class="slds-required" title="required">*</abbr>
+                                                                Contact First Name
+                                                            </label>
+                                                            <div class="slds-form-element__control">
+                                                                <input type="text" class="slds-input" placeholder="" required="">
+                                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                        <div class="slds-form-element slds-m-bottom_medium">
+                                                            <label class="slds-form-element__label">
+                                                                <abbr class="slds-required" title="required">*</abbr>
+                                                                Contact Last Name
+                                                            </label>
+                                                            <div class="slds-form-element__control">
+                                                                <input type="text" class="slds-input" placeholder="" required="">
+                                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div> -->
+                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label">
+                                                        Time Zone
+                                                    </label>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-select_container">
+                                                            <select class="slds-select" id="timezone" name="timezone" getFormData>
+                                                                <% timezones.forEach(function(timezone) { %>
+                                                                    <option value="<%= timezone %>" ><%= timezone %></option>
+                                                                <% }) %>
+                                                                <!-- <option value="America/Los_Angeles">(UTC-08:00) Pacific Time (US & Canada)</option>
+                                                                <option value="Asia/Kolkata">(UTC+05:30) Chennai, Kolkata, Mumbai, New Delhi</option> -->
+                                                            </select>
+                                                        </div>
+                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label">
+                                                        Currency
+                                                    </label>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-select_container">
+                                                            <select class="slds-select">
+                                                                <option value="">USD</option>
+                                                                <option value="">option</option>
+                                                                <option value="">option</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                        </div>
+                                                    </div>
+                                                </div> -->
+                                               <!--  <div class="slds-grid slds-wrap slds-gutters">
+                                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                        <div class="slds-form-element slds-m-bottom_medium">
+                                                            <label class="slds-form-element__label">
+
+                                                                Expense Category
+                                                            </label>
+                                                            <div class="slds-form-element__control">
+                                                                <input type="text" class="slds-input" placeholder="" id="expenseCategoryInput" >
+                                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                        <div class="slds-form-element slds-m-bottom_medium">
+                                                            <label class="slds-form-element__label">
+
+                                                            </label>
+                                                            <div class="slds-form-element__control">
+
+                                                                <button class="slds-button slds-button_neutral" type="button" onclick="addNewExpenseCat()">
+                                                                    <i class="fa fa-plus"></i>
+                                                                    Add Row
+                                                                </button>
+                                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div> -->
+                                               <!--  <div class="slds-grid slds-wrap slds-gutters">
+                                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                        <div class="slds-form-element slds-m-bottom_medium">
+
+                                                            <div class="slds-form-element__control">
+
+                                                                <textarea class=" text-size-12 slds-p-top_xx-small" id="expenseCatDiv" style="border:1px solid #dddbda; border-radius: 5px; height:100px;padding:5px;" ></textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div class="slds-grid slds-wrap slds-gutters">
+                                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                        <div class="slds-form-element slds-m-bottom_medium">
+                                                            <label class="slds-form-element__label">
+
+                                                                User Role
+                                                            </label>
+                                                            <div class="slds-form-element__control">
+                                                                <input type="text" class="slds-input" placeholder="" id="userRoleInput" >
+                                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                        <div class="slds-form-element slds-m-bottom_medium">
+                                                            <label class="slds-form-element__label">
+
+                                                            </label>
+                                                            <div class="slds-form-element__control">
+
+                                                                <button class="slds-button slds-button_neutral" type="button" onclick="addNewUserRole()">
+                                                                    <i class="fa fa-plus"></i>
+                                                                    Add Row
+                                                                </button>
+                                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div> -->
+                                                <!-- <div class="slds-grid slds-wrap slds-gutters">
+                                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                        <div class="slds-form-element slds-m-bottom_medium">
+
+                                                            <div class="slds-form-element__control">
+
+                                                                <textarea class=" text-size-12 slds-p-top_xx-small" id="userRoleDiv" style="border:1px solid #dddbda; border-radius: 5px; height:100px; padding:5px;" ></textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div> -->
+                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label">
+                                                        Currency
+                                                    </label>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-select_container">
+                                                            <select class="slds-select" name="companyCurrency" id="companyCurrency"  getFormData>
+                                                              <% currencyWithSymbolArray.forEach(function(currency){ %>
+                                                                  <option value="<%= currency.name %>"><%= currency.name %></option>
+                                                              <% }) %>
+                                                            </select>
+                                                        </div>
+                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                    <!-- <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                        <div class="slds-form-element slds-m-bottom_medium">
+                                                            <label class="slds-form-element__label">
+                                                                <abbr class="slds-required" title="required">*</abbr>
+                                                                Contact Last Name
+                                                            </label>
+                                                            <div class="slds-form-element__control">
+                                                                <input type="text" class="slds-input" placeholder="" required="">
+                                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>-->
+                                                <!-- <div class="slds-grid slds-wrap slds-gutters">
+                                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_12-of-12">
+                                                        <div class="slds-form-element slds-m-bottom_medium">
+                                                            <label class="slds-form-element__label">
+
+                                                                Default Invoice Note
+                                                            </label>
+                                                            <div class="slds-form-element__control">
+
+                                                                <textarea class=" text-size-12 slds-p-top_xx-small" id="defaultInvoiceNote" name="invoiceNote" style="border:1px solid #dddbda; width:100%;border-radius: 5px; height:70px;padding:5px;" getFormData></textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div> -->
+
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_1-of-12 slds-p-horizontal_small">
+                                    </div>
+                                    <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_5-of-12 slds-p-horizontal_small">
+                                        <div class="slds-p-bottom_x-small line-bottom">
+                                            <div class="text-uppercase ">
+                                                Address
+                                            </div>
+                                        </div>
+                                        <div class="slds-p-top_large">
+                                            <div class="slds-form-element slds-m-bottom_medium">
+                                                <label class="slds-form-element__label">Street</label>
+                                                <div class="slds-form-element__control">
+                                                    <input type="text" class="slds-input" id="companyStreet" name="companyStreet" getFormData placeholder="">
+                                                    <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-grid slds-gutters slds-wrap">
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                    <div class="slds-form-element slds-m-bottom_medium">
+                                                        <label class="slds-form-element__label">City</label>
+                                                        <div class="slds-form-element__control">
+                                                            <input type="text" class="slds-input" id="companyCity" name="companyCity" placeholder="" getFormData>
+                                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                    <div class="slds-form-element slds-m-bottom_medium">
+                                                        <label class="slds-form-element__label">State</label>
+                                                        <div class="slds-form-element__control">
+                                                            <input type="text" id="companyState" name="companyState" class="slds-input" placeholder="" getFormData>
+                                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-grid slds-gutters slds-wrap">
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                    <div class="slds-form-element slds-m-bottom_medium">
+                                                        <label class="slds-form-element__label">Country</label>
+                                                        <div class="slds-form-element__control">
+                                                            <input type="text" class="slds-input" id="companyCountry" name="companyCountry"  placeholder="" getFormData>
+                                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                    <div class="slds-form-element slds-m-bottom_medium">
+                                                        <label class="slds-form-element__label">ZIP</label>
+                                                        <div class="slds-form-element__control">
+                                                            <input type="text" class="slds-input" id="companyZip" name="companyZip"  placeholder="" getFormData>
+                                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                    <div class="text-right tpd-15">
+                                        <button class="slds-button slds-button_brand slds-align-top" type="button" onclick="saveCompanyGeneralSetting()">
+                                            Save Changes
+                                        </button>
+                                    </div>
+                            </div>
+                           </form>
+
+                        <!-- body end -->
+                </div>
+            </div>
+        </div>
+
+        <% include ../layouts/footer %>
+    </main>
+
+    <% include ../layouts/scripts %>
+    <% include ../layouts/setting-script %>
+</body>
+
+</html>

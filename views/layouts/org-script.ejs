@@ -1,0 +1,421 @@
+<script>
+$(document).ready(function(){
+
+	$("#offset").text(parseInt($("#pageRecordNo").text()));
+	let noOfRecord=parseInt($("#offset").text());
+	let searchFilter=$("#selectedFilter").text();
+
+	if(searchFilter=="All"){
+		if((<%= totalCount %>) >parseInt($("#offset").text())){
+			$("#totalRecordCount").text(<%= totalCount %>);
+		}
+	}else if(searchFilter=="Active"){
+		if((<%= activeCount %>)>parseInt($("#offset").text())){
+			$("#totalRecordCount").text(<%= activeCount %>);
+		}
+	}else if(searchFilter=="Archive"){
+		if((<%= archivedCount %>)>parseInt($("#offset").text())){
+			$("#totalRecordCount").text(<%= archivedCount %>);
+		}
+	}
+	if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
+		$(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
+	}else{
+		$(".slds-button[loadItemId]").hide();
+	}
+})
+function loadMoreData(){
+	let offset=$("#offset").text();
+	let searchText=$("#searchCompName").val();
+	showLoader('#globalLoader');
+	let searchField=[];
+	let filterCriteria=$("#selectedFilter").text();
+	
+	if(searchText!=""){
+		let searchCriteria={"fieldName":"name ilike ","fieldValue":'%'+searchText+'%'};
+		searchField.push(searchCriteria);
+	}
+	if(filterCriteria=="Active"){
+		let searchCriteria={"fieldName":"archived = ","fieldValue":false};
+		searchField.push(searchCriteria);
+	} else if(filterCriteria=="Archive"){
+		let searchCriteria={"fieldName":"archived = ","fieldValue":true};
+		searchField.push(searchCriteria);
+	}
+	$.ajax({
+	      type: 'POST',
+	      url : '/findCompanyByCriteria',
+	      contentType: 'application/json',
+	      dataType: 'json',
+	      data:JSON.stringify({"searchField":searchField,"offset":offset}),
+	       success : function(response){
+			   if(response.success){
+					hideLoader('#globalLoader');
+					console.log(response.accounts);
+					if(response.companies.length>0){
+						response.companies.forEach(function(company){
+							setDataToTable(company);
+							setDataToCard(company);
+						})
+						$("#offset").text(parseInt($("#offset").text())+parseInt($("#pageRecordNo").text()));
+						/*let searchFilter=$("#selectedFilter").text();*/
+						let noOfRecord=parseInt($("#offset").text());
+						if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
+							$(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
+						}else{
+							$(".slds-button[loadItemId]").hide();
+						}
+						
+					}else{
+						showGlobalToast('#globalToast', 'error','No company found with this search crieteria', 4000);
+					}
+			   }
+
+	        },
+	       error: function(response){ 
+                console.log('error is : '+response);
+                hideLoader('#globalLoader');
+                
+                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+	        }
+	    });
+}
+function searchCompany(filter,obj){
+	$("div[title=noCompanyFound]").addClass('slds-hide');
+	showLoader('#globalLoader');
+	$(".slds-button[loadItemId]").show();
+	$("#offset").text("0");
+	let noOfRecord=parseInt($("#offset").text());
+	let searchField=[];
+	if(filter=="Archive"){
+		
+		let searchCriteria={"fieldName":"archived = ","fieldValue":true};
+		searchField.push(searchCriteria);
+	}else if(filter=="Active"){
+		
+		let searchCriteria={"fieldName":"archived = ","fieldValue":false};
+		searchField.push(searchCriteria);
+	}
+
+	$("#orgListTBody").html('');
+	$("#orgCardView").html('');
+	$.ajax({
+	      type: 'POST',
+	      url : '/findCompanyByCriteria',
+	      contentType: 'application/json',
+	      dataType: 'json',
+	      data:JSON.stringify({"searchField":searchField}),
+	       success : function(response){
+			   if(response.success){
+					hideLoader('#globalLoader');
+					console.log(response.accounts);
+					if(response.companies.length>0){
+						/*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
+						response.companies.forEach(function(company){
+							setDataToTable(company);
+							setDataToCard(company);
+						})
+						$(obj).closest('div[title="filterDropDown').find('#selectedFilter').text(filter);
+						$(obj).closest('div[title="filterDropDown').removeClass('slds-is-open');
+						$("#totalRecordCount").text(response.count);
+						$("#offset").text(parseInt($("#offset").text())+parseInt($("#pageRecordNo").text()));
+						/*let searchFilter=$("#selectedFilter").text();*/
+						let noOfRecord=parseInt($("#offset").text());
+						if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
+							$(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
+						}else{
+							$(".slds-button[loadItemId]").hide();
+						}
+						
+
+					}else{
+						$("div[title=noCompanyFound]").removeClass('slds-hide').text('No company found with this search crieteria');
+						$(obj).closest('div[title="filterDropDown').find('#selectedFilter').text(filter);
+						$(obj).closest('div[title="filterDropDown').removeClass('slds-is-open');
+						/*showGlobalToast('#globalToast', 'error','No company found with this search crieteria', 4000);*/
+					}
+			   }
+
+	        },
+	       error: function(response){ 
+                console.log('error is : '+response);
+                hideLoader('#globalLoader');
+                $("div[title=noCompanyFound]").removeClass('slds-hide').text(response.responseJSON.message);
+                /*showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);*/
+	        }
+	    });
+}
+function findCompanyByName(){
+	$("div[title=noCompanyFound]").addClass('slds-hide');
+	showLoader('#globalLoader');
+	
+	$(".slds-button[loadItemId]").show();
+	$("#offset").text('0');
+	let noOfRecord=parseInt($("#offset").text());
+
+	let searchField=[];
+	let searchText=$("#searchCompName").val();
+	let filterCriteria=$("#selectedFilter").text();
+	if(searchText!=""){
+		let searchCriteria={"fieldName":"name ilike ","fieldValue":'%'+searchText+'%'};
+		searchField.push(searchCriteria);
+	}if(filterCriteria=="Active"){
+		
+		let searchCriteria={"fieldName":"archived = ","fieldValue":false};
+		searchField.push(searchCriteria);
+	} else if(filterCriteria=="Archive"){
+		
+		let searchCriteria={"fieldName":"archived = ","fieldValue":true};
+		searchField.push(searchCriteria);
+	}
+	$("#orgListTBody").html('');
+	$("#orgCardView").html('');
+	$.ajax({
+	      type: 'POST',
+	      url : '/findCompanyByCriteria',
+	      contentType: 'application/json',
+	      dataType: 'json',
+	      data:JSON.stringify({"searchField":searchField}),
+	       success : function(response){
+			   if(response.success){
+					hideLoader('#globalLoader');
+					console.log(response.accounts);
+					if(response.companies.length>0){
+						/*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
+						response.companies.forEach(function(company){
+							setDataToTable(company);
+							setDataToCard(company);
+						})
+						$("#totalRecordCount").text(response.count);
+						$("#offset").text(parseInt($("#offset").text())+parseInt($("#pageRecordNo").text()));
+						let searchFilter=$("#selectedFilter").text();
+						let noOfRecord=parseInt($("#offset").text());
+						if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
+							$(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
+						}else{
+							$(".slds-button[loadItemId]").hide();
+						}
+					
+						
+					}else{
+						$("div[title=noCompanyFound]").removeClass('slds-hide').text('No company found with this search crieteria');
+						/*showGlobalToast('#globalToast', 'error','No company found with this search crieteria', 4000);*/
+					}
+			   }
+
+	        },
+	       error: function(response){ 
+                console.log('error is : '+response);
+                hideLoader('#globalLoader');
+                $("div[title=noCompanyFound]").removeClass('slds-hide').text(response.responseJSON.message);
+                /*showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);*/
+	        }
+	    });
+
+}
+function setDataToCard(companyData){
+	let compStatus=(companyData.archived==true)?"Archived":"Active";
+	let orgCard='<div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_3-of-12 slds-p-horizontal_small">'+
+				'<div class=" slds-m-bottom_medium slds-p-around_small slds-card">'+
+					'<div class="line-bottom slds-m-bottom_small slds-p-bottom_xx-small">'+
+						'<div class="slds-grid">'+
+							'<div class="slds-has-flexi-truncate">'+
+								'<div class="slds-truncate">'+
+									'<a href="/org-details?companyid='+companyData.id+'" class="text-size-16">'+companyData.name +'</a>'+
+								'</div>'+
+							'</div>'+
+							'<div class="slds-col--bump-left">'+
+								'<div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">'+
+									'<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" title="Show More">'+
+									'<span class="slds-button__icon">'+
+										'<i class=" fa fa-caret-down" aria-hidden="true"></i>'+
+									'</span>'+
+									'<span class="slds-assistive-text">Show More</span>'+
+									'</button>'+
+									'<div class="slds-dropdown slds-dropdown_right slds-dropdown_actions">'+
+										'<ul class="slds-dropdown__list" role="menu">'+
+											'<li class="slds-dropdown__item" role="presentation">'+
+												'<a href="/org-details?companyid='+companyData.id+'" role="menuitem" tabindex="0">'+
+													'<span class="slds-truncate" title="">'+
+														'<i class="fa fa-eye"></i> &nbsp;'+
+														'View Details'+
+													'</span>'+
+												'</a>'+
+											'</li>'+
+											'<li class="slds-has-divider_top-space" role="separator"></li>'+
+											'<li class="slds-dropdown__item" role="presentation">'+
+												'<a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteCompany('+companyData.id+')">'+
+													'<span class="slds-truncate " title="">'+
+														'<i class="fa fa-trash text-red"></i> &nbsp;'+
+														'Archive'+
+													'</span>'+
+												'</a>'+
+											'</li>'+
+										'</ul>'+
+									'</div>'+
+								'</div>'+
+							'</div>'+
+						'</div>'+
+					'</div>'+
+					'<div>'+
+						
+						'<div class="slds-p-bottom_x-small slds-truncate">'+
+							'<i class="fa fa-link"></i>'+
+							' '+
+							companyData.domain+
+						'</div>'+
+						'<div class="text-size-11">'+
+							'<div class="slds-grid">'+
+								'<div class="slds-has-flexi-truncate">'+
+									'<span class="text-uppercase text-dull">Create on :</span>'+
+									'<time>'+companyData.created_date+'</time>'+
+								'</div>'+
+								'<div class="slds-no-flex slds-p-left_small">'+
+									'<span class="text-uppercase text-dull">Status :</span>'+
+									'<span class="text-green">'+
+										compStatus+
+									'</span>'+
+								'</div>'+
+							'</div>'+
+						'</div>'+
+					'</div>'+
+				'</div>'+
+			'</div>';
+	$("#orgCardView").append(orgCard);
+}
+function setDataToTable(companyData){
+	let orgTr='<tr class="">'+
+				'<th scope="row" tabindex="0">'+
+					'<div class="slds-truncate" title="">'+
+						'<a href="/org-details?companyid='+companyData.id+'" tabindex="-1">'+
+							companyData.name+
+						'</a>'+
+					'</div>'+
+				'</th>'+
+				'<td role="gridcell">'+
+					'<div class="slds-truncate" title="">'+
+						companyData.domain+
+					'</div>'+
+				'</td>'+
+				'<td role="gridcell">'+
+					'<div class="slds-truncate" title="">'+
+						companyData.created_date+
+					'</div>'+
+				'</td>'+
+				'<td role="gridcell">'+
+					'<div class="slds-truncate" title="">'+
+						companyData.archived+
+					'</div>'+
+				'</td>'+
+				'<td role="gridcell">'+
+					'<div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">'+
+						'<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" title="Show More">'+
+						'<span class="slds-button__icon">'+
+							'<i class=" fa fa-caret-down" aria-hidden="true"></i>'+
+						'</span>'+
+						'<span class="slds-assistive-text">Show More</span>'+
+						'</button>'+
+						'<div class="slds-dropdown slds-dropdown_right slds-dropdown_actions">'+
+							'<ul class="slds-dropdown__list" role="menu">'+
+								'<li class="slds-dropdown__item" role="presentation">'+
+									'<a href="/org-details?companyid='+companyData.id+'" role="menuitem" tabindex="0">'+
+										'<span class="slds-truncate" title="">'+
+											'<i class="fa fa-eye"></i>&nbsp;'+ 
+											'View Details'+
+										'</span>'+
+									'</a>'+
+								'</li>'+
+								'<li class="slds-has-divider_top-space" role="separator"></li>'+
+								'<li class="slds-dropdown__item" role="presentation">'+
+									'<a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteCompany('+companyData.id+')">'+
+										'<span class="slds-truncate sf-text-red" title="">'+
+											'<i class="fa fa-trash text-red"></i> &nbsp;'+
+											'Archive'+
+										'</span>'+
+									'</a>'+
+								'</li>'+
+							'</ul>'+
+						'</div>'+
+					'</div>'+
+				'</td>'+
+			'</tr>';
+	$("#orgListTBody").append(orgTr);
+}
+function addOrganization(modalId){
+	clearError("#orgName");
+	clearError("#domain");
+	/*clearError("#adminPass");*/
+	clearError("#adminEmail");
+	let orgData={}; 
+	orgData.orgName=$("#orgName").val();
+	domain=$("#domain").val();
+	/*orgData.adminUserName=$("#adminUserName").val();*/
+	/*orgData.adminPass=$("#adminPass").val();*/
+	orgData.adminEmail=$("#adminEmail").val();
+	orgData.isSignup = true;
+	console.log(orgData);
+	if(orgData.orgName==""||orgData.orgName==null||orgData.orgName==undefined){
+		addError("#orgName","Please enter company name");
+	}else if(domain==""||domain==null||domain==undefined){
+		addError("#domain","Please enter company domain");
+	}else if(orgData.adminEmail==""||orgData.adminEmail==null||orgData.adminEmail==undefined){
+		addError("#adminEmail","Please enter company admin email id");
+	}else if(!(validateEmail(orgData.adminEmail))){
+		addError("#adminEmail","Please enter correct email id");
+	}else{
+		orgData.domain = domain+".krow.com";
+		showLoader('#globalLoader');
+		clearError("#orgName");
+		clearError("#domain");
+		/*clearError("#adminPass");*/
+		clearError("#adminEmail");
+	    $.ajax({
+	      type: 'POST',
+	      url : '/addCompany',
+	      contentType: 'application/json',
+	      dataType: 'json',
+	      data:JSON.stringify(orgData),
+	       success : function(response){
+			   if(response.success){
+					hideLoader('#globalLoader');
+					closeModal(modalId);        
+					showGlobalToast('#globalToast', 'success', "A confirmation mail has been sent to company admin.", 4000);
+				   	setTimeout(() => {
+						location.reload(); 
+					   }, 1000);
+			   }
+
+	        },
+	       error: function(response){ 
+                console.log('error is : '+response);
+                hideLoader('#globalLoader');
+                closeModal(modalId);        
+                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+	        }
+	    });
+	  }
+}
+function deleteCompany(companyId){
+		showLoader('#globalLoader');
+		console.log('company id is '+companyId);
+		$.ajax({
+	      type: 'POST',
+	      url : '/deleteCompany',
+	      contentType: 'application/json',
+	      dataType: 'json',
+	      data:JSON.stringify({"companyId":companyId}),
+	       success : function(response){
+	       		console.log(response);
+	       		hideLoader('#globalLoader');
+	       		window.location.href="/org-listing";
+	       		//showGlobalToast('#globalToast', 'success', 'company added successfully', 4000);
+	            
+	        },
+	       error: function(response){
+	       		hideLoader('#globalLoader');
+	            console.log(response.responseJSON.message);
+	            showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+	        }
+	    });
+	}
+</script>

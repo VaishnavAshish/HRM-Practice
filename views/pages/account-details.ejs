@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="en">
+
+<% include ../layouts/head %>
+
+<body class="kw">
+
+    <% include ../layouts/nav %>
+    <% include ../layouts/sideNav %>
+    <main class="main-body-space tpd-60 bpd-100">
+        <div>
+            <div class="slds-p-around_small">
+                <!-- breadcrumb start -->
+                <div class="slds-p-bottom_small">
+                    <nav role="navigation" aria-label="Breadcrumbs" >
+                        <ol class="slds-breadcrumb slds-list_horizontal slds-wrap">
+                            <li class="slds-breadcrumb__item "><a href="/accounts-listing">Accounts</a></li>
+                            <li class="slds-breadcrumb__item "><a href="javascript:void(0);"><%= account.name %></a></li>
+                        </ol>
+                    </nav>
+                </div>
+                <!-- breadcrumb end -->
+                <div class="">
+                    <div id="pageRecordNo" style="display:none;"><%= process.env.PAGE_RECORD_NO %></div>
+                    <div id="filterCriteria" style="display:none;" ></div>
+
+                    <div id="totalRecordProject" style="display:none;"></div>
+                    <div id="offsetProject" style="display:none;">0</div>
+
+                    <div id="totalRecordInvoice" style="display:none;"></div>
+                    <div id="offsetInvoice" style="display:none;">0</div>
+                    <div class="slds-tabs_default bg-none">
+                        <!-- header start end -->
+                        <div class="slds-card">
+                            <div class="slds-grid slds-wrap slds-p-horizontal_small slds-p-top_small">
+                                <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                    <div class="slds-grid">
+                                        <div class="slds-no-flex slds-p-right_x-small">
+                                            <span class="slds-icon_container slds-icon-standard-carousel">
+                                                <i class="fa fa-user-tie text-size-21 text-white slds-icon"></i>
+                                            </span>
+                                        </div>
+                                        <div class="slds-has-flexi-truncate">
+                                         <div class="text-size-18 text-height-1">
+                                                <strong>
+                                                    <%= account.name %>
+                                                </strong>
+                                            </div>
+                                             <div class="slds-text-body_small tpd-2">
+                                                <%= account.modified_date %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                    <div class="text-right sm-tpd-15">
+                                        <button class="slds-button slds-button_brand slds-align-top" onclick="updateAccount('<%= account.id %>')">
+                                            Save Changes
+                                        </button>
+                                        <% if(account.archived==true) { %>
+                                            <button class="slds-button slds-button_neutral slds-align-top" onclick="activateBeforeConfirm('#globalAlert', 'activate(\'<%= account.id %>\',\'account\')')">
+                                                Activate
+                                            </button>
+                                        <% } else { %>
+                                                <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', '   deleteAccount(\'<%= account.id %>\')')">
+                                                        Dectivate
+                                                </button>
+
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="">
+
+
+                            <ul class="slds-tabs_default__nav radius-4 scroll-x-auto bpd-2 text-size-14">
+                                <li data-navigation="detailTab" class="navigation slds-tabs_default__item slds-is-active" onclick="openTab(this, 'account-details')">
+                                    <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="0">
+                                        Details
+                                    </a>
+                                </li>
+                                <li  data-navigation="projectTab" class="navigation slds-tabs_default__item"  onclick="openTab(this, 'account-projects')">
+                                    <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="-1">
+                                        Projects (<%= projectTotalCount %>)
+                                    </a>
+                                </li>
+                                <li  data-navigation="invoiceTab" class="navigation slds-tabs_default__item"  onclick="openTab(this, 'account-invoices')">
+                                    <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="-1">
+                                        Invoice (<%= invoiceTotalCount %>)
+                                    </a>
+                                </li>
+                            </ul>
+                            </div>
+
+                        </div>
+                        <!-- header end -->
+
+                        <div class="slds-tabs_default__content" target-tab="account-details">
+                            <div class=" slds-card slds-p-around_large sm-pd-10">
+                                <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                    <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_6-of-12 slds-p-horizontal_small">
+                                        <div class="slds-p-bottom_x-small line-bottom">
+                                            <div class="text-uppercase ">
+                                                Details
+                                            </div>
+                                        </div>
+                                        <div class="slds-p-top_large">
+                                            <div>
+                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label ">
+                                                        Clients/Accounts Title
+                                                        <abbr class="slds-required" title="required">*</abbr>
+                                                    </label>
+                                                    <div class="slds-form-element__control">
+                                                        <input type="text" id="name" class="slds-input" placeholder="" required="" value="<%= account.name; %>">
+                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label">
+                                                        <abbr class="slds-required" title="required">*</abbr>
+                                                        Currency
+                                                    </label>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-select_container">
+                                                            <select class="slds-select" required="">
+                                                                <option value=""> </option>
+                                                                <option value="AFN">AFN - Afghan Afghani</option>
+                                                                <option value="ALL">ALL - Albanian Lek</option>
+                                                                <option value="AMD">AMD - Armenian Dram</option>
+                                                                <option value="ANG">ANG - Netherlands Antillean Guilder</option>
+                                                                <option value="AOA">AOA - Angolan Kwanza</option>
+                                                                <option value="ARS">ARS - Argentine Peso</option>
+                                                                <option value="AUD">AUD - Australian Dollar</option>
+                                                                <option value="AWG">AWG - Aruban Florin</option>
+                                                                <option value="AZN">AZN - Azerbaijani Manat</option>
+                                                                <option value="BAM">BAM - Bosnia And Herzegovina Convertible Mark</option>
+                                                                <option value="BBD">BBD - Barbados Dollar</option>
+                                                                <option value="BDT">BDT - Bangladeshi Taka</option>
+                                                                <option value="BGN">BGN - Bulgarian Lev</option>
+                                                                <option value="BHD">BHD - Bahraini Dinar</option>
+                                                                <option value="BIF">BIF - Burundian Franc</option>
+                                                                <option value="BMD">BMD - Bermudian Dollar</option>
+                                                                <option value="BND">BND - Brunei Dollar</option>
+                                                                <option value="BOB">BOB - Boliviano</option>
+                                                                <option value="BRL">BRL - Brazilian Real</option>
+                                                                <option value="BSD">BSD - Bahamian Dollar</option>
+                                                                <option value="BTC">BTC - Bitcoin</option>
+                                                                <option value="BTN">BTN - Bhutanese Ngultrum</option>
+                                                                <option value="BWP">BWP - Botswana Pula</option>
+                                                                <option value="BYR">BYR - Belarusian Ruble</option>
+                                                                <option value="BZD">BZD - Belize Dollar</option>
+                                                                <option value="CAD">CAD - Canadian Dollar</option>
+                                                                <option value="CDF">CDF - Congolese Franc</option>
+                                                                <option value="CHF">CHF - Swiss Franc</option>
+                                                                <option value="CLP">CLP - Chilean Peso</option>
+                                                                <option value="CNY">CNY - Chinese Yuan</option>
+                                                                <option value="COP">COP - Colombian Peso</option>
+                                                                <option value="CRC">CRC - Costa Rican Colon</option>
+                                                                <option value="CUC">CUC - Cuban Convertible Peso</option>
+                                                                <option value="CUP">CUP - Cuban Peso</option>
+                                                                <option value="CVE">CVE - Cape Verde Escudo</option>
+                                                                <option value="CZK">CZK - Czech Koruna</option>
+                                                                <option value="DJF">DJF - Djiboutian Franc</option>
+                                                                <option value="DKK">DKK - Danish Krone</option>
+                                                                <option value="DOP">DOP - Dominican Peso</option>
+                                                                <option value="DZD">DZD - Algerian Dinar</option>
+                                                                <option value="EGP">EGP - Egyptian Pound</option>
+                                                                <option value="ERN">ERN - Eritrean Nakfa</option>
+                                                                <option value="ETB">ETB - Ethiopian Birr</option>
+                                                                <option value="EUR">EUR - Euro</option>
+                                                                <option value="FJD">FJD - Fiji Dollar</option>
+                                                                <option value="FKP">FKP - Falkland Islands Pound</option>
+                                                                <option value="GBP">GBP - Pound Sterling</option>
+                                                                <option value="GEL">GEL - Georgian Lari</option>
+                                                                <option value="GGP">GGP - Guernsey Pound</option>
+                                                                <option value="GHS">GHS - Ghanaian Cedi</option>
+                                                                <option value="GIP">GIP - Gibraltar Pound</option>
+                                                                <option value="GMD">GMD - Gambian Dalasi</option>
+                                                                <option value="GNF">GNF - Guinean Franc</option>
+                                                                <option value="GTQ">GTQ - Guatemalan Quetzal</option>
+                                                                <option value="GYD">GYD - Guyanese Dollar</option>
+                                                                <option value="HKD">HKD - Hong Kong Dollar</option>
+                                                                <option value="HNL">HNL - Honduran Lempira</option>
+                                                                <option value="HRK">HRK - Croatian Kuna</option>
+                                                                <option value="HTG">HTG - Haitian Gourde</option>
+                                                                <option value="HUF">HUF - Hungarian Forint</option>
+                                                                <option value="IDR">IDR - Indonesian Rupiah</option>
+                                                                <option value="ILS">ILS - Israeli New Shekel</option>
+                                                                <option value="IMP">IMP - Isle of Man Pound</option>
+                                                                <option selected="selected" value="INR">INR - Indian Rupee</option>
+                                                                <option value="IQD">IQD - Iraqi Dinar</option>
+                                                                <option value="IRR">IRR - Iranian Rial</option>
+                                                                <option value="ISK">ISK - Icelandic Króna</option>
+                                                                <option value="JEP">JEP - Jersey Pound</option>
+                                                                <option value="JMD">JMD - Jamaican Dollar</option>
+                                                                <option value="JOD">JOD - Jordanian Dinar</option>
+                                                                <option value="JPY">JPY - Japanese Yen</option>
+                                                                <option value="KES">KES - Kenyan Shilling</option>
+                                                                <option value="KGS">KGS - Kyrgyzstani Som</option>
+                                                                <option value="KHR">KHR - Cambodian Riel</option>
+                                                                <option value="KMF">KMF - Comoro Franc</option>
+                                                                <option value="KPW">KPW - North Korean Won</option>
+                                                                <option value="KRW">KRW - South Korean Won</option>
+                                                                <option value="KWD">KWD - Kuwaiti Dinar</option>
+                                                                <option value="KYD">KYD - Cayman Islands Dollar</option>
+                                                                <option value="KZT">KZT - Kazakhstani Tenge</option>
+                                                                <option value="LAK">LAK - Lao Kip</option>
+                                                                <option value="LBP">LBP - Lebanese Pound</option>
+                                                                <option value="LKR">LKR - Sri Lankan Rupee</option>
+                                                                <option value="LRD">LRD - Liberian Dollar</option>
+                                                                <option value="LSL">LSL - Lesotho Loti</option>
+                                                                <option value="LTL">LTL - Lithuania Litas</option>
+                                                                <option value="LVL">LVL - Latvia Lat</option>
+                                                                <option value="LYD">LYD - Libyan Dinar</option>
+                                                                <option value="MAD">MAD - Moroccan Dirham</option>
+                                                                <option value="MDL">MDL - Moldovan Leu</option>
+                                                                <option value="MGA">MGA - Malagasy Ariary</option>
+                                                                <option value="MKD">MKD - Macedonian Denar</option>
+                                                                <option value="MMK">MMK - Myanmar Kyat</option>
+                                                                <option value="MNT">MNT - Mongolian Tugrik</option>
+                                                                <option value="MOP">MOP - Macanese Pataca</option>
+                                                                <option value="MRO">MRO - Mauritanian Ouguiya</option>
+                                                                <option value="MUR">MUR - Mauritian Rupee</option>
+                                                                <option value="MVR">MVR - Maldivian Rufiyaa</option>
+                                                                <option value="MWK">MWK - Malawian Kwacha</option>
+                                                                <option value="MXN">MXN - Mexican Peso</option>
+                                                                <option value="MYR">MYR - Malaysian Ringgit</option>
+                                                                <option value="MZN">MZN - Mozambican Metical</option>
+                                                                <option value="NAD">NAD - Namibian Dollar</option>
+                                                                <option value="NGN">NGN - Nigerian Naira</option>
+                                                                <option value="NIO">NIO - Nicaraguan Córdoba</option>
+                                                                <option value="NOK">NOK - Norwegian Krone</option>
+                                                                <option value="NPR">NPR - Nepalese Rupee</option>
+                                                                <option value="NZD">NZD - New Zealand Dollar</option>
+                                                                <option value="OMR">OMR - Omani Rial</option>
+                                                                <option value="PAB">PAB - Panamanian Balboa</option>
+                                                                <option value="PEN">PEN - Peruvian Nuevo Sol</option>
+                                                                <option value="PGK">PGK - Papua New Guinean Kina</option>
+                                                                <option value="PHP">PHP - Philippine Peso</option>
+                                                                <option value="PKR">PKR - Pakistani Rupee</option>
+                                                                <option value="PLN">PLN - Polish Zloty</option>
+                                                                <option value="PYG">PYG - Paraguayan Guaraní</option>
+                                                                <option value="QAR">QAR - Qatari Riyal</option>
+                                                                <option value="RON">RON - Romanian New Leu</option>
+                                                                <option value="RSD">RSD - Serbian Dinar</option>
+                                                                <option value="RUB">RUB - Russian Ruble</option>
+                                                                <option value="RWF">RWF - Rwandan Franc</option>
+                                                                <option value="SAR">SAR - Saudi Riyal</option>
+                                                                <option value="SBD">SBD - Solomon Islands Dollar</option>
+                                                                <option value="SCR">SCR - Seychelles Rupee</option>
+                                                                <option value="SDG">SDG - Sudanese Pound</option>
+                                                                <option value="SEK">SEK - Swedish Krona/Kronor</option>
+                                                                <option value="SGD">SGD - Singapore Dollar</option>
+                                                                <option value="SHP">SHP - Saint Helena Pound</option>
+                                                                <option value="SLL">SLL - Sierra Leonean Leone</option>
+                                                                <option value="SOS">SOS - Somali Shilling</option>
+                                                                <option value="SPL">SPL - * Seborga Luigino</option>
+                                                                <option value="SRD">SRD - Surinamese Dollar</option>
+                                                                <option value="STD">STD - São Tomé And Príncipe Dobra</option>
+                                                                <option value="SVC">SVC - El Salvador Colon</option>
+                                                                <option value="SYP">SYP - Syrian Pound</option>
+                                                                <option value="SZL">SZL - Swazi Lilangeni</option>
+                                                                <option value="THB">THB - Thai Baht</option>
+                                                                <option value="TJS">TJS - Tajikistani Somoni</option>
+                                                                <option value="TMT">TMT - Turkmenistani Manat</option>
+                                                                <option value="TND">TND - Tunisian Dinar</option>
+                                                                <option value="TOP">TOP - Tongan Pa?anga</option>
+                                                                <option value="TRY">TRY - Turkish Lira</option>
+                                                                <option value="TTD">TTD - Trinidad And Tobago Dollar</option>
+                                                                <option value="TVD">TVD - Tuvalu Dollar</option>
+                                                                <option value="TWD">TWD - New Taiwan Dollar</option>
+                                                                <option value="TZS">TZS - Tanzanian Shilling</option>
+                                                                <option value="UAH">UAH - Ukrainian Hryvnia</option>
+                                                                <option value="UGX">UGX - Ugandan Shilling</option>
+                                                                <option value="USD">USD - United States Dollar</option>
+                                                                <option value="UYU">UYU - Uruguayan Peso</option>
+                                                                <option value="UZS">UZS - Uzbekistan Som</option>
+                                                                <option value="VEF">VEF - Venezuelan Bolívar</option>
+                                                                <option value="VND">VND - Vietnamese Dong</option>
+                                                                <option value="VUV">VUV - Vanuatu Vatu</option>
+                                                                <option value="WST">WST - Samoan Tala</option>
+                                                                <option value="XCD">XCD - East Caribbean Dollar</option>
+                                                                <option value="XOF">XOF - Cfa Franc Bceao</option>
+                                                                <option value="XPF">XPF - Cfp Franc (Franc Pacifique)</option>
+                                                                <option value="YER">YER - Yemeni Rial</option>
+                                                                <option value="ZAR">ZAR - South African Rand</option>
+                                                                <option value="ZMW">ZMW - Zambian Kwacha</option>
+                                                                <option value="ZWD">ZWD - Zimbabwe Dollar</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                        </div>
+                                                    </div>
+                                                </div> -->
+
+                                                <div class="slds-grid slds-wrap slds-gutters">
+                                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                        <div class="slds-form-element slds-m-bottom_medium">
+                                                            <label class="slds-form-element__label">
+                                                               <!--  <abbr class="slds-required" title="required">*</abbr> -->
+                                                                Contact First Name
+                                                            </label>
+                                                            <div class="slds-form-element__control">
+                                                                <input type="text" id="first_name" class="slds-input" placeholder="" required="" value="<%= account.first_name %>">
+                                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                        <div class="slds-form-element slds-m-bottom_medium">
+                                                            <label class="slds-form-element__label">
+                                                              <!--   <abbr class="slds-required" title="required">*</abbr> -->
+                                                                Contact Last Name
+                                                            </label>
+                                                            <div class="slds-form-element__control">
+                                                                <input type="text" id="last_name" class="slds-input" placeholder="" required="" value="<%= account.last_name %>">
+                                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-grid slds-wrap slds-gutters">
+                                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                        <div class="slds-form-element slds-m-bottom_medium">
+                                                            <label class="slds-form-element__label">
+                                                                Contact Email
+                                                                <abbr class="slds-required" title="required">*</abbr>
+                                                            </label>
+                                                            <div class="slds-form-element__control">
+                                                                <input type="email" id="email" class="slds-input" placeholder="" required="" value="<%= account.email%>">
+                                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                        <div class="slds-form-element slds-m-bottom_medium">
+                                                            <label class="slds-form-element__label">
+                                                                Currency
+                                                                <abbr class="slds-required" title="required">*</abbr>
+                                                            </label>
+                                                            <div class="slds-form-element__control">
+                                                                <div class="slds-select_container">
+                                                                    <select id="currency" class="slds-select" required="" id="currency" name="currency" getFormData>
+                                                                      <% currencyWithSymbolArray.forEach(function(currency){ %>
+                                                                          <option value="<%= currency.name %>"><%= currency.name %></option>
+                                                                      <% }) %>
+
+                                                                    </select>
+                                                                </div>
+                                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- <div class="line-top slds-p-vertical_x-small">
+                                                    <div class="slds-grid">
+                                                        <div class="slds-has-flexi-truncate">
+                                                            <div>Require Timesheet Approvals</div>
+                                                            <div class="text-size-11 text-dull">
+                                                                Timesheet Users added to the project will require their timesheets be approved by default.
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-col--bump-left slds-p-left_medium">
+                                                            <div class="slds-form-element">
+                                                                <label class="slds-checkbox_toggle slds-grid">
+
+                                                                    <input type="checkbox" name="checkbox-toggle-3" value="checkbox-toggle-3" aria-describedby="checkbox-toggle-3">
+                                                                    <span id="checkbox-toggle-3" class="slds-checkbox_faux_container" aria-live="assertive">
+                                                                        <span class="slds-checkbox_faux"></span>
+                                                                    </span>
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_6-of-12 slds-p-horizontal_small">
+                                        <div class="slds-p-bottom_x-small line-bottom">
+                                            <div class="text-uppercase ">
+                                                Address
+                                            </div>
+                                        </div>
+                                        <div class="slds-p-top_large">
+                                            <div class="slds-form-element slds-m-bottom_medium">
+                                                <label class="slds-form-element__label">Street</label>
+                                                <div class="slds-form-element__control">
+                                                    <input type="text" id="street" class="slds-input" placeholder="" value="<%= account.street %>">
+                                                    <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-grid slds-gutters slds-wrap">
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                    <div class="slds-form-element slds-m-bottom_medium">
+                                                        <label class="slds-form-element__label">City</label>
+                                                        <div class="slds-form-element__control">
+                                                            <input type="text" id="city" class="slds-input" placeholder="" value="<%= account.city %>">
+                                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                    <div class="slds-form-element slds-m-bottom_medium">
+                                                        <label class="slds-form-element__label">State</label>
+                                                        <div class="slds-form-element__control">
+                                                            <input type="text" id="state" class="slds-input" placeholder="" value="<%= account.state %>">
+                                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-grid slds-gutters slds-wrap">
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                    <div class="slds-form-element slds-m-bottom_medium">
+                                                        <label class="slds-form-element__label">Country</label>
+                                                        <div class="slds-form-element__control">
+                                                            <input type="text" id="country" class="slds-input" placeholder="" value="<%= account.country%>">
+                                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                    <div class="slds-form-element slds-m-bottom_medium">
+                                                        <label class="slds-form-element__label">ZIP</label>
+                                                        <div class="slds-form-element__control">
+                                                            <input type="text" id="zip_code" class="slds-input" placeholder="" value="<%= account.zip_code%>">
+                                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                        <div class="slds-tabs_default__content hide" target-tab="account-projects">
+                            <div class=" slds-card slds-p-around_large sm-pd-10">
+                                <div class=" slds-p-bottom_small">
+                                    <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                        <div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-p-horizontal_small">
+                                            <!-- <div class="slds-grid sm-bpd-10">
+
+                                                <div class="slds-no-flex">
+                                                    <label class="slds-form-element__label slds-p-top_x-small" for="">
+                                                        Sort By :
+                                                    </label>
+                                                </div>
+                                                <div class="">
+                                                    <div class="slds-select_container">
+                                                        <select class="slds-select" id="">
+                                                            <option value="">Recent1</option>
+                                                            <option>Other</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div> -->
+                                        </div>
+                                        <div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-p-horizontal_small">
+                                            <div class="slds-grid slds-grid_align-end">
+                                                <!-- <div class="slds-no-flex slds-p-right_small">
+                                                    <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top" title="edit">
+                                                        <span class="slds-button__icon">
+                                                            <i class=" fa fa-filter" aria-hidden="true"></i>
+                                                        </span>
+                                                    </button>
+                                                </div> -->
+                                                <div class="sm-slds-grow">
+                                                        <div class="slds-form-element">
+                                                            <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
+                                                                <input type="text" class="slds-input" placeholder="Search project by name" id="searchProjectName" searchFunc="findProjectByName()" onkeypress="handle(event,this);">
+                                                                <div class="slds-input__icon-group slds-input__icon-group_right">
+                                                                 <button class="slds-input__icon slds-input__icon_right slds-button slds-button_icon" title="Clear" onclick="clearSearchBox(this);findProjectByName();">
+                                                                      <i class="fa fa-times-circle"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-no-flex slds-p-left_small">
+                                                        <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top" title="Search" onclick="findProjectByName();">
+                                                        <span class="slds-button__icon">
+                                                            <i class=" fa fa-search" aria-hidden="true"></i>
+                                                        </span>
+                                                        </button>
+                                                    </div>
+                                                <!-- <div class="sm-slds-grow">
+                                                    <div class="slds-form-element">
+                                                        <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_left-right slds-input-has-icon_group-right">
+                                                            <span class=" slds-input__icon_left slds-input__icon">
+                                                                <i class="fa fa-search"></i>
+                                                            </span>
+                                                            <input type="text"  class="slds-input" placeholder="Search">
+                                                            <div class="slds-input__icon-group slds-input__icon-group_right">
+                                                                <button class="slds-input__icon slds-input__icon_right slds-button slds-button_icon" title="Clear">
+                                                                    <i class="fa fa-times-circle"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="projectCardView">
+                                    <!-- box -->
+                                    <% if(projects.length > 0) { %>
+                                        <% projects.forEach(function(project) { %>
+                                            <div class="line-around slds-p-around_small slds-m-bottom_small">
+                                                <div class="slds-grid slds-wrap">
+                                                    <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                                        <div>
+                                                            <a href="/project-details?projectId=<%= project.id %>" class="text-size-16"> <%= project.name %> </a>
+                                                        </div>
+                                                        <div class="max-w-300">
+                                                            <div class="">
+                                                                <div class="slds-grid slds-p-vertical_xx-small text-size-11">
+                                                                    <div class="slds-has-flexi-truncate">
+                                                                        <span>
+                                                                            Burn <%= project.total_hours %> of <%= project.estimated_hours %>
+                                                                        </span>
+                                                                    </div>
+                                                                    <div class="slds-no-flex">
+                                                                        <%= project.percent_completed %>%
+                                                                    </div>
+                                                                </div>
+                                                                <div class="slds-progress-bar slds-progress-bar_small slds-progress-bar_circular">
+                                                                    <span class="slds-progress-bar__value" style="width: <%= project.percent_completed;%>%">
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                                        <div class="sm-tpd-15">
+                                                            <div class="slds-grid">
+                                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                                                                    <div class="slds-truncate  text-dull slds-p-bottom_xx-small">
+                                                                        Start
+                                                                    </div>
+                                                                    <div>
+                                                                        <%= project.start_date %>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                                                                    <div class="slds-truncate  text-dull slds-p-bottom_xx-small">
+                                                                        End
+                                                                    </div>
+                                                                    <div>
+                                                                        <%= project.end_date %>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                                                                    <div class="slds-truncate  text-dull slds-p-bottom_xx-small">
+                                                                        Completion
+                                                                    </div>
+                                                                    <div>
+                                                                        <%= project.percent_completed %>%
+                                                                    </div>
+                                                                </div>
+
+                                                                <!-- <div class="slds-no-flex">
+                                                                    <a href=""><i class="fa fa-cog fa-lg"></i></a>
+                                                                </div> -->
+                                                            </div>
+                                                        </div>
+
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <% }); %>
+                                    <% } %>
+
+                                    <!-- box -->
+                                   <!--  <div class="line-around slds-p-around_small slds-m-bottom_small">
+                                        <div class="slds-grid slds-wrap">
+                                            <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                                <div>
+                                                    <a href="" class="text-size-16"> Project Title Here </a>
+                                                </div>
+                                                <div class="max-w-300">
+                                                    <div class="">
+                                                        <div class="slds-grid slds-p-vertical_xx-small text-size-11">
+                                                            <div class="slds-has-flexi-truncate">
+                                                                <span>
+                                                                    Burn 100h 30m of 500h
+                                                                </span>
+                                                            </div>
+                                                            <div class="slds-no-flex">
+                                                                25%
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-progress-bar slds-progress-bar_small slds-progress-bar_circular">
+                                                            <span class="slds-progress-bar__value" style="width: 25%;">
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                                <div class="sm-tpd-15">
+                                                    <div class="slds-grid">
+                                                                        <div class="slds-col">
+                                                                            <div class="slds-truncate  text-dull slds-p-bottom_xx-small">
+                                                                                Start
+                                                                            </div>
+                                                                            <div>
+                                                                                03/06/2018
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="slds-col">
+                                                                            <div class="slds-truncate  text-dull slds-p-bottom_xx-small">
+                                                                                End
+                                                                            </div>
+                                                                            <div>
+                                                                                03/07/2018
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="slds-col">
+                                                                            <div class="slds-truncate  text-dull slds-p-bottom_xx-small">
+                                                                                Completion
+                                                                            </div>
+                                                                            <div>
+                                                                                25%
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="slds-no-flex">
+                                                                            <a href=""><i class="fa fa-cog fa-lg"></i></a>
+                                                                        </div>
+                                                                    </div>
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+                                    </div>
+ -->
+                                    <!-- box -->
+                                   <!--  <div class="line-around slds-p-around_small slds-m-bottom_small">
+                                        <div class="slds-grid slds-wrap">
+                                            <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                                <div>
+                                                    <a href="" class="text-size-16"> Project Title Here </a>
+                                                </div>
+                                                <div class="max-w-300">
+                                                    <div class="">
+                                                        <div class="slds-grid slds-p-vertical_xx-small text-size-11">
+                                                            <div class="slds-has-flexi-truncate">
+                                                                <span>
+                                                                    Burn 100h 30m of 500h
+                                                                </span>
+                                                            </div>
+                                                            <div class="slds-no-flex">
+                                                                25%
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-progress-bar slds-progress-bar_small slds-progress-bar_circular">
+                                                            <span class="slds-progress-bar__value" style="width: 25%;">
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                                <div class="sm-tpd-15">
+                                                    <div class="slds-grid">
+                                                                        <div class="slds-col">
+                                                                            <div class="slds-truncate  text-dull slds-p-bottom_xx-small">
+                                                                                Start
+                                                                            </div>
+                                                                            <div>
+                                                                                03/06/2018
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="slds-col">
+                                                                            <div class="slds-truncate  text-dull slds-p-bottom_xx-small">
+                                                                                End
+                                                                            </div>
+                                                                            <div>
+                                                                                03/07/2018
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="slds-col">
+                                                                            <div class="slds-truncate  text-dull slds-p-bottom_xx-small">
+                                                                                Completion
+                                                                            </div>
+                                                                            <div>
+                                                                                25%
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="slds-no-flex">
+                                                                            <a href=""><i class="fa fa-cog fa-lg"></i></a>
+                                                                        </div>
+                                                                    </div>
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+                                    </div> -->
+
+                                    <!-- box -->
+                                    <!-- <div class="line-around slds-p-around_small slds-m-bottom_small">
+                                        <div class="slds-grid slds-wrap">
+                                            <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                                <div>
+                                                    <a href="" class="text-size-16"> Project Title Here </a>
+                                                </div>
+                                                <div class="max-w-300">
+                                                    <div class="">
+                                                        <div class="slds-grid slds-p-vertical_xx-small text-size-11">
+                                                            <div class="slds-has-flexi-truncate">
+                                                                <span>
+                                                                    Burn 100h 30m of 500h
+                                                                </span>
+                                                            </div>
+                                                            <div class="slds-no-flex">
+                                                                25%
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-progress-bar slds-progress-bar_small slds-progress-bar_circular">
+                                                            <span class="slds-progress-bar__value" style="width: 25%;">
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                                <div class="sm-tpd-15">
+                                                    <div class="slds-grid">
+                                                                        <div class="slds-col">
+                                                                            <div class="slds-truncate  text-dull slds-p-bottom_xx-small">
+                                                                                Start
+                                                                            </div>
+                                                                            <div>
+                                                                                03/06/2018
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="slds-col">
+                                                                            <div class="slds-truncate  text-dull slds-p-bottom_xx-small">
+                                                                                End
+                                                                            </div>
+                                                                            <div>
+                                                                                03/07/2018
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="slds-col">
+                                                                            <div class="slds-truncate  text-dull slds-p-bottom_xx-small">
+                                                                                Completion
+                                                                            </div>
+                                                                            <div>
+                                                                                25%
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="slds-no-flex">
+                                                                            <a href=""><i class="fa fa-cog fa-lg"></i></a>
+                                                                        </div>
+                                                                    </div>
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+ -->
+                    </div>
+                    <% if(projects.length <= 0) { %>
+                        <div class="slds-p-around_small text-center" title="" id="noProjectFound" >
+                            No project found.
+                        </div>
+                    <% } else { %>
+                        <div class="slds-p-around_small text-center slds-hide" title="" id="noProjectFound" >
+                            No project found.
+                        </div>
+                    <% } %>
+                    <div class="slds-text-align_center slds-p-vertical_medium">
+                        <button class="slds-button" id="loadMoreProject" loadItemId="loadMoreBtn" onclick="loadMoreProject()">&nbsp;</button>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="slds-tabs_default__content hide" target-tab="account-invoices" >
+                            <div class="slds-card">
+                               <div class=" slds-p-around_small">
+                                    <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                        <div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-p-horizontal_small">
+                                            <!-- <div class="slds-grid sm-bpd-10">
+
+                                                <div class="slds-no-flex">
+                                                    <label class="slds-form-element__label slds-p-top_x-small" for="">
+                                                        Sort By :
+                                                    </label>
+                                                </div>
+                                                <div class="">
+                                                    <div class="slds-select_container">
+                                                        <select class="slds-select" id="">
+                                                            <option value="">Recent</option>
+                                                            <option>Other</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div> -->
+                                        </div>
+                                        <div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-p-horizontal_small">
+                                            <div class="slds-grid slds-grid_align-end">
+                                                <!-- <div class="slds-no-flex slds-p-right_small">
+                                                    <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top" title="edit">
+                                                        <span class="slds-button__icon">
+                                                            <i class=" fa fa-filter" aria-hidden="true"></i>
+                                                        </span>
+                                                    </button>
+                                                </div> -->
+                                                <div class="sm-slds-grow">
+                                                        <div class="slds-form-element">
+                                                            <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
+                                                                <input type="text" class="slds-input" placeholder="Search invoice by invoice date" id="searchInvoiceNum" searchFunc="findInvoiceByNum()" onkeypress="handle(event,this);">
+                                                                <div class="slds-input__icon-group slds-input__icon-group_right">
+                                                                    <button class="slds-input__icon slds-input__icon_right slds-button slds-button_icon" title="Clear" onclick="clearSearchBox(this);findInvoiceByNum();">
+                                                                    <i class="fa fa-times-circle"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-no-flex slds-p-left_small">
+                                                        <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top" title="Search" onclick="findInvoiceByNum();">
+                                                        <span class="slds-button__icon">
+                                                            <i class=" fa fa-search" aria-hidden="true"></i>
+                                                        </span>
+                                                        </button>
+                                                    </div>
+                                                <!-- <div class="sm-slds-grow">
+                                                    <div class="slds-form-element">
+                                                        <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_left-right slds-input-has-icon_group-right">
+                                                            <span class=" slds-input__icon_left slds-input__icon">
+                                                                <i class="fa fa-search"></i>
+                                                            </span>
+                                                            <input type="text"  class="slds-input" placeholder="Search">
+                                                            <div class="slds-input__icon-group slds-input__icon-group_right">
+                                                                <button class="slds-input__icon slds-input__icon_right slds-button slds-button_icon" title="Clear">
+                                                                    <i class="fa fa-times-circle"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="" >
+                                    <table class="slds-table slds-table_bordered slds-table_fixed-layout slds-table_cell-buffer" role="grid">
+                                        <thead>
+                                            <tr class="slds-text-title_caps">
+                                                <th class="slds-is-sortable " scope="col" width="175px">
+                                                    <span class="slds-truncate" title="Status">Status</span>
+                                                </th>
+                                                <th class="slds-is-sortable" scope="col">
+                                                    <span class="slds-truncate" title="Invoice No.">Invoice No.</span>
+                                                </th>
+                                                <th class="slds-is-sortable " scope="col">
+                                                    <span class="slds-truncate" title="Invoice Date">Invoice Date</span>
+                                                </th>
+                                                <th class="slds-is-sortable " scope="col">
+                                                    <span class="slds-truncate" title="Due Date">Due Date</span>
+                                                </th>
+                                                <th class="slds-is-sortable" scope="col">
+                                                    <span class="slds-truncate" title="Currency">Currency</span>
+                                                </th>
+                                                <th class="slds-is-sortable" scope="col">
+                                                    <span class="slds-truncate" title="Total">Total</span>
+                                                </th>
+                                                <!-- <th class=" " scope="col" style="width: 3.25rem;">
+
+                                                </th> -->
+                                            </tr>
+                                        </thead>
+                                        <tbody id="invoiceTBody">
+                                        <% if(invoices.length > 0) { %>
+                                            <% invoices.forEach(function(invoice) { %>
+                                            <tr class="">
+                                                <td role="gridcell">
+                                                    <div class="slds-truncate" title="">
+                                                        <span class="text-uppercase">
+                                                            <span class="text-uppercase text-dull">
+                                                                <%= invoice.status %>
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <th scope="row" tabindex="0">
+                                                    <div class="slds-truncate" title="">
+                                                        <a href="/invoice-details?invoiceId=<%= invoice.id %>" tabindex="-1">
+                                                            <%= invoice.record_id %>
+                                                        </a>
+                                                    </div>
+                                                </th>
+
+                                                <td role="gridcell">
+                                                    <div class="slds-truncate" title="">
+                                                        <%= invoice.start_date %>
+                                                    </div>
+                                                </td>
+                                                <td role="gridcell">
+                                                    <div class="slds-truncate" title="">
+                                                        <%= invoice.due_date %>
+                                                    </div>
+                                                </td>
+                                                <td role="gridcell">
+                                                    <div class="slds-truncate" title="">
+                                                        <span class="text-uppercase">USD</span>
+                                                    </div>
+                                                </td>
+                                                <td role="gridcell">
+                                                    <div class="slds-truncate" title="">
+                                                        <span class="text-uppercase text-dull">USD</span>
+                                                        <strong class="text-uppercase"><%= invoice.total_amount %></strong>
+                                                    </div>
+                                                </td>
+                                               <!--  <td role="gridcell">
+                                                    <div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">
+                                                        <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" title="Show More">
+                                                            <span class="slds-button__icon">
+                                                                <i class=" fa fa-caret-down" aria-hidden="true"></i>
+                                                            </span>
+                                                            <span class="slds-assistive-text">Show More</span>
+                                                        </button>
+                                                        <div class="slds-dropdown slds-dropdown_right slds-dropdown_actions" style="">
+                                                            <ul class="slds-dropdown__list" role="menu">
+                                                                <li class="slds-dropdown__item" role="presentation">
+                                                                    <a href="/invoice-details?invoiceId=<%= invoice.id %>" role="menuitem" tabindex="0">
+                                                                        <span class="slds-truncate" title="">
+                                                                            <i class="fa fa-eye"></i> &nbsp;
+                                                                            View Details
+                                                                        </span>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="slds-has-divider_top-space" role="separator"></li>
+                                                                <li class="slds-dropdown__item" role="presentation">
+                                                                    <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteInvoice(\'<%= invoice.id %>\')')">
+                                                                        <span class="slds-truncate" title="">
+                                                                            <i class="fa fa-trash text-red"></i> &nbsp;
+                                                                            Archive
+                                                                        </span>
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </td> -->
+                                            </tr>
+                                        <% }); %>
+                                    <% } %>
+                                            <!-- row end -->
+
+                                            <!-- row start -->
+                                            <!-- <tr class="">
+                                                <td role="gridcell">
+                                                    <div class="slds-truncate" title="">
+                                                        <span class="text-uppercase">
+                                                            <span class="text-uppercase text-red">
+                                                                Overdue
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <th scope="row" tabindex="0">
+                                                    <div class="slds-truncate" title="">
+                                                        <a href="/invoice-details" tabindex="-1">
+                                                            #Invoice12435
+                                                        </a>
+                                                    </div>
+                                                </th>
+
+                                                <td role="gridcell">
+                                                    <div class="slds-truncate" title="">
+                                                        03/06/2018
+                                                    </div>
+                                                </td>
+                                                <td role="gridcell">
+                                                    <div class="slds-truncate" title="">
+                                                        03/07/2018
+                                                    </div>
+                                                </td>
+                                                <td role="gridcell">
+                                                    <div class="slds-truncate" title="">
+                                                        <span class="text-uppercase">USD</span>
+                                                    </div>
+                                                </td>
+                                                <td role="gridcell">
+                                                    <div class="slds-truncate" title="">
+                                                        <span class="text-uppercase text-dull">USD</span>
+                                                        <strong class="text-uppercase">999.00</strong>
+                                                    </div>
+                                                </td>
+                                                <td role="gridcell">
+                                                    <div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">
+                                                        <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" title="Show More">
+                                                            <span class="slds-button__icon">
+                                                                <i class=" fa fa-caret-down" aria-hidden="true"></i>
+                                                            </span>
+                                                            <span class="slds-assistive-text">Show More</span>
+                                                        </button>
+                                                        <div class="slds-dropdown slds-dropdown_right slds-dropdown_actions">
+                                                            <ul class="slds-dropdown__list" role="menu">
+                                                                <li class="slds-dropdown__item" role="presentation">
+                                                                    <a href="/invoice-details" role="menuitem" tabindex="0">
+                                                                        <span class="slds-truncate" title="">
+                                                                            <i class="fa fa-eye"></i> &nbsp;
+                                                                            View Details
+                                                                        </span>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="slds-has-divider_top-space" role="separator"></li>
+                                                                <li class="slds-dropdown__item" role="presentation">
+                                                                    <a href="javascript:void(0);" role="menuitem" tabindex="-1">
+                                                                        <span class="slds-truncate" title="">
+                                                                            <i class="fa fa-trash text-red"></i> &nbsp;
+                                                                            Archive
+                                                                        </span>
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr> -->
+                                            <!-- row end -->
+
+                                            <!-- row start -->
+                                            <!-- <tr class="">
+                                                <td role="gridcell">
+                                                    <div class="slds-truncate" title="">
+                                                        <span class="text-uppercase">
+                                                            <span class="text-uppercase text-green">
+                                                                Paid
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <th scope="row" tabindex="0">
+                                                    <div class="slds-truncate" title="">
+                                                        <a href="/invoice-details" tabindex="-1">
+                                                            #Invoice12435
+                                                        </a>
+                                                    </div>
+                                                </th>
+
+                                                <td role="gridcell">
+                                                    <div class="slds-truncate" title="">
+                                                        03/06/2018
+                                                    </div>
+                                                </td>
+                                                <td role="gridcell">
+                                                    <div class="slds-truncate" title="">
+                                                        03/07/2018
+                                                    </div>
+                                                </td>
+                                                <td role="gridcell">
+                                                    <div class="slds-truncate" title="">
+                                                        <span class="text-uppercase">USD</span>
+                                                    </div>
+                                                </td>
+                                                <td role="gridcell">
+                                                    <div class="slds-truncate" title="">
+                                                        <span class="text-uppercase text-dull">USD</span>
+                                                        <strong class="text-uppercase">999.00</strong>
+                                                    </div>
+                                                </td>
+                                                <td role="gridcell">
+                                                    <div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">
+                                                        <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" title="Show More">
+                                                            <span class="slds-button__icon">
+                                                                <i class=" fa fa-caret-down" aria-hidden="true"></i>
+                                                            </span>
+                                                            <span class="slds-assistive-text">Show More</span>
+                                                        </button>
+                                                        <div class="slds-dropdown slds-dropdown_right slds-dropdown_actions">
+                                                            <ul class="slds-dropdown__list" role="menu">
+                                                                <li class="slds-dropdown__item" role="presentation">
+                                                                    <a href="/invoice-details" role="menuitem" tabindex="0">
+                                                                        <span class="slds-truncate" title="">
+                                                                            <i class="fa fa-eye"></i> &nbsp;
+                                                                            View Details
+                                                                        </span>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="slds-has-divider_top-space" role="separator"></li>
+                                                                <li class="slds-dropdown__item" role="presentation">
+                                                                    <a href="javascript:void(0);" role="menuitem" tabindex="-1">
+                                                                        <span class="slds-truncate" title="">
+                                                                            <i class="fa fa-trash text-red"></i> &nbsp;
+                                                                            Archive
+                                                                        </span>
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr> -->
+                                            <!-- row end -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <% if(invoices.length <= 0) { %>
+                                    <div class="slds-p-around_small text-center" title="" id="noInvoiceFound" >
+                                        No invoice found.
+                                    </div>
+                                <% }  else { %>
+                                    <div class="slds-p-around_small text-center slds-hide" title="" id="noInvoiceFound" >
+                                        No invoice found.
+                                    </div>
+                                <% } %>
+                        <div class="slds-text-align_center slds-p-vertical_medium">
+                            <button class="slds-button" id="loadMoreInvoice" loadItemId="loadMoreBtn" onclick="loadMoreInvoice()">&nbsp;</button>
+                        </div>
+                </div>
+            </div>
+        </div>
+        <% include ../layouts/footer %>
+    </main>
+
+    <% include ../layouts/scripts %>
+    <% include ../layouts/account-script %>
+    <% include ../layouts/account-det-script %>
+
+</body>
+
+</html>

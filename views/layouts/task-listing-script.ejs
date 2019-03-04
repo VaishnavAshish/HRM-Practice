@@ -1,0 +1,12 @@
+<script>
+$(document).ready(function(){
+    $("#offset").text(parseInt($("#pageRecordNo").text()));
+    let noOfRecord=parseInt($("#offset").text());
+    $("#totalRecordCount").text(<%= taskTotalCount %>);
+    if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
+        $(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
+    }else{
+        $(".slds-button[loadItemId]").hide();
+    }
+})
+</script>

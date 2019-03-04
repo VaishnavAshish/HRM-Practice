@@ -1,0 +1,17 @@
+a.link-white, 
+.link-white a, 
+a.link-white:hover, 
+.link-white a:hover{
+    color: white;
+}
+
+.link-btn{
+    background: none;
+    border: none;
+    outline: none;
+}
+.link-nodeco,
+.link-nodeco:hover,
+.link-nodeco:focus{
+    text-decoration: none;
+}

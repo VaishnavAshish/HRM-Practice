@@ -1,0 +1,53 @@
+<!-- modal add new expense category start-->        
+<div id="modalAddNewExpCate">
+    <section role="dialog" tabindex="-1" class="slds-modal">
+        <form id="addExpenseCat">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="closeModal('#modalAddNewExpCate');">
+                    <span class="slds-button__icon">
+                        <i class="fa fa-times text-size-21"></i>
+                    </span> 
+                </button>
+                <h2  class="slds-text-heading_medium slds-hyphenate">Add New Expense Category</h2>
+            </header>
+            
+            <div class="slds-modal__content slds-p-around_medium">
+                <div>
+                    <div class="slds-form-element slds-m-bottom_medium">
+                        <label class="slds-form-element__label">
+                            Category Name
+                            <abbr class="slds-required" title="required">*</abbr>
+                        </label>
+                        <div class="slds-form-element__control">
+                            <input type="text" class="slds-input" placeholder="" required="" id="expenseCat" name="expenseCat" getFormData reset='value'/>
+                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                       
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <div class="slds-form-element slds-m-bottom_medium">
+                        <div class="slds-form-element__control">
+                            <span class="slds-checkbox">
+                                <input type="checkbox"  id="enableExp" value="" checked="" name="enableExp" getFormData>
+                                <label class="slds-checkbox__label" for="enableExp">
+                                    <span class="slds-checkbox_faux"></span>
+                                    <span class="slds-form-element__label">Enable</span>
+                                </label>
+                            </span>
+                        </div>
+                    </div> -->
+                            
+                </div>
+            </div>
+        
+            <footer class="slds-modal__footer">
+                <button class="slds-button slds-button_neutral" type="button" onclick="closeModal('#modalAddNewExpCate');">Cancel</button>
+                <button class="slds-button slds-button_brand" type="button" onclick="addNewExpCat('#modalAddNewExpCate', 'Category Added Successfully')">Add</button>
+            </footer>
+        </div>
+        </form>
+    </section>
+    <div class="slds-backdrop"></div>
+</div>
+<!-- modal add new expense category end-->   

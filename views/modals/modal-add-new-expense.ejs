@@ -1,0 +1,245 @@
+<!-- modal add new Expense start-->
+            <div id="modalAddNewExpense">
+                <section role="dialog" tabindex="-1" class="slds-modal slds-modal_medium">
+                    <div class="slds-modal__container">
+                        <header class="slds-modal__header">
+                            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="closeModal('#modalAddNewExpense');">
+                                <span class="slds-button__icon">
+                                    <i class="fa fa-times text-size-21"></i>
+                                </span>
+                            </button>
+                            <h2  class="slds-text-heading_medium slds-hyphenate">Add New Expense</h2>
+                        </header>
+                        <div class="slds-modal__content">
+                            <div>
+                                <div class="slds-wrap slds-gutters slds-grid_vertical-stretch">
+                                    <div class="slds-p-around_large">
+                                            <div class="slds-grid slds-wrap slds-gutters">
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                    <div class="slds-form-element slds-m-bottom_medium" reset='errorclass'>
+                                                        <label class="slds-form-element__label">
+                                                            Project
+                                                            <abbr class="slds-required" title="required">*</abbr>
+                                                        </label>
+                                                        <div class="slds-form-element__control">
+                                                            <div class="slds-select_container">
+                                                                <select class="slds-select" id="project" onchange="setCurrencyOfAccount()" reset='value'>
+                                                                    <option value=""> </option>
+                                                                    <% if(projects.length > 0) { %>
+                                                                        <% projects.forEach(function(project) { %>
+                                                                            <option value="<%= project.id%>" accountId="<%= project.account_id%>"><%= project.name%></option>
+                                                                            <% }); %>
+                                                                    <% } %>
+                                                                </select>
+                                                            </div>
+                                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" id="err-msg-project" reset='errmsg'>
+        
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                    <div class="slds-form-element slds-p-top_large">
+                                                        <div class="slds-grid slds-grid_vertical-align-center">
+                                                            <div class="slds-col--bump-left slds-p-right_medium">
+                                                                <div class="slds-form-element ">
+                                                                    <label class="slds-checkbox_toggle slds-grid">
+                                                                            <input type="checkbox" checked name="billable" id="billable" reset-checked='true'>    
+                                                                        <span id="checkbox-toggle-3" class="slds-checkbox_faux_container">
+                                                                            <span class="slds-checkbox_faux"></span>
+                                                                        </span>
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-has-flexi-truncate">
+                                                                <span>Billable</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <div class="slds-grid slds-wrap slds-gutters">
+                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label">
+                                                        Date
+                                                    </label>
+                                                    <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
+                                                        <span class="slds-input__icon slds-input__icon_right">
+                                                            <i class="fa fa-calendar"></i>
+                                                        </span>
+                                                        <input type="date" class="slds-input open-date-pik" id="expense_date" reset='value'>
+                                                    </div>
+                                                    <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                <div class="slds-form-element slds-m-bottom_medium" reset='errorclass'>
+                                                    <label class="slds-form-element__label">
+                                                        Category
+                                                    </label>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-select_container">
+                                                            <select class="slds-select" id="category" required="" reset='value'>
+                                                                <option value=""></option>
+                                                                    <% if(expCatList.length>0) { %>
+                                                                        <% expCatList.forEach(function(expCat) { %>
+                                                                            <option value="<%= expCat %>"><%= expCat %></option>
+                                                                        <% }); %>
+                                                                    <% } %>
+                                                            </select>
+                                                        </div>
+                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset='errmsg'>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-grid slds-wrap slds-gutters">
+                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                <div class="slds-form-element slds-m-bottom_medium" reset='errorclass'>
+                                                    <label class="slds-form-element__label">
+                                                        Currency
+                                                    </label>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-select_container">
+                                                            <select class="slds-select" required="" id="currency"  reset='default' default-val='USD'>
+                                                                <% currencyWithSymbolArray.forEach(function(currency){ %>
+                                                                    <option value="<%= currency.name %>"><%= currency.name %></option>
+                                                                <% }) %>
+                                                            </select>
+                                                        </div>
+                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset='errmsg'>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                <div class="slds-form-element slds-m-bottom_medium" reset='errorclass'>
+                                                    <label class="slds-form-element__label">
+                                                        Amount
+                                                    </label>
+                                                    <div class="slds-form-element__control">
+                                                        <input type="text" class="slds-input" id="amount" placeholder="" required="" reset='value'/>
+                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset='errmsg'>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="slds-grid slds-wrap slds-gutters">
+                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label">
+                                                        Tax
+                                                    </label>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-select_container">
+                                                            <select class="slds-select" id="tax" reset='value'>
+                                                                <option value=""> </option>
+                                                                <option value="GST">GST</option>
+                                                                <option value="VAT">VAT</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label">
+                                                        Tax Amount
+                                                    </label>
+                                                    <div class="slds-form-element__control">
+                                                        <input type="text" class="slds-input" placeholder="" id="tax_no" reset='value'/>
+                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="slds-form-element slds-m-bottom_medium">
+                                            <label class="slds-form-element__label" >Note</label>
+                                            <div class="slds-form-element__control">
+                                                <textarea class="slds-textarea" placeholder="Placeholder Text" id="note" reset='value'></textarea>
+                                            </div>
+                                        </div>
+                                        <!--  <div class="slds-form-element slds-m-bottom_medium">
+                                            <div class="slds-form-element__control">
+                                                <div class="slds-file-selector slds-file-selector_files">
+                                                    <div class="">
+                                                        <input type="file" class="slds-file-selector__input slds-assistive-text" accept="image/png" id="file-upload-input-01" aria-labelledby="file-selector-primary-label file-selector-secondary-label">
+                                                        <label class="slds-file-selector__body" for="file-upload-input-01" id="file-selector-secondary-label">
+                                                            <span class="slds-file-selector__button slds-button slds-button_neutral">
+                                                                <i class="fa fa-paperclip rpd-10"></i>
+                                                                Attachments
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="">
+                                            <div>
+                                                <ul>
+                                                    <li class="line-top slds-p-vertical_xx-small">
+                                                        <div class="slds-grid">
+                                                            <div class="slds-has-flexi-truncate">
+                                                                <a href="" class="slds-truncate view-inline">
+                                                                    file-name.txt
+                                                                </a>
+                                                            </div>
+                                                            <div class="slds-no-flex slds-p-horizontal_small">
+                                                                <span class="text-dull text-uppercase">(98 kb)</span>
+                                                            </div>
+                                                            <div class="slds-no-flex">
+                                                                <button class="slds-button slds-button_icon" title="Remove" onclick="">
+                                                                    <i class="fa fa-times-circle text-red"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li class="line-top slds-p-vertical_xx-small">
+                                                        <div class="slds-grid">
+                                                            <div class="slds-has-flexi-truncate">
+                                                                <a href="" class="slds-truncate view-inline">
+                                                                    file-name.txt
+                                                                </a>
+                                                            </div>
+                                                            <div class="slds-no-flex slds-p-horizontal_small">
+                                                                <span class="text-dull text-uppercase">(98 kb)</span>
+                                                            </div>
+                                                            <div class="slds-no-flex">
+                                                                <button class="slds-button slds-button_icon" title="Remove" onclick="">
+                                                                    <i class="fa fa-times-circle text-red"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <button class="slds-button slds-button_neutral" onclick="closeModal('#modalAddNewExpense');">Cancel</button>
+                            <button class="slds-button slds-button_brand" onclick="addExpense('#modalAddNewExpense')">Add</button>
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop"></div>
+            </div>
+          <!-- modal add new Expense end-->

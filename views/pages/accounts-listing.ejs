@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="en">
+
+<% include ../layouts/head %>
+
+<body class="kw">
+
+    <% include ../layouts/nav %>
+    <% include ../layouts/sideNav %>
+    <main class="main-body-space tpd-60 bpd-100">
+        <div>
+            <div class="slds-p-around_small">
+                <div class="">
+                    <div id="pageRecordNo" style="display:none;"><%= process.env.PAGE_RECORD_NO %></div>
+                    <div id="filterCriteria" style="display:none;" ></div>
+                    <div id="totalRecordCount" style="display:none;"></div>
+                    <div id="offset" style="display:none;">0</div>
+                    <!-- header start end -->
+                    <div class="slds-card slds-p-around_small slds-m-bottom_medium">
+                        <div class="slds-grid slds-p-bottom_xx-small">
+                            <div class="slds-has-flexi-truncate">
+                                <div class="slds-grid">
+                                    <div class="slds-no-flex slds-p-right_x-small">
+                                        <span class="slds-icon_container slds-icon-standard-carousel">
+                                            <i class="fa fa-user-tie text-size-21 text-white slds-icon"></i>
+                                        </span>
+                                    </div>
+                                    <div class="slds-has-flexi-truncate">
+                                        <div class="slds-text-body_small text-height-normal">
+                                            Clients/Accounts
+                                        </div>
+                                        <h1 class="slds-page-header__title slds-p-right_x-small text-height-normal">
+                                            <div class="slds-dropdown-trigger slds-dropdown-trigger_click cursor-pointer" aria-haspopup="true" title="filterDropDown" onclick="openDropdown(this, event, true);">
+                                                <div class="slds-grid slds-has-flexi-truncate slds-grid_vertical-align-center">
+                                                    <span class="slds-truncate" title="" id="selectedFilter">All</span>
+                                                    <i class="fa fa-caret-down lpd-5"></i>
+                                                </div>
+                                                <div class="slds-dropdown slds-dropdown_left text-normal">
+                                                    <ul class="slds-dropdown__list">
+                                                        <li class="slds-dropdown__item">
+                                                            <a href="javascript:void(0);" tabindex="0" class="slds-grid_vertical-align-center" onclick="searchAccount('All',this)">
+                                                                <div class="slds-no-flex">
+                                                                    <span class="slds-badge slds-align-middle"> <%= totalCount %> </span>
+                                                                </div>
+                                                                <div class="slds-has-flexi-truncate slds-p-horizontal_small">
+                                                                    <div class="slds-truncate">
+                                                                        All
+                                                                    </div>
+                                                                </div>
+                                                            </a>
+                                                        </li>
+                                                        <li class="slds-dropdown__item">
+                                                            <a href="javascript:void(0);" tabindex="0" class="slds-grid_vertical-align-center" onclick="searchAccount('Active',this)">
+                                                                <div class="slds-no-flex">
+                                                                    <span class="slds-badge slds-align-middle"> <%= activeCount %> </span>
+                                                                </div>
+                                                                <div class="slds-has-flexi-truncate slds-p-horizontal_small">
+                                                                    <div class="slds-truncate">
+                                                                        Active
+                                                                    </div>
+                                                                </div>
+                                                            </a>
+                                                        </li>
+                                                        <li class="slds-dropdown__item">
+                                                            <a href="javascript:void(0);" tabindex="0" class="slds-grid_vertical-align-center" onclick="searchAccount('Archive',this)" >
+                                                                <div class="slds-no-flex">
+                                                                    <span class="slds-badge slds-align-middle"> <%= archivedCount %> </span>
+                                                                </div>
+                                                                <div class="slds-has-flexi-truncate slds-p-horizontal_small">
+                                                                    <div class="slds-truncate">
+                                                                        Archive
+                                                                    </div>
+                                                                </div>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </h1>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="slds-col--bump-left slds-p-left_medium">
+                                <div class="">
+                                    <button class="slds-button slds-button_brand slds-align-top" onclick="openModal('#modalAddNewAccount', true)">
+                                        <i class="fa fa-plus"></i>
+                                        <span class="sm-hide">Add New</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class=" slds-p-top_x-small line-top">
+                            <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                <div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-p-horizontal_small">
+                                    <div class="slds-grid sm-bpd-10">
+                                        <div class="sm-hide slds-p-right_small">
+                                            <div class="slds-button-group" role="group">
+                                                <button data-navigation="default" class="slds-button slds-button_icon slds-button_icon-border-filled btn-is-on" onclick="btnGroupTabView(this, '#accountsViews', 'accounts-table');" title="List View">
+                                                    <i class="fa fa-list"></i>
+                                                </button>
+                                                <button data-navigation="cardview" class="slds-button slds-button_icon slds-button_icon-border-filled" onclick="btnGroupTabView(this, '#accountsViews', 'accounts-cards');" title="Card View">
+                                                    <i class="fa fa-th-large"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <!-- <div class="slds-no-flex">
+                                            <label class="slds-form-element__label slds-p-top_x-small" for="">
+                                                Sort By :
+                                            </label>
+                                        </div>
+                                        <div class="">
+                                            <div class="slds-select_container">
+                                                <select class="slds-select" id="">
+                                                    <option value="">Recent</option>
+                                                    <option>Other</option>
+                                                </select>
+                                            </div>
+                                        </div> -->
+                                    </div>
+                                </div>
+                                <div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-p-horizontal_small">
+                                    <div class="slds-grid slds-grid_align-end">
+                                       <!--  <div class="slds-no-flex slds-p-right_small">
+                                            <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top" title="edit">
+                                                <span class="slds-button__icon">
+                                                    <i class=" fa fa-filter" aria-hidden="true"></i>
+                                                </span>
+                                            </button>
+                                        </div> -->
+
+                                        <!-- <div class="sm-slds-grow">
+                                            <div class="slds-form-element">
+                                                <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_left-right slds-input-has-icon_group-right">
+                                                    <span class=" slds-input__icon_left slds-input__icon">
+                                                        <i class="fa fa-search"></i>
+                                                    </span>
+                                                    <input type="text"  class="slds-input" placeholder="Search">
+                                                    <div class="slds-input__icon-group slds-input__icon-group_right">
+                                                        <button class="slds-input__icon slds-input__icon_right slds-button slds-button_icon" title="Clear">
+                                                            <i class="fa fa-times-circle"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div> -->
+                                        <div class="sm-slds-grow">
+                                            <div class="slds-form-element">
+                                                <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
+                                                    <input type="text" class="slds-input" placeholder="Search account by name" id="searchAccountName" searchFunc="findAccountByName()" onkeypress="handle(event,this);">
+                                                    <div class="slds-input__icon-group slds-input__icon-group_right">
+                                                        <button class="slds-input__icon slds-input__icon_right slds-button slds-button_icon" title="Clear" onclick="clearSearchBox(this);findAccountByName();" >
+                                                        <i class="fa fa-times-circle"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-no-flex slds-p-left_small">
+                                            <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top" title="Search" onclick="findAccountByName();">
+                                            <span class="slds-button__icon">
+                                                <i class=" fa fa-search" aria-hidden="true"></i>
+                                            </span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- header end -->
+
+
+                    <div id="accountsViews">
+
+                        <!-- table view start -->
+                        <div class="slds-card sm-hide" btn-tabview="accounts-table">
+                            <div class="">
+
+
+                                <div class="slds-p-top_small">
+                                    <table class="slds-table slds-table_bordered slds-table_fixed-layout slds-table_cell-buffer" role="grid">
+                                        <thead>
+                                            <tr class="slds-text-title_caps">
+                                                <th class="slds-is-sortable" scope="col">
+                                                    <span class="slds-truncate" title="Record Id">#</span>
+                                                </th>
+                                                <th class="slds-is-sortable" scope="col" width="25%">
+                                                    <span class="slds-truncate" title="Company Name">Company Name</span>
+                                                </th>
+                                                <th class="slds-is-sortable" scope="col">
+                                                    <span class="slds-truncate" title="Created Date">Create Date</span>
+                                                </th>
+                                                <th class="slds-is-sortable " scope="col">
+                                                    <span class="slds-truncate" title="Email">Email</span>
+                                                </th>
+                                                <th class="slds-is-sortable" scope="col">
+                                                    <span class="slds-truncate" title="Status">Status</span>
+                                                </th>
+                                                <th class=" " scope="col" style="width: 3.25rem;">
+
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="accountListTBody">
+                                                <% if(accounts.length > 0) { %>
+                                                    <% accounts.forEach(function(account) { %>
+                                            <!-- account start -->
+                                            <tr class="">
+                                                <th scope="row" tabindex="0">
+                                                    <div class="slds-truncate" title="">
+                                                        <a href="/account-details?accountId=<%= account.id %>#detailTab" tabindex="-1">
+                                                            <%= account.record_id %>
+                                                        </a>
+                                                    </div>
+                                                </th>
+                                                <th scope="row" tabindex="0">
+                                                    <div class="slds-truncate" title="">
+                                                        <a href="/account-details?accountId=<%= account.id %>#detailTab" tabindex="-1">
+                                                            <%= account.name %>
+                                                        </a>
+                                                    </div>
+                                                </th>
+                                                <td role="gridcell">
+                                                    <div class="slds-truncate" title="">
+                                                        <%= account.created_date %>
+                                                    </div>
+                                                </td>
+                                                <td role="gridcell">
+                                                    <div class="slds-truncate" title="">
+                                                        <%= account.email %>
+                                                    </div>
+                                                </td>
+                                                <td role="gridcell">
+                                                    <div class="slds-truncate" title="">
+                                                        <% if(account.archived==true) { %>
+                                                            <span class="text-red">
+                                                                Deactive
+                                                            </span>
+                                                        <% }else { %>
+                                                            <span class="text-green">
+                                                                Active
+                                                            </span>
+                                                        <% } %>
+                                                    </div>
+                                                </td>
+                                                <td role="gridcell">
+                                                    <div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">
+                                                        <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" title="Show More">
+                                                            <span class="slds-button__icon">
+                                                                <i class=" fa fa-caret-down" aria-hidden="true"></i>
+                                                            </span>
+                                                            <span class="slds-assistive-text">Show More</span>
+                                                        </button>
+                                                        <div class="slds-dropdown slds-dropdown_right slds-dropdown_actions">
+                                                            <ul class="slds-dropdown__list" role="menu">
+                                                                <li class="slds-dropdown__item" role="presentation">
+                                                                    <a href="/account-details?accountId=<%= account.id %>" role="menuitem" tabindex="0">
+                                                                        <span class="slds-truncate" title="">
+                                                                            <i class="fa fa-eye"></i> &nbsp;
+                                                                            View Details
+                                                                        </span>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="slds-has-divider_top-space" role="separator"></li>
+                                                                <li class="slds-dropdown__item" role="presentation">
+                                                                <% if(account.archived==true) { %>
+                                                                    <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="activateBeforeConfirm('#globalAlert', 'activate(\'<%= account.id %>\',\'account\')')">
+                                                                    <span class="slds-truncate" title="">
+                                                                        <i class="fa fa-check-circle text-green"></i> &nbsp;
+                                                                        Activate
+                                                                    </span>
+                                                                </a>
+                                                                <% }else { %>
+                                                                    <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteAccount(\'<%= account.id %>\')')">
+                                                                    <span class="slds-truncate" title="">
+                                                                        <i class="fa fa-trash text-red"></i> &nbsp;
+                                                                        Deactivate
+                                                                    </span>
+                                                                </a>
+                                                                <% } %>
+
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <% }); %>
+                                            <% } %>
+                                            <!-- row end -->
+
+                                            <!-- row start -->
+
+
+                                        </tbody>
+                                    </table>
+                                     <% if(accounts.length <= 0) { %>
+                                        <div class="slds-p-around_small text-center" title="noAccountFound" >
+                                            No account found.
+                                        </div>
+                                    <% } else { %>
+                                        <div class="slds-p-around_small text-center slds-hide" title="noAccountFound" >
+                                            No account found.
+                                        </div>
+                                    <% } %>
+                                    <div class="slds-text-align_center slds-p-vertical_medium">
+                                        <button class="slds-button" loadItemId="loadMoreBtn" onclick="loadMoreAccount()">&nbsp;</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- card view start -->
+                        <div class="sm-show hide" btn-tabview="accounts-cards">
+                          <div class="">
+                            <div class="slds-grid slds-wrap slds-grid_pull-padded" id="accountCardView">
+                                <!-- card start -->
+                                 <% if(accounts.length > 0) { %>
+                                            <% accounts.forEach(function(account) { %>
+                                        <div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_3-of-12 slds-p-horizontal_small">
+                                            <div class=" slds-m-bottom_medium slds-p-around_small slds-card">
+                                                <div class="line-bottom slds-m-bottom_small slds-p-bottom_xx-small">
+                                                    <div class="slds-grid">
+                                                        <div class="slds-has-flexi-truncate">
+                                                            <div class="slds-truncate">
+                                                                <a href="/account-details?accountId=<%= account.id %>" class="text-size-16"> <%= account.name %> </a><br/>
+                                                                #<a href="/account-details?accountId=<%= account.id %>" class="text-size-8"><%= account.record_id %></a>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-col--bump-left">
+                                                            <div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">
+                                                                <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" title="Show More">
+                                                                    <span class="slds-button__icon">
+                                                                        <i class=" fa fa-caret-down" aria-hidden="true"></i>
+                                                                    </span>
+                                                                    <span class="slds-assistive-text">Show More</span>
+                                                                </button>
+                                                                <div class="slds-dropdown slds-dropdown_right slds-dropdown_actions">
+                                                                    <ul class="slds-dropdown__list" role="menu">
+                                                                        <li class="slds-dropdown__item" role="presentation">
+                                                                            <a href="/account-details?accountId=<%= account.id %>" role="menuitem" tabindex="0">
+                                                                                <span class="slds-truncate" title="">
+                                                                                    <i class="fa fa-eye"></i> &nbsp;
+                                                                                    View Details
+                                                                                </span>
+                                                                            </a>
+                                                                        </li>
+                                                                        <li class="slds-has-divider_top-space" role="separator"></li>
+                                                                        <li class="slds-dropdown__item" role="presentation">
+                                                                        <% if(account.archived==true) { %>
+                                                                            <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="activateBeforeConfirm('#globalAlert', 'activate(\'<%= account.id %>\',\'account\')')">
+                                                                            <span class="slds-truncate" title="">
+                                                                                <i class="fa fa-check-circle text-green"></i> &nbsp;
+                                                                                Activate
+                                                                            </span>
+                                                                        </a>
+                                                                        <% }else { %>
+                                                                            <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteAccount(\'<%= account.id %>\')')">
+                                                                            <span class="slds-truncate" title="">
+                                                                                <i class="fa fa-trash text-red"></i> &nbsp;
+                                                                                Deactivate
+                                                                            </span>
+                                                                        </a>
+                                                                        <% } %>
+
+
+                                                                            <!-- <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteAccount(\'<%= account.id %>\')')">
+                                                                                <span class="slds-truncate " title="">
+                                                                                    <i class="fa fa-trash text-red"></i> &nbsp;
+                                                                                    Archive
+                                                                                </span>
+                                                                            </a> -->
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div class="slds-p-bottom_x-small slds-truncate">
+                                                        <i class="fa fa-user"></i>
+                                                        <%= account.first_name %> <%= account.last_name %>
+                                                    </div>
+                                                    <div class="slds-p-bottom_x-small slds-truncate">
+                                                        <i class="fa fa-envelope"></i>
+                                                        <a href="mailto:<%= account.email %>" class=""><%= account.email %></a>
+
+                                                    </div>
+                                                    <div class="text-size-11">
+                                                        <div class="slds-grid">
+                                                            <div class="slds-has-flexi-truncate">
+                                                                <span class="text-uppercase text-dull">Create on :</span>
+                                                                <time><%= account.created_date %></time>
+                                                            </div>
+                                                            <div class="slds-no-flex slds-p-left_small">
+                                                                <span class="text-uppercase text-dull">Status :</span>
+                                                                    <% if(account.archived==true) { %>
+                                                                        <span class="text-red">
+                                                                            Deactive
+                                                                        </span>
+                                                                    <% } else { %>
+                                                                        <span class="text-green">
+                                                                            Active
+                                                                        </span>
+                                                                    <% } %>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% }); %>
+                                <% } %>
+
+                                <!-- card end -->
+                            </div>
+                            <div class="slds-text-align_center slds-p-vertical_medium">
+                                <button class="slds-button" loadItemId="loadMoreBtn" onclick="loadMoreAccount()">&nbsp;</button>
+                            </div>
+                        </div>
+                        <% if(accounts.length <= 0) { %>
+                            <div class="slds-p-around_small text-center" title="noAccountFound" >
+                                No account found.
+                            </div>
+                        <% } else { %>
+                            <div class="slds-p-around_small text-center slds-hide" title="noAccountFound" >
+                                No account found.
+                            </div>
+                        <% } %>
+                    </div>
+                <!-- card view end -->
+
+                    </div>
+                    <!-- table view end -->
+                </div>
+            </div>
+        </div>
+
+        <% include ../modals/modal-add-new-account %>
+        <% include ../layouts/footer %>
+    </main>
+
+    <% include ../layouts/scripts %>
+    <% include ../layouts/account-script %>
+    <% include ../layouts/account %>
+
+</body>
+
+</html>

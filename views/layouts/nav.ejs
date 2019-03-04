@@ -1,0 +1,244 @@
+<% include ../modals/modal-add-new-timesheet-quick %>
+<!-- views/layouts/nav.ejs -->
+    <div class="slds-global-header_container">
+        <div class="slds-context-bar slds-grid_vertical-align-center top-bar-space">
+
+            <div class="slds-no-flex line-right">
+                <a href="javascript:void(0);" class="slds-p-around_small" onclick="collapseSideMenu();">
+                    <i class="fa fa-bars text-size-21"></i>
+                </a>
+            </div>
+            <div class="slds-has-flexi-truncate slds-p-left_small">
+                <div class="">
+                    <h1 class="slds-text-heading_medium slds-truncate max-w-500 sm-text-size-14">
+                        <!-- <i class="fas fa-warehouse text-green"></i> &nbsp; -->
+                        <%=user.company %>
+
+                    </h1>
+                </div>
+            </div>
+
+
+            <div class="slds-no-flex slds-p-horizontal_large">
+                <div class="slds-grid slds-grid_vertical-align-center">
+                    <div class="slds-p-right_medium sm-hide">
+                        <% if(user.permissions.includes("timesheetEntry")){ %>
+                          <div title="Start Timer" name="globalStart" start-timer class="cursor-pointer hide"  onclick="startKwTimerGlobally(this,'[name=kwTimer]');" timerDiv>
+                              <div class="bg-dull vpd-5 hpd-15 radius-500 " name="" >
+                                <div class="slds-grid">
+                                  <div class="cursor-pointer">
+                                        <i class="fa fa-play text-blue fa-fw"></i>
+                                  </div>
+                                    <div class="slds-no-flex slds-p-horizontal_x-small">
+                                        <time name="kwTimer">
+                                            Start
+                                        </time>
+                                    </div>
+                                    <div class="lpd-5 line-semi-black-left slds-col--bump-left">
+                                        <i class="far fa-clock"></i>
+                                    </div>
+                                </div>
+                            </div>
+                          </div>
+
+                          <div title="Stop Timer" name="globalStop" stop-timer class="cursor-pointer hide" onclick="stopKwTimerGlobally(this, '[name=kwTimer]', '#syncTimer', '#modalAddNewTsheetQuick');" timerDiv>
+                              <div class="bg-dull vpd-5 hpd-15 radius-500 " name="" >
+                                <div class="slds-grid">
+                                  <div class="cursor-pointer">
+                                        <i class="fa fa-stop text-red"></i>
+                                    </div>
+                                    <div class="slds-no-flex slds-p-horizontal_x-small">
+                                        <time name="kwTimer">0:00:01</time>
+                                    </div>
+                                    <div class="lpd-5 line-semi-black-left slds-col--bump-left">
+                                        <i class="far fa-clock"></i>
+                                    </div>
+                                </div>
+                            </div>
+                          </div>
+                        <%}%>
+                    </div>
+                    <div class="slds-p-right_medium">
+                        <!-- <i class="fa fa-bell fa-2x text-gray cursor-pointer" title="Notifications" onclick="showNotification('#kwNotiPanel', '#kwNotiLoader')"></i> -->
+                        <a href="https://freepsa.zendesk.com" target="_blank">
+                            <i class="fa fa-question-circle fa-2x text-gray cursor-pointer" title="Help"></i>
+                        </a>
+                    </div>
+                    <div>
+                        <div class="slds-dropdown-trigger slds-dropdown-trigger_click rpd-8" onclick="openDropdown(this, event, true);">
+                            <span class="slds-avatar slds-avatar_circle cursor-pointer">
+                                <img alt="Person name" src="/getUserPicture/<%= user.id %>" title="User avatar" />
+                            </span>
+                            <div class="slds-dropdown slds-dropdown_right slds-nubbin_top-right">
+                                <ul class="slds-dropdown__list">
+                                    <li class="slds-dropdown__item" >
+                                        <a href="/user-profile"  tabindex="0">
+                                            <span class="slds-truncate">Profile</span>
+                                        </a>
+                                    </li>
+                                    <!-- <% if(user.user_role.includes("ADMIN") || user.user_role.includes("USER")){ %>
+                                    <li class="slds-dropdown__item" >
+                                        <a href="/company-profile"  tabindex="-1">
+                                            <span class="slds-truncate">Company Profile</span>
+                                        </a>
+                                    </li>
+                                    <%}%> -->
+
+                                    <li class="slds-has-divider_top-space"></li>
+                                    <li class="slds-dropdown__item" >
+                                        <a href="/logout"  tabindex="-1">
+                                            <span class="slds-truncate">Logout</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+    <script>
+
+        function getProjectForCompany(next) {
+            $.ajax({
+                type: 'GET',
+                url: '/getProjectListForCompany',
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function (response) {
+                    console.log(response);
+                    if (response.success == true) {
+                        let projects=response.projects;
+                        companyDefaultTimezone=response.companyDefaultTimezone;
+                        userRoles=response.userRoles;
+                        let optionUserRole='';
+                        userRoles.forEach(function(roles){
+                            optionUserRole+='<option value="'+roles+'">'+roles+'</option>'
+                        });
+                        $("#globalUserRole").html(optionUserRole);
+
+                        next(projects,null);
+                    } else {
+                        console.log(response);
+                        next(projects,response.message);
+
+                    }
+                },
+                error: function (response) {
+                    console.log(response);
+
+                    next(null,response.responseJSON.message);
+                }
+            });
+        }
+    </script>
+    <script>
+    $(window).on('load',function(e){
+        getProjectForCompany((projects,error)=>{
+                if(error){
+                    showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+                }else{
+                    let options='';
+                    // companyDefaultTimezone=response.companyDefaultTimezone;
+                    // userRoles=response.userRoles;
+                    if(projects.length<=0){
+                        options+='<option value="">No Project Found</option>'
+                        /*addError("#globalProjectForTimesheet","No project found");*/
+                    }else{
+                        options+='<option value=""> </option>'
+                        projects.forEach(function(project){
+                            options+='<option pr_id="'+project.id+'" value="'+project.name+'">'+project.name+'</option>'
+                        });
+                        $("#globalProjectForTimesheet").html(options);
+                    }
+                    $.ajax({
+                        type: 'POST',
+                        url: '/getTimesheetWithPlay',
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        success: function (response) {
+                            console.log(response);
+                            if (response.success == true) {
+                                console.log('timesheet data which is playing '+JSON.stringify(response.timesheetData));
+                                if(response.timesheetData.length>0){
+                                  // $("[timerDiv]").on('click',function(){stopKwTimerGlobally(this, '[name=kwTimer]', '#syncTimer', '#modalAddNewTsheetQuick')});
+                                  let timesheetCreatedDate=response.timesheetData[0].created_date.toString().split('T')[0];
+                                  if(timesheetCreatedDate==response.currentDate){
+
+                                    hmsToSecondsOnly(response.timesheetData[0].lastruntime,(playStartTime)=>{
+                                      //let currentTime=hoursToMinutes((new Date()).toTimeString().split(' ')[0]);
+                                      hmsToSecondsOnly(response.currentTime,(currentTime)=>{
+
+                                          let difference=currentTime-playStartTime;
+                                          let previousTotalHours=(response.timesheetData[0].total_work_hours*60);
+                                          secondsToHms(previousTotalHours+difference,(currentPlayingTime)=>{
+                                                $("[name=kwTimer]").text(currentPlayingTime);
+                                                $("[name=kwTimer]").attr("taskId",response.timesheetData[0].id);
+                                                $("[name=kwTimer]").attr("lineItemTaskId",response.timesheetData[0].task_id);
+
+                                              let eleToStart=$("#day-tabs").find("[line_item_id='"+response.timesheetData[0].id+"']").not('.hide');
+                                              // $("[timerDiv]").show();
+                                              if(eleToStart.length>0){
+                                                $(eleToStart).closest('.slds-grid').find('time').text(currentPlayingTime);
+                                                startTimer(eleToStart);
+                                              }else{
+                                                $("[name=globalStart]").addClass('hide');
+                                                // $("[name=globalStart]").css('display','none');
+                                                $("[name=globalStart]").next('[stop-timer]').removeClass('hide');
+                                                kwCounter = $("[name=kwTimer]");
+                                                intervalID = NaN;
+                                                if (isNaN(intervalID)){
+                                                  intervalID = setInterval(incrementTime, 1000);
+                                                }
+                                              }
+                                              console.log(difference);
+                                          });
+
+                                      });
+
+                                    });
+                                  }else{
+                                    hmsToSecondsOnly(response.timesheetData[0].lastruntime,(playStartTime)=>{
+
+                                        hmsToSecondsOnly('19:00:00',(timesheetDateTime)=>{
+
+                                            let difference=timesheetDateTime-playStartTime;
+                                            let previousTotalHours=(response.timesheetData[0].total_work_hours*60);
+                                            secondsToHms(previousTotalHours+difference,(currentPlayingTime)=>{
+
+                                                console.log(currentPlayingTime);
+                                                $("[name=kwTimer]").text(currentPlayingTime);
+                                                $("[name=kwTimer]").attr("taskId",response.timesheetData[0].id);
+                                                $("[name=kwTimer]").attr("lineItemTaskId",response.timesheetData[0].task_id);
+                                                $("[name=kwTimer]").attr("lineItemDate",response.timesheetData[0].created_date.toString().split('T')[0]);
+                                                stopKwTimerGlobally(this, '[name=kwTimer]', '#syncTimer', '#modalAddNewTsheetQuick');
+                                            });
+                                        });
+                                    });
+
+
+                                  }
+                                }else{
+                                    // $("[timerDiv]").on('click',function(){startKwTimerGlobally(this,'[name=kwTimer]')});
+                                    $("[name=globalStart]").removeClass('hide');
+                                }
+                            } else {
+                                console.log(response);
+                                showGlobalToast('#globalToast', 'error', response.message, 4000);
+                                // next(null,response.message);
+                            }
+                        },
+                        error: function (response) {
+                            console.log(response);
+                            showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+                            // next(null,response.responseJSON.message);
+                        }
+                    });
+                }
+            })
+        });
+    </script>
+    <% include ../layouts/notification-panel %>

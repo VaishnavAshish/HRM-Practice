@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="en">
+
+<% include ../layouts/head %>
+
+<body class="kw">
+
+    <%- include('../layouts/nav', {user:user}); %>
+    <%- include('../layouts/sideNav',{user:user}); %>
+    <main class="main-body-space tpd-60 bpd-100">
+        <div>
+            <div class="slds-p-around_small">
+                <div class="">
+                    <!-- header start end -->
+                    <div class="slds-card slds-p-around_small slds-m-bottom_medium">
+                        <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                            <div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-p-horizontal_small">
+                                <div class="slds-grid">
+                                    <div class="slds-no-flex slds-p-right_x-small">
+                                        <span class="slds-icon_container slds-icon-standard-action-list-component">
+                                            <i class="fa fa-user text-size-21 text-white slds-icon"></i>
+                                        </span>
+                                    </div>
+                                    <div class="slds-has-flexi-truncate">
+                                        <div class="text-size-18 text-height-1">
+                                            <%=company.name%>
+                                        </div>
+                                        <div class="slds-text-body_small">
+                                            Last Modify:<%=company.modified_date%>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- <div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-p-horizontal_small">
+                                <div class="slds-text-align_right sm-tpd-10 sm-text-left">
+                                    <button class="slds-button slds-button_brand slds-align-top" onclick="dummySave()">
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </div> -->
+                        </div>
+                    </div>
+                    <!-- header end -->
+
+                    <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                        <div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-p-horizontal_small">
+                            <div class="slds-card slds-p-around_large sm-pd-10 slds-m-bottom_large">
+                                <div class=""> 
+                                    <div class="">
+                                        <div class="slds-form-element slds-m-bottom_medium">
+                                            <label class="slds-form-element__label">
+                                                Company Name
+                                                <abbr class="slds-required" title="required">*</abbr>
+                                            </label>
+                                            <div class="slds-form-element__control">
+                                                <input type="text" class="slds-input" placeholder="" required="" value="<%=company.name%>" disabled/>
+                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                            
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form-element slds-m-bottom_medium">
+                                            <label class="slds-form-element__label">
+                                                Domain Name
+                                                <abbr class="slds-required" title="required">*</abbr>
+                                            </label>
+                                            <div class="slds-form-element__control">
+                                                <input type="text" class="slds-input" placeholder="" required="" value="<%=company.domain%>" disabled/>
+                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                            
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% include ../layouts/footer %>
+    </main>
+    
+
+    
+
+    <% include ../layouts/scripts %>
+
+</body>
+
+</html>

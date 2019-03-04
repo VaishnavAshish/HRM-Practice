@@ -1,0 +1,149 @@
+<script>
+$(document).ready(function(){
+
+    var category = '<%= expense.category %>';
+    $('#category').val(category);
+    var currency = '<%= expense.currency %>';
+    $('#currency').val(currency);
+    var tax = '<%= expense.tax %>';
+    $('#tax').val(tax);
+    /*var account_id = '<%= expense.account_id %>';
+    $('#account').val(account_id);
+    getAccountProject($('#account'));*/
+    var project_id = '<%= expense.project_id %>';
+    $('#project').val(project_id);
+    var category = '<%= expense.category %>';
+    $('#category').val(category);
+    var category = '<%= expense.category %>';
+    $('#category').val(category);
+
+    console.log(status);
+});
+function deleteExpense(expenseId){
+        showLoader('#globalLoader');
+        console.log('expense id is '+expenseId);
+        $.ajax({
+          type: 'POST',
+          url : '/deleteExpense',
+          contentType: 'application/json',
+          dataType: 'json',
+          data:JSON.stringify({"expenseId":expenseId}),
+           success : function(response){
+                console.log(response);
+                hideLoader('#globalLoader');
+                 /*window.history.back();*/
+                showGlobalToast('#globalToast', 'success', response.message, 4000);
+                window.location.href="/expenses-listing";
+                 /*window.location.href = document.referrer;*/
+
+            },
+           error: function(response){
+                hideLoader('#globalLoader');
+                console.log(response.responseJSON.message);
+                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+            }
+        });
+    }
+function updateExpense(expenseId){
+
+        console.log('expense id is '+expenseId);
+        clearError('#account', '#err-msg-account');
+        clearError('#project', '#err-msg-project');
+        /*if($('#account option:selected').val() != null && $('#account option:selected').val() != undefined && $('#account option:selected').val() != '' && $('#account option:selected').val() != 'none') {
+            clearError('#account', '#err-msg-account');*/
+            if($('#project option:selected').val() != null && $('#project option:selected').val() != undefined && $('#project option:selected').val() != '' && $('#project option:selected').val() != 'none') {
+              if($('#amount').val()<0){
+                  addError($('#amount'),'Please enter correct amount');
+              }else{
+                 
+                  showLoader('#globalLoader');
+                  clearError('#project', '#err-msg-project')
+                    let expenseData={};
+                    expenseData.expenseId=expenseId;
+                    expenseData.tax = $("#tax option:selected").val();
+                    expenseData.tax_no = ($("#tax_no").val()=="")?0:$("#tax_no").val();
+                    expenseData.expense_date = new Date($("#expense_date").val());
+                    expenseData.category = $('#category option:selected').val();
+                    expenseData.currency = $('#currency option:selected').val();
+                    expenseData.amount = ($('#amount').val()=="")?0:$('#amount').val();
+                    expenseData.note = $('#note').val();
+                    expenseData.billable = $('#bill1').is(':checked');
+                    /*expenseData.account_id = $('#account option:selected').val();*/
+                    expenseData.project_id = $('#project option:selected').val();
+                    expenseData.account_id = $('#project option:selected').attr('accountId');
+                    console.log(expenseData);
+                    $.ajax({
+                      type: 'POST',
+                      url : '/editExpense',
+                      contentType: 'application/json',
+                      dataType: 'json',
+                      data:JSON.stringify(expenseData),
+                       success : function(response){
+                          console.log(response);
+                          setTimeout(function () {
+                              showGlobalToast('#globalToast', 'success',response.message, 4000);
+                              hideLoader('#globalLoader');
+                          }, 2000);
+
+                        },
+                       error: function(response){
+                            hideLoader('#globalLoader');
+                            console.log(response.responseJSON.error);
+                            showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+                        }
+                    });
+                }
+          } else {
+            $('#project').closest('.slds-form-element').addClass('slds-has-error');
+            $('#err-msg-project').html('Please select project');
+        }
+   /* } else {
+        $('#account').closest('.slds-form-element').addClass('slds-has-error');
+        $('#err-msg-account').html('Please select account');
+    }*/
+}
+function clearError(id, errMsgId) {
+        $(id).closest('.slds-form-element').removeClass('slds-has-error');
+            $(errMsgId).html('');
+    }
+function getAccountProject(val) {
+    var projectList = <%- JSON.stringify(projects) %>;
+    console.log(projectList);
+        if($('option:selected', val).val() != '' && $('option:selected', val).val() != undefined && $('option:selected', val).val() != null) {
+            let accountId = $('option:selected', val).val();
+
+                let option = '';
+                let accountProject = projectList.filter(function(project) {
+                    return project.account_id==accountId;
+                  });
+                console.log('accountProject '+JSON.stringify(accountProject));
+                if(accountProject.length > 0) {
+                    option += '<option value=""> </option>';
+                    accountProject.forEach(function (acc_project) {
+                       option += '<option value='+acc_project.id+'>'+acc_project.name+'</option>' ;
+                    });
+                } else {
+                    option = '<option value=""> </option>'
+                }
+                console.log(option);
+                $('#project').html(option);
+
+        } else {
+            $('#project').html('<option value=""> </option>');
+        }
+    }
+function setCurrencyOfAccount(){
+    let project=$("#project option:selected").val();
+    let accountId=$("#project option:selected").attr('accountId');
+    let accountList= <%- JSON.stringify(accounts) %>
+    if(accountList.length>0){
+        let accountCurrency;
+        accountCurrency=accountList.filter(account=>{
+            return account.id==accountId;
+        })
+        if(accountCurrency!=undefined&&accountCurrency!=null&&accountCurrency!=''){
+            $("#currency").val(accountCurrency[0].currency);
+        }
+    }
+}
+</script>

@@ -1,0 +1,31 @@
+.slds-nav-vertical__action{
+  padding-left:1rem;
+  padding-right:1rem;
+}
+
+.slds-icon{
+  line-height: 2rem;
+  text-align:center;
+}
+.slds-icon_small{
+  line-height: 1.5rem;
+}
+.slds-icon_large{
+  line-height: 3rem;
+}
+
+.slds-has-error .slds-input{
+  box-shadow: none;
+}
+
+.slds-input.slds-combobox__input-value[readonly]{
+  background-color:white;
+  border-color: $border;
+}
+.no-transform{
+  transform: none;
+}
+table .tbl-head-blue th, table .tbl-head-blue thead th{
+  background-color: $txtBlue;
+  color: white;
+}

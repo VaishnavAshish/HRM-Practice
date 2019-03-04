@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="en">
+
+<% include ../layouts/head %>
+
+<body class="kw">
+
+    <% include ../layouts/nav %>
+    <% include ../layouts/sideNav %>
+    <main class="main-body-space tpd-60 bpd-100">
+        <div>
+            <div class="slds-p-around_small">
+                <!-- breadcrumb start -->
+                <div class="slds-p-bottom_small">
+                    <nav role="navigation" aria-label="Breadcrumbs" >
+                        <ol class="slds-breadcrumb slds-list_horizontal slds-wrap">
+                            <%if (isSuperAdmin) { %>
+                                <li class="slds-breadcrumb__item "><a href="/org-listing">Companies</a></li>
+                                <li class="slds-breadcrumb__item "><a href="/org-details?companyid=<%=resource.company_id%>" id="comp_name"><%=company%></a></li>
+                                <li class="slds-breadcrumb__item "><a href="javascript:void(0);"><%=resource.email%></a></li>
+                            <% } else { %>
+                                <li class="slds-breadcrumb__item "><a href="/resources-listing">Resources</a></li>
+                                <li class="slds-breadcrumb__item "><a href="javascript:void(0);"><%=resource.email%></a></li>
+                            <% } %>
+
+                        </ol>
+                    </nav>
+                </div>
+                <!-- breadcrumb end -->
+                <div class="">
+
+                        <!-- header start end -->
+                        <div class="slds-card slds-m-bottom_medium">
+                            <div class="slds-grid slds-wrap slds-p-around_small">
+                                <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                    <div class="slds-grid">
+                                        <div class="slds-no-flex slds-p-right_x-small">
+                                            <span class="slds-avatar slds-avatar_circle cursor-pointer">
+                                                <img alt="Person name" src="/getUserPicture/<%= resource.id %>" title="User avatar">
+                                            </span>
+                                        </div>
+                                        <div class="slds-has-flexi-truncate">
+                                         <div class="text-size-18 text-height-1">
+                                                <strong>
+                                                    <%=resource.first_name%>
+                                                </strong>
+                                            </div>
+                                             <div class="slds-text-body_small tpd-2">
+                                                Role: <%=resource.role%>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="slds-size_1-of-1 slds-medium-size_1-of-2" notSuperAdmin>
+                                    <div class="text-right sm-tpd-15">
+                                        <button class="slds-button slds-button_brand slds-align-top" onclick="updateUser(<%=resource.id;%>)">
+                                            Save Changes
+                                        </button>
+                                        <% if(resource.archived==true) { %>
+                                            <button class="slds-button slds-button_neutral slds-align-top" onclick="activateBeforeConfirm('#globalAlert', 'activate(\'<%=resource.id;%>\',\'users\')')" >
+                                                Activate
+                                            </button>
+
+                                        <% }else { %>
+                                            <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteResource(\'<%=resource.id;%>\')')">
+                                                Deactivate
+                                            </button>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <!-- header end -->
+
+                            <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                <%if (isSuperAdmin) { %>
+                                        <div class="slds-size_1-of-1 slds-medium-size_12-of-12   slds-p-horizontal_small">
+                                <% }else { %>
+                                        <div class="slds-size_1-of-1 slds-medium-size_8-of-12   slds-p-horizontal_small">
+                                <% } %>
+                            <div class="slds-card slds-p-around_large sm-pd-10 slds-m-bottom_large">
+                                <div class="slds-p-bottom_x-small line-bottom">
+                                    <div class="text-uppercase ">
+                                        Details
+                                    </div>
+                                </div>
+                                <div class="slds-p-top_medium">
+
+
+
+                                        <div class="slds-grid slds-wrap slds-gutters">
+                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                <div class="slds-grid slds-m-bottom_medium">
+                                                    <div class="slds-no-flex slds-p-right_medium">
+                                                        <span class="slds-avatar slds-avatar_large slds-avatar_circle cursor-pointer">
+                                                            <img alt="Person name" src="/getUserPicture/<%= resource.id %>" title="User avatar">
+                                                        </span>
+                                                    </div>
+                                                    <div class="">
+                                                        <div class="slds-form-element">
+                                                            <span class=" slds-form-element__label"="" id="">&nbsp;
+                                                            <div class="slds-form-element__control">
+                                                                <!-- <div class="slds-file-selector slds-file-selector_files">
+                                                                    <div class="slds-file-selector__dropzone">
+                                                                        <input type="file" class="slds-file-selector__input slds-assistive-text" accept="image/png" id="file-upload-input-01" aria-labelledby="file-selector-primary-label file-selector-secondary-label">
+                                                                        <label class="slds-file-selector__body" for="file-upload-input-01" id="file-selector-secondary-label">
+                                                                            <span class="slds-file-selector__button slds-button slds-button_neutral">
+                                                                                <i class="fa fa-upload rpd-10"></i>
+                                                                                Upload Image
+                                                                            </span>
+                                                                        </label>
+                                                                    </div>
+                                                                </div> -->
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label">
+                                                        User Email
+                                                        <abbr class="slds-required" title="required">*</abbr>
+                                                    </label>
+                                                    <div class="slds-form-element__control">
+                                                        <input type="email" id="email" class="slds-input" placeholder="" required="" value="<%=resource.email;%>" disabled>
+                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-grid slds-wrap slds-gutters">
+                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label">
+                                                        First Name
+                                                    </label>
+                                                    <div class="slds-form-element__control">
+                                                        <input type="text" id="first_name" class="slds-input" placeholder="" required="" value="<%=resource.first_name;%>">
+                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label">
+                                                        Last Name
+                                                    </label>
+                                                    <div class="slds-form-element__control">
+                                                        <input type="text" id="last_name" class="slds-input" placeholder="" required="" value="<%=resource.last_name;%>">
+                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="slds-grid slds-wrap slds-gutters">
+                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label">
+                                                        Phone
+                                                    </label>
+                                                    <div class="slds-form-element__control">
+                                                        <input type="text" id="phone" class="slds-input" placeholder="" required="" value="<%=resource.phone;%>">
+                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label">
+                                                        Mobile
+                                                    </label>
+                                                    <div class="slds-form-element__control">
+                                                        <input type="text" id="mobile" class="slds-input" placeholder="" required="" value="<%=resource.mobile;%>">
+                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-grid slds-wrap slds-gutters" notSuperAdmin>
+                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label" for="" id="">Default Billable Rate</label>
+                                                    <div class="slds-form-element__control slds-input-has-fixed-addon">
+                                                        <!-- <span class="slds-form-element__addon" id="">$</span> -->
+                                                        <input type="text" id="billRate" class="slds-input" placeholder="0.00" min="0" value="<%=resource.bill_rate;%>">
+
+                                                        <span class="slds-form-element__addon slds-no-flex" id="">per hour</span>
+                                                    </div>
+                                                    <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label" for="" id="">Default Cost Rate</label>
+                                                    <div class="slds-form-element__control slds-input-has-fixed-addon">
+                                                        <!-- <span class="slds-form-element__addon" id="">$</span> -->
+                                                        <input type="text" id="costRate" class="slds-input" min="0" placeholder="0.00" value="<%=resource.cost_rate;%>">
+
+                                                        <span class="slds-form-element__addon slds-no-flex" id="">per hour</span>
+                                                    </div>
+                                                    <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="slds-form-element slds-m-bottom_medium" notSuperAdmin>
+                                            <label class="slds-form-element__label">
+                                                User Role
+                                                <abbr class="slds-required" title="required">*</abbr>
+                                            </label>
+                                            <div class="slds-form-element__control ">
+                                                <div class="slds-select_container">
+                                                    <select class="slds-select" required="" getFormData name="user_role" id="user_role" value="<%= resource.role %>">
+                                                        <% if(userRoleList.length>0) { %>
+                                                            <% userRoleList.forEach(function(userRole) { %>
+                                                                <option value="<%= userRole %>"><%= userRole %></option>
+                                                            <% }); %>
+                                                        <% } %>
+
+                                                    </select>
+                                                </div>
+                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- <div class="slds-form-element slds-m-bottom_medium">
+                                            <label class="slds-form-element__label">
+                                                <abbr class="slds-required" title="required">*</abbr>
+                                                Profile Role
+                                            </label>
+                                            <div class="slds-form-element__control">
+                                                <input type="text" id="profile_role" class="slds-input" placeholder="" required="" value="<%=resource.user_role;%>">
+                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="slds-form-element slds-m-bottom_medium">
+                                            <label class="slds-form-element__label">
+                                                Team
+                                            </label>
+                                            <div class="slds-form-element__control">
+                                                <input type="text" id="team" class="slds-input" placeholder="" value="<%=resource.team;%>">
+                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="slds-form-element slds-m-bottom_medium">
+                                            <label class="slds-form-element__label">
+                                                Add to specific projects
+                                            </label>
+                                            <div class="slds-form-element__control">
+                                                <div class="slds-select_container">
+                                                    <select class="slds-select">
+                                                        <option value=""> </option>
+                                                        <option value="">option</option>
+                                                        <option value="">option</option>
+                                                    </select>
+                                                </div>
+                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                </div>
+                                            </div>
+                                        </div>-->
+
+</div>
+
+                            </div>
+                        </div>
+                        <div class="slds-size_1-of-1 slds-medium-size_4-of-12 slds-p-horizontal_small" notSuperAdmin>
+                            <div class="slds-card slds-p-around_large sm-pd-10 slds-m-bottom_large">
+                                <div class="" >
+                                    <div class="slds-p-bottom_x-small line-bottom">
+                                        <div class="text-uppercase ">
+                                            Manage Access
+                                        </div>
+                                    </div>
+                                    <div class="slds-p-top_medium">
+                                        <div class="slds-form-element slds-m-bottom_large">
+                                            <div class="slds-form-element__control">
+                                                <span class="slds-checkbox">
+                                                <% if (resource.permissions!=null){ %>
+                                                    <% if (resource.permissions.includes('timesheetEntry')) { %>
+                                                        <input type="checkbox" name="permissions" id="timesheetEntry" value="timesheetEntry" checked onchange='isPermissionModified(this);'>
+                                                <% } else { %>
+                                                        <input type="checkbox" name="permissions" id="timesheetEntry" value="timesheetEntry" onchange='isPermissionModified(this);'>
+                                                <% } } else{ %>
+                                                    <input type="checkbox" name="permissions" id="timesheetEntry" value="timesheetEntry" onchange='isPermissionModified(this);'>
+                                                <% } %>
+                                                    <label class="slds-checkbox__label" for="timesheetEntry">
+                                                        <span class="slds-checkbox_faux"></span>
+                                                        <span class="slds-form-element__label">Time Entry User</span>
+                                                    </label>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div class="slds-form-element slds-m-bottom_large">
+                                            <div class="slds-form-element__control">
+                                                <span class="slds-checkbox">
+                                                <% if (resource.permissions!=null){ %>
+                                                    <% if (resource.permissions.includes('expenseManager')) { %>
+                                                        <input type="checkbox" name="permissions" id="expenseManager" value="expenseManager" checked onchange='isPermissionModified(this);'>
+                                                    <% } else { %>
+                                                        <input type="checkbox" name="permissions" id="expenseManager" value="expenseManager" onchange='isPermissionModified(this);'>
+                                                <% } } else{ %>
+                                                    <input type="checkbox" name="permissions" id="expenseManager" value="expenseManager" onchange='isPermissionModified(this);'>
+                                                <% } %>
+                                                    <label class="slds-checkbox__label" for="expenseManager">
+                                                        <span class="slds-checkbox_faux"></span>
+                                                        <span class="slds-form-element__label">Expense Manager</span>
+                                                    </label>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div class="slds-form-element slds-m-bottom_large">
+                                            <div class="slds-form-element__control">
+                                                <span class="slds-checkbox">
+                                                <% if (resource.permissions!=null){ %>
+                                                    <% if (resource.permissions.includes('projectManager')) { %>
+                                                        <input type="checkbox" name="permissions" id="projectManager" value="projectManager" checked onchange='isPermissionModified(this);'>
+                                                <% } else { %>
+                                                        <input type="checkbox" name="permissions" id="projectManager" value="projectManager" onchange='isPermissionModified(this);'>
+                                                <% } } else{ %>
+                                                    <input type="checkbox" name="permissions" id="projectManager" value="projectManager" onchange='isPermissionModified(this);'>
+                                                <% } %>
+                                                    <label class="slds-checkbox__label" for="projectManager">
+                                                        <span class="slds-checkbox_faux"></span>
+                                                        <span class="slds-form-element__label">Project Manager </span>
+                                                    </label>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div class="slds-form-element slds-m-bottom_large">
+                                            <div class="slds-form-element__control">
+                                                <span class="slds-checkbox">
+                                                <% if (resource.permissions!=null){ %>
+                                                    <% if (resource.permissions.includes('invoiceManager')) { %>
+                                                        <input type="checkbox" name="permissions" id="invoiceManager" value="invoiceManager" checked onchange='isPermissionModified(this);'>
+                                                <% } else { %>
+                                                        <input type="checkbox" name="permissions" id="invoiceManager" value="invoiceManager" onchange='isPermissionModified(this);'>
+                                                <% } } else{ %>
+                                                        <input type="checkbox" name="permissions" id="invoiceManager" value="invoiceManager" onchange='isPermissionModified(this);'>
+                                                <% } %>
+                                                    <label class="slds-checkbox__label" for="invoiceManager">
+                                                        <span class="slds-checkbox_faux"></span>
+                                                        <span class="slds-form-element__label">Invoice Manager</span>
+                                                    </label>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div class="slds-form-element slds-m-bottom_large">
+                                            <div class="slds-form-element__control">
+                                                <span class="slds-checkbox">
+                                                <% if (resource.permissions!=null){ %>
+                                                    <% if (resource.permissions.includes('timesheetApprover')) { %>
+                                                        <input type="checkbox" name="permissions" id="timesheetApprover" value="timesheetApprover" checked onchange='isPermissionModified(this);selectTimesheetEntry(this)'>
+                                                <% } else { %>
+                                                        <input type="checkbox" name="permissions" id="timesheetApprover" value="timesheetApprover" onchange='isPermissionModified(this);selectTimesheetEntry(this)'>
+                                                <% } } else{ %>
+                                                        <input type="checkbox" name="permissions" id="timesheetApprover" value="timesheetApprover" onchange='isPermissionModified(this);selectTimesheetEntry(this)'>
+                                                <% } %>
+                                                    <label class="slds-checkbox__label" for="timesheetApprover">
+                                                        <span class="slds-checkbox_faux"></span>
+                                                        <span class="slds-form-element__label">Timesheet Approver</span>
+                                                    </label>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form-element slds-m-bottom_large">
+                                            <div class="slds-form-element__control">
+                                                <span class="slds-checkbox">
+                                                <% if (resource.permissions!=null){ %>
+                                                    <% if (resource.permissions.includes('expenseApprover')) { %>
+                                                        <input type="checkbox" name="permissions" id="expenseApprover" value="expenseApprover" checked onchange='isPermissionModified(this);selectExpenseManager(this)'>
+                                                <% } else { %>
+                                                        <input type="checkbox" name="permissions" id="expenseApprover" value="expenseApprover" onchange='isPermissionModified(this);selectExpenseManager(this)'>
+                                                <% } } else{ %>
+                                                        <input type="checkbox" name="permissions" id="expenseApprover" value="expenseApprover" onchange='isPermissionModified(this);selectExpenseManager(this)'>
+                                                <% } %>
+                                                    <label class="slds-checkbox__label" for="expenseApprover">
+                                                        <span class="slds-checkbox_faux"></span>
+                                                        <span class="slds-form-element__label">Expense Approver</span>
+                                                    </label>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <% include ../layouts/footer %>
+    </main>
+
+
+    <% include ../layouts/scripts %>
+    <% include ../layouts/res-detail-script %>
+    <% include ../layouts/resource-detail-script %>
+
+
+
+</body>
+
+</html>

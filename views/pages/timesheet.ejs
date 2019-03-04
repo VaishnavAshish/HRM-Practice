@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="en">
+    <% include ../layouts/head %>
+    <body class="kw">
+        <%- include('../layouts/nav', {user:user}); %>
+        <%- include('../layouts/sideNav',{user:user }); %>
+        <main class="main-body-space tpd-60 bpd-100">
+            <div>
+                <div class=" slds-p-around_small">
+                    <div class="">
+                        <!-- timesheet start end -->
+                        <div class="slds-card slds-p-around_small slds-m-bottom_medium">
+                            <div class="slds-grid slds-wrap">
+                                <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                    <div class="slds-grid">
+                                        <div class="slds-no-flex slds-p-right_x-small">
+                                            <span class="slds-icon_container slds-icon-standard-opportunity">
+                                                <i class="far fa-clock text-size-21 text-white slds-icon"></i>
+                                            </span>
+                                        </div>
+                                        <div class="slds-has-flexi-truncate">
+                                            <div class="slds-text-body_small text-height-normal">
+                                                Timesheets
+                                            </div>
+                                            <h1 class="slds-page-header__title slds-p-right_x-small text-height-normal ">
+                                                <% if(timeheet_users.length <= 0) {%>
+                                                    Time Entry
+                                                <% } else { %>
+                                                    <div class="slds-dropdown-trigger slds-dropdown-trigger_click cursor-pointer view-block max-w-350" aria-haspopup="true" title="" onclick="openDropdown(this, event, true);">
+                                                        <div class="slds-grid  slds-grid_vertical-align-center">
+                                                            <div class="slds-truncate slds-no-flex" title="<%= user.email%>`" selectedResourceId="<%= user.id %>" user-email>
+                                                                <%= user.email%>
+                                                            </div>
+                                                            <i class="fa fa-caret-down lpd-5"></i>
+                                                        </div>
+                                                        <div class="slds-dropdown slds-dropdown_left text-normal max-w-250 slds-dropdown_length-5">
+                                                            <ul class="slds-dropdown__list">
+                                                                <% timeheet_users.forEach(function(timeheet_user) { %>
+                                                                <li class="slds-dropdown__item">
+                                                                    <a href="/timesheet/<%= timeheet_user.id %>#default" tabindex="0" title="<%= timeheet_user.email %> (<%= timeheet_user.role%>)">
+                                                                        <div class="slds-truncate slds-no-flex">
+                                                                            <%= timeheet_user.email %> (<%= timeheet_user.role%>)
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                <% }); %>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                <% } %>
+                                            </h1>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                    <div class="slds-text-align_right sm-tpd-10 sm-text-left" id="btn-timesheet-shift">
+                                        <div class="slds-button-group slds-align-top" role="group">
+                                            <button data-navigation="dayview" class="slds-button slds-button_neutral" onclick="btnGroupTabView(this, '#timesheetView', 'day');">Day</button>
+                                            <button data-navigation="default" class="slds-button slds-button_neutral" onclick="btnGroupTabView(this, '#timesheetView', 'week');">Week</button>
+                                        </div>
+                                        <div class="slds-button-group slds-align-top" role="group">
+                                            <button class="slds-button slds-button_neutral" onclick="displayPreviousDay(this);">
+                                            <i class=" fa fa-angle-left" aria-hidden="true"></i>
+                                            </button>
+                                            <a class="slds-button slds-button_neutral sm-hide" href="" id="todayDiv">Today</a>
+                                            <button class="slds-button slds-button_neutral" onclick="displayNextDay(this);">
+                                            <i class=" fa fa-angle-right" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                        <!-- <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top" title="edit">
+                                        <span class="slds-button__icon">
+                                            <i class=" fa fa-calendar" aria-hidden="true"></i>
+                                        </span>
+                                        </button> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- timesheet header end -->
+                        <div id="timesheetView">
+                            <!-- timesheet week view start -->
+                            <div class="slds-card slds-p-around_small hide" btn-tabview="week">
+                                <div class="">
+                                    <div class=" slds-p-bottom_small">
+                                        <div class="slds-grid slds-wrap">
+                                            <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                                <div class="slds-text-heading_medium slds-truncate">
+                                                    <strong id="current-display-week-date"></strong>
+                                                    <small class="text-dull">[Week]</small>
+                                                </div>
+                                            </div>
+                                            <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                                <div class="text-right sm-tpd-10" remove-on-other-user>
+                                                    <!-- <div class="slds-button-group" role="group">
+                                                        <button class="slds-button slds-button_neutral" onclick="openModal('#modalAddNewTsheetWeek');">
+                                                        <i class=" fa fa-plus" aria-hidden="true"></i>
+                                                        Add Row
+                                                        </button>
+                                                        <div class="slds-dropdown-trigger slds-dropdown-trigger_click slds-button_last" onclick="openDropdown(this, event, true)">
+                                                            <button class="slds-button slds-button_icon slds-button_icon-border-filled" title="Show More">
+                                                            <i class="fa fa-caret-down"></i>
+                                                            </button>
+                                                            <div class="slds-dropdown slds-dropdown_right slds-dropdown_actions">
+                                                                <ul class="slds-dropdown__list">
+                                                                    <li class="slds-dropdown__item">
+                                                                        <a href="javascript:void(0);" tabindex="0">
+                                                                            <span class="slds-truncate">Copy From Previous (Week)</span>
+                                                                        </a>
+                                                                    </li>
+                                                                    <li class="slds-dropdown__item">
+                                                                        <a href="javascript:void(0);" tabindex="-1">
+                                                                            <span class="slds-truncate">Copy From Schedule</span>
+                                                                        </a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div> -->
+                                                    <button class="slds-button slds-button_neutral" onclick="openModal('#modalAddNewTsheetWeek', true);">
+                                                    <i class=" fa fa-plus" aria-hidden="true"></i>
+                                                    Add Row
+                                                    </button>
+                                                    <button class="slds-button slds-button_brand" onclick="saveWeeklyTimesheet(this, 'Day');">Save</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-card">
+                                        <div class="slds-grid slds-grid_pull-padded  slds-wrap line-top line-bottom">
+                                            <div class="slds-size_1-of-1 slds-medium-size_4-of-12 slds-p-horizontal_small sm-hide">
+                                                <span class="text-dull text-uppercase tpd-10 view-inline">
+                                                    Task
+                                                </span>
+                                            </div>
+                                            <div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-p-horizontal_small">
+                                                <div class="slds-grid text-size-11 bg-dull vpd-5" id="date-div-parent">
+                                                    <div class="slds-col">
+                                                        <div class="text-center ">
+                                                            <div class="text-uppercase text-thick">
+                                                                Su
+                                                            </div>
+                                                            <div class="date-div">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-col">
+                                                        <div class="text-center ">
+                                                            <div class="text-uppercase text-thick">
+                                                                Mo
+                                                            </div>
+                                                            <div class="date-div">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-col">
+                                                        <div class="text-center ">
+                                                            <div class="text-uppercase text-thick">
+                                                                Tu
+                                                            </div>
+                                                            <div class="date-div">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-col">
+                                                        <div class="text-center ">
+                                                            <div class="text-uppercase text-thick">
+                                                                We
+                                                            </div>
+                                                            <div class="date-div">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-col">
+                                                        <div class="text-center ">
+                                                            <div class="text-uppercase text-thick">
+                                                                Th
+                                                            </div>
+                                                            <div class="date-div">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-col">
+                                                        <div class="text-center ">
+                                                            <div class="text-uppercase text-thick">
+                                                                Fr
+                                                            </div>
+                                                            <div class="date-div">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-col">
+                                                        <div class="text-center ">
+                                                            <div class="text-uppercase text-thick">
+                                                                Sa
+                                                            </div>
+                                                            <div class="date-div">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-size_1-of-1 slds-medium-size_2-of-12 slds-p-horizontal_small sm-hide">
+                                                <span class="text-dull text-uppercase tpd-10 view-inline">
+                                                    Hours
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <ul class="last-li-line-bottom-0" id="week-timesheet-ul">
+                                            <!-- <li class="line-bottom slds-p-vertical_x-small sm-vpd-20">
+                                                    <div class="slds-grid slds-grid_pull-padded  slds-wrap">
+                                                        <div class="slds-size_1-of-1 slds-medium-size_4-of-12 slds-p-horizontal_small">
+                                                            <div class="text-gray">
+                                                                <i class="fa fa-folder-open"></i>
+                                                                <span class="text-uppercase text-size-11">
+                                                                    Porject Name Here
+                                                                </span>
+                                                            </div>
+                                                            <div class="slds-p-left_small">
+                                                                <div class="text-size-16 text-thick">
+                                                                    Task Title here
+                                                                </div>
+                                                                <div class=" text-size-11 text-dull">
+                                                                    Task 24
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-p-horizontal_small sm-vpd-15">
+                                                            <div class="slds-grid tsheet-week-grid">
+                                                                <div class="slds-col hpd-2">
+                                                                    <div class="slds-form-element__control text-center">
+                                                                        <input type="text" class="slds-input hpd-2 text-center" placeholder="0:00">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="slds-col tsheet-week-time" title="Edit" onclick="openModal('#modalEditTsheetTime');">
+                                                                   0:00
+                                                                </div>
+                                                                <div class="slds-col tsheet-week-time" title="Edit" onclick="openModal('#modalEditTsheetTime');">
+                                                                   0:00
+                                                                </div>
+                                                                <div class="slds-col tsheet-week-time" title="Edit" onclick="openModal('#modalEditTsheetTime');">
+                                                                   0:00
+                                                                </div>
+                                                                <div class="slds-col tsheet-week-time" title="Edit" onclick="openModal('#modalEditTsheetTime');">
+                                                                   0:00
+                                                                </div>
+                                                                <div class="slds-col tsheet-week-time" title="Edit" onclick="openModal('#modalEditTsheetTime');">
+                                                                   0:00
+                                                                </div>
+                                                                <div class="slds-col tsheet-week-time" title="Edit" onclick="openModal('#modalEditTsheetTime');">
+                                                                   0:00
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-size_1-of-1 slds-medium-size_2-of-12 slds-p-horizontal_small">
+                                                            <div class="text-size-18">
+                                                                40:00
+                                                            </div>
+                                                            <div>
+                                                                <ul class="slds-list_horizontal slds-has-dividers_left">
+                                                                    <li class="slds-item">Consultant</li>
+                                                                    <li class="slds-item">Billable</li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li> -->
+                                        <!-- row -->
+                                        <% if(timesheetWeekData.length>0) { %>
+                                            <% timesheetWeekData.forEach(function(weekData) { %>
+                                                <!-- row -->
+                                                <li class="line-bottom slds-p-vertical_x-small sm-vpd-20">
+                                                    <div class="slds-grid slds-grid_pull-padded  slds-wrap">
+                                                        <div class="slds-size_1-of-1 slds-medium-size_4-of-12 slds-p-horizontal_small">
+                                                            <div class="text-gray">
+                                                                <i class="fa fa-folder-open"></i>
+                                                                <span class="text-uppercase text-size-11"><%= weekData.project_name %></span>
+                                                            </div>
+                                                            <div class="slds-p-left_small">
+                                                                <div class="text-size-16 text-thick"><%= weekData.task_name %></div>
+                                                                <div class=" text-size-11 text-dull">Role: <%= weekData.user_role %></div>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-p-horizontal_small sm-vpd-15">
+                                                            <div class="slds-grid tsheet-week-grid">
+                                                                <% weekData.timesheetObjData.forEach(function(data, index) { %>
+
+                                                                        <!-- <div class="slds-col hpd-2">
+                                                                            <div class="slds-form-element__control text-center">
+                                                                                <input type="text" class="slds-input hpd-2 text-center" placeholder="0:00" disabled="">
+                                                                            </div>
+                                                                        </div> -->
+
+                                                                        <div class="slds-col tsheet-week-time" title="Edit" index='<%= index %>' project-name='<%= weekData.project_name %>' task-name='<%= weekData.task_name %>' week-start-date='<%= weekData.week_start_date %>' task-id='<%= weekData.task_id %>' user-role='<%= weekData.user_role %>' project-id='<%= weekData.project_id %>' onclick="getTaskDetailsForWeek(this, '#modalEditTsheetTime')" saved>
+                                                                            <%= data %>
+                                                                        </div>
+
+                                                                <% }); %>
+                                                               <!--  <div class="slds-col tsheet-week-time" title="Edit" onclick="openModal('#modalEditTsheetTime');">
+                                                                0:00
+                                                                </div>
+                                                                <div class="slds-col tsheet-week-time" title="Edit" onclick="openModal('#modalEditTsheetTime');">
+                                                                0:00
+                                                                </div>
+                                                                <div class="slds-col tsheet-week-time" title="Edit" onclick="openModal('#modalEditTsheetTime');">
+                                                                0:00
+                                                                </div>
+                                                                <div class="slds-col tsheet-week-time" title="Edit" onclick="openModal('#modalEditTsheetTime');">
+                                                                0:00
+                                                                </div>
+                                                                <div class="slds-col tsheet-week-time" title="Edit" onclick="openModal('#modalEditTsheetTime');">
+                                                                0:00
+                                                                </div>
+                                                                <div class="slds-col tsheet-week-time" title="Edit" onclick="openModal('#modalEditTsheetTime');">
+                                                                0:00
+                                                                </div> -->
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-size_1-of-1 slds-medium-size_2-of-12 slds-p-horizontal_small">
+                                                            <div class="text-size-18"><%= weekData.totalTime%> <small class="text-dull">hr</small></div>
+                                                            <!-- <div>
+                                                                <ul class="slds-list_horizontal slds-has-dividers_left">
+                                                                    <li class="slds-item"><%= weekData.user_role %></li>
+
+                                                                </ul>
+                                                            </div> -->
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                        <% }); %>
+                                    <% } %>
+
+                                    </ul>
+                                </div>
+                            </div>
+                            <!-- timesheet week view end -->
+
+                            <!-- timesheet day view start -->
+                            <div class="slds-card slds-p-around_small hide" btn-tabview="day">
+                                <div class="">
+                                    <div class=" slds-p-bottom_medium">
+                                        <div class="slds-grid slds-wrap">
+                                            <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                                <div class="slds-text-heading_medium slds-truncate">
+                                                    <strong id="active-tab-day"></strong>
+                                                    <span></span>
+                                                    <!-- 1 july -->
+                                                </div>
+                                            </div>
+
+                                             <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                                 <div class="text-right slds-m-bottom_small" remove-on-other-user>
+                                                    <button class="slds-button slds-button_neutral" onclick="validateHoursAndOpenModal('#modalAddNewTsheetDay', this, true);">
+                                                    <i class=" fa fa-plus" aria-hidden="true"></i>
+                                                    Add
+                                                    </button>
+                                                    <button class="slds-button slds-button_brand" onclick="submitDayTimesheet(this)">Submit</button>
+                                                    <!-- submitDayTimesheet(this) -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-tabs_default" id="day-tabs">
+                                        <ul class="slds-tabs_default__nav slds-grid slds-grid_align-space line-top text-normal text-size-11" id="day-tab-ul">
+                                            <li data-navigation="sunday" class="slds-tabs_default__item slds-grow text-center hpd-2 " title="" day=0  onclick="openTabWithUpdate(this, 'Sunday')">
+                                                <a class="slds-tabs_default__link text-height-normal" href="javascript:void(0);" tabindex="0" style="height: auto;">
+                                                    <div class="text-uppercase text-thick vpd-5">
+                                                        Sun
+                                                    </div>
+                                                    <div class="bpd-5" total-time>
+                                                        0:00
+                                                    </div>
+                                                </a>
+                                            </li>
+                                            <li data-navigation="monday" class="slds-tabs_default__item slds-grow text-center hpd-2" title="" day=1 onclick="openTabWithUpdate(this, 'Monday')">
+                                                <a class="slds-tabs_default__link text-height-normal" href="javascript:void(0);" tabindex="-1" style="height: auto;">
+                                                    <div class="text-uppercase text-thick vpd-5">
+                                                        Mon
+                                                    </div>
+                                                    <div class="bpd-5" total-time>
+                                                        0:00
+                                                    </div>
+                                                </a>
+                                            </li>
+                                            <li data-navigation="tuesday" class="slds-tabs_default__item slds-grow text-center hpd-2" title="" day=2 onclick="openTabWithUpdate(this, 'Tuesday')">
+                                                <a class="slds-tabs_default__link text-height-normal" href="javascript:void(0);" tabindex="-1" style="height: auto;">
+                                                    <div class="text-uppercase text-thick vpd-5">
+                                                        Tue
+                                                    </div>
+                                                    <div class="bpd-5" total-time>
+                                                        0:00
+                                                    </div>
+                                                </a>
+                                            </li>
+                                            <li data-navigation="wednesday" class="slds-tabs_default__item slds-grow text-center hpd-2" title="" day=3 onclick="openTabWithUpdate(this, 'Wednesday')">
+                                                <a class="slds-tabs_default__link text-height-normal" href="javascript:void(0);" tabindex="-1" style="height: auto;">
+                                                    <div class="text-uppercase text-thick vpd-5">
+                                                        Wed
+                                                    </div>
+                                                    <div class="bpd-5" total-time>
+                                                        0:00
+                                                    </div>
+                                                </a>
+                                            </li>
+                                            <li data-navigation="thursday" class="slds-tabs_default__item slds-grow text-center hpd-2" title="" day=4 onclick="openTabWithUpdate(this, 'Thursday')">
+                                                <a class="slds-tabs_default__link text-height-normal" href="javascript:void(0);" tabindex="-1" style="height: auto;">
+                                                    <div class="text-uppercase text-thick vpd-5">
+                                                        Thu
+                                                    </div>
+                                                    <div class="bpd-5" total-time>
+                                                        0:00
+                                                    </div>
+                                                </a>
+                                            </li>
+                                            <li data-navigation="friday" class="slds-tabs_default__item slds-grow text-center hpd-2" title="" day=5 onclick="openTabWithUpdate(this, 'Friday')">
+                                                <a class="slds-tabs_default__link text-height-normal" href="javascript:void(0);" tabindex="-1" style="height: auto;">
+                                                    <div class="text-uppercase text-thick vpd-5">
+                                                        Fri
+                                                    </div>
+                                                    <div class="bpd-5" total-time>
+                                                        0:00
+                                                    </div>
+                                                </a>
+                                            </li>
+                                            <li data-navigation="saturday" class="slds-tabs_default__item slds-grow text-center hpd-2" title="" day=6 onclick="openTabWithUpdate(this, 'Saturday')">
+                                                <a class="slds-tabs_default__link text-height-normal" href="javascript:void(0);" tabindex="-1" style="height: auto;">
+                                                    <div class="text-uppercase text-thick vpd-5">
+                                                        Sat
+                                                    </div>
+                                                    <div class="bpd-5" total-time>
+                                                        0:00
+                                                    </div>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                        <% var dayArr=[0,1,2,3,4,5,6]; %>
+                                        <% timesheetList.forEach(function(data, index) { %>
+                                            <% var index = dayArr.indexOf(data.day); %>
+                                                <% dayArr.splice(index, 1) %>
+                                                <div class="slds-tabs_default__content hide" day=<%= data.day %> target-tab='<%= daysEnum[data.day] %>' date=<%= data.date %> >
+                                                    <div class=" slds-p-bottom_medium ">
+                                                        <% data.data.forEach(function(timesheetRow) {%>
+                                                          <% if(timesheetRow.project_name!=null) { %>
+                                                            <% if(timesheetRow.submitted) { %>
+                                                                <div class="line-around slds-p-around_x-small slds-m-bottom_small" id="<%= timesheetRow.id %>" submitted>
+                                                            <% } else { %>
+                                                                <div class="line-around slds-p-around_x-small slds-m-bottom_small" id="<%= timesheetRow.id %>" saved>
+                                                            <% } %>
+                                                                <div class="slds-grid slds-wrap">
+                                                                    <div class="slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                                        <div class="text-gray">
+                                                                            <i class="fa fa-folder-open"></i>
+                                                                            <span class="text-uppercase text-size-11" id="projectLineItem" pr_id="<%= timesheetRow.project_id %>"><%= timesheetRow.project_name %></span>
+                                                                        </div>
+
+                                                                        <div class="text-size-16 text-thick" id="taskLineItem" tk_id="<%= timesheetRow.task_id %>"><%= timesheetRow.task_name %></div>
+
+                                                                        <div class=" text-size-11 text-dull sm-vpd-8" id="noteLineItem"> <%= timesheetRow.description %></div>
+                                                                    </div>
+                                                                    <div class="slds-size_1-of-1 slds-medium-size_3-of-12">
+                                                                        <div class=" slds-truncate" >Role: <span id="userRoleLineItem"> <%= timesheetRow.user_role %></span></div>
+                                                                    </div>
+                                                                    <div class="slds-size_1-of-1 slds-medium-size_3-of-12">
+                                                                        <div class="slds-grid slds-wrap slds-grid_pull-padded sm-tpd-10">
+                                                                            <div class="slds-size_7-of-12  slds-p-horizontal_small">
+                                                                                <div class="slds-grid">
+                                                                                    <div class="slds-no-flex slds-size_1-of-5" remove-on-other-user>
+                                                                                    <% if(!timesheetRow.submitted) { %>
+                                                                                        <button class="slds-button slds-button_icon slds-button_icon-border-filled" title="start" start line_item_id="<%= timesheetRow.id %>"    onclick="startTimer(this);">
+                                                                                            <span class="slds-button__icon">
+                                                                                                <i class=" fa fa-play text-blue" aria-hidden="true"></i>
+                                                                                            </span>
+                                                                                        </button>
+                                                                                        <button class="slds-button slds-button_icon slds-button_icon-border-filled hide" title="stop" stop line_item_id="<%= timesheetRow.id %>" onclick="stopTimer(this);">
+                                                                                             <span class="slds-button__icon">
+                                                                                                <i class=" fa fa-stop text-red" aria-hidden="true"></i>
+                                                                                            </span>
+                                                                                        </button>
+                                                                                    <% } %>
+                                                                                    </div>
+                                                                                    <div class="line-left slds-p-horizontal_small slds-m-left_small slds-has-flexi-truncate slds-size_4-of-5">
+                                                                                        <time class="text-size-21"><%= timesheetRow.total_work_hours %></time>
+                                                                                        <ul class="slds-list_horizontal slds-has-dividers_left">
+                                                                                            <% if(timesheetRow.billable) { %>
+                                                                                                <li class="slds-item" id="billableLineItem">
+                                                                                                    Billable
+                                                                                                </li>
+                                                                                            <% } %>
+                                                                                            <% if(timesheetRow.submitted) { %>
+                                                                                                <li class="slds-item text-green">Submitted</li>
+                                                                                            <% } %>
+                                                                                        </ul>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <% if(!timesheetRow.submitted) { %>
+                                                                                <div class="slds-size_5-of-12  slds-p-horizontal_small">
+                                                                                    <div class="text-right" remove-on-other-user>
+                                                                                        <button class="slds-button slds-button_icon slds-m-right_small" title="edit"  onclick="updateDayTimesheet(`<%= timesheetRow.id %>`);">
+                                                                                            <span class="slds-button__icon">
+                                                                                                <i class=" fa fa-pen text-blue" aria-hidden="true"></i>
+                                                                                            </span>
+                                                                                        </button>
+                                                                                        <button class="slds-button slds-button_icon" title="delete" ts_li_id="<%= timesheetRow.id %>" onclick="deleteDayTimesheet(this);">
+                                                                                            <span class="slds-button__icon">
+                                                                                                <i class=" fa fa-trash text-red" aria-hidden="true"></i>
+                                                                                            </span>
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </div>
+                                                                            <% } %>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <% } %>
+                                                        <% }); %>
+                                                    </div>
+                                                </div>
+                                                <% }); %>
+
+                                                <!-- <% dayArr.forEach(function(data) { %>
+                                                    <div class="slds-tabs_default__content hide" day=<%= data %> target-tab=<%= daysEnum[data] %>>
+                                                        <div class=" slds-p-bottom_medium" remove-on-other-user>
+
+                                                            <div class="text-right sm-tpd-10">
+                                                                <button class="slds-button slds-button_neutral" onclick="openModal('#modalAddNewTsheetDay');">
+                                                                <i class=" fa fa-plus" aria-hidden="true"></i>
+                                                                Add
+                                                                </button>
+                                                                <button class="slds-button slds-button_brand" onclick="submitDayTimesheet(this)">Submit</button>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                            <% }); %> -->
+                                        <!-- <div class="slds-tabs_default__content hide" day=1 target-tab="Monday">
+                                            <div class=" slds-p-bottom_medium ">
+                                                <% timesheetList.forEach(function(data) { %>
+                                                <% if(data.day == 1) { %>
+                                                <% data.data.forEach(function(timesheetRow) {%>
+                                                <div class="line-around slds-p-around_x-small slds-m-bottom_small">
+                                                    <div class="slds-grid slds-wrap">
+                                                        <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                                            <div class="text-gray">
+                                                                <i class="fa fa-folder-open"></i>
+                                                                <span class="text-uppercase text-size-11">
+                                                                    <%= timesheetRow.project_name %>
+                                                                </span>
+                                                            </div>
+                                                            <div class="slds-p-left_small">
+                                                                <div class="text-size-16 text-thick">
+                                                                    <%= timesheetRow.task_name %>
+                                                                </div>
+                                                                <div class=" text-size-11 text-dull sm-vpd-8">
+                                                                    <%= timesheetRow.description %>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+
+                                                            <div class="slds-grid slds-grid_align-end slds-grid_vertical-align-center">
+                                                                <div>
+                                                                    <button class="slds-button slds-button_icon slds-button_icon-border-filled" title="edit">
+                                                                    <span class="slds-button__icon">
+                                                                        <i class=" fa fa-play text-blue" aria-hidden="true"></i>
+                                                                    </span>
+                                                                    </button>
+                                                                </div>
+                                                                <div class="line-left slds-p-horizontal_small slds-m-left_small">
+                                                                    <span class="text-size-21">
+                                                                        <%= timesheetRow.total_work_hours %>
+                                                                    </span>
+                                                                </div>
+                                                                <div>
+                                                                    <ul class="slds-list_horizontal slds-has-dividers_left">
+                                                                        <li class="slds-item">Consultant</li>
+                                                                        <li class="slds-item"><%= timesheetRow.category %></li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                            <div class="text-right">
+                                                                <button class="slds-button slds-button_icon slds-button_icon-border-filled" title="edit">
+                                                                <span class="slds-button__icon">
+                                                                    <i class=" fa fa-pen text-blue" aria-hidden="true"></i>
+                                                                </span>
+                                                                </button>
+                                                                <button class="slds-button slds-button_icon slds-button_icon-border-filled" title="delete">
+                                                                <span class="slds-button__icon">
+                                                                    <i class=" fa fa-trash text-red" aria-hidden="true"></i>
+                                                                </span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <% }); %>
+                                                <% } %>
+                                                <% }); %>
+                                            </div>
+                                        </div>
+                                        <div class="slds-tabs_default__content hide" day=2 target-tab="Tuesday">
+                                            <div class=" slds-p-bottom_medium ">
+                                                <% timesheetList.forEach(function(data) { %>
+                                                <% if(data.day == 2) { %>
+                                                <% data.data.forEach(function(timesheetRow) {%>
+                                                <div class="line-around slds-p-around_x-small slds-m-bottom_small">
+                                                    <div class="slds-grid slds-wrap">
+                                                        <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                                            <div class="text-gray">
+                                                                <i class="fa fa-folder-open"></i>
+                                                                <span class="text-uppercase text-size-11">
+                                                                    <%= timesheetRow.project_name %>
+                                                                </span>
+                                                            </div>
+                                                            <div class="slds-p-left_small">
+                                                                <div class="text-size-16 text-thick">
+                                                                    <%= timesheetRow.task_name %>
+                                                                </div>
+                                                                <div class=" text-size-11 text-dull sm-vpd-8">
+                                                                    <%= timesheetRow.description %>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+
+                                                            <div class="slds-grid slds-grid_align-end slds-grid_vertical-align-center">
+                                                                <div>
+                                                                    <button class="slds-button slds-button_icon slds-button_icon-border-filled" title="edit">
+                                                                    <span class="slds-button__icon">
+                                                                        <i class=" fa fa-play text-blue" aria-hidden="true"></i>
+                                                                    </span>
+                                                                    </button>
+                                                                </div>
+                                                                <div class="line-left slds-p-horizontal_small slds-m-left_small">
+                                                                    <span class="text-size-21">
+                                                                        <%= timesheetRow.total_work_hours %>
+                                                                    </span>
+                                                                </div>
+                                                                <div>
+                                                                    <ul class="slds-list_horizontal slds-has-dividers_left">
+                                                                        <li class="slds-item">Consultant</li>
+                                                                        <li class="slds-item"><%= timesheetRow.category %></li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                            <div class="text-right">
+                                                                <button class="slds-button slds-button_icon slds-button_icon-border-filled" title="edit">
+                                                                <span class="slds-button__icon">
+                                                                    <i class=" fa fa-pen text-blue" aria-hidden="true"></i>
+                                                                </span>
+                                                                </button>
+                                                                <button class="slds-button slds-button_icon slds-button_icon-border-filled" title="delete">
+                                                                <span class="slds-button__icon">
+                                                                    <i class=" fa fa-trash text-red" aria-hidden="true"></i>
+                                                                </span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <% }); %>
+                                                <% } %>
+                                                <% }); %>
+                                            </div>
+                                        </div>
+                                        <div class="slds-tabs_default__content hide" day=3 target-tab="Wednesday">
+                                            <div class=" slds-p-bottom_medium ">
+                                                <% timesheetList.forEach(function(data) { %>
+                                                <% if(data.day == 3) { %>
+                                                <% data.data.forEach(function(timesheetRow) {%>
+                                                <div class="line-around slds-p-around_x-small slds-m-bottom_small">
+                                                    <div class="slds-grid slds-wrap">
+                                                        <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                                            <div class="text-gray">
+                                                                <i class="fa fa-folder-open"></i>
+                                                                <span class="text-uppercase text-size-11">
+                                                                    <%= timesheetRow.project_name %>
+                                                                </span>
+                                                            </div>
+                                                            <div class="slds-p-left_small">
+                                                                <div class="text-size-16 text-thick">
+                                                                    <%= timesheetRow.task_name %>
+                                                                </div>
+                                                                <div class=" text-size-11 text-dull sm-vpd-8">
+                                                                    <%= timesheetRow.description %>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+
+                                                            <div class="slds-grid slds-grid_align-end slds-grid_vertical-align-center">
+                                                                <div>
+                                                                    <button class="slds-button slds-button_icon slds-button_icon-border-filled" title="edit">
+                                                                    <span class="slds-button__icon">
+                                                                        <i class=" fa fa-play text-blue" aria-hidden="true"></i>
+                                                                    </span>
+                                                                    </button>
+                                                                </div>
+                                                                <div class="line-left slds-p-horizontal_small slds-m-left_small">
+                                                                    <span class="text-size-21">
+                                                                        <%= timesheetRow.total_work_hours %>
+                                                                    </span>
+                                                                </div>
+                                                                <div>
+                                                                    <ul class="slds-list_horizontal slds-has-dividers_left">
+                                                                        <li class="slds-item">Consultant</li>
+                                                                        <li class="slds-item"><%= timesheetRow.category %></li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                            <div class="text-right">
+                                                                <button class="slds-button slds-button_icon slds-button_icon-border-filled" title="edit">
+                                                                <span class="slds-button__icon">
+                                                                    <i class=" fa fa-pen text-blue" aria-hidden="true"></i>
+                                                                </span>
+                                                                </button>
+                                                                <button class="slds-button slds-button_icon slds-button_icon-border-filled" title="delete">
+                                                                <span class="slds-button__icon">
+                                                                    <i class=" fa fa-trash text-red" aria-hidden="true"></i>
+                                                                </span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <% }); %>
+                                                <% } %>
+                                                <% }); %>
+                                            </div>
+                                        </div>
+
+                                        <div class="slds-tabs_default__content hide" day=4 target-tab="Thursday">
+                                            <div class=" slds-p-bottom_medium ">
+                                                <% timesheetList.forEach(function(data) { %>
+                                                <% if(data.day == 4) { %>
+                                                <% data.data.forEach(function(timesheetRow) {%>
+                                                <div class="line-around slds-p-around_x-small slds-m-bottom_small">
+                                                    <div class="slds-grid slds-wrap">
+                                                        <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                                            <div class="text-gray">
+                                                                <i class="fa fa-folder-open"></i>
+                                                                <span class="text-uppercase text-size-11">
+                                                                    <%= timesheetRow.project_name %>
+                                                                </span>
+                                                            </div>
+                                                            <div class="slds-p-left_small">
+                                                                <div class="text-size-16 text-thick">
+                                                                    <%= timesheetRow.task_name %>
+                                                                </div>
+                                                                <div class=" text-size-11 text-dull sm-vpd-8">
+                                                                    <%= timesheetRow.description %>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+
+                                                            <div class="slds-grid slds-grid_align-end slds-grid_vertical-align-center">
+                                                                <div>
+                                                                    <button class="slds-button slds-button_icon slds-button_icon-border-filled" title="edit">
+                                                                    <span class="slds-button__icon">
+                                                                        <i class=" fa fa-play text-blue" aria-hidden="true"></i>
+                                                                    </span>
+                                                                    </button>
+                                                                </div>
+                                                                <div class="line-left slds-p-horizontal_small slds-m-left_small">
+                                                                    <span class="text-size-21">
+                                                                        <%= timesheetRow.total_work_hours %>
+                                                                    </span>
+                                                                </div>
+                                                                <div>
+                                                                    <ul class="slds-list_horizontal slds-has-dividers_left">
+                                                                        <li class="slds-item">Consultant</li>
+                                                                        <li class="slds-item"><%= timesheetRow.category %></li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                            <div class="text-right">
+                                                                <button class="slds-button slds-button_icon slds-button_icon-border-filled" title="edit">
+                                                                <span class="slds-button__icon">
+                                                                    <i class=" fa fa-pen text-blue" aria-hidden="true"></i>
+                                                                </span>
+                                                                </button>
+                                                                <button class="slds-button slds-button_icon slds-button_icon-border-filled" title="delete">
+                                                                <span class="slds-button__icon">
+                                                                    <i class=" fa fa-trash text-red" aria-hidden="true"></i>
+                                                                </span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <% }); %>
+                                                <% } %>
+                                                <% }); %>
+                                            </div>
+                                        </div>
+                                        <div class="slds-tabs_default__content hide" day=5 target-tab="Friday">
+                                            <div class=" slds-p-bottom_medium ">
+                                                <% timesheetList.forEach(function(data) { %>
+                                                <% if(data.day == 5) { %>
+                                                <% data.data.forEach(function(timesheetRow) {%>
+                                                <div class="line-around slds-p-around_x-small slds-m-bottom_small">
+                                                    <div class="slds-grid slds-wrap">
+                                                        <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                                            <div class="text-gray">
+                                                                <i class="fa fa-folder-open"></i>
+                                                                <span class="text-uppercase text-size-11">
+                                                                    <%= timesheetRow.project_name %>
+                                                                </span>
+                                                            </div>
+                                                            <div class="slds-p-left_small">
+                                                                <div class="text-size-16 text-thick">
+                                                                    <%= timesheetRow.task_name %>
+                                                                </div>
+                                                                <div class=" text-size-11 text-dull sm-vpd-8">
+                                                                    <%= timesheetRow.description %>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+
+                                                            <div class="slds-grid slds-grid_align-end slds-grid_vertical-align-center">
+                                                                <div>
+                                                                    <button class="slds-button slds-button_icon slds-button_icon-border-filled" title="edit">
+                                                                    <span class="slds-button__icon">
+                                                                        <i class=" fa fa-play text-blue" aria-hidden="true"></i>
+                                                                    </span>
+                                                                    </button>
+                                                                </div>
+                                                                <div class="line-left slds-p-horizontal_small slds-m-left_small">
+                                                                    <span class="text-size-21">
+                                                                        <%= timesheetRow.total_work_hours %>
+                                                                    </span>
+                                                                </div>
+                                                                <div>
+                                                                    <ul class="slds-list_horizontal slds-has-dividers_left">
+                                                                        <li class="slds-item">Consultant</li>
+                                                                        <li class="slds-item"><%= timesheetRow.category %></li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                            <div class="text-right">
+                                                                <button class="slds-button slds-button_icon slds-button_icon-border-filled" title="edit">
+                                                                <span class="slds-button__icon">
+                                                                    <i class=" fa fa-pen text-blue" aria-hidden="true"></i>
+                                                                </span>
+                                                                </button>
+                                                                <button class="slds-button slds-button_icon slds-button_icon-border-filled" title="delete">
+                                                                <span class="slds-button__icon">
+                                                                    <i class=" fa fa-trash text-red" aria-hidden="true"></i>
+                                                                </span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <% }); %>
+                                                <% } %>
+                                                <% }); %>
+                                            </div>
+                                        </div>
+                                        <div class="slds-tabs_default__content hide" day=6 target-tab="Saturday">
+                                            <div class=" slds-p-bottom_medium ">
+                                                <% timesheetList.forEach(function(data) { %>
+                                                <% if(data.day == 6) { %>
+                                                <% data.data.forEach(function(timesheetRow) {%>
+                                                <div class="line-around slds-p-around_x-small slds-m-bottom_small">
+                                                    <div class="slds-grid slds-wrap">
+                                                        <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                                            <div class="text-gray">
+                                                                <i class="fa fa-folder-open"></i>
+                                                                <span class="text-uppercase text-size-11">
+                                                                    <%= timesheetRow.project_name %>
+                                                                </span>
+                                                            </div>
+                                                            <div class="slds-p-left_small">
+                                                                <div class="text-size-16 text-thick">
+                                                                    <%= timesheetRow.task_name %>
+                                                                </div>
+                                                                <div class=" text-size-11 text-dull sm-vpd-8">
+                                                                    <%= timesheetRow.description %>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+
+                                                            <div class="slds-grid slds-grid_align-end slds-grid_vertical-align-center">
+                                                                <div>
+                                                                    <button class="slds-button slds-button_icon slds-button_icon-border-filled" title="edit">
+                                                                    <span class="slds-button__icon">
+                                                                        <i class=" fa fa-play text-blue" aria-hidden="true"></i>
+                                                                    </span>
+                                                                    </button>
+                                                                </div>
+                                                                <div class="line-left slds-p-horizontal_small slds-m-left_small">
+                                                                    <span class="text-size-21">
+                                                                        <%= timesheetRow.total_work_hours %>
+                                                                    </span>
+                                                                </div>
+                                                                <div>
+                                                                    <ul class="slds-list_horizontal slds-has-dividers_left">
+                                                                        <li class="slds-item">Consultant</li>
+                                                                        <li class="slds-item"><%= timesheetRow.category %></li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                            <div class="text-right">
+                                                                <button class="slds-button slds-button_icon slds-button_icon-border-filled" title="edit">
+                                                                <span class="slds-button__icon">
+                                                                    <i class=" fa fa-pen text-blue" aria-hidden="true"></i>
+                                                                </span>
+                                                                </button>
+                                                                <button class="slds-button slds-button_icon slds-button_icon-border-filled" title="delete">
+                                                                <span class="slds-button__icon">
+                                                                    <i class=" fa fa-trash text-red" aria-hidden="true"></i>
+                                                                </span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <% }); %>
+                                                <% } %>
+                                                <% }); %>
+                                            </div>
+                                        </div> -->
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- timesheet day view end -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% include ../modals/modal-add-new-timesheet-day %>
+            <% include ../modals/modal-edit-timesheet-day %>
+            <% include ../modals/modal-add-new-timesheet-week %>
+            <% include ../modals/modal-edit-tsheet-week-time %>
+            <% include ../layouts/footer %>
+        </main>
+        <% include ../layouts/scripts %>
+        <% include ../layouts/timesheet-script %>
+    </body>
+</html>

@@ -1,0 +1,538 @@
+<script>
+
+function deleteExpense(expenseId){
+        showLoader('#globalLoader');
+        /*console.log('expense id is '+userId);*/
+        console.log('expense id is '+expenseId);
+        $.ajax({
+          type: 'POST',
+          url : '/deleteExpense',
+          contentType: 'application/json',
+          dataType: 'json',
+          data:JSON.stringify({"expenseId":expenseId}),
+           success : function(response){
+                console.log(response);
+                hideLoader('#globalLoader');
+                showGlobalToast('#globalToast', 'success', response.message, 4000);
+                /*if(userId!=undefined){
+                    location.reload();
+                }else{
+                    window.location.href='/expenses-listing/'+userId+'#default';
+                }*/
+                 window.location.href = document.referrer;
+
+            },
+           error: function(response){
+                hideLoader('#globalLoader');
+                console.log(response.responseJSON.message);
+                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+            }
+        });
+    }
+
+    function getUserExpense(ele) {
+        var u_id = $('option:selected', ele).val();
+        window.location.href = "/expenses-listing/"+u_id+"#default";
+    }
+function addExpense(modalId) {
+   /* clearError('#account', '#err-msg-account');*/
+    clearError('#project', '#err-msg-project');
+    /*if($('#account option:selected').val() != null && $('#account option:selected').val() != undefined && $('#account option:selected').val() != '' && $('#account option:selected').val() != 'none') {
+        clearError('#account', '#err-msg-account');*/
+        if($('#project option:selected').val() != null && $('#project option:selected').val() != undefined && $('#project option:selected').val() != '' && $('#project option:selected').val() != 'none') {
+            if($('#amount').val()<0){
+                addError($('#amount'),'Please enter correct amount');
+            }else{
+                showLoader('#globalLoader');
+                clearError('#project', '#err-msg-project')
+                let expenseData = {};
+                expenseData.tax = $("#tax option:selected").val();
+                expenseData.tax_no = ($("#tax_no").val()=="")?0:$("#tax_no").val();
+                expenseData.expense_date =($("#expense_date").val()==""?new Date():new Date($("#expense_date").val()));
+                expenseData.category = $('#category option:selected').val();
+                expenseData.currency = $('#currency option:selected').val();
+                expenseData.amount = ($('#amount').val()=="")?0:$('#amount').val();
+                expenseData.note = $('#note').val();
+                expenseData.billable = $('#billable').prop('checked');
+                expenseData.project_id = $('#project option:selected').val();
+                expenseData.account_id = $('#project option:selected').attr('accountId');
+                console.log(expenseData);
+                $.ajax({
+                    type: 'POST',
+                    url : '/addExpense',
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    data:JSON.stringify(expenseData),
+                    success : function(response){
+                        if(response.success == true) {
+                            console.log(response);
+                            /*location.reload();*/
+                            window.location.href="/expense-details?expenseId="+response.expense.id;
+
+                        } else {
+                            hideLoader('#globalLoader');
+                            closeModal(modalId);
+                            showGlobalToast('#globalToast', 'error', "Error in add project.", 4000);
+                        }
+
+                    },
+                    error: function(response){
+                        console.log(response);
+                        hideLoader('#globalLoader');
+                        closeModal(modalId);
+                        showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+
+                    }
+                });
+            }
+        } else {
+            $('#project').closest('.slds-form-element').addClass('slds-has-error');
+            $('#err-msg-project').html('Please select project');
+        }
+    /*} else {
+        $('#account').closest('.slds-form-element').addClass('slds-has-error');
+        $('#err-msg-account').html('Please select account');
+    }*/
+}
+function clearError(id, errMsgId) {
+        $(id).closest('.slds-form-element').removeClass('slds-has-error');
+            $(errMsgId).html('');
+    }
+$(document).ready(function(){
+    let url = new URL(window.location.href);
+    var isUserId = url.pathname.substring(((url.pathname).lastIndexOf('/')+1), (url.pathname).lastIndexOf('#')).length > 0;
+    if(isUserId) {
+        reqUserId = url.pathname.substring(((url.pathname).lastIndexOf('/')+1), url.pathname.length);
+    }
+    let permissionsOfUser=<%- JSON.stringify(user.permissions) %>;
+    if( permissionsOfUser.includes('expenseApprover')) {
+        var usersList = <%- JSON.stringify(usersList) %>;
+        console.log(usersList);
+        usersList.filter(function (userObj) {
+            if(userObj.id == reqUserId){
+                $('#selectedFilter').html(userObj.email);
+                $('#selectedFilter').attr('title',userObj.email);
+            }
+        });
+    }
+    $("#offset").text(parseInt($("#pageRecordNo").text()));
+    let noOfRecord=parseInt($("#offset").text());
+    let searchFilter=$("#selectedFilter").text();
+
+    // if(searchFilter=="All"){
+    //     if((<%= totalCount %>) >parseInt($("#offset").text())){
+    //         $("#totalRecordCount").text(<%= totalCount %>);
+    //     }
+    // }else if(searchFilter=="Draft"){
+    //     if((<%= draftCount %>)>parseInt($("#offset").text())){
+    //         $("#totalRecordCount").text(<%= draftCount %>);
+    //     }
+    // }else if(searchFilter=="Archive"){
+    //     if((<%= approvedCount %>)>parseInt($("#offset").text())){
+    //         $("#totalRecordCount").text(<%= approvedCount %>);
+    //     }
+    // }
+    $("#totalRecordCount").text(<%= totalCount %>);
+    if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
+        $(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
+    }else{
+        $(".slds-button[loadItemId]").hide();
+    }
+})
+
+/*function getAccountProject(val) {
+    var projectList = <%- JSON.stringify(projects) %>;
+    console.log(projectList);
+        if($('option:selected', val).val() != '' && $('option:selected', val).val() != undefined && $('option:selected', val).val() != null) {
+            let accountId = $('option:selected', val).val();
+
+                let option = '';
+                let accountProject = projectList.filter(function(project) {
+                    return project.account_id==accountId;
+                  });
+                console.log('accountProject '+JSON.stringify(accountProject));
+                if(accountProject.length > 0) {
+                    option += '<option value=""> </option>';
+                    accountProject.forEach(function (acc_project) {
+                       option += '<option value='+acc_project.id+'>'+acc_project.name+'</option>' ;
+                    });
+                } else {
+                    option = '<option value=""> </option>'
+                }
+                console.log(option);
+                $('#project').html(option);
+
+        } else {
+            $('#project').html('<option value=""> </option>');
+        }
+    }*/
+function loadMoreExpense(){
+    showLoader('#globalLoader');
+
+    let offset=$("#offset").text();
+
+    let searchText=$("#searchExpenseForAccount").val();
+    let requestBody={"searchText":searchText,"searchField":"account_id"};
+    let filterCriteria=$("#selectedFilter").text();
+    if(filterCriteria=="Draft"){
+        requestBody.status="Draft";
+    }else if(filterCriteria=="Approved"){
+        requestBody.status="Approved";
+    }
+    requestBody.offset=offset;
+    let url = new URL(window.location.href);
+    reqUserId = url.pathname.substring(((url.pathname).lastIndexOf('/')+1), url.pathname.length);
+    requestBody.user_id = reqUserId;
+    console.log(requestBody);
+    $.ajax({
+          type: 'POST',
+          url : '/findExpenseForAccount',
+          contentType: 'application/json',
+          dataType: 'json',
+          data:JSON.stringify(requestBody),
+           success : function(response){
+               if(response.success){
+                    hideLoader('#globalLoader');
+                    console.log(response.expenses);
+                    if(response.expenses.length>0){
+
+                        response.expenses.forEach(function(expense){
+                            setDataToTable(expense);
+                            setDataToCard(expense);
+                        })
+                    }else{
+                        showGlobalToast('#globalToast', 'error','No expense found with this search crieteria', 4000);
+                    }
+                    $("#offset").text(parseInt($("#offset").text())+parseInt($("#pageRecordNo").text()));
+                    let noOfRecord=parseInt($("#offset").text());
+                    if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
+                        $(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
+                    }else{
+                        $(".slds-button[loadItemId]").hide();
+                    }
+                    hideLoader('#globalLoader');
+               }
+
+            },
+           error: function(response){
+                console.log('error is : '+response);
+                hideLoader('#globalLoader');
+                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+            }
+        });
+
+
+}
+function searchExpense(filter,obj){
+    $("div[title=noExpenseFound]").addClass('slds-hide');
+    showLoader('#globalLoader');
+
+    $(".slds-button[loadItemId]").show();
+    $("#offset").text("0");
+
+    let searchField=[];
+    searchCriteria={"fieldName":"archived = ","fieldValue":false};
+    searchField.push(searchCriteria);
+    let url = new URL(window.location.href);
+    reqUserId = url.pathname.substring(((url.pathname).lastIndexOf('/')+1), url.pathname.length);
+
+    if(filter=="Draft"){
+        searchCriteria={"fieldName":"status = ","fieldValue":'Draft'};
+        searchField.push(searchCriteria);
+    }else if(filter=="Approved"){
+        searchCriteria={"fieldName":"status = ","fieldValue":'Approved'};
+        searchField.push(searchCriteria);
+    }
+    $.ajax({
+          type: 'POST',
+          url : '/findExpenseByCriteria',
+          contentType: 'application/json',
+          dataType: 'json',
+          data:JSON.stringify({"searchField":searchField,'user_id':reqUserId}),
+           success : function(response){
+               if(response.success){
+                    hideLoader('#globalLoader');
+                    console.log(response.accounts);
+                    $("#expenseListTBody").html('');
+                    $("#expenseCardView").html('');
+                    if(response.expenses.length>0){
+                            /*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
+                            response.expenses.forEach(function(expense){
+                                setDataToTable(expense);
+                                setDataToCard(expense);
+                            })
+                        $(obj).closest('div[title="filterDropDown"]').find('#selectedFilter').text(filter);
+                        $(obj).closest('div[title="filterDropDown"]').removeClass('slds-is-open');
+
+
+                    }else{
+                        $(obj).closest('div[title="filterDropDown"]').find('#selectedFilter').text(filter);
+                        $(obj).closest('div[title="filterDropDown"]').removeClass('slds-is-open');
+                        $("div[title=noExpenseFound]").removeClass('slds-hide').text('No expense found with this search crieteria');
+                        /*showGlobalToast('#globalToast', 'error','No expense found with this search crieteria', 4000);*/
+                        hideLoader('#globalLoader');
+                    }
+                    $("#totalRecordCount").text(response.count);
+                    $("#offset").text(parseInt($("#offset").text())+parseInt($("#pageRecordNo").text()));
+                    /*let searchFilter=$("#selectedFilter").text();*/
+                    let noOfRecord=parseInt($("#offset").text());
+                    if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
+                        $(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
+                    }else{
+                        $(".slds-button[loadItemId]").hide();
+                    }
+               }
+
+            },
+           error: function(response){
+                console.log('error is : '+response);
+                hideLoader('#globalLoader');
+                $("div[title=noExpenseFound]").removeClass('slds-hide').text(response.responseJSON.message);
+                /*showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);*/
+            }
+        });
+}
+function findExpenseForAccount(){
+        $("div[title=noExpenseFound]").addClass('slds-hide');
+        showLoader('#globalLoader');
+
+        $(".slds-button[loadItemId]").show();
+        $("#offset").text("0");
+
+        let searchText=$("#searchExpenseForAccount").val();
+        let requestBody={"searchText":searchText,"searchField":"account_id"};
+        let filterCriteria=$("#selectedFilter").text();
+        if(filterCriteria=="Draft"){
+            requestBody.status="Draft";
+        }else if(filterCriteria=="Approved"){
+            requestBody.status="Approved";
+        }
+        $("#expenseListTBody").html('');
+        $("#expenseCardView").html('');
+        let url = new URL(window.location.href);
+        reqUserId = url.pathname.substring(((url.pathname).lastIndexOf('/')+1), url.pathname.length);
+        requestBody.user_id = reqUserId;
+        console.log(requestBody);
+        $.ajax({
+              type: 'POST',
+              url : '/findExpenseForAccount',
+              contentType: 'application/json',
+              dataType: 'json',
+              data:JSON.stringify(requestBody),
+               success : function(response){
+                   if(response.success){
+                        hideLoader('#globalLoader');
+                        console.log(response.expenses);
+                        if(response.expenses.length>0){
+                            /*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
+                            response.expenses.forEach(function(expense){
+                                setDataToTable(expense);
+                                setDataToCard(expense);
+                            })
+                        }else{
+                            $("div[title=noExpenseFound]").removeClass('slds-hide').text('No expense found with this search crieteria');
+                            /*showGlobalToast('#globalToast', 'error','No expense found with this search crieteria', 4000);*/
+                        }
+                        $("#totalRecordCount").text(response.count);
+                        $("#offset").text(parseInt($("#offset").text())+parseInt($("#pageRecordNo").text()));
+                        /*let searchFilter=$("#selectedFilter").text();*/
+                        let noOfRecord=parseInt($("#offset").text());
+                        if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
+                            $(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
+                        }else{
+                            $(".slds-button[loadItemId]").hide();
+                        }
+                   }
+
+                },
+               error: function(response){
+                    console.log('error is : '+response);
+                    hideLoader('#globalLoader');
+                    $("div[title=noExpenseFound]").removeClass('slds-hide').text(response.responseJSON.message);
+                    /*showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);*/
+                }
+            });
+
+    }
+    function setDataToCard(expense){
+      let currencyWithSymbolArray= <%- JSON.stringify(currencyWithSymbolArray) %>
+      let currency_symbols = currencyWithSymbolArray.filter(function(currency){
+          return currency.name == expense.currency;
+      })
+        let expenseStatus='';
+        let expenseCard='<div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_3-of-12 slds-p-horizontal_small">'+
+                            '<div class=" slds-m-bottom_medium slds-p-around_small slds-card">'+
+                                '<div class="">'+
+                                    '<div class="slds-grid">'+
+                                        '<div class="slds-truncate slds-p-vertical_x-small">'+
+                                            '<a href="/expense-details?expenseId='+expense.id+'" class="text-size-16">'+expense.record_id+'</a>'+
+                                        '</div>'+
+                                        '<div class="slds-col--bump-left">'+
+                                            '<div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">'+
+                                                '<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" title="Show More">'+
+                                                '<span class="slds-button__icon">'+
+                                                    '<i class=" fa fa-caret-down" aria-hidden="true"></i>'+
+                                                '</span>'+
+                                                '<span class="slds-assistive-text">Show More</span>'+
+                                                '</button>'+
+                                                '<div class="slds-dropdown slds-dropdown_right slds-dropdown_actions">'+
+                                                    '<ul class="slds-dropdown__list" role="menu">'+
+                                                        '<li class="slds-dropdown__item" role="presentation">'+
+                                                            '<a href="/expense-details?expenseId='+expense.id+'" role="menuitem" tabindex="0">'+
+                                                                '<span class="slds-truncate" title="">'+
+                                                                    '<i class="fa fa-eye"></i> &nbsp;'+
+                                                                    'View Details'+
+                                                                '</span>'+
+                                                            '</a>'+
+                                                        '</li>'+
+                                                        '<li class="slds-has-divider_top-space" role="separator"></li>'+
+                                                        '<li class="slds-dropdown__item" role="presentation">'+
+                                                            '<a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteExpense('+expense.id+')">'+
+                                                                '<span class="slds-truncate " title="">'+
+                                                                    '<i class="fa fa-trash text-red"></i> &nbsp;'+
+                                                                    'Delete'+
+                                                                '</span>'+
+                                                            '</a>'+
+                                                        '</li>'+
+                                                    '</ul>'+
+                                                '</div>'+
+                                            '</div>'+
+                                        '</div>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div>'+
+                                    '<div class="slds-p-bottom_x-small">'+
+                                        '<div class="slds-grid">'+
+                                            '<div class="slds-no-flex slds-p-right_x-small">'+
+                                                '<i class="fa fa-user-tie text-dull"></i>'+
+                                            '</div>'+
+                                            '<div class="slds-has-flexi-truncate">'+
+                                                '<div class="slds-truncate">'+
+                                                    expense.account_name+
+                                                '</div>'+
+                                            '</div>'+
+                                        '</div>'+
+                                    '</div>'+
+                                    '<div class="">'+
+                                        '<div class="slds-grid">'+
+                                            '<div class="slds-no-flex slds-p-right_x-small">'+
+                                                '<i class="fa fa-folder text-dull"></i>'+
+                                            '</div>'+
+                                            '<div class="slds-has-flexi-truncate">'+
+                                                '<div class="slds-truncate">'+
+                                                    expense.project_name+
+                                                '</div>'+
+                                            '</div>'+
+                                        '</div>'+
+                                    '</div>'+
+                                    '<div class="text-size-18 text-thick slds-p-vertical_x-small slds-truncate text-right">'+
+                                        '<span>'+currency_symbols[0].symbol +'</span> '+
+                                        '<span>'+expense.amount+'</span>'+
+                                    '</div>'+
+                                    '<div class="text-size-11 line-top slds-p-top_xx-small">'+
+                                        '<div class="slds-grid">'+
+                                            '<div class="slds-has-flexi-truncate">'+
+                                                '<span class="text-uppercase text-dull">Date:</span>'+
+                                                '<time>'+expense.expense_date+'</time>'+
+                                            '</div>'+
+                                        '</div>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>';
+        $("#expenseCardView").append(expenseCard);
+    }
+    function setDataToTable(expense){
+      let currencyWithSymbolArray= <%- JSON.stringify(currencyWithSymbolArray) %>
+      let currency_symbols = currencyWithSymbolArray.filter(function(currency){
+          return currency.name == expense.currency;
+      })
+        let expenseTr='<tr class="">'+
+                        '<td role="gridcell">'+
+                            '<div class="slds-truncate" title="">'+
+                                '<a href="/expense-details?expenseId='+expense.id+'">'+
+                                       expense.record_id+
+                                '</a>'+
+                            '</div>'+
+                        '</td>'+
+                        '<td role="gridcell">'+
+                            '<div class="slds-truncate" title="">'+
+
+                                    expense.expense_date+
+
+                            '</div>'+
+                        '</td>'+
+                        '<td role="gridcell">'+
+                            '<div class="slds-truncate" title="">'+
+                                expense.category+
+                            '</div>'+
+                        '</td>'+
+                        '<td role="gridcell">'+
+                            '<div class="slds-truncate" title="" >'+
+                               expense.account_name+
+                            '</div>'+
+                        '</td>'+
+                        '<td role="gridcell">'+
+                            '<div class="slds-truncate" title="" >'+
+                                expense.project_name+
+                            '</div>'+
+                        '</td>'+
+                        '<td role="gridcell">'+
+                            '<div class="slds-truncate" title="" >'+
+                                expense.createdBy+
+                            '</div>'+
+                        '</td>'+
+                        '<td role="gridcell">'+
+                            '<div class="slds-truncate" title="">'+
+                                '<span class="text-uppercase text-dull">'+currency_symbols[0].symbol+'</span><strong class="text-uppercase"> '+expense.amount+' </strong>'+
+                            '</div>'+
+                        '</td>'+
+                        '<td role="gridcell">'+
+                            '<div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">'+
+                                '<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" title="Show More">'+
+                                '<span class="slds-button__icon">'+
+                                    '<i class=" fa fa-caret-down" aria-hidden="true"></i>'+
+                                '</span>'+
+                                '<span class="slds-assistive-text">Show More</span>'+
+                                '</button>'+
+                                '<div class="slds-dropdown slds-dropdown_right slds-dropdown_actions">'+
+                                    '<ul class="slds-dropdown__list" role="menu">'+
+                                        '<li class="slds-dropdown__item" role="presentation">'+
+                                            '<a href="/expense-details?expenseId='+expense.id+'" role="menuitem" tabindex="0">'+
+                                                '<span class="slds-truncate" title="">'+
+                                                    '<i class="fa fa-eye"></i> &nbsp;'+
+                                                    'Edit/View'+
+                                                '</span>'+
+                                            '</a>'+
+                                        '</li>'+
+                                        '<li class="slds-has-divider_top-space" role="separator"></li>'+
+                                        '<li class="slds-dropdown__item" role="presentation">'+
+                                            '<a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteExpense('+expense.id+')">'+
+                                                '<span class="slds-truncate" title="">'+
+                                                    '<i class="fa fa-trash text-red"></i> &nbsp;'+
+                                                    'Delete'+
+                                                '</span>'+
+                                            '</a>'+
+                                        '</li>'+
+                                    '</ul>'+
+                                '</div>'+
+                            '</div>'+
+                        '</td>'+
+                    '</tr>';
+        $("#expenseListTBody").append(expenseTr);
+    }
+function setCurrencyOfAccount(){
+    let project=$("#project option:selected").val();
+    let accountId=$("#project option:selected").attr('accountId');
+    let accountList= <%- JSON.stringify(accounts) %>
+    if(accountList.length>0){
+        let accountCurrency;
+        accountCurrency=accountList.filter(account=>{
+            return account.id==accountId;
+        })
+        if(accountCurrency!=undefined&&accountCurrency!=null&&accountCurrency!=''){
+            $("#currency").val(accountCurrency[0].currency);
+        }
+    }
+}
+</script>

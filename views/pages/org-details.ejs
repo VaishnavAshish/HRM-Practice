@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="en">
+
+<% include ../layouts/head %>
+
+<body class="kw">
+
+    <%- include('../layouts/nav', {user:user}); %>
+    <%- include('../layouts/sideNav',{user:user}); %>
+    <main class="main-body-space tpd-60 bpd-100">
+        <div>
+            <div class="slds-p-around_small">
+                <!-- breadcrumb start -->
+                <div class="slds-p-bottom_small">
+                    <nav role="navigation" aria-label="Breadcrumbs" >
+                        <ol class="slds-breadcrumb slds-list_horizontal slds-wrap">
+                            <li class="slds-breadcrumb__item "><a href="/org-listing">Companies</a></li>
+                            <li class="slds-breadcrumb__item "><a href="javascript:void(0);" id="comp_name"><%=company.name%></a></li>
+                        </ol>
+                    </nav>
+                </div>
+                <div id="pageRecordNo" style="display:none;"><%= process.env.PAGE_RECORD_NO %></div>
+                    <div id="filterCriteria" style="display:none;" ></div>
+                    <div id="totalRecordCount" style="display:none;"></div>
+                    <div id="offset" style="display:none;">0</div>
+                <!-- breadcrumb end -->
+                <div class="">
+                    <div class="slds-tabs_default bg-none">
+                        <!-- header start end -->
+                        <div class="slds-card">
+                            <div class="slds-grid slds-wrap slds-p-horizontal_small slds-p-top_small">
+                                <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                    <div class="slds-grid">
+                                        <div class="slds-no-flex slds-p-right_x-small">
+                                            <span class="slds-icon_container slds-icon-standard-template">
+                                                <i class="fa fa-building text-size-21 text-white slds-icon"></i>
+                                            </span>
+                                        </div>
+                                        <div class="slds-has-flexi-truncate">
+                                         <div class="text-size-18 text-height-1" id="name">
+                                                <strong >
+                                                    <%=company.name%>
+                                                </strong>
+                                            </div>
+                                             <div class="slds-text-body_small tpd-2">
+                                                Last Modify:<%=company.modified_date%>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                    <div class="text-right sm-tpd-15">
+                                        <button class="slds-button slds-button_brand slds-align-top" onclick="updateCompany(<%=company.id;%>)">
+                                            Save Changes
+                                        </button>
+                                        <% if(company.archived==true) { %>
+                                            <button class="slds-button slds-button_neutral slds-align-top" onclick="activateBeforeConfirm('#globalAlert', 'activate(\'<%= company.id %>\',\'company\')')">
+                                                Restore
+                                            </button>
+                                        <% }else { %>
+                                            <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteCompany(\'<%= company.id %>\')')">
+                                                Delete
+                                            </button>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="">
+
+
+                            <ul class="slds-tabs_default__nav radius-4 scroll-x-auto bpd-2 text-size-14">
+                                <li class="slds-tabs_default__item slds-is-active" onclick="openTab(this, 'org-details')">
+                                    <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="0">
+                                        Details
+                                    </a>
+                                </li>
+                                <li class="slds-tabs_default__item" onclick="openTab(this, 'org-users')">
+                                    <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="0">
+                                        Users(<%= count %>)
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+                        <!-- header end -->
+
+
+
+                    <div class="slds-tabs_default__content" target-tab="org-details">
+                        <div class=" slds-card slds-p-around_large sm-pd-10">
+
+                            <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_6-of-12 slds-p-horizontal_small">
+                                    <div class="slds-p-bottom_x-small line-bottom">
+                                        <div class="text-uppercase ">
+                                            Details
+                                        </div>
+                                    </div>
+                                    <div class="slds-p-top_large">
+                                        <div>
+
+                                            <div class="slds-form-element slds-m-bottom_medium ">
+                                                <label class="slds-form-element__label ">
+                                                    Organization Domain
+                                                    <abbr class="slds-required" title="required">*</abbr>
+                                                </label>
+                                                <div class="slds-form-element__control">
+                                                    <input type="text" class="slds-input" placeholder="" required="" id="company_domain" value="<%=company.domain%>" disabled>
+                                                    <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="slds-form-element slds-m-bottom_medium ">
+                                                <label class="slds-form-element__label ">
+                                                    Organization Title
+                                                    <abbr class="slds-required" title="required">*</abbr>
+                                                </label>
+                                                <div class="slds-form-element__control">
+                                                    <input type="text" class="slds-input" placeholder="" required="" id="company_name" value="<%=company.name;%>">
+                                                    <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="slds-form-element slds-m-bottom_medium ">
+                                                <div class="slds-form-element__control">
+                                                    <input type="hidden" class="slds-input" placeholder="" required="" id="companyId" value="<%=company.id;%>">
+                                                    <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_6-of-12 slds-p-horizontal_small">
+                                    <div class="slds-p-bottom_x-small line-bottom">
+                                        <div class="text-uppercase ">
+                                            Address
+                                        </div>
+                                    </div>
+                                    <div class="slds-p-top_large">
+                                        <div class="slds-form-element slds-m-bottom_medium">
+                                            <label class="slds-form-element__label">Street</label>
+                                            <div class="slds-form-element__control">
+                                                <input type="text" id="street" class="slds-input" placeholder="" value="<%=company.street%>">
+                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-grid slds-gutters slds-wrap">
+                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label">City</label>
+                                                    <div class="slds-form-element__control">
+                                                        <input type="text" id="city" class="slds-input" placeholder="" value="<%=company.city%>">
+                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label">State</label>
+                                                    <div class="slds-form-element__control">
+                                                        <input type="text" id="state" class="slds-input" placeholder value="<%=company.state%>"
+                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-grid slds-gutters slds-wrap">
+                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label">Country</label>
+                                                    <div class="slds-form-element__control">
+                                                        <input type="text" id="country" class="slds-input" placeholder="" value="<%=company.country%>">
+                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label">ZIP</label>
+                                                    <div class="slds-form-element__control">
+                                                        <input type="text" id="zipcode" class="slds-input" placeholder="" value="<%=company.zip_code%>">
+                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-tabs_default__content hide" target-tab="org-users">
+                            <div class=" slds-card ">
+                                <div class="slds-p-around_small">
+                                        <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                            <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_5-of-12 slds-p-horizontal_small">
+                                                <div class="slds-grid">
+                                                    <div class="slds-p-right_medium sm-hide">
+                                                        <div class="slds-grid">
+                                                            <!-- <div class="slds-no-flex">
+                                                                <label class="slds-form-element__label slds-p-top_x-small" for="">
+                                                                    Sort By :
+                                                                </label>
+                                                            </div>
+                                                            <div class="">
+                                                                <div class="slds-select_container">
+                                                                    <select class="slds-select" id="">
+                                                                        <option value="">Recent</option>
+                                                                        <option>Other</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div> -->
+                                                        </div>
+                                                    </div>
+                                                    <!-- <div class="slds-no-flex slds-p-right_small">
+                                                        <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top" title="filter">
+                                                            <span class="slds-button__icon">
+                                                                <i class=" fa fa-filter" aria-hidden="true"></i>
+                                                            </span>
+                                                        </button>
+                                                    </div> -->
+                                                    <div class="sm-slds-grow">
+                                                        <div class="slds-form-element">
+                                                            <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
+                                                                <input type="text" class="slds-input" placeholder="Search user by email" id="searchUserEmail" searchFunc="findUserByEmail()" onkeypress="handle(event,this);">
+                                                                <div class="slds-input__icon-group slds-input__icon-group_right">
+                                                                    <button class="slds-input__icon slds-input__icon_right slds-button slds-button_icon" title="Clear" onclick="clearSearchBox(this);findUserByEmail();">
+                                                                    <i class="fa fa-times-circle"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-no-flex slds-p-left_small">
+                                                        <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top" title="Search" onclick="findUserByEmail();">
+                                                        <span class="slds-button__icon">
+                                                            <i class=" fa fa-search" aria-hidden="true"></i>
+                                                        </span>
+                                                        </button>
+                                                    </div>
+                                                    <!-- <div class="sm-slds-grow">
+                                                        <div class="slds-form-element">
+                                                            <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_left-right slds-input-has-icon_group-right">
+                                                                <span class=" slds-input__icon_left slds-input__icon">
+                                                                    <i class="fa fa-search"></i>
+                                                                </span>
+                                                                <input type="text" class="slds-input" placeholder="Search">
+                                                                <div class="slds-input__icon-group slds-input__icon-group_right">
+                                                                    <button class="slds-input__icon slds-input__icon_right slds-button slds-button_icon" title="Clear">
+                                                                        <i class="fa fa-times-circle"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div> -->
+
+                                                </div>
+                                            </div>
+                                            <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_7-of-12 slds-p-horizontal_small" notSuperAdmin>
+                                                <div class="text-right sm-tpd-15">
+                                                    <button class="slds-button slds-button_brand slds-align-top" onclick="openModal('#modalAddNewResource')">
+                                                        <i class="fa fa-plus"></i>
+                                                        <span class="">Add Users</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div >
+                                        <table class="slds-table slds-table_bordered slds-table_fixed-layout slds-table_cell-buffer radius-around-8" role="grid">
+                                            <thead>
+                                                <tr class="slds-text-title_caps">
+                                                    <th class="slds-is-sortable" scope="col" style="width: 5rem;">
+                                                        <span class="slds-truncate" title=""></span>
+                                                    </th>
+
+                                                    <th class="slds-is-sortable" scope="col">
+                                                        <span class="slds-truncate" title="Title">Email</span>
+                                                    </th>
+                                                    <th class="slds-is-sortable" scope="col">
+                                                        <span class="slds-truncate" title="Title">Name</span>
+                                                    </th>
+                                                    <th class="slds-is-sortable " scope="col">
+                                                        <span class="slds-truncate" title="Role">Default Role</span>
+                                                    </th>
+                                                    <th class="slds-is-sortable" scope="col">
+                                                        <span class="slds-truncate" title="Team">Last Modified</span>
+                                                    </th>
+                                                    <th class="slds-is-sortable" scope="col">
+                                                        <span class="slds-truncate" title="Team">Created Date</span>
+                                                    </th>
+                                                    <th class="slds-is-sortable" scope="col">
+                                                        <span class="slds-truncate" title="Team">Archived</span>
+                                                    </th>
+                                                    <th class=" " scope="col" style="width: 3.25rem;">
+
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="resourceTable">
+                                                <% resources.forEach(function(resource){ %>
+                                                <tr class="">
+                                                    <th scope="row" tabindex="0">
+                                                        <div class="slds-truncate" title="">
+                                                            <a href="javascript:void(0);" tabindex="-1">
+                                                                <span class="slds-avatar slds-avatar_circle cursor-pointer">
+                                                                    <img alt="<%= resource.first_name%> <%= resource.last_name%>" src="/getUserPicture/<%= resource.id %>" title="<%= resource.first_name%> <%= resource.last_name%>">
+                                                                </span>
+                                                            </a>
+                                                        </div>
+                                                    </th>
+                                                    <th scope="row" tabindex="0">
+                                                        <div class="slds-truncate" title="">
+                                                            <a href="/resource-details?userid=<%= resource.id%>&comp_name=<%= company.name%>" tabindex="-1">
+                                                                <%= resource.email%>
+
+                                                            </a>
+                                                        </div>
+                                                    </th>
+                                                    <td role="gridcell" >
+                                                        <div class="slds-truncate" title="">
+                                                            <%= resource.first_name%> <%= resource.last_name%>
+                                                        </div>
+                                                    </td>
+                                                    <td role="gridcell" class="slds-text-title_caps">
+                                                        <div class="slds-truncate" title="">
+                                                            <%= resource.role%>
+                                                        </div>
+                                                    </td>
+                                                    <td role="gridcell">
+                                                        <div class="slds-truncate" title="">
+                                                            <%= resource.modified_date%>
+                                                        </div>
+                                                    </td>
+                                                    <td role="gridcell">
+                                                        <div class="slds-truncate" title="">
+                                                            <%= resource.created_date%>
+                                                        </div>
+                                                    </td>
+                                                    <td role="gridcell">
+                                                        <div class="slds-truncate" title="">
+                                                            <%= resource.archived%>
+                                                        </div>
+                                                    </td>
+                                                    <td role="gridcell">
+                                                        <div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">
+                                                            <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" title="Show More">
+                                                                <span class="slds-button__icon">
+                                                                    <i class=" fa fa-caret-down" aria-hidden="true"></i>
+                                                                </span>
+                                                                <span class="slds-assistive-text">Show More</span>
+                                                            </button>
+                                                            <div class="slds-dropdown slds-dropdown_right slds-dropdown_actions">
+                                                                <ul class="slds-dropdown__list" role="menu">
+                                                                    <li class="slds-dropdown__item" role="presentation">
+                                                                        <a href="/resource-details?userid=<%= resource.id%>&comp_name=<%= company.name%>" role="menuitem" tabindex="0">
+                                                                            <span class="slds-truncate" title="">
+                                                                                <i class="fa fa-eye"></i> &nbsp;
+                                                                                View Details
+                                                                            </span>
+                                                                        </a>
+                                                                    </li>
+
+                                                                    <!-- <li class="slds-has-divider_top-space" role="separator"></li>
+                                                                    <li class="slds-dropdown__item" role="presentation">
+                                                                        <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteResource(<%=resource.id;%>)">
+                                                                            <span class="slds-truncate sf-text-red" title="">
+                                                                                <i class="fa fa-trash text-red"></i> &nbsp;
+                                                                                Archive
+                                                                            </span>
+                                                                        </a>
+                                                                    </li> -->
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <% }); %>
+                                            </tbody>
+                                        </table>
+                                        <% if(resources.length <= 0) { %>
+                                            <div class="slds-p-around_small text-center" title="noResourceFound">
+                                                No resource found.
+                                            </div>
+                                        <% } else { %>
+                                            <div class="slds-p-around_small text-center slds-hide" title="noResourceFound" >
+                                                No resource found.
+                                            </div>
+                                        <% } %>
+                                        <div class="slds-text-align_center slds-p-vertical_medium">
+                                            <button class="slds-button" loadItemId="loadMoreBtn" onclick="loadMoreResource()">&nbsp;</button>
+                                        </div>
+                                    </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+        <% include ../modals/modal-add-new-resource %>
+        <% include ../layouts/footer %>
+    <% include ../layouts/scripts %>
+    <% include ../layouts/org-detail-script %>
+    <% include ../layouts/res-detail-script %>
+</body>
+
+</html>

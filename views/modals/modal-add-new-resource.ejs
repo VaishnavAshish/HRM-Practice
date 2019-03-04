@@ -1,0 +1,315 @@
+<!-- modal add new organization start-->
+            <div id="modalAddNewResource">
+                <section role="dialog" tabindex="-1" class="slds-modal slds-modal_medium">
+                    <div class="slds-modal__container">
+                        <header class="slds-modal__header">
+                            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="closeModal('#modalAddNewResource');">
+                                <span class="slds-button__icon">
+                                    <i class="fa fa-times text-size-21"></i>
+                                </span>
+                            </button>
+                            <h2  class="slds-text-heading_medium slds-hyphenate">Add New Resource</h2>
+                        </header>
+                        <div class="slds-modal__content">
+                            <div>
+                                <div class="slds-grid slds-wrap slds-gutters slds-grid_vertical-stretch">
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_8-of-12">
+                                        <div class="slds-p-around_large">
+
+
+                                        <div class="slds-form-element slds-m-bottom_medium" reset='errorclass'>
+                                            <label class="slds-form-element__label">
+                                                User Email
+                                                <abbr class="slds-required" title="required">*</abbr>
+                                            </label>
+                                            <div class="slds-form-element__control">
+                                                <input type="email" id="email" class="slds-input" placeholder="" required="" reset='value'/>
+                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset='errmsg'>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form-element slds-m-bottom_medium" notAuthorized reset='errorclass'>
+                                            <label class="slds-form-element__label">
+                                                User Role
+                                                <abbr class="slds-required" title="required">*</abbr>
+                                            </label>
+                                            <div class="slds-form-element__control">
+                                                <div class="slds-select_container">
+                                                    <select class="slds-select" required="" getFormData name="user_role" id="project_user_role" onchange="setBillCostRate(this, 'resource')" reset='value'>
+                                                        <option value=""></option>
+                                                        <% if(userRoleList.length>0) { %>
+                                                            <% userRoleList.forEach(function(userRole) { %>
+                                                                <option value="<%= userRole %>"><%= userRole %></option>
+                                                            <% }); %>
+                                                        <% } %>
+
+                                                    </select>
+                                                </div>
+                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset='errmsg'>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                          <!-- <div class="slds-grid slds-wrap slds-gutters slds-grid_vertical-stretch"> -->
+                                            <!-- <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label">
+                                                        <abbr class="slds-required" title="required">*</abbr>
+                                                        User Name
+                                                    </label>
+                                                    <div class="slds-form-element__control">
+                                                        <input type="text" id="user_name" class="slds-input" placeholder="" required="">
+                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div> -->
+
+
+                                            <!-- <div class="slds-form-element slds-m-bottom_medium">
+                                                <label class="slds-form-element__label">
+                                                    <abbr class="slds-required" title="required">*</abbr>
+                                                    User Password
+                                                </label>
+                                                <div class="slds-form-element__control">
+                                                    <input type="password" id="password" class="slds-input" placeholder="" required=""/>
+                                                    <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                    </div>
+                                                </div>
+                                            </div> -->
+                                        <!-- </div> -->
+
+                                        <div class="slds-grid slds-wrap slds-gutters">
+                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label">
+                                                        <!-- <abbr class="slds-required" title="required">*</abbr> -->
+                                                        First Name
+                                                    </label>
+                                                    <div class="slds-form-element__control">
+                                                        <input type="text" id="first_name" class="slds-input" placeholder="" required="" reset='value'>
+                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label">
+                                                        <!-- <abbr class="slds-required" title="required">*</abbr> -->
+                                                        Last Name
+                                                    </label>
+                                                    <div class="slds-form-element__control">
+                                                        <input type="text" id="last_name" class="slds-input" placeholder="" required="" reset='value'>
+                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="slds-grid slds-wrap slds-gutters">
+                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label">
+                                                        <!-- <abbr class="slds-required" title="required">*</abbr> -->
+                                                        Phone
+                                                    </label>
+                                                    <div class="slds-form-element__control">
+                                                        <input type="text" id="phone" class="slds-input" placeholder="" required="" reset='value'>
+                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label">
+                                                        <!-- <abbr class="slds-required" title="required">*</abbr> -->
+                                                        Mobile
+                                                    </label>
+                                                    <div class="slds-form-element__control">
+                                                        <input type="text" id="mobile" class="slds-input" placeholder="" required="" reset='value'>
+                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="slds-grid slds-wrap slds-gutters" notAuthorized>
+                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label" for="" id="">Default Billable Rate</label>
+                                                    <div class="slds-form-element__control slds-input-has-fixed-addon">
+                                                        <!-- <span class="slds-form-element__addon" id="">$</span> -->
+                                                        <input type="text"  id="billRate" class="slds-input" placeholder="0.00" reset='value' />
+
+                                                        <span class="slds-form-element__addon slds-no-flex" id="">per hour</span>
+                                                    </div>
+                                                    <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12" notAuthorized>
+                                                <div class="slds-form-element slds-m-bottom_medium">
+                                                    <label class="slds-form-element__label" for="" id="">Default Cost Rate</label>
+                                                    <div class="slds-form-element__control slds-input-has-fixed-addon">
+                                                        <!-- <span class="slds-form-element__addon" id="">$</span> -->
+                                                        <input type="text"  id="costRate" class="slds-input" placeholder="0.00" reset='value' />
+
+                                                        <span class="slds-form-element__addon slds-no-flex" id="">per hour</span>
+                                                    </div>
+                                                    <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- <div class="slds-form-element slds-m-bottom_medium">
+                                            <label class="slds-form-element__label">
+                                                <abbr class="slds-required" title="required">*</abbr>
+                                                Profile Role
+                                            </label>
+                                            <div class="slds-form-element__control">
+                                                <input type="text" id="profile_role" class="slds-input" placeholder="" required=""/>
+                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="slds-form-element slds-m-bottom_medium">
+                                            <label class="slds-form-element__label">
+                                                Team
+                                            </label>
+                                            <div class="slds-form-element__control">
+                                                <input type="text" id="team" class="slds-input" placeholder=""/>
+                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="slds-form-element slds-m-bottom_medium">
+                                            <label class="slds-form-element__label">
+                                                Add to specific projects
+                                            </label>
+                                            <div class="slds-form-element__control">
+                                                <div class="slds-select_container">
+                                                    <select class="slds-select" >
+                                                        <option value=""> </option>
+                                                        <option value="">option</option>
+                                                        <option value="">option</option>
+                                                    </select>
+                                                </div>
+                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                </div>
+                                            </div>
+                                        </div> -->
+
+</div>
+
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12 slds-theme_shade" notAuthorized>
+                                        <div class="">
+                                            <div class="slds-p-around_small line-semi-black-bottom">
+                                                <div class="text-uppercase">
+                                                    Manage Access
+                                                </div>
+                                            </div>
+                                            <div class="slds-p-around_small">
+                                                <div class="slds-form-element slds-m-bottom_large">
+                                                    <div class="slds-form-element__control">
+                                                        <span class="slds-checkbox">
+                                                            <input type="checkbox" name="permissions" id="timesheetEntry" value="timesheetEntry" checked reset-checked='true'/>
+                                                            <label class="slds-checkbox__label" for="timesheetEntry">
+                                                                <span class="slds-checkbox_faux"></span>
+                                                                <span class="slds-form-element__label"> Time Entry User</span>
+                                                            </label>
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="slds-form-element slds-m-bottom_large">
+                                                    <div class="slds-form-element__control">
+                                                        <span class="slds-checkbox">
+                                                            <input type="checkbox" name="permissions" id="expenseManager" value="expenseManager" reset-unchecked='true'/>
+                                                            <label class="slds-checkbox__label" for="expenseManager">
+                                                                <span class="slds-checkbox_faux"></span>
+                                                                <span class="slds-form-element__label">Expense Manager</span>
+                                                            </label>
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="slds-form-element slds-m-bottom_large">
+                                                    <div class="slds-form-element__control">
+                                                        <span class="slds-checkbox">
+                                                            <input type="checkbox" name="permissions" id="projectManager" value="projectManager" reset-unchecked='true'/>
+                                                            <label class="slds-checkbox__label" for="projectManager">
+                                                                <span class="slds-checkbox_faux"></span>
+                                                                <span class="slds-form-element__label">Project Manager </span>
+                                                            </label>
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="slds-form-element slds-m-bottom_large">
+                                                    <div class="slds-form-element__control">
+                                                        <span class="slds-checkbox">
+                                                            <input type="checkbox" name="permissions" id="invoiceManager" value="invoiceManager" reset-unchecked='true'/>
+                                                            <label class="slds-checkbox__label" for="invoiceManager">
+                                                                <span class="slds-checkbox_faux"></span>
+                                                                <span class="slds-form-element__label">Invoice Manager</span>
+                                                            </label>
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                 <div class="slds-form-element slds-m-bottom_large">
+                                                    <div class="slds-form-element__control">
+                                                        <span class="slds-checkbox">
+                                                            <input type="checkbox" name="permissions" id="timesheetApprover" value="timesheetApprover" reset-unchecked='true' onchange='selectTimesheetEntry(this)'/>
+                                                            <label class="slds-checkbox__label" for="timesheetApprover">
+                                                                <span class="slds-checkbox_faux"></span>
+                                                                <span class="slds-form-element__label">Timesheet Approver</span>
+                                                            </label>
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="slds-form-element slds-m-bottom_large">
+                                                    <div class="slds-form-element__control">
+                                                        <span class="slds-checkbox">
+                                                            <input type="checkbox" name="permissions" id="expenseApprover" value="expenseApprover" reset-unchecked='true' onchange='selectExpenseManager(this)'/>
+                                                            <label class="slds-checkbox__label" for="expenseApprover">
+                                                                <span class="slds-checkbox_faux"></span>
+                                                                <span class="slds-form-element__label">Expense Approver</span>
+                                                            </label>
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <button class="slds-button slds-button_neutral" onclick="closeModal('#modalAddNewResource');">Cancel</button>
+                            <button class="slds-button slds-button_brand" onclick="addResource('#modalAddNewResource');">Add</button>
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop"></div>
+            </div>
+          <!-- modal add new organization start-->

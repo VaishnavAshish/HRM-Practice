@@ -1,0 +1,796 @@
+<script>
+
+function addAccount(modalId){
+		clearError("#name");
+		clearError("#email");
+		showLoader('#globalLoader');
+		let accountData={};
+		accountData.name=$("#name").val();
+		accountData.first_name=$("#first_name").val();
+		accountData.last_name=$("#last_name").val();
+		accountData.email=$("#email").val();
+		accountData.currency=$("#currency option:selected").val();
+		console.log(accountData);
+		if(accountData.name==""||accountData.name==undefined||accountData.name==null){
+			hideLoader('#globalLoader');
+			addError("#name","Please enter account name");
+		}else if(accountData.email==""||accountData.email==undefined||accountData.email==null){
+			hideLoader('#globalLoader');
+			addError("#email","Please enter contact email id");
+		}else if(!(validateEmail(accountData.email))){
+			hideLoader('#globalLoader');
+			addError("#email","Please enter correct email id");
+		}else{
+			clearError("#name");
+			clearError("#email");
+		    $.ajax({
+		      type: 'POST',
+		      url : '/addAccount',
+		      contentType: 'application/json',
+		      dataType: 'json',
+		      data:JSON.stringify(accountData),
+		       success : function(response){
+				   if(response.success){
+						hideLoader('#globalLoader');
+						closeModal(modalId);
+						showGlobalToast('#globalToast', 'success', response.message, 4000);
+					   	location.reload();
+				   }
+		        },
+		       error: function(response){
+	                console.log('error is : '+JSON.stringify(response));
+	                hideLoader('#globalLoader');
+	                closeModal(modalId);
+	                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+		        }
+		    });
+
+		}
+	}
+function deleteAccount(accountId){
+		console.log('account id is '+accountId);
+		showLoader('#globalLoader');
+		$.ajax({
+	      type: 'POST',
+	      url : '/deleteAccount',
+	      contentType: 'application/json',
+	      dataType: 'json',
+	      data:JSON.stringify({"accountId":accountId}),
+	       success : function(response){
+	       		console.log(response);
+	       		hideLoader('#globalLoader');
+	       		 /*window.history.back(); */
+
+	       		/* window.location.href = document.referrer;*/
+	       		showGlobalToast('#globalToast', 'success', response.message, 4000);
+	       		window.location.href="/accounts-listing";
+
+	        },
+	       error: function(response){
+	       		console.log('error is : '+JSON.stringify(response));
+	       		hideLoader('#globalLoader');
+	            console.log(response.responseJSON.message);
+	            showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+	            //showGlobalToast('#globalToast', 'error', 'error in validating domain', 4000);
+	        }
+	    });
+	}
+
+
+function updateAccount(accountId){
+		clearError("#name");
+		clearError("#email");
+		console.log('account id is '+accountId);
+		showLoader('#globalLoader');
+		let accountData={};
+		accountData.accountId=accountId;
+		accountData.name=$("#name").val();
+		accountData.first_name=$("#first_name").val();
+		accountData.last_name=$("#last_name").val();
+		accountData.email=$("#email").val();
+		accountData.street=$("#street").val();
+		accountData.city=$("#city").val();
+		accountData.state=$("#state").val();
+		accountData.country=$("#country").val();
+		accountData.zip_code=$("#zip_code").val();
+		accountData.currency=$("#currency option:selected").val();
+		if(accountData.name==""||accountData.name==undefined||accountData.name==null){
+			hideLoader('#globalLoader');
+			addError("#name","Please enter account name");
+		}else if(accountData.email==""||accountData.email==undefined||accountData.email==null){
+			hideLoader('#globalLoader');
+			addError("#email","Please enter contact email id");
+		}else if(!(validateEmail(accountData.email))){
+			hideLoader('#globalLoader');
+			addError("#email","Please enter correct email id");
+		}else{
+			$.ajax({
+		      type: 'POST',
+		      url : '/editAccount',
+		      contentType: 'application/json',
+		      dataType: 'json',
+		      data:JSON.stringify(accountData),
+		       success : function(response){
+		       		console.log(response);
+					setTimeout(() => {
+						hideLoader('#globalLoader');
+						showGlobalToast('#globalToast', 'success', response.message, 4000);
+					}, 2000);
+
+		        },
+		       error: function(response){
+		            console.log('error is : '+JSON.stringify(response));
+	                hideLoader('#globalLoader');
+	                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+		        }
+		    });
+		 }
+	}
+function setDataToInvoiceTable(invoice){
+		let invoiceArchive=(invoice.archived==true)?'Deactive':'Active';
+        let invoiceTr='<tr class="">'+
+					    '<td role="gridcell">'+
+					        '<div class="slds-truncate" title="">'+
+					            '<span class="text-uppercase">'+
+					                '<span class="text-uppercase text-dull">'+
+					                    invoice.status+
+					                '</span>'+
+					            '</span>'+
+					        '</div>'+
+					    '</td>'+
+					    '<th scope="row" tabindex="0">'+
+					        '<div class="slds-truncate" title="">'+
+					            '<a href="/invoice-details?invoiceId='+ invoice.id+'" tabindex="-1">'+
+					                invoice.record_id+
+					            '</a>'+
+					        '</div>'+
+					    '</th>'+
+
+					    '<td role="gridcell">'+
+					        '<div class="slds-truncate" title="">'+
+					            invoice.startDateFormatted+
+					        '</div>'+
+					    '</td>'+
+					    '<td role="gridcell">'+
+					        '<div class="slds-truncate" title="">'+
+					            invoice.dueDateFormatted+
+					        '</div>'+
+					    '</td>'+
+					    '<td role="gridcell">'+
+					        '<div class="slds-truncate" title="">'+
+					            '<span class="text-uppercase">USD</span>'+
+					        '</div>'+
+					    '</td>'+
+					    '<td role="gridcell">'+
+					        '<div class="slds-truncate" title="">'+
+					            '<span class="text-uppercase text-dull">USD</span>'+
+					            '<strong class="text-uppercase">'+ invoice.total_amount+'</strong>'+
+					        '</div>'+
+					    '</td>'+
+					'</tr>';
+
+        $("#invoiceTBody").append(invoiceTr);
+    }
+function findInvoiceByNum(){
+	$("#noInvoiceFound").addClass('slds-hide');
+    showLoader('#globalLoader');
+
+    $("#loadMoreInvoice").show();
+	$("#offsetInvoice").text("0");
+
+    let searchText=$("#searchInvoiceNum").val();
+    let searchField=[];
+    // let url = new URL(window.location.href);
+    // let accountId=url.searchParams.get("accountId");
+		let accountId=getURLParameter('accountId');
+    searchCriteria={"fieldName":"archived = ","fieldValue":false};
+    searchField.push(searchCriteria);
+		searchCriteria={"fieldName":"account_id = ","fieldValue":accountId};
+		searchField.push(searchCriteria);
+	    if(searchText!=''){
+	    	searchCriteria={"fieldName":"record_id ilike ","fieldValue":'%'+searchText+'%'};
+		    searchField.push(searchCriteria);
+	    }
+    $("#invoiceTBody").html('');
+    $.ajax({
+          type: 'POST',
+          url : '/findInvoiceByCriteria',
+          contentType: 'application/json',
+          dataType: 'json',
+          data:JSON.stringify({"searchField":searchField}),
+           success : function(response){
+               if(response.success){
+                    hideLoader('#globalLoader');
+                    console.log(response.accounts);
+                    if(response.invoices.length>0){
+                        /*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
+                        response.invoices.forEach(function(invoice){
+                            setDataToInvoiceTable(invoice);
+                        })
+
+                    }else{
+                    	$("#noInvoiceFound").removeClass('slds-hide').text('No invoice found with this search crieteria');
+                        /*showGlobalToast('#globalToast', 'error','No invoice found with this search crieteria', 4000);*/
+                    }
+                    $("#totalRecordInvoice").text(response.count);
+                    $("#offsetInvoice").text(parseInt($("#offsetInvoice").text())+parseInt($("#pageRecordNo").text()));
+										let noOfRecord=parseInt($("#offsetInvoice").text());
+										if(parseInt($("#totalRecordInvoice").text())>parseInt($("#offsetInvoice").text())){
+											$("#loadMoreInvoice").text('Load More ('+noOfRecord+'/'+$("#totalRecordInvoice").text()+')');
+										}else{
+											$("#loadMoreInvoice").hide();
+										}
+               }
+
+            },
+           error: function(response){
+                console.log('error is : '+response);
+                hideLoader('#globalLoader');
+                $("#noInvoiceFound").removeClass('slds-hide').text(response.responseJSON.message);
+                /*showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);*/
+            }
+        });
+}
+function loadMoreInvoice(){
+	let offset=$("#offsetInvoice").text();
+	showLoader('#globalLoader');
+    let searchText=$("#searchInvoiceNum").val();
+    let searchField=[];
+		let accountId=getURLParameter('accountId');
+    // let url = new URL(window.location.href);
+    // let accountId=url.searchParams.get("accountId");
+    searchCriteria={"fieldName":"archived = ","fieldValue":false};
+    searchField.push(searchCriteria);
+	searchCriteria={"fieldName":"account_id = ","fieldValue":accountId};
+	searchField.push(searchCriteria);
+    if(searchText!=''){
+    	searchCriteria={"fieldName":"name ilike ","fieldValue":'%'+searchText+'%'};
+	    searchField.push(searchCriteria);
+    }
+
+    $.ajax({
+          type: 'POST',
+          url : '/findInvoiceByCriteria',
+          contentType: 'application/json',
+          dataType: 'json',
+          data:JSON.stringify({"searchField":searchField,"offset":offset}),
+           success : function(response){
+               if(response.success){
+                    hideLoader('#globalLoader');
+                    console.log(response.accounts);
+                    if(response.invoices.length>0){
+                        /*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
+                        response.invoices.forEach(function(invoice){
+                            setDataToInvoiceTable(invoice);
+                        })
+
+                    }else{
+                        showGlobalToast('#globalToast', 'error','No invoice found with this search crieteria', 4000);
+                    }
+                    $("#offsetInvoice").text(parseInt($("#offsetInvoice").text())+parseInt($("#pageRecordNo").text()));
+										let noOfRecord=parseInt($("#offsetInvoice").text());
+										if(parseInt($("#totalRecordInvoice").text())>parseInt($("#offsetInvoice").text())){
+											$("#loadMoreInvoice").text('Load More ('+noOfRecord+'/'+$("#totalRecordInvoice").text()+')');
+										}else{
+											$("#loadMoreInvoice").hide();
+										}
+               }
+
+            },
+           error: function(response){
+                console.log('error is : '+response);
+                hideLoader('#globalLoader');
+                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+            }
+        });
+}
+function loadMoreProject(){
+	let offset=$("#offsetProject").text();
+	showLoader('#globalLoader');
+    let searchText=$("#searchProjectName").val();
+		let accountId=getURLParameter('accountId');
+    // let url = new URL(window.location.href);
+    // let accountId=url.searchParams.get("accountId");
+    $.ajax({
+          type: 'POST',
+          url : '/findProjectByName',
+          contentType: 'application/json',
+          dataType: 'json',
+          data:JSON.stringify({"searchText":searchText,"searchField":"name","accountId":accountId,"offset":offset}),
+           success : function(response){
+               if(response.success){
+                    hideLoader('#globalLoader');
+                    console.log(response.projects);
+                    if(response.projects.length>0){
+                        /*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
+                        response.projects.forEach(function(project){
+                            setDataToProjectCard(project);
+                        })
+                    }else{
+                        showGlobalToast('#globalToast', 'error','No project found with this search crieteria', 4000);
+                    }
+                    $("#offsetProject").text(parseInt($("#offsetProject").text())+parseInt($("#pageRecordNo").text()));
+					let noOfRecord=parseInt($("#offsetProject").text());
+					if(parseInt($("#totalRecordProject").text())>parseInt($("#offsetProject").text())){
+						$("#loadMoreProject").text('Load More ('+noOfRecord+'/'+$("#totalRecordProject").text()+')');
+					}else{
+						$("#loadMoreProject").hide();
+					}
+               }
+
+            },
+           error: function(response){
+                console.log('error is : '+response);
+                hideLoader('#globalLoader');
+
+                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+            }
+        });
+}
+function findProjectByName(){
+	$("#noProjectFound").addClass('slds-hide');
+    showLoader('#globalLoader');
+
+    $("#loadMoreProject").show();
+	$("#offsetProject").text("0");
+
+
+    let searchText=$("#searchProjectName").val();
+		let accountId=url.searchParams.get("accountId");
+    // let url = new URL(window.location.href);
+    // let accountId=url.searchParams.get("accountId");
+    $.ajax({
+          type: 'POST',
+          url : '/findProjectByName',
+          contentType: 'application/json',
+          dataType: 'json',
+          data:JSON.stringify({"searchText":searchText,"searchField":"name","accountId":accountId}),
+           success : function(response){
+               if(response.success){
+                    hideLoader('#globalLoader');
+                    console.log(response.projects);
+                    $("#projectCardView").html('');
+                    if(response.projects.length>0){
+                        /*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
+                        response.projects.forEach(function(project){
+                            setDataToProjectCard(project);
+                        })
+                    }else{
+                    	$("#noProjectFound").removeClass('slds-hide').text('No project found with this search crieteria');
+                        /*showGlobalToast('#globalToast', 'error','No project found with this search crieteria', 4000);*/
+                    }
+                    $("#totalRecordProject").text(response.count);
+                    $("#offsetProject").text(parseInt($("#offsetProject").text())+parseInt($("#pageRecordNo").text()));
+					let noOfRecord=parseInt($("#offsetProject").text());
+					if(parseInt($("#totalRecordProject").text())>parseInt($("#offsetProject").text())){
+						$("#loadMoreProject").text('Load More ('+noOfRecord+'/'+$("#totalRecordProject").text()+')');
+					}else{
+						$("#loadMoreProject").hide();
+					}
+               }
+
+            },
+           error: function(response){
+                console.log('error is : '+response);
+                hideLoader('#globalLoader');
+                $("#noProjectFound").removeClass('slds-hide').text(response.responseJSON.message);
+                /*showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);*/
+            }
+        });
+
+}
+function setDataToProjectCard(project){
+    let projectCard='<div class="line-around slds-p-around_small slds-m-bottom_small">'+
+					    '<div class="slds-grid slds-wrap">'+
+					        '<div class="slds-size_1-of-1 slds-medium-size_1-of-2">'+
+					            '<div>'+
+					                '<a href="/project-details?projectId='+project.id+'" class="text-size-16">'+project.name+'</a>'+
+					            '</div>'+
+					            '<div class="max-w-300">'+
+					                '<div class="">'+
+					                    '<div class="slds-grid slds-p-vertical_xx-small text-size-11">'+
+					                        '<div class="slds-has-flexi-truncate">'+
+					                            '<span>'+
+					                                'Burn '+ project.total_hours +' of '+ project.estimated_hours+
+					                            '</span>'+
+					                        '</div>'+
+					                        '<div class="slds-no-flex">'+
+					                            project.percent_completed +' %'+
+					                        '</div>'+
+					                    '</div>'+
+					                    '<div class="slds-progress-bar slds-progress-bar_small slds-progress-bar_circular">'+
+					                        '<span class="slds-progress-bar__value" style="width: '+project.percent_completed+'%;">'+
+					                        '</span>'+
+					                    '</div>'+
+					                '</div>'+
+					            '</div>'+
+					        '</div>'+
+					        '<div class="slds-size_1-of-1 slds-medium-size_1-of-2">'+
+					            '<div class="sm-tpd-15">'+
+					                '<div class="slds-grid">'+
+					                    '<div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">'+
+					                        '<div class="slds-truncate  text-dull slds-p-bottom_xx-small">'+
+					                            'Start'+
+					                        '</div>'+
+					                        '<div>'+
+					                            project.start_date+
+					                        '</div>'+
+					                    '</div>'+
+					                    '<div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">'+
+					                        '<div class="slds-truncate  text-dull slds-p-bottom_xx-small">'+
+					                            'End'+
+					                        '</div>'+
+					                        '<div>'+
+					                            project.end_date+
+					                        '</div>'+
+					                    '</div>'+
+					                    '<div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">'+
+					                        '<div class="slds-truncate  text-dull slds-p-bottom_xx-small">'+
+					                            'Completion'+
+					                        '</div>'+
+					                        '<div>'+
+					                            project.percent_completed+' %'+
+					                        '</div>'+
+					                    '</div>'+
+					                '</div>'+
+					            '</div>'+
+
+					        '</div>'+
+					    '</div>'+
+					'</div>';
+    $("#projectCardView").append(projectCard);
+}
+function loadMoreAccount(){
+	let offset=$("#offset").text();
+	showLoader('#globalLoader');
+	let searchField=[];
+	let searchText=$("#searchAccountName").val();
+	let filterCriteria=$("#selectedFilter").text();
+	if(searchText!=""){
+		let searchCriteria={"fieldName":"name ilike ","fieldValue":'%'+searchText+'%'};
+		searchField.push(searchCriteria);
+	}if(filterCriteria=="Active"){
+		let searchCriteria={"fieldName":"archived = ","fieldValue":false};
+		searchField.push(searchCriteria);
+	} else if(filterCriteria=="Archive"){
+		let searchCriteria={"fieldName":"archived = ","fieldValue":true};
+		searchField.push(searchCriteria);
+	}
+	$.ajax({
+	      type: 'POST',
+	      url : '/findAccountByCriteria',
+	      contentType: 'application/json',
+	      dataType: 'json',
+	      data:JSON.stringify({"searchField":searchField,"offset":offset}),
+	       success : function(response){
+			   if(response.success){
+					hideLoader('#globalLoader');
+					console.log(response.accounts);
+					if(response.accounts.length>0){
+						/*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
+						response.accounts.forEach(function(account){
+							setDataToTable(account);
+							setDataToCard(account);
+						});
+						$("#totalRecordCount").text(response.count);
+						$("#offset").text(parseInt($("#offset").text())+parseInt($("#pageRecordNo").text()));
+						/*let searchFilter=$("#selectedFilter").text();*/
+						let noOfRecord=parseInt($("#offset").text());
+						if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
+							$(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
+						}else{
+							$(".slds-button[loadItemId]").hide();
+						}
+					}else{
+						hideLoader('#globalLoader');
+						showGlobalToast('#globalToast', 'error','No account found with this search crieteria', 4000);
+					}
+			   }
+
+	        },
+	       error: function(response){
+                console.log('error is : '+response);
+                hideLoader('#globalLoader');
+
+                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+	        }
+	    });
+}
+
+function searchAccount(filter,obj){
+	$("div[title=noAccountFound]").addClass('slds-hide');
+	showLoader('#globalLoader');
+
+	$(".slds-button[loadItemId]").show();
+	$("#offset").text("0");
+
+	let searchField=[];
+	if(filter=="Archive"){
+		let searchCriteria={"fieldName":"archived = ","fieldValue":true};
+		searchField.push(searchCriteria);
+	}else if(filter=="Active"){
+		let searchCriteria={"fieldName":"archived = ","fieldValue":false};
+		searchField.push(searchCriteria);
+	}
+	$("#accountListTBody").html('');
+	$("#accountCardView").html('');
+	$.ajax({
+	      type: 'POST',
+	      url : '/findAccountByCriteria',
+	      contentType: 'application/json',
+	      dataType: 'json',
+	      data:JSON.stringify({"searchField":searchField}),
+	       success : function(response){
+			   if(response.success){
+					hideLoader('#globalLoader');
+					console.log(response.accounts);
+					if(response.accounts.length>0){
+						/*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
+						response.accounts.forEach(function(account){
+							setDataToTable(account);
+							setDataToCard(account);
+						});
+						$(obj).closest('div[title="filterDropDown"]').find('#selectedFilter').text(filter);
+						$(obj).closest('div[title="filterDropDown"]').removeClass('slds-is-open');
+						$("#totalRecordCount").text(response.count);
+						$("#offset").text(parseInt($("#offset").text())+parseInt($("#pageRecordNo").text()));
+						/*let searchFilter=$("#selectedFilter").text();*/
+						let noOfRecord=parseInt($("#offset").text());
+						if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
+							$(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
+						}else{
+							$(".slds-button[loadItemId]").hide();
+						}
+					}else{
+						$("div[title=noAccountFound]").removeClass('slds-hide').text('No account found with this search crieteria');
+						$(obj).closest('div[title="filterDropDown"]').find('#selectedFilter').text(filter);
+						$(obj).closest('div[title="filterDropDown"]').removeClass('slds-is-open');
+						hideLoader('#globalLoader');
+						/*showGlobalToast('#globalToast', 'error','No account found with this search crieteria', 4000);*/
+					}
+			   }
+
+	        },
+	       error: function(response){
+                console.log('error is : '+response);
+                hideLoader('#globalLoader');
+                $("div[title=noAccountFound]").removeClass('slds-hide').text(response.responseJSON.message);
+                /*showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);*/
+	        }
+	    });
+}
+
+function findAccountByName(){
+	$("div[title=noAccountFound]").addClass('slds-hide');
+	showLoader('#globalLoader');
+
+	$(".slds-button[loadItemId]").show();
+	$("#offset").text("0");
+
+	let searchField=[];
+	let searchText=$("#searchAccountName").val();
+	let filterCriteria=$("#selectedFilter").text();
+	if(searchText!=""){
+		let searchCriteria={"fieldName":"name ilike ","fieldValue":'%'+searchText+'%'};
+		searchField.push(searchCriteria);
+	}if(filterCriteria=="Active"){
+		let searchCriteria={"fieldName":"archived = ","fieldValue":false};
+		searchField.push(searchCriteria);
+	} else if(filterCriteria=="Archive"){
+		let searchCriteria={"fieldName":"archived = ","fieldValue":true};
+		searchField.push(searchCriteria);
+	}
+	$("#accountListTBody").html('');
+	$("#accountCardView").html('');
+		$.ajax({
+	      type: 'POST',
+	      url : '/findAccountByCriteria',
+	      contentType: 'application/json',
+	      dataType: 'json',
+	      data:JSON.stringify({"searchField":searchField}),
+	       success : function(response){
+			   if(response.success){
+					hideLoader('#globalLoader');
+					console.log(response.accounts);
+					if(response.accounts.length>0){
+						/*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
+						response.accounts.forEach(function(account){
+							setDataToTable(account);
+							setDataToCard(account);
+						});
+
+					}else{
+						$("div[title=noAccountFound]").removeClass('slds-hide').text('No account found with this search crieteria');
+						/*showGlobalToast('#globalToast', 'error','No account found with this search crieteria', 4000);*/
+					}
+					$("#totalRecordCount").text(response.count);
+					$("#offset").text(parseInt($("#offset").text())+parseInt($("#pageRecordNo").text()));
+					/*let searchFilter=$("#selectedFilter").text();*/
+					let noOfRecord=parseInt($("#offset").text());
+					if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
+						$(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
+					}else{
+						$(".slds-button[loadItemId]").hide();
+					}
+			   }else{
+					hideLoader('#globalLoader');
+					$("div[title=noAccountFound]").removeClass('slds-hide').text('No account found with this search crieteria');
+					/*showGlobalToast('#globalToast', 'error','No account found with this search crieteria', 4000);*/
+				}
+
+	        },
+	       error: function(response){
+                console.log('error is : '+response);
+                hideLoader('#globalLoader');
+                $("div[title=noAccountFound]").removeClass('slds-hide').text(response.responseJSON.message);
+                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+	        }
+	    });
+}
+function setDataToCard(account){
+	let accStatus=(account.archived==true)?"Deactive":"Active";
+	if(account.archived==false){
+			archivedButton='<a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm(\'#globalAlert\', \'deleteAccount('+account.id+')\')">'+
+													'<span class="slds-truncate" title="">'+
+															'<i class="fa fa-trash text-red"></i> &nbsp;'+
+															'Deactivate'+
+													'</span>'+
+											'</a>';
+	}else{
+		archivedButton=`<a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="activateBeforeConfirm('#globalAlert', 'activate(`+account.id+`,&quot;account&quot;)')">
+												<span class="slds-truncate" title="">
+														<i class="fa fa-check-circle text-green"></i> &nbsp;
+														Activate
+												</span>
+										</a>`;
+	}
+	let accountCard='<div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_3-of-12 slds-p-horizontal_small">'+
+					    '<div class=" slds-m-bottom_medium slds-p-around_small slds-card">'+
+					        '<div class="line-bottom slds-m-bottom_small slds-p-bottom_xx-small">'+
+					            '<div class="slds-grid">'+
+					                '<div class="slds-has-flexi-truncate">'+
+					                    '<div class="slds-truncate">'+
+					                        '<a href="/account-details?accountId='+account.id+'" class="text-size-16">'+account.name+'</a><br/>'+
+											'#<a href="/account-details?accountId='+account.id+'" class="text-size-8">'+account.record_id+'</a>'+
+					                    '</div>'+
+					                '</div>'+
+					                '<div class="slds-col--bump-left">'+
+					                    '<div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">'+
+					                        '<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" title="Show More">'+
+					                        '<span class="slds-button__icon">'+
+					                            '<i class=" fa fa-caret-down" aria-hidden="true"></i>'+
+					                        '</span>'+
+					                        '<span class="slds-assistive-text">Show More</span>'+
+					                        '</button>'+
+					                        '<div class="slds-dropdown slds-dropdown_right slds-dropdown_actions">'+
+					                            '<ul class="slds-dropdown__list" role="menu">'+
+					                                '<li class="slds-dropdown__item" role="presentation">'+
+					                                    '<a href="/account-details?accountId='+account.id+'" role="menuitem" tabindex="0">'+
+					                                        '<span class="slds-truncate" title="">'+
+					                                            '<i class="fa fa-eye"></i> &nbsp;'+
+					                                            'View Details'+
+					                                        '</span>'+
+					                                    '</a>'+
+					                                '</li>'+
+					                                '<li class="slds-has-divider_top-space" role="separator"></li>'+
+					                                '<li class="slds-dropdown__item" role="presentation">'+
+					                                    archivedButton+
+					                                '</li>'+
+					                            '</ul>'+
+					                        '</div>'+
+					                    '</div>'+
+					                '</div>'+
+					            '</div>'+
+					        '</div>'+
+					        '<div>'+
+					            '<div class="slds-p-bottom_x-small slds-truncate">'+
+					                '<i class="fa fa-user"></i>'+
+					                account.first_name +' '+ account.last_name+
+					            '</div>'+
+					            '<div class="slds-p-bottom_x-small slds-truncate">'+
+					                '<i class="fa fa-envelope"></i>  '+
+													  ' <a href="mailto:'+account.email+'" class=""> '+account.email+' </a>'+
+					            '</div>'+
+					            '<div class="text-size-11">'+
+					                '<div class="slds-grid">'+
+					                    '<div class="slds-has-flexi-truncate">'+
+					                        '<span class="text-uppercase text-dull">Create on :</span>'+
+					                        '<time>'+account.created_date+'</time>'+
+					                    '</div>'+
+					                    '<div class="slds-no-flex slds-p-left_small">'+
+					                        '<span class="text-uppercase text-dull">Status :</span>'+
+					                        '<span class="text-green"> '+
+					                           accStatus
+					                        '</span>'+
+					                    '</div>'+
+					                '</div>'+
+					            '</div>'+
+					        '</div>'+
+					    '</div>'+
+					'</div>';
+	$("#accountCardView").append(accountCard);
+}
+function setDataToTable(account){
+	let archivedStatus;
+	if(account.archived==true){
+		archivedStatus=`<span class="text-red"> Deactive </span`;
+	}else{
+		archivedStatus=`<span class="text-green"> Active </span`;
+	}
+	let archivedButton;
+	let object='account';
+	if(account.archived==false){
+		archivedButton='<a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm(\'#globalAlert\', \'deleteAccount('+account.id+')\')">'+
+													'<span class="slds-truncate" title="">'+
+															'<i class="fa fa-trash text-red"></i> &nbsp;'+
+															'Deactivate'+
+													'</span>'+
+											'</a>';
+	}else{
+		archivedButton=`<a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="activateBeforeConfirm('#globalAlert', 'activate(`+account.id+`,&quot;account&quot;)')">
+												<span class="slds-truncate" title="">
+														<i class="fa fa-check-circle text-green"></i> &nbsp;
+														Activate
+												</span>
+										</a>`;
+	}
+	let accTr='<tr class="">'+
+					'<th scope="row" tabindex="0">'+
+				        '<div class="slds-truncate" title="">'+
+				            '<a href="/account-details?accountId='+account.id+'" tabindex="-1">'+
+				                account.record_id+
+				            '</a>'+
+				        '</div>'+
+				    '</th>'+
+				    '<th scope="row" tabindex="0">'+
+				        '<div class="slds-truncate" title="">'+
+				            '<a href="/account-details?accountId='+account.id+'" tabindex="-1">'+
+				                account.name+
+				            '</a>'+
+				        '</div>'+
+				    '</th>'+
+				    '<td role="gridcell">'+
+				        '<div class="slds-truncate" title="">'+
+				            account.created_date+
+				        '</div>'+
+				    '</td>'+
+				    '<td role="gridcell">'+
+				        '<div class="slds-truncate" title="">'+
+				            account.email+
+				        '</div>'+
+				    '</td>'+
+				    '<td role="gridcell">'+
+				        '<div class="slds-truncate" title="">'+
+				            archivedStatus+
+				        '</div>'+
+				    '</td>'+
+				    '<td role="gridcell">'+
+				        '<div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">'+
+				            '<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" title="Show More">'+
+				            '<span class="slds-button__icon">'+
+				                '<i class=" fa fa-caret-down" aria-hidden="true"></i>'+
+				            '</span>'+
+				            '<span class="slds-assistive-text">Show More</span>'+
+				            '</button>'+
+				            '<div class="slds-dropdown slds-dropdown_right slds-dropdown_actions">'+
+				                '<ul class="slds-dropdown__list" role="menu">'+
+				                    '<li class="slds-dropdown__item" role="presentation">'+
+				                        '<a href="/account-details?accountId='+account.id+'" role="menuitem" tabindex="0">'+
+				                            '<span class="slds-truncate" title="">'+
+				                                '<i class="fa fa-eye"></i> &nbsp;'+
+				                                'View Details'+
+				                            '</span>'+
+				                        '</a>'+
+				                    '</li>'+
+				                    '<li class="slds-has-divider_top-space" role="separator"></li>'+
+				                    '<li class="slds-dropdown__item" role="presentation">'+
+															archivedButton+
+				                    '</li>'+
+				                '</ul>'+
+				            '</div>'+
+				        '</div>'+
+				    '</td>'+
+				'</tr>';
+	$("#accountListTBody").append(accTr);
+}
+</script>

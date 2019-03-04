@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="en">
+
+<% include ../layouts/head %>
+
+    <body class="kw">
+        <main class="tpd-60 bpd-100">
+            <div>
+                <div class=" slds-p-around_small">
+                    <div class="max-w-450 mr-0-auto">
+                        <div class="text-center vpd-20">
+                            <a href="/">
+                                <img src="img/krow-logo.png" alt="">
+                            </a>
+                        </div>
+
+                        <div class="slds-card slds-p-around_large">
+                            <div>
+                                <div class="slds-form-element ">
+                                    <!-- <div class="slds-form-element__control slds-m-bottom_medium">
+                                        <input type="text" class="slds-input" placeholder="domain name" name="domain" id="domain" />
+                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" id="err-msg-domain">
+
+                                        </div>
+                                    </div> -->
+                                    <div class="slds-form-element slds-m-bottom_medium">
+                                            <label class="slds-form-element__label" for="">
+                                                <span>
+                                                    Domain Name
+                                                 </span>
+                                                 <!-- <small>
+                                                     (letters, number and dashes only )
+                                                 </small> -->
+                                            </label>
+                                            <div class="slds-form-element__control slds-input-has-fixed-addon">
+                                                <input type="text" class="slds-input" id="domain" name="domain" placeholder="">
+                                                <span class="slds-form-element__addon slds-no-flex">
+                                                    <strong class="text-size-16">
+                                                        .krow.com
+                                                    </strong>
+                                                </span>
+                                            </div>
+                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                         
+                                            </div>
+                                         </div>
+                                </div>
+                                <div class="slds-m-bottom_medium">
+                                    <button class="slds-button slds-button_brand w-full" onclick="validateDomain()">
+                                        Continue
+                                    </button>
+                                </div>
+                                <div class="text-center">
+                                    Haven't started yet? <a href="/signup">Signup now</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <% include ../layouts/footer %>
+            <% include ../layouts/scripts %>
+                <% include ../layouts/login-script %>
+    </body>
+
+</html>

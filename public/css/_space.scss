@@ -1,0 +1,48 @@
+@each $space in $spaceamounts {
+  .mr-#{$space} {
+    margin: #{$space}px;
+  }
+  .pd-#{$space} {
+    padding: #{$space}px;
+  }
+}
+
+@each $space in $spaceamounts {
+  @each $side in $sides {
+    .#{str-slice($side, 0, 1)}mr-#{$space} {
+      margin-#{$side}: #{$space}px;
+    }
+  
+    .#{str-slice($side, 0, 1)}pd-#{$space} {
+      padding-#{$side}: #{$space}px;
+    }
+  }
+}
+
+@each $space in $spaceamounts {
+  .vmr-#{$space} {
+    margin-top: #{$space}px;
+    margin-bottom: #{$space}px;
+  }
+  .vpd-#{$space} {
+    padding-top: #{$space}px;
+    padding-bottom: #{$space}px;
+  }
+}
+
+@each $space in $spaceamounts {
+  .hmr-#{$space} {
+    margin-left: #{$space}px;
+    margin-right: #{$space}px;
+  }
+
+  .hpd-#{$space} {
+    padding-left: #{$space}px;
+    padding-right: #{$space}px;
+  }
+}
+
+.mr-0-auto{
+  margin-left:auto;
+  margin-right:auto;
+}

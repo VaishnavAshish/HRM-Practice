@@ -1,0 +1,27 @@
+<script>
+	$(document).ready(function(){
+
+		$("#offset").text(parseInt($("#pageRecordNo").text()));
+		let noOfRecord=parseInt($("#offset").text());
+		let searchFilter=$("#selectedFilter").text();
+
+		if(searchFilter=="All"){
+			if((<%= totalCount %>) >parseInt($("#offset").text())){
+				$("#totalRecordCount").text(<%= totalCount %>);
+			}
+		}else if(searchFilter=="Active"){
+			if((<%= activeCount %>)>parseInt($("#offset").text())){
+				$("#totalRecordCount").text(<%= activeCount %>);
+			}
+		}else if(searchFilter=="Archive"){
+			if((<%= archivedCount %>)>parseInt($("#offset").text())){
+				$("#totalRecordCount").text(<%= archivedCount %>);
+			}
+		}
+		if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
+			$(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
+		}else{
+			$(".slds-button[loadItemId]").hide();
+		}
+	})
+</script>

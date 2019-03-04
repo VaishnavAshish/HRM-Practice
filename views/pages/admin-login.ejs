@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="en">
+
+<% include ../layouts/head %>
+
+<body class="kw">
+    <main class="tpd-60 bpd-100">
+        <div>
+            <div class=" slds-p-around_small">
+                <div class="max-w-350 mr-0-auto">
+                    <div class="text-center vpd-20">
+                        <a href="/"><img src="img/krow-logo.png" alt=""></a>
+                    </div>
+                    <div class="slds-card slds-p-around_large">
+                        <div class="slds-m-bottom_medium">
+                            <div>
+                                <h1 class="slds-text-heading_medium">
+                                    <i class="fas fa-key text-blue"></i> Admin Login
+                                </h1>
+                            </div>
+                            
+                        </div>
+                        <div>
+                            <div class="slds-form-element">
+                                <div class="slds-form-element__control slds-m-bottom_medium">
+                                    <input type="email" class="slds-input" placeholder="email" name="email" id="email"/>
+                                    <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-form-element">
+                                <div class="slds-form-element__control slds-m-bottom_medium">
+                                    <input type="password" class="slds-input" placeholder="password" name="password" id="password"/>
+                                    <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-m-bottom_medium">
+                                <button class="slds-button slds-button_brand w-full" onclick="dummyLogin()">
+                                    Login
+                                </button>
+                            </div>
+                            <!-- <div class="slds-grid">
+                                <div class="slds-has-flexi-truncate">
+                                    <div class="slds-form-element__control">
+                                        <span class="slds-checkbox">
+                                            <input type="checkbox" name="default" id="RememberLogin" value="RememberLogin" />
+                                            <label class="slds-checkbox__label" for="RememberLogin">
+                                                <span class="slds-checkbox_faux"></span>
+                                                <span class="slds-form-element__label">Remember Me</span>
+                                            </label>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="slds-no-flex">
+                                    <a href="">Forgot Your Password?</a>
+                                </div>
+                            </div> -->
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </main>
+    <% include ../layouts/footer %>
+    <% include ../layouts/scripts %>
+
+</body>
+
+</html>

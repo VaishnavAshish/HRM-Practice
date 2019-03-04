@@ -1,0 +1,71 @@
+<!-- modal edit tax start-->        
+<div id="modalEditTax">
+    <section role="dialog" tabindex="-1" class="slds-modal">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="closeModal('#modalEditTax');">
+                    <span class="slds-button__icon">
+                        <i class="fa fa-times text-size-21"></i>
+                    </span>
+                </button>
+                <h2  class="slds-text-heading_medium slds-hyphenate">Edit Tax</h2>
+            </header>
+            <div class="slds-modal__content slds-p-around_medium">
+                <div>
+                    <div class="slds-form-element slds-m-bottom_medium">
+                        <label class="slds-form-element__label">
+                            Name
+                            <abbr class="slds-required" title="required">*</abbr>
+                        </label>
+                        <div class="slds-form-element__control">
+                            <input type="text" class="slds-input" placeholder="" required=""/>
+                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                       
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-m-bottom_medium">
+                        <label class="slds-form-element__label">
+                            
+                            Description
+                        </label>
+                        <div class="slds-form-element__control">
+                            <input type="text" class="slds-input" placeholder=""/>
+                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                       
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-m-bottom_medium">
+                        <label class="slds-form-element__label">
+                            Rate %
+                            <abbr class="slds-required" title="required">*</abbr>
+                        </label>
+                        <div class="slds-form-element__control">
+                            <input type="number" class="slds-input" placeholder="" required=""/>
+                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                       
+                            </div>
+                        </div>
+                    </div>
+                            
+                </div>
+            </div>
+            <footer class="slds-modal__footer">
+                <div class="slds-grid">
+                    <div class="slds-has-flexi-truncate">
+                        <div class="text-left">
+                            <button class="slds-button slds-button_destructive">Delete</button>    
+                        </div>
+                    </div>
+                    <div class="slds-no-flex">
+                        <button class="slds-button slds-button_neutral" onclick="closeModal('#modalEditTax');">Cancel</button>
+                        <button class="slds-button slds-button_brand" onclick="dummyAddItem('#modalEditTax', 'Save Successfully')">Add</button>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop"></div>
+</div>
+<!-- modal edit tax end-->   

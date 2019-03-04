@@ -1,0 +1,67 @@
+<!-- modal add new invoice start-->        
+<div id="modalAddNewInvoice">
+    <section role="dialog" tabindex="-1" class="slds-modal">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="closeModal('#modalAddNewInvoice');">
+                    <span class="slds-button__icon">
+                        <i class="fa fa-times text-size-21"></i>
+                    </span>
+                </button>
+                <h2  class="slds-text-heading_medium slds-hyphenate">Create New Invoice</h2>
+            </header>
+            <div class="slds-modal__content slds-p-around_medium">
+                <div>
+
+                    <div class="slds-form-element slds-m-bottom_medium" reset='errorclass'>
+                        <label class="slds-form-element__label">
+                            Account
+                            <abbr class="slds-required" title="required">*</abbr>
+                        </label>
+                        <div class="slds-form-element__control">
+                            <div class="slds-select_container">
+                                <select class="slds-select" id="invoice-account" onchange="getAccountProject(this)" reset='value'>
+                                    <% if(accounts.length >0) {%>
+                                        <option value=""> </option>
+                                        <% accounts.forEach(function(account) { %>
+                                            <option ac_id="<%= account.id %>" value="<%= account.name %>"><%= account.name %></option>
+                                        <% }); %>
+                                    <% } else { %>
+                                        <option value=""> </option>
+                                    <% } %>                                    
+                                </select> 
+                            </div>
+                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" id="err-msg-account" reset='errmsg'>
+                                
+                            </div>
+                        </div>
+                    </div>
+                        <!-- <div class="slds-form-element slds-m-bottom_medium">
+                            <label class="slds-form-element__label">
+                                <abbr class="slds-required" title="required">*</abbr>
+                                Project
+                            </label>
+                            <div class="slds-form-element__control">
+                                <div class="slds-select_container">
+                                    <select class="slds-select" id="invoice-project">
+                                        <option value=""> </option>
+                                                                           
+                                    </select> 
+                                </div>
+                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small"  id="err-msg-project">
+                                    
+                                </div>
+                            </div>
+                        </div> -->
+                            
+                </div>
+            </div>
+            <footer class="slds-modal__footer">
+                <button class="slds-button slds-button_neutral" onclick="closeModal('#modalAddNewInvoice');">Cancel</button>
+                <button class="slds-button slds-button_brand" onclick="createInvoice('#modalAddNewInvoice');">Create Invoice</button>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop"></div>
+</div>
+<!-- modal add new invoice end-->   
