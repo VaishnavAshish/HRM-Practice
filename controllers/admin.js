@@ -570,7 +570,7 @@ sendEmail = (req, res, next) => {
   email.sendMail(req, res, function (error, info) {
     // console.log('transpoter');
     if (error) {
-      // console.log(error);
+      console.log(error);
       next(error, null);
     } else {
       // console.log('Message sent: ' + info.response);
