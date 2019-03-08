@@ -25,29 +25,33 @@ shouldAbort = (err, client, done) => {
 }
 */
 function dateFormat(gDate) {
-    var sDate = new Date(gDate);
-    var date = sDate.getDate();
-    var month = sDate.getMonth() + 1;
-    var year = sDate.getFullYear();
-    var formatedDate = '';
-    if (month != 10 && month != 11 && month != 12) {
-        if (date < 10) {
-            formatedDate = year + '-0' + month + '-0' + date;
-        } else {
-            formatedDate = year + '-0' + month + '-' + date;
-        }
-
-    } else {
-        if (date < 10) {
-            formatedDate = year + '-' + month + '-0' + date;
-        } else {
-            formatedDate = year + '-' + month + '-' + date;
-        }
-
-    }
-    // console.log(formatedDate);
-    return formatedDate;
+  return(gDate.split(' ')[0]);
 }
+
+// function dateFormat(gDate) {
+//     var sDate = new Date(gDate);
+//     var date = sDate.getDate();
+//     var month = sDate.getMonth() + 1;
+//     var year = sDate.getFullYear();
+//     var formatedDate = '';
+//     if (month != 10 && month != 11 && month != 12) {
+//         if (date < 10) {
+//             formatedDate = year + '-0' + month + '-0' + date;
+//         } else {
+//             formatedDate = year + '-0' + month + '-' + date;
+//         }
+//
+//     } else {
+//         if (date < 10) {
+//             formatedDate = year + '-' + month + '-0' + date;
+//         } else {
+//             formatedDate = year + '-' + month + '-' + date;
+//         }
+//
+//     }
+//     // console.log(formatedDate);
+//     return formatedDate;
+// }
 
 
 exports.getExpense = (req, res) => {
@@ -74,7 +78,7 @@ exports.getExpense = (req, res) => {
         pool.connect((err, client, done) => {
             whereClause='WHERE company_id=$1 AND archived=$2 AND project_id IN (SELECT id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$5) AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2 AND user_id=$6)';
             // console.log('queryToExec '+'SELECT e.*,(select count(*) from EXPENSE '+whereClause+') as totalCount,(select count(*) from EXPENSE '+whereClause+' AND status ilike $3) as draftCount,(select count(*) from EXPENSE '+whereClause+' AND status ilike $4) as approvedCount FROM EXPENSE e '+whereClause+' ORDER BY expense_date,record_id OFFSET 0 LIMIT ' + process.env.PAGE_RECORD_NO+' searchCrieteriaValue'+req.user.company_id, false, 'Draft', 'Approved',false, user_id);
-            client.query('SELECT e.*,(select count(*) from EXPENSE '+whereClause+') as totalCount,(select count(*) from EXPENSE '+whereClause+' AND status ilike $3) as draftCount,(select count(*) from EXPENSE '+whereClause+' AND status ilike $4) as approvedCount FROM EXPENSE e '+whereClause+' ORDER BY expense_date DESC,record_id OFFSET 0 LIMIT ' + process.env.PAGE_RECORD_NO, [req.user.company_id, false, 'Draft', 'Approved',false, user_id], function(err, expense) {
+            client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id ,(select count(*) from EXPENSE '+whereClause+') as totalCount,(select count(*) from EXPENSE '+whereClause+' AND status ilike $3) as draftCount,(select count(*) from EXPENSE '+whereClause+' AND status ilike $4) as approvedCount FROM EXPENSE e '+whereClause+' ORDER BY expense_date DESC,record_id OFFSET 0 LIMIT ' + process.env.PAGE_RECORD_NO, [req.user.company_id, false, 'Draft', 'Approved',false, user_id], function(err, expense) {
                 if (err) {
                     handleResponse.shouldAbort(err, client, done);
                     handleResponse.responseToPage(res, 'pages/expenses-listing', {
@@ -191,9 +195,12 @@ exports.getExpense = (req, res) => {
                                                     expense.rows.forEach(function(data) {
                                                         if (accountIdArr.includes(data.account_id)) {
                                                             if (projectIdArr.includes(data.project_id)) {
-                                                                data["created_date"] = dateFormat(moment.tz(data.expense_date, companyDefaultTimezone).format());
-                                                                data["modified_date"] = dateFormat(moment.tz(data.created_date, companyDefaultTimezone).format());
-                                                                data["expense_date"] = dateFormat(moment.tz(data.modified_date, companyDefaultTimezone).format());
+                                                                // data["created_date"] = dateFormat(moment.tz(data.expense_date, companyDefaultTimezone).format());
+                                                                // data["modified_date"] = dateFormat(moment.tz(data.created_date, companyDefaultTimezone).format());
+                                                                // data["expense_date"] = dateFormat(moment.tz(data.modified_date, companyDefaultTimezone).format());
+                                                                data["created_date"] = dateFormat(data.created_date);
+                                                                data["modified_date"] = dateFormat(data.modified_date);
+                                                                data["expense_date"] = dateFormat(data.expense_date);
                                                                 if (project.rows.length > 0) {
                                                                     project.rows.forEach(function(project) {
                                                                         if (project.id == data.project_id) {
@@ -282,7 +289,22 @@ exports.getExpense = (req, res) => {
 };
 
 exports.getExpenseDetail = (req, res) => {
-    if (req.user) {
+  let user_id = req.params.userId;
+  setting.getCompanySetting(req, res ,(err,result)=>{
+    if(err==true){
+      // console.log('error in setting');
+      // console.log(err);
+      handleResponse.responseToPage(res, 'pages/expense-details', {
+          expense: {},
+          accounts: [],
+          projects: [],
+          expCatList:[],
+          user: req.session.passport.user,
+          error: err
+      }, "error", " Server Error:Error in finding company settings");
+
+    }else{
+      companyDefaultTimezone=result.timezone;
         // console.log('getExpenseDetail-------------' + req.query.expenseId);
         let expenseId = req.query.expenseId;
         if (expenseId == '' || expenseId == null || expenseId == undefined) {
@@ -297,7 +319,7 @@ exports.getExpenseDetail = (req, res) => {
             /*handleResponse.handleError(res, 'incorrect expense id', 'Server Error : Expense id is not correct');*/
         } else {
             pool.connect((err, client, done) => {
-                client.query('SELECT * FROM EXPENSE where id=$1 AND company_id=$2', [req.query.expenseId, req.user.company_id], function(err, expense) {
+                client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id FROM EXPENSE e where id=$1 AND company_id=$2', [req.query.expenseId, req.user.company_id], function(err, expense) {
                     if (err) {
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);
@@ -366,9 +388,12 @@ exports.getExpenseDetail = (req, res) => {
                                                     /*let created_date = dateFormat(expense.rows[0].created_date);
                                                     let modified_date = dateFormat(expense.rows[0].modified_date);
                                                     let expense_date = dateFormat(expense.rows[0].expense_date);*/
-                                                    created_date = dateFormat(moment.tz(expense.rows[0].expense_date, companyDefaultTimezone).format());
-                                                    modified_date = dateFormat(moment.tz(expense.rows[0].created_date, companyDefaultTimezone).format());
-                                                    expense_date = dateFormat(moment.tz(expense.rows[0].modified_date, companyDefaultTimezone).format());
+                                                    // created_date = dateFormat(moment.tz(expense.rows[0].expense_date, companyDefaultTimezone).format());
+                                                    // modified_date = dateFormat(moment.tz(expense.rows[0].created_date, companyDefaultTimezone).format());
+                                                    // expense_date = dateFormat(moment.tz(expense.rows[0].modified_date, companyDefaultTimezone).format());
+                                                    created_date = dateFormat(expense.rows[0].created_date);
+                                                    modified_date = dateFormat(expense.rows[0].modified_date);
+                                                    expense_date = dateFormat(expense.rows[0].expense_date);
                                                     expense.rows[0]["created_date"] = created_date;
                                                     expense.rows[0]["modified_date"] = modified_date;
                                                     expense.rows[0]["expense_date"] = expense_date;
@@ -392,10 +417,8 @@ exports.getExpenseDetail = (req, res) => {
                 })
             });
         }
-    } else {
-        done();
-        res.redirect('/domain');
     }
+  });
 };
 
 
@@ -420,10 +443,10 @@ exports.postEditExpense = (req, res) => {
         } else {
             // console.log(req.body.expenseId);
             // console.log(req.user.company_id);
-            let modified_date = moment.tz(new Date(), companyDefaultTimezone).format();
+            // let modified_date = moment.tz(new Date(), companyDefaultTimezone).format();
             // console.log('modified_date  ' + modified_date);
             pool.connect((err, client, done) => {
-                client.query('SELECT * FROM EXPENSE where id=$1 AND company_id=$2', [req.body.expenseId, req.user.company_id], function(err, expense) {
+                client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id FROM EXPENSE e where id=$1 AND company_id=$2', [req.body.expenseId, req.user.company_id], function(err, expense) {
                     if (err) {
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);
@@ -431,7 +454,7 @@ exports.postEditExpense = (req, res) => {
                     } else {
                         // console.log('getExpense>>>>>>>>>>>>>');
                         // console.log(expense.rows[0]);
-                        client.query('UPDATE EXPENSE SET tax=$1,tax_amount=$2,note=$3, category =$4,amount=$5,billable=$6,modified_date=$7,expense_date=$8,project_id=$9,account_id=$10,currency=$11 WHERE id=$12 AND company_id=$13', [req.body.tax, req.body.tax_no, req.body.note, req.body.category, req.body.amount, req.body.billable, modified_date, req.body.expense_date, req.body.project_id, req.body.account_id, req.body.currency, req.body.expenseId, req.user.company_id], function(err, updatedData) {
+                        client.query('UPDATE EXPENSE SET tax=$1,tax_amount=$2,note=$3, category =$4,amount=$5,billable=$6,modified_date=$7,expense_date=$8,project_id=$9,account_id=$10,currency=$11 WHERE id=$12 AND company_id=$13', [req.body.tax, req.body.tax_no, req.body.note, req.body.category, req.body.amount, req.body.billable,'now()', moment.tz(req.body.expense_date.split('T')[0], companyDefaultTimezone).format(), req.body.project_id, req.body.account_id, req.body.currency, req.body.expenseId, req.user.company_id], function(err, updatedData) {
                             // console.log('Error >>>>>>>>>>>>>');
                             // console.log(err);
                             if (err) {
@@ -475,11 +498,11 @@ exports.postAddExpense = (req, res) => {
             }
         } else {
             /*var createdDate = new Date(Date.now());*/
-            let createdDate = moment.tz(new Date(), companyDefaultTimezone).format();
+            // let createdDate = moment.tz(new Date(), companyDefaultTimezone).format();
             // console.log('createdDate ' + createdDate);
             pool.connect((err, client, done) => {
                 let total_expense_amount = parseFloat(req.body.tax_no) + parseFloat(req.body.amount);
-                client.query('Insert INTO EXPENSE (tax,tax_amount,note,status,category,amount,billable,created_date,modified_date,expense_date,project_id,account_id,company_id,currency,user_id, total_amount) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING id', [ req.body.tax, req.body.tax_no, req.body.note, "Draft", req.body.category, req.body.amount, req.body.billable, createdDate, createdDate, req.body.expense_date, req.body.project_id, req.body.account_id, req.session.passport.user.company_id, req.body.currency, req.user.id, total_expense_amount], function(err, insertedExpense) {
+                client.query('Insert INTO EXPENSE (tax,tax_amount,note,status,category,amount,billable,created_date,modified_date,expense_date,project_id,account_id,company_id,currency,user_id, total_amount) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING id', [ req.body.tax, req.body.tax_no, req.body.note, "Draft", req.body.category, req.body.amount, req.body.billable, 'now()', 'now()', moment.tz(req.body.expense_date.split('T')[0], companyDefaultTimezone).format(), req.body.project_id, req.body.account_id, req.session.passport.user.company_id, req.body.currency, req.user.id, total_expense_amount], function(err, insertedExpense) {
                     if (err) {
                         handleResponse.shouldAbort(err, client, done);
                         handleResponse.handleError(res, err, 'Server error : Error in adding expense data to the database');
@@ -579,7 +602,7 @@ exports.findExpenseByCriteria = (req, res) => {
         whereClause+='AND project_id IN (SELECT id FROM PROJECT WHERE company_id=$1 AND archived=$'+(searchCriteriaVal.length+1)+' AND isGlobal=$'+(searchCriteriaVal.length+2)+') AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$'+(searchCriteriaVal.length+1)+')'
         searchCriteriaVal.push(false);
         searchCriteriaVal.push(false);
-        let queryToExec = 'SELECT e.*,(select count(*) from EXPENSE ' + whereClause + ') as searchCount FROM EXPENSE e ' + whereClause + ' ORDER BY expense_date DESC,record_id OFFSET ' + offset + ' LIMIT ' + process.env.PAGE_RECORD_NO;
+        let queryToExec = 'SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id,(select count(*) from EXPENSE ' + whereClause + ') as searchCount FROM EXPENSE e ' + whereClause + ' ORDER BY expense_date DESC,record_id OFFSET ' + offset + ' LIMIT ' + process.env.PAGE_RECORD_NO;
         // console.log('queryToExec ' + queryToExec + ' ' + searchCriteriaVal);
         client.query(queryToExec, searchCriteriaVal, function(err, expense) {
             if (err) {
@@ -627,9 +650,12 @@ exports.findExpenseByCriteria = (req, res) => {
                                             expense.rows.forEach(function(data) {
                                                 if (accountIdArr.includes(data.account_id)) {
                                                     if (projectIdArr.includes(data.project_id)) {
-                                                        data["created_date"] = dateFormat(moment.tz(data.expense_date, companyDefaultTimezone).format());
-                                                        data["modified_date"] = dateFormat(moment.tz(data.created_date, companyDefaultTimezone).format());
-                                                        data["expense_date"] = dateFormat(moment.tz(data.modified_date, companyDefaultTimezone).format());
+                                                        // data["created_date"] = dateFormat(moment.tz(data.expense_date, companyDefaultTimezone).format());
+                                                        // data["modified_date"] = dateFormat(moment.tz(data.created_date, companyDefaultTimezone).format());
+                                                        // data["expense_date"] = dateFormat(moment.tz(data.modified_date, companyDefaultTimezone).format());
+                                                        data["created_date"] = dateFormat(data.created_date);
+                                                        data["modified_date"] = dateFormat(data.modified_date);
+                                                        data["expense_date"] = dateFormat(data.expense_date);
                                                         if (project.rows.length > 0) {
                                                             project.rows.forEach(function(project) {
                                                                 if (project.id == data.project_id) {
@@ -732,7 +758,7 @@ exports.findExpenseForAccount = (req, res) => {
                                     }
                                     // console.log(offset);
                                     whereClause =' WHERE account_id = ANY($1::bigint[]) AND company_id=$2 AND archived=$3 AND project_id IN (SELECT id FROM PROJECT WHERE account_id = ANY($1::bigint[]) AND company_id=$2 AND archived=$3 AND isGlobal=$4) AND user_id=$5'
-                                    queryToExec = 'SELECT e.*,(select count(*) from EXPENSE '+whereClause+') as searchCount FROM EXPENSE e '+whereClause+' ORDER BY expense_date DESC,record_id OFFSET ' + offset + ' LIMIT ' + process.env.PAGE_RECORD_NO;
+                                    queryToExec = 'SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id,(select count(*) from EXPENSE '+whereClause+') as searchCount FROM EXPENSE e '+whereClause+' ORDER BY expense_date DESC,record_id OFFSET ' + offset + ' LIMIT ' + process.env.PAGE_RECORD_NO;
                                     let searchFieldVal = [accountId, req.user.company_id, false,false, req.body.user_id];
 
                                     if (req.body.status) {
@@ -759,9 +785,12 @@ exports.findExpenseForAccount = (req, res) => {
                                             if (expenses.rows.length > 0) {
                                               expenses.rows.forEach(function(data,index) {
                                                 if (projectIdArr.includes(data.project_id)) {
-                                                  data["created_date"] = dateFormat(moment.tz(data.expense_date, companyDefaultTimezone).format());
-                                                  data["modified_date"] = dateFormat(moment.tz(data.created_date, companyDefaultTimezone).format());
-                                                  data["expense_date"] = dateFormat(moment.tz(data.modified_date, companyDefaultTimezone).format());
+                                                  // data["created_date"] = dateFormat(moment.tz(data.expense_date, companyDefaultTimezone).format());
+                                                  // data["modified_date"] = dateFormat(moment.tz(data.created_date, companyDefaultTimezone).format());
+                                                  // data["expense_date"] = dateFormat(moment.tz(data.modified_date, companyDefaultTimezone).format());
+                                                  data["created_date"] = dateFormat(data.created_date);
+                                                  data["modified_date"] = dateFormat(data.modified_date);
+                                                  data["expense_date"] = dateFormat(data.expense_date);
                                                   accounts.rows.forEach(function(account) {
                                                       if (account.id == data.account_id) {
                                                           data["account_name"] = account.name;
@@ -820,10 +849,10 @@ exports.findExpenseForAccount = (req, res) => {
             let searchFieldVal = [req.user.company_id, false,false, req.body.user_id];
             if (req.body.status) {
                 innerQuery += ' AND status=$5';
-                queryToExec = 'SELECT e.*,(' + innerQuery + ') as searchCount FROM EXPENSE e '+whereClause+'AND status=$5';
+                queryToExec = 'SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id,(' + innerQuery + ') as searchCount FROM EXPENSE e '+whereClause+'AND status=$5';
                 searchFieldVal.push(req.body.status);
             } else {
-                queryToExec = 'SELECT e.*,(' + innerQuery + ') as searchCount FROM EXPENSE e '+whereClause;
+                queryToExec = 'SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id,(' + innerQuery + ') as searchCount FROM EXPENSE e '+whereClause;
             }
             queryToExec += ' ORDER BY expense_date DESC,record_id OFFSET ' + offset + ' LIMIT ' + process.env.PAGE_RECORD_NO;
             // console.log(queryToExec);
@@ -876,9 +905,12 @@ exports.findExpenseForAccount = (req, res) => {
                                                 expense.rows.forEach(function(data) {
                                                     if (accountIdArr.includes(data.account_id)) {
                                                         if (projectIdArr.includes(data.project_id)) {
-                                                            data["created_date"] = dateFormat(moment.tz(data.expense_date, companyDefaultTimezone).format());
-                                                            data["modified_date"] = dateFormat(moment.tz(data.created_date, companyDefaultTimezone).format());
-                                                            data["expense_date"] = dateFormat(moment.tz(data.modified_date, companyDefaultTimezone).format());
+                                                            // data["created_date"] = dateFormat(moment.tz(data.expense_date, companyDefaultTimezone).format());
+                                                            // data["modified_date"] = dateFormat(moment.tz(data.created_date, companyDefaultTimezone).format());
+                                                            // data["expense_date"] = dateFormat(moment.tz(data.modified_date, companyDefaultTimezone).format());
+                                                            data["created_date"] = dateFormat(data.created_date);
+                                                            data["modified_date"] = dateFormat(data.modified_date);
+                                                            data["expense_date"] = dateFormat(data.expense_date);
                                                             if (project.rows.length > 0) {
                                                                 project.rows.forEach(function(project) {
                                                                     if (project.id == data.project_id) {

@@ -28,28 +28,31 @@ shouldAbort = (err, client, done) => {
   return !!err
 }*/
 function dateFormat(gDate) {
-  var sDate = new Date(gDate);
-  var date = sDate.getDate();
-  var month = sDate.getMonth() + 1;
-  var year = sDate.getFullYear();
-  var formatedDate = '';
-  if (month < 10) {
-    if(date<10){
-      formatedDate = year + '-0' + month + '-0' + date;
-    }else{
-      formatedDate = year + '-0' + month + '-' + date;
-    }
-  } else {
-    if(date<10){
-      formatedDate = year + '-' + month + '-0' + date;
-    }else{
-      formatedDate = year + '-' + month + '-' + date;
-    }
-
-  }
-  // console.log(formatedDate);
-  return formatedDate;
+  return(gDate.split(' ')[0]);
 }
+// function dateFormat(gDate) {
+//   var sDate = new Date(gDate);
+//   var date = sDate.getDate();
+//   var month = sDate.getMonth() + 1;
+//   var year = sDate.getFullYear();
+//   var formatedDate = '';
+//   if (month < 10) {
+//     if(date<10){
+//       formatedDate = year + '-0' + month + '-0' + date;
+//     }else{
+//       formatedDate = year + '-0' + month + '-' + date;
+//     }
+//   } else {
+//     if(date<10){
+//       formatedDate = year + '-' + month + '-0' + date;
+//     }else{
+//       formatedDate = year + '-' + month + '-' + date;
+//     }
+//
+//   }
+//   // console.log(formatedDate);
+//   return formatedDate;
+// }
 
 getCompany = (companyid,next) => {
 
@@ -194,12 +197,12 @@ exports.postAddResource = (req, res) => {
                       handleResponse.shouldAbort(err, client, done);
                       handleResponse.handleError(res, err, 'Server error : Error in connecting to the database');
                     } else {
-                      client.query('SELECT * FROM users where email = $1 AND company_id=$2', [req.body.email,req.user.company_id], function (err, existingUser) {
+                      client.query('SELECT u.id ,u.email ,u.password ,u.username ,u.company_id ,u.user_role ,u.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,u.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,u.first_name ,u.last_name ,u.phone ,u.mobile ,u.designation ,u.archived ,u.password_reset_token ,u.add_status ,u.bill_rate ,u.cost_rate ,u.permissions ,u.role ,u.record_id FROM users u where u.email = $1 AND u.company_id=$2', [req.body.email,req.user.company_id], function (err, existingUser) {
                         if (err) {
                           handleResponse.shouldAbort(err, client, done);
                           handleResponse.handleError(res, err, 'Server error : Error in finding user data');
                         } else {
-                          let created_date = moment.tz(new Date(), companyDefaultTimezone).format();
+                          // let created_date = moment.tz(new Date(), companyDefaultTimezone).format();
                           // console.log("existingUser-----------");
                           // console.log(existingUser);
 
@@ -215,7 +218,7 @@ exports.postAddResource = (req, res) => {
                                 if(parseInt(req.user.company_id) == parseInt('999999999999999')) {
                                   user_role = '{"SUPER_ADMIN"}';
                                 }
-                                client.query('Insert into USERS(email,user_role,first_name,last_name,phone,mobile,company_id,created_date,modified_date,add_status,password_reset_token,bill_rate,cost_rate,permissions, role) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)  RETURNING id', [req.body.email, user_role, req.body.first_name, req.body.last_name, req.body.phone, req.body.mobile, companyId, created_date, created_date, "Invited",token,req.body.bill_rate,req.body.cost_rate,req.body.permissions, req.body.user_role], function (err, user) {
+                                client.query('Insert into USERS(email,user_role,first_name,last_name,phone,mobile,company_id,created_date,modified_date,add_status,password_reset_token,bill_rate,cost_rate,permissions, role) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)  RETURNING id', [req.body.email, user_role, req.body.first_name, req.body.last_name, req.body.phone, req.body.mobile, companyId, 'now()', 'now()', "Invited",token,req.body.bill_rate,req.body.cost_rate,req.body.permissions, req.body.user_role], function (err, user) {
                                   if (err) {
                                     // console.log(err);
                                     handleResponse.shouldAbort(err, client, done);
@@ -256,6 +259,7 @@ exports.postAddResource = (req, res) => {
                                 });
                             })
                             .catch(err=>{
+                              console.log(err);
                               handleResponse.handleError(res, err, 'Server error : Error in generating random token');
                             });
 
@@ -273,7 +277,7 @@ sendInvitationEmail = (req, res, next) => {
 
     let mailOptions = {
       to: req.body.email,
-      from: 'noreply@krowsoftware.com',
+      from: 'krowtesting@athenalogics.com',
       subject: req.user.email+" had invited you to join krow timesheet app"
     };
     let hostN=process.env.BASE_URL;
@@ -374,7 +378,7 @@ sendInvitationEmail = (req, res, next) => {
 sendResetEmail = (req,res)=>{
   let mailOptions = {
       to: req.body.email,
-      from: 'noreply@krowsoftware.com',
+      from: 'krowtesting@athenalogics.com',
       subject: "Reset your password"
     };
     let hostN=process.env.BASE_URL;
@@ -474,24 +478,6 @@ sendResetEmail = (req,res)=>{
         }
     });
 }
-exports.getResource = (req, res) => {
-  if (req.user) {
-    let domain = req.user.domain;
-    let domainWODot = domain.split('.').join("");
-    // console.log('SELECT * FROM ' + domainWODot + '_users');
-    client.query('SELECT * FROM ' + domainWODot + '_users', function (err, project) {
-      if (err) {
-        handleResponse.handleError(res, err, err);
-      }else{
-        res.status(200).json(project.rows);
-      }
-
-    });
-  }
-  else {
-    return res.redirect('/login');
-  }
-};
 
 exports.deleteResource = (req, res) => {
 
@@ -572,7 +558,7 @@ exports.updateResource = (req, res) => {
                 handleResponse.handleError(res, err, 'Server error : Error in connecting to database .');
               } else {
                 let permissions=(req.body.permissions)?req.body.permissions:req.user.permissions;
-                let newDate=moment.tz(new Date(), companyDefaultTimezone).format();
+                // let newDate=moment.tz(new Date(), companyDefaultTimezone).format();
                 client.query('SELECT * FROM USERS WHERE id=$1',[req.body.id], function (err, selectedUser) {
                   if (err) {
                     handleResponse.shouldAbort(err, client, done);
@@ -583,7 +569,7 @@ exports.updateResource = (req, res) => {
                     // console.log('------------------req.body.bill_rate---------');
                     req.body.bill_rate=(req.body.bill_rate==undefined||req.body.bill_rate==null||req.body.bill_rate=='')?selectedUser.rows[0].bill_rate:req.body.bill_rate;
                     req.body.cost_rate=(req.body.cost_rate==undefined||req.body.cost_rate==null||req.body.cost_rate=='')?selectedUser.rows[0].cost_rate:req.body.cost_rate;
-                    client.query('UPDATE users set email=$1,first_name=$2,last_name=$3,phone=$4,mobile=$5,modified_date=$6,bill_rate=$7,cost_rate=$8,permissions=$9,role=$10 where id=$11  RETURNING *', [req.body.email, req.body.first_name, req.body.last_name, req.body.phone, req.body.mobile, newDate,req.body.bill_rate,req.body.cost_rate,permissions,req.body.user_role, req.body.id], function (err, resource) {
+                    client.query('UPDATE users set email=$1,first_name=$2,last_name=$3,phone=$4,mobile=$5,modified_date=$6,bill_rate=$7,cost_rate=$8,permissions=$9,role=$10 where id=$11  RETURNING *', [req.body.email, req.body.first_name, req.body.last_name, req.body.phone, req.body.mobile, 'now()',req.body.bill_rate,req.body.cost_rate,permissions,req.body.user_role, req.body.id], function (err, resource) {
                       if (err) {
                         handleResponse.shouldAbort(err, client, done);
                         handleResponse.handleError(res, err, 'Server error : Error in updating resource data');
@@ -693,10 +679,10 @@ exports.findResourceByCriteria = (req, res) => {
                     if(req.body.offset){
                       offset=req.body.offset;
                     }
-                    let queryToExec='SELECT u.*,(SELECT count(*) from USERS '+whereClause+') as searchcount FROM USERS u '+whereClause+' ORDER BY created_date DESC,email OFFSET '+offset+' LIMIT '+process.env.PAGE_RECORD_NO;
+                    let queryToExec='SELECT u.id ,u.email ,u.password ,u.username ,u.company_id ,u.user_role ,u.created_date at time zone \''+companyDefaultTimezone+'\' as created_date,u.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date,u.first_name ,u.last_name ,u.phone ,u.mobile ,u.designation ,u.archived ,u.password_reset_token ,u.add_status ,u.bill_rate ,u.cost_rate ,u.permissions ,u.role ,u.record_id,(SELECT count(*) from USERS '+whereClause+') as searchcount FROM USERS u '+whereClause+' ORDER BY created_date DESC,email OFFSET '+offset+' LIMIT '+process.env.PAGE_RECORD_NO;
                     if(req.body.company_id){
                         whereClause=' WHERE company_id=$1 AND archived=$2 AND email ilike $3';
-                        queryToExec='SELECT u.*,(SELECT count(*) from USERS '+whereClause+') as searchcount FROM USERS u '+whereClause+' ORDER BY created_date DESC,email OFFSET '+offset+' LIMIT '+process.env.PAGE_RECORD_NO;
+                        queryToExec='SELECT u.id ,u.email ,u.password ,u.username ,u.company_id ,u.user_role ,u.created_date at time zone \''+companyDefaultTimezone+'\' as created_date,u.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date,u.first_name ,u.last_name ,u.phone ,u.mobile ,u.designation ,u.archived ,u.password_reset_token ,u.add_status ,u.bill_rate ,u.cost_rate ,u.permissions ,u.role ,u.record_id,(SELECT count(*) from USERS '+whereClause+') as searchcount FROM USERS u '+whereClause+' ORDER BY created_date DESC,email OFFSET '+offset+' LIMIT '+process.env.PAGE_RECORD_NO;
                         if(req.body.searchField&&req.body.searchField.length>0){
                             searchCriteriaVal=[req.body.company_id,false,req.body.searchField[0].fieldValue];
                         }else{
@@ -721,9 +707,12 @@ exports.findResourceByCriteria = (req, res) => {
                                   } else {
                                     userData['user_status'] = "Invited";
                                   }
-                                    userData.created_date=dateFormat(moment.tz(userData.created_date, companyDefaultTimezone).format());
-                                    userData.modified_date=dateFormat(moment.tz(userData.modified_date, companyDefaultTimezone).format());
+                                    // userData.created_date=dateFormat(moment.tz(userData.created_date, companyDefaultTimezone).format());
+                                    // userData.modified_date=dateFormat(moment.tz(userData.modified_date, companyDefaultTimezone).format());
+                                    userData.created_date=dateFormat(userData.created_date);
+                                    userData.modified_date=dateFormat(userData.modified_date);
                                 })
+
                                 searchCount=users.rows[0].searchcount;
                                 // console.log('search count result is: '+users.rows[0].searchcount);
                               }
@@ -754,7 +743,7 @@ exports.findUserByEmail = (req, res) => {
         // console.log('companyDefaultTimezone');
         // console.log(companyDefaultTimezone);
         pool.connect((err, client, done) => {
-            let queryToExec='SELECT * FROM users WHERE email ilike $1'+'%'+req.body.searchText+'%';
+            let queryToExec='SELECT u.id ,u.email ,u.password ,u.username ,u.company_id ,u.user_role ,u.created_date at time zone \''+companyDefaultTimezone+'\' as created_date,u.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date,u.first_name ,u.last_name ,u.phone ,u.mobile ,u.designation ,u.archived ,u.password_reset_token ,u.add_status ,u.bill_rate ,u.cost_rate ,u.permissions ,u.role ,u.record_id FROM users u WHERE email ilike $1'+'%'+req.body.searchText+'%';
             client.query('SELECT name FROM company WHERE id=$1',[company_id], function (err, company) {
               if (err) {
                 handleResponse.shouldAbort(err, client, done);
@@ -765,7 +754,7 @@ exports.findUserByEmail = (req, res) => {
                 if(req.body.offset){
                   offset=req.body.offset;
                 }
-                let queryToExec='SELECT u.*,(select count(*) from Users WHERE '+req.body.searchField+' ilike $1 AND company_id=$2 AND archived=false ) as searchCount FROM Users u WHERE '+req.body.searchField+' ilike $1 AND company_id=$2 AND archived=false ORDER BY created_date DESC,email OFFSET '+offset+' LIMIT '+process.env.PAGE_RECORD_NO;
+                let queryToExec='SELECT u.id ,u.email ,u.password ,u.username ,u.company_id ,u.user_role ,u.created_date at time zone \''+companyDefaultTimezone+'\' as created_date,u.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date,u.first_name ,u.last_name ,u.phone ,u.mobile ,u.designation ,u.archived ,u.password_reset_token ,u.add_status ,u.bill_rate ,u.cost_rate ,u.permissions ,u.role ,u.record_id,(select count(*) from Users WHERE '+req.body.searchField+' ilike $1 AND company_id=$2 AND archived=false ) as searchCount FROM Users u WHERE '+req.body.searchField+' ilike $1 AND company_id=$2 AND archived=false ORDER BY created_date DESC,email OFFSET '+offset+' LIMIT '+process.env.PAGE_RECORD_NO;
                 // console.log("queryToExec "+queryToExec);
                 client.query(queryToExec,['%'+req.body.searchText+'%',company_id], function (err, users) {
                   if (err) {
@@ -777,8 +766,10 @@ exports.findUserByEmail = (req, res) => {
                       let searchCount=0;
                       if(users.rows.length>0){
                         users.rows.forEach(function(userData){
-                            userData.created_date=dateFormat(moment.tz(userData.created_date, companyDefaultTimezone).format());
-                            userData.modified_date=dateFormat(moment.tz(userData.modified_date, companyDefaultTimezone).format());
+                            // userData.created_date=dateFormat(moment.tz(userData.created_date, companyDefaultTimezone).format());
+                            // userData.modified_date=dateFormat(moment.tz(userData.modified_date, companyDefaultTimezone).format());
+                            userData.created_date=dateFormat(userData.created_date);
+                            userData.modified_date=dateFormat(userData.modified_date);
                         })
                         searchCount=users.rows[0].searchcount;
                         // console.log('search count result is: '+users.rows[0].searchcount);

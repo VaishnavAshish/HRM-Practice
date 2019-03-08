@@ -26,21 +26,25 @@ shouldAbort = (err, client, done) => {
 }*/
 
 function dateFormat(gDate) {
-  // console.log('Date format called');
-  var today = new Date(gDate);
-  var dd = today.getDate();
-  var mm = today.getMonth() + 1; //January is 0!
-  var yyyy = today.getFullYear();
-  if (dd < 10) {
-    dd = '0' + dd
-  }
-  if (mm < 10) {
-    mm = '0' + mm
-  }
-  formatedDate = yyyy + '-' + mm + '-' + dd;
-  // console.log('Date format returned');
-  return formatedDate;
+  return(gDate.split(' ')[0]);
 }
+
+// function dateFormat(gDate) {
+//   // console.log('Date format called');
+//   var today = new Date(gDate);
+//   var dd = today.getDate();
+//   var mm = today.getMonth() + 1; //January is 0!
+//   var yyyy = today.getFullYear();
+//   if (dd < 10) {
+//     dd = '0' + dd
+//   }
+//   if (mm < 10) {
+//     mm = '0' + mm
+//   }
+//   formatedDate = yyyy + '-' + mm + '-' + dd;
+//   // console.log('Date format returned');
+//   return formatedDate;
+// }
 
 exports.findTaskByName = (req, res) => {
   // console.log("findAccountByName----------------------------------"+req.body.searchText);
@@ -59,7 +63,8 @@ exports.findTaskByName = (req, res) => {
           if(req.body.offset){
             offset=req.body.offset;
           }
-          let queryToExec='SELECT t.*,(SELECT count(*) FROM TASK WHERE '+req.body.searchField+' ilike $1 AND company_id=$2 AND project_id=$3 AND archived=false) as searchcount FROM task t WHERE '+req.body.searchField+' ilike $1 AND company_id=$2 AND project_id=$3 AND archived=false ORDER BY project_id,start_date DESC,name OFFSET '+offset+' LIMIT '+process.env.PAGE_RECORD_NO;
+          let queryToExec='SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,t.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,t.archived ,t.project_name ,t.record_id,(SELECT count(*) FROM TASK WHERE '+req.body.searchField+' ilike $1 AND company_id=$2 AND project_id=$3 AND archived=false) as searchcount FROM task t WHERE '+req.body.searchField+
+          ' ilike $1 AND company_id=$2 AND project_id=$3 AND archived=false ORDER BY project_id,start_date DESC,name OFFSET '+offset+' LIMIT '+process.env.PAGE_RECORD_NO;
           // console.log('queryToExec '+queryToExec+' '+'%'+req.body.searchText+'%'+' '+req.user.company_id+' '+req.body.project_id);
           client.query(queryToExec,['%'+req.body.searchText+'%',req.user.company_id,req.body.project_id], function (err, tasks) {
             if (err) {
@@ -68,7 +73,7 @@ exports.findTaskByName = (req, res) => {
             }
             else{
 
-              client.query('SELECT distinct on (task_id) task_id, user_email, updated_date FROM TASK_ASSIGNMENT WHERE project_id=$1 AND company_id=$2 order by task_id, updated_date desc', [req.body.project_id, req.user.company_id], function (err, taskAssList) {
+              client.query('SELECT distinct on (task_id) task_id, user_email, updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date FROM TASK_ASSIGNMENT WHERE project_id=$1 AND company_id=$2 order by task_id, updated_date desc', [req.body.project_id, req.user.company_id], function (err, taskAssList) {
                 if (err) {
                   handleResponse.shouldAbort(err, client, done);
                   handleResponse.handleError(res, err, 'Server Error: Error in finding task data');
@@ -77,8 +82,10 @@ exports.findTaskByName = (req, res) => {
                   let searchCount=0;
                   if (tasks.rows.length > 0) {
                     tasks.rows.forEach(function (data, index) {
-                      let startDateFormatted = (data.start_date==null)?'':dateFormat(moment.tz(data.start_date, companyDefaultTimezone).format());
-                      let endDateFormatted = (data.end_date==null)?'':dateFormat(moment.tz(data.end_date, companyDefaultTimezone).format());
+                      // let startDateFormatted = (data.start_date==null)?'':dateFormat(moment.tz(data.start_date, companyDefaultTimezone).format());
+                      // let endDateFormatted = (data.end_date==null)?'':dateFormat(moment.tz(data.end_date, companyDefaultTimezone).format());
+                      let startDateFormatted = (data.start_date==null)?'':dateFormat(data.start_date);
+                      let endDateFormatted = (data.end_date==null)?'':dateFormat(data.end_date);
                       data["startDateFormatted"] = startDateFormatted;
                       data["endDateFormatted"] = endDateFormatted;
                       taskAssList.rows.filter(function (taskAssignment) {
@@ -117,11 +124,16 @@ exports.postAddTask = (req, res) => {
       /*handleResponse.handleError(res, err, 'Server Error: error in finding company setting');*/
     } else {
       companyDefaultTimezone=result.timezone;
-      var today = moment.tz(new Date(), companyDefaultTimezone).format('Y-MM-DD');
-      var dd = parseInt(moment.tz(new Date(), companyDefaultTimezone).format('D'));
-      var mm = parseInt(moment.tz(new Date(), companyDefaultTimezone).format('M')); //January is 0!
-      var yyyy = parseInt(moment.tz(new Date(), companyDefaultTimezone).format('Y'));
-
+      // var today = moment.tz(new Date(), companyDefaultTimezone).format('Y-MM-DD');
+      // var dd = parseInt(moment.tz(new Date(), companyDefaultTimezone).format('D'));
+      // var mm = parseInt(moment.tz(new Date(), companyDefaultTimezone).format('M')); //January is 0!
+      // var yyyy = parseInt(moment.tz(new Date(), companyDefaultTimezone).format('Y'));
+      console.log(req.body.taskData.start_date);
+      console.log(req.body.taskData.end_date);
+      req.body.taskData.start_date = moment.tz(req.body.taskData.start_date.split('T')[0], companyDefaultTimezone).format();
+      req.body.taskData.due_date = moment.tz(req.body.taskData.due_date.split('T')[0], companyDefaultTimezone).format();
+      console.log(req.body.taskData.start_date);
+      console.log(req.body.taskData.end_date);
       if (!req.body.taskData.start_date) {
         req.body.taskData.start_date = null;
       }
@@ -135,7 +147,7 @@ exports.postAddTask = (req, res) => {
       pool.connect((err, client, done) => {
         // console.log("Project Id");
         // console.log(req.body.projectId);
-        client.query('SELECT * FROM TASK where name=$1 AND company_id=$2 AND project_id=$3', [req.body.taskData.task_name, req.user.company_id, req.body.projectId], function (err, taskList) {
+        client.query('SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,t.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,t.archived ,t.project_name ,t.record_id FROM TASK t where name=$1 AND company_id=$2 AND project_id=$3', [req.body.taskData.task_name, req.user.company_id, req.body.projectId], function (err, taskList) {
           if (err) {
             console.error(err);
             handleResponse.shouldAbort(err, client, done);
@@ -208,16 +220,20 @@ function createTaskRecord(req, client, err, done, taskData, res, callback) {
 }
 
 function updateTaskRecord(req, client, err, done, res, taskData, callback) {
-  let newDate=moment.tz(new Date(), companyDefaultTimezone).format();
+  // let newDate=moment.tz(new Date(), companyDefaultTimezone).format();
   let start_date = null;
   let end_date = null;
   if(req.body.taskDetails.start_date) {
-    start_date = req.body.taskDetails.start_date;
+    start_date = moment.tz(req.body.taskDetails.start_date, companyDefaultTimezone).format()
+    console.log(req.body.taskDetails.start_date+' '+start_date);
+    // start_date = req.body.taskDetails.start_date;
   }
   if(req.body.taskDetails.end_date) {
-    end_date = req.body.taskDetails.end_date;
+    end_date = moment.tz(req.body.taskDetails.end_date, companyDefaultTimezone).format()
+    console.log(req.body.taskDetails.end_date+' '+end_date);
+    // end_date = req.body.taskDetails.end_date;
   }
-  client.query('UPDATE TASK SET name=$1, start_date=$2, end_date=$3, billable=$4, status=$5, description=$6, estimated_hours=$7, priority=$8, updated_date=$9, assigned_user_id=$12 WHERE id=$10 AND company_id=$11 RETURNING id', [req.body.taskDetails.title, start_date, end_date, req.body.taskDetails.billable, req.body.taskDetails.status, req.body.taskDetails.description, req.body.taskDetails.estimated_hours, req.body.taskDetails.priority, newDate, req.body.taskDetails.taskId, req.user.company_id, taskData.assigned_user_id], function (err, updatedData) {
+  client.query('UPDATE TASK SET name=$1, start_date=$2, end_date=$3, billable=$4, status=$5, description=$6, estimated_hours=$7, priority=$8, updated_date=$9, assigned_user_id=$12 WHERE id=$10 AND company_id=$11 RETURNING id', [req.body.taskDetails.title, start_date, end_date, req.body.taskDetails.billable, req.body.taskDetails.status, req.body.taskDetails.description, req.body.taskDetails.estimated_hours, req.body.taskDetails.priority, 'now()', req.body.taskDetails.taskId, req.user.company_id, taskData.assigned_user_id], function (err, updatedData) {
     if (err) {
       console.error(err);
       handleResponse.shouldAbort(err, client, done);
@@ -244,7 +260,7 @@ exports.getTaskDetails = (req, res) => {
         // console.log(companyDefaultTimezone);
           if (req.query.taskId != '' && req.query.taskId != undefined && req.query.taskId != null) {
             pool.connect((err, client, done) => {
-              client.query('SELECT * FROM TASK where id=$1 AND company_id=$2', [req.query.taskId, req.user.company_id], function (err, taskDetail) {
+              client.query('SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date ,t.updated_date ,t.archived ,t.project_name ,t.record_id FROM TASK t where id=$1 AND company_id=$2', [req.query.taskId, req.user.company_id], function (err, taskDetail) {
                 if (err) {
                   console.error(err);
                   handleResponse.shouldAbort(err, client, done);
@@ -253,7 +269,7 @@ exports.getTaskDetails = (req, res) => {
                 } else {
                   if(taskDetail.rows.length>0){
                       let taskId=taskDetail.rows[0].id;
-                      client.query('SELECT * FROM TASK_ASSIGNMENT where task_id=$1 AND company_id=$2', [req.query.taskId, req.user.company_id], function (err, taskAssignDetail) {
+                      client.query('SELECT ta.id ,ta.company_id ,ta.project_id ,ta.user_id ,ta.created_by ,ta.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,ta.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,ta.account_id ,ta.task_id ,ta.user_email ,ta.bill_rate ,ta.cost_rate ,ta.user_role ,ta.record_id FROM TASK_ASSIGNMENT ta where task_id=$1 AND company_id=$2', [req.query.taskId, req.user.company_id], function (err, taskAssignDetail) {
                       if (err) {
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);
@@ -276,8 +292,10 @@ exports.getTaskDetails = (req, res) => {
                                     // console.log(taskDetail);
                                     done();
                                     let userListCombined=[];
-                                    let startDateFormatted = dateFormat(moment.tz(taskDetail.rows[0].start_date, companyDefaultTimezone).format());
-                                    let endDateFormatted = dateFormat(moment.tz(taskDetail.rows[0].end_date, companyDefaultTimezone).format());
+                                    // let startDateFormatted = dateFormat(moment.tz(taskDetail.rows[0].start_date, companyDefaultTimezone).format());
+                                    // let endDateFormatted = dateFormat(moment.tz(taskDetail.rows[0].end_date, companyDefaultTimezone).format());
+                                    let startDateFormatted = dateFormat(taskDetail.rows[0].start_date);
+                                    let endDateFormatted = dateFormat(taskDetail.rows[0].end_date);
                                     taskDetail.rows[0]["startDateFormatted"] = startDateFormatted;
                                     taskDetail.rows[0]["endDateFormatted"] = endDateFormatted;
                                     if(taskAssignDetail.rows.length>0){
@@ -325,7 +343,7 @@ exports.postEditTask = (req, res) => {
         companyDefaultTimezone=result.timezone;
           if (req.body.taskDetails.taskId != '' && req.body.taskDetails.taskId != undefined && req.body.taskDetails.taskId != null) {
             pool.connect((err, client, done) => {
-              client.query('SELECT * FROM TASK where id=$1 AND company_id=$2', [req.body.taskDetails.taskId, req.user.company_id], function (err, taskDetail) {
+              client.query('SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date ,t.updated_date ,t.archived ,t.project_name ,t.record_id FROM TASK t where id=$1 AND company_id=$2', [req.body.taskDetails.taskId, req.user.company_id], function (err, taskDetail) {
                 if (err) {
                   console.error(err);
                   handleResponse.shouldAbort(err, client, done);
@@ -455,30 +473,35 @@ exports.deleteTask = (req, res) => {
 
 exports.getTaskList = (req, res, callback) => {
   // console.log("Inside method")
-  if(req.user){
-    pool.connect((err, client, done) => {
-      client.query('SELECT * FROM TASK where project_id=$1 AND company_id=$2', [req.body.projectId, req.user.company_id], function (err, tasks) {
-        if (err) {
-          console.error(err);
-          handleResponse.shouldAbort(err, client, done);
-          handleResponse.handleError(res, err, 'Server error : Error in finding task data');
-        } else {
-          // console.log("req.body.getTaskList");
-          // console.log(req.body.getTaskList)
-          if(req.body.getTaskList) {
-            // console.log("returned success");
-            return callback(tasks.rows);
-          } else {
-            done();
-            handleResponse.sendSuccess(res,'Task list fetched',{"tasks": tasks.rows });
-            /*res.status(200).json({ "success": true, "tasks": tasks.rows ,"message":"success"});*/
-          }
-        }
-      })
+  setting.getCompanySetting(req, res ,(err,result)=>{
+      if(err==true){
+        // console.log('error in setting');
+        // console.log(err);
+        handleResponse.handleError(res, err, 'Server Error: error in finding company setting');
+      }else{
+        companyDefaultTimezone=result.timezone;
+        pool.connect((err, client, done) => {
+          client.query('SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date ,t.updated_date ,t.archived ,t.project_name ,t.record_id FROM TASK t where project_id=$1 AND company_id=$2', [req.body.projectId, req.user.company_id], function (err, tasks) {
+            if (err) {
+              console.error(err);
+              handleResponse.shouldAbort(err, client, done);
+              handleResponse.handleError(res, err, 'Server error : Error in finding task data');
+            } else {
+              // console.log("req.body.getTaskList");
+              // console.log(req.body.getTaskList)
+              if(req.body.getTaskList) {
+                // console.log("returned success");
+                return callback(tasks.rows);
+              } else {
+                done();
+                handleResponse.sendSuccess(res,'Task list fetched',{"tasks": tasks.rows });
+                /*res.status(200).json({ "success": true, "tasks": tasks.rows ,"message":"success"});*/
+              }
+            }
+          })
+        });
+      }
     });
-  } else{
-    res.redirect('/domain');
-  }
 };
 
 /* exports.getEditTask = (req, res) => {

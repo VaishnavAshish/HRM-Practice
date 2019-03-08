@@ -2,7 +2,6 @@
  * Module dependencies.
  */
 
-
 const express = require('express');
 const compression = require('compression');
 const session = require('express-session');
@@ -12,7 +11,7 @@ const logger = require('morgan');
 const chalk = require('chalk');
 const errorHandler = require('errorhandler');
 const lusca = require('lusca');
-const dotenv = require('dotenv');
+const dotenv = require('dotenv').load({ path: '.env' });
 /*const MongoStore = require('connect-mongo')(session);*/
 /*const flash = require('express-flash');*/
 const path = require('path');
@@ -32,8 +31,9 @@ const fileUpload = require('express-fileupload');
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
  */
-dotenv.load({ path: '.env.example' });
-
+// dotenv.config();
+// console.log(dotenv.load({ path: '.env' }));
+// console.log(process.env.DATABASE_URL);
 /**
  * API keys and Passport configuration.
  */
@@ -129,9 +129,17 @@ routes(app);
  */
 if (process.env.NODE_ENV === 'development') {
   // only use in development
-  app.use(errorHandler());
+  app.use(errorHandler({log: errorNotification}));
 }
 
+function errorNotification(err, str, req) {
+  var title = 'Error in ' + req.method + ' ' + req.url
+
+  notifier.notify({
+    title: title,
+    message: str
+  })
+}
 /**
  * Start Express server.
  */

@@ -83,6 +83,8 @@ module.exports = function(app) {
 
     app.post('/activate', passportConfig.isAuthenticated,adminController.postActivate);
 
+    app.get('/currentTimestamp', passportConfig.isAuthenticated,adminController.getCurrentTimestamp);
+
     app.post('/editCompanySetting', passportConfig.isAuthenticated,settingController.postEditSetting);
     app.post('/editCompanySettingExpense', passportConfig.isAuthenticated,settingController.postEditSettingExpense);
     app.post('/editCompanySettingUserRole', passportConfig.isAuthenticated,settingController.postEditSettingUserRole);
@@ -136,7 +138,7 @@ module.exports = function(app) {
     app.post('/addProjectResource', passportConfig.isAuthenticated, projectResourceController.postAddProjectRes);
     app.post('/deleteProjectResource', passportConfig.isAuthenticated, projectResourceController.deleteProjectRes);
 
-    app.get('/users', passportConfig.isAuthenticated, resourceController.getResource);
+    // app.get('/users', passportConfig.isAuthenticated, resourceController.getResource);
     app.post('/addResource', passportConfig.isAuthenticated, resourceController.postAddResource);
     app.post('/deleteResource', passportConfig.isAuthenticated, resourceController.deleteResource);
     app.post('/updateResource', passportConfig.isAuthenticated, resourceController.updateResource);

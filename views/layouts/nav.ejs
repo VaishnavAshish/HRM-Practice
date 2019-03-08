@@ -165,7 +165,7 @@
                                 console.log('timesheet data which is playing '+JSON.stringify(response.timesheetData));
                                 if(response.timesheetData.length>0){
                                   // $("[timerDiv]").on('click',function(){stopKwTimerGlobally(this, '[name=kwTimer]', '#syncTimer', '#modalAddNewTsheetQuick')});
-                                  let timesheetCreatedDate=response.timesheetData[0].created_date.toString().split('T')[0];
+                                  let timesheetCreatedDate=response.timesheetData[0].created_date.toString().split(' ')[0].split('T')[0];
                                   if(timesheetCreatedDate==response.currentDate){
 
                                     hmsToSecondsOnly(response.timesheetData[0].lastruntime,(playStartTime)=>{

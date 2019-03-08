@@ -364,20 +364,24 @@ function incrementTime() {
 }
 
 function dateFormat(gDate) {
-    // var today = new Date(gDate);
-    // var dd = today.getDate();
-    // var mm = today.getMonth() + 1; //January is 0!
-    // var yyyy = today.getFullYear();
-    // if (dd < 10) {
-    //     dd = '0' + dd
-    // }
-    // if (mm < 10) {
-    //     mm = '0' + mm
-    // }
-    // formatedDate = yyyy + '-' + mm + '-' + dd;
-    let formatedDate = moment.tz(gDate, companyDefaultTimezone).format('YYYY-MM-DD');
-    return formatedDate;
+  return(gDate.split(' ')[0].split('T')[0]);
 }
+
+// function dateFormat(gDate) {
+//     // var today = new Date(gDate);
+//     // var dd = today.getDate();
+//     // var mm = today.getMonth() + 1; //January is 0!
+//     // var yyyy = today.getFullYear();
+//     // if (dd < 10) {
+//     //     dd = '0' + dd
+//     // }
+//     // if (mm < 10) {
+//     //     mm = '0' + mm
+//     // }
+//     // formatedDate = yyyy + '-' + mm + '-' + dd;
+//     let formatedDate = moment.tz(gDate, companyDefaultTimezone).format('YYYY-MM-DD');
+//     return formatedDate;
+// }
 
 function addDataToLineItem(lineItemData,next){
     $.ajax({
@@ -409,6 +413,7 @@ function startKwTimerGlobally(ele,id) {
         contentType: 'application/json',
         success: function (response) {
             console.log(response);
+            console.log('current timestamp in start timer'+response.currentTimestamp);
             if (response.success == true) {
                 globalTaskId = response.task.id;
                 $.ajax({
@@ -477,7 +482,7 @@ function startKwTimerGlobally(ele,id) {
                         showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
                     }
                 });
-                
+
 
             } else {
                 showGlobalToast('#globalToast', 'error', response.message, 4000);
@@ -709,114 +714,128 @@ function addTimeLogEntry(modalId,formId){
                 lineItemData.timesheet_date = line_item_date;
                 console.log(lineItemData);
                 $.ajax({
-                    type: 'POST',
-                    url: '/addTimesheet',
+                    type: 'GET',
+                    url: '/currentTimestamp',
                     contentType: 'application/json',
-                    dataType: 'json',
-                    data: JSON.stringify(lineItemData),
-                    success: function (response) {
-                        console.log(response);
-                        hideLoader('#globalLoader');
-                        if (response.success == true) {
-                            $('#addTimesheetLoader').addClass('hide');
-                            closeModal(modalId);
-                            let eleToStart=$("#day-tabs");
-                            if(eleToStart.length>0){
-                                let currentDiv=$("#day-tabs > div").not('.hide');
-                                if(currentDiv.attr('date')== dateFormat(moment.tz(new Date(), companyDefaultTimezone).format())){
-                                    addRowToTimesheet(response.line_item);
-                                    if(selectedEle!=null&&selectedEle!=undefined){
-                                        intervalID = NaN;
-                                        let currentLineItemId=$(selectedEle).attr('line_item_id');
-                                        let updatedLineItem={"line_item_id":currentLineItemId,"lastRunTime":moment.tz(new Date(), companyDefaultTimezone).format('HH:mm:ss'),"isRunning":true};
-                                        updateCurrentLineItem(updatedLineItem,(success,nores,err)=>{
-                                            if(success==true){
-                                                $(selectedEle).addClass('hide');
-                                                $(selectedEle).next('[stop]').removeClass('hide');
-                                                startKwTimerGlobal($("[name=globalStart]"));
-                                                $("[name=globalStop]").removeClass('hide');
-                                                if (isNaN(intervalID)){
-                                                    intervalID = setInterval(function(){incrementTimeOfCount}, 1000);
-                                                }
-                                            }else if(nores==true){
-                                                $('#addTimesheetLoader').addClass('hide');
-                                                showGlobalToast('#globalToast', 'error', response.message, 4000);
-                                            }else{
-                                                console.log(response);
-                                                $('#addTimesheetLoader').addClass('hide');
-                                                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
-                                            }
-                                        });
-                                    }
-                                }else{
-                                    if(selectedEle!=null&&selectedEle!=undefined){
+                    success: function (res) {
+                        // console.log(response);
+                        console.log('current timestamp for addTimeLogEntry'+res.currentTimestamp);
+                        let currentDate = res.currentTimestamp;
+                          $.ajax({
+                              type: 'POST',
+                              url: '/addTimesheet',
+                              contentType: 'application/json',
+                              dataType: 'json',
+                              data: JSON.stringify(lineItemData),
+                              success: function (response) {
+                                  console.log(response);
+                                  hideLoader('#globalLoader');
+                                  if (response.success == true) {
+                                      $('#addTimesheetLoader').addClass('hide');
+                                      closeModal(modalId);
+                                      let eleToStart=$("#day-tabs");
+                                      if(eleToStart.length>0){
+                                          let currentDiv=$("#day-tabs > div").not('.hide');
+                                          if(currentDiv.attr('date')== dateFormat(moment.tz(res.currentDate, companyDefaultTimezone).format())){
+                                              addRowToTimesheet(response.line_item);
+                                              if(selectedEle!=null&&selectedEle!=undefined){
+                                                  intervalID = NaN;
+                                                  let currentLineItemId=$(selectedEle).attr('line_item_id');
+                                                  let updatedLineItem={"line_item_id":currentLineItemId,"lastRunTime":res.currentTime,"isRunning":true};
+                                                  updateCurrentLineItem(updatedLineItem,(success,nores,err)=>{
+                                                      if(success==true){
+                                                          $(selectedEle).addClass('hide');
+                                                          $(selectedEle).next('[stop]').removeClass('hide');
+                                                          startKwTimerGlobal($("[name=globalStart]"));
+                                                          $("[name=globalStop]").removeClass('hide');
+                                                          if (isNaN(intervalID)){
+                                                              intervalID = setInterval(function(){incrementTimeOfCount()}, 1000);
+                                                          }
+                                                      }else if(nores==true){
+                                                          $('#addTimesheetLoader').addClass('hide');
+                                                          showGlobalToast('#globalToast', 'error', response.message, 4000);
+                                                      }else{
+                                                          console.log(response);
+                                                          $('#addTimesheetLoader').addClass('hide');
+                                                          showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+                                                      }
+                                                  });
+                                              }
+                                          }else{
+                                              if(selectedEle!=null&&selectedEle!=undefined){
 
-                                        intervalID = NaN;
-                                        let timesheetRowData={};
-                                        let ele=selectedEle;
-                                        timesheetRowDataid=$(ele).attr('line_item_id');
-                                        let currentSelectedRow=$(ele).closest('div[id='+timesheetRowDataid+']');
-                                        timesheetRowData.project_id=currentSelectedRow.find('#projectLineItem').attr('pr_id');
-                                        timesheetRowData.day_project=currentSelectedRow.find('#projectLineItem').text();
-                                        timesheetRowData.task_id=currentSelectedRow.find('#taskLineItem').attr('tk_id');
-                                        timesheetRowData.day_task=currentSelectedRow.find('#taskLineItem').text();
-                                        timesheetRowData.user_role=currentSelectedRow.find('#userRoleLineItem').text();
-                                        timesheetRowData.day_note=(currentSelectedRow.find('#noteLineItem').text()=="")?' ':currentSelectedRow.find('#noteLineItem').text();
-                                        timesheetRowData.day_category=(currentSelectedRow.find('#billableLineItem').text()=="Billable")?true:false;
-                                        timesheetRowData.lastruntime=((new Date()).toTimeString().split(' ')[0]);
-                                        timesheetRowData.timesheet_date=dateFormat(new Date());
-                                        timesheetRowData.isRunning=true;
-                                        timesheetRowData.day_time="0:00";
-                                        console.log(timesheetRowData);
-                                        /*addRowToTimesheet(timesheetRowData);*/
-                                        $.ajax({
-                                            type: 'POST',
-                                            url: '/addTimesheet',
-                                            contentType: 'application/json',
-                                            dataType: 'json',
-                                            data: JSON.stringify(timesheetRowData),
-                                            success: function (response) {
-                                                console.log(response);
-                                                if (response.success == true) {
-                                                    $('#addTimesheetLoader').addClass('hide');
-                                                    let reqUserId = response.userId;
-                                                    console.log(reqUserId);
-                                                    /*showGlobalToast('#globalToast', 'success', response.message, 4000);*/
-                                                    window.location.href='/timesheet/'+reqUserId+'#'+moment.tz(new Date(), companyDefaultTimezone).format('dddd').toLowerCase();
-                                                    location.reload();
-                                                } else {
-                                                    $('#addTimesheetLoader').addClass('hide');
-                                                    showGlobalToast('#globalToast', 'error', response.message, 4000);
-                                                }
-                                            },
-                                            error: function (response) {
-                                                console.log(response);
-                                                $('#addTimesheetLoader').addClass('hide');
-                                                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
-                                            }
-                                        });
-                                    }
-                                }
-                            }
+                                                  intervalID = NaN;
+                                                  let timesheetRowData={};
+                                                  let ele=selectedEle;
+                                                  timesheetRowDataid=$(ele).attr('line_item_id');
+                                                  let currentSelectedRow=$(ele).closest('div[id='+timesheetRowDataid+']');
+                                                  timesheetRowData.project_id=currentSelectedRow.find('#projectLineItem').attr('pr_id');
+                                                  timesheetRowData.day_project=currentSelectedRow.find('#projectLineItem').text();
+                                                  timesheetRowData.task_id=currentSelectedRow.find('#taskLineItem').attr('tk_id');
+                                                  timesheetRowData.day_task=currentSelectedRow.find('#taskLineItem').text();
+                                                  timesheetRowData.user_role=currentSelectedRow.find('#userRoleLineItem').text();
+                                                  timesheetRowData.day_note=(currentSelectedRow.find('#noteLineItem').text()=="")?' ':currentSelectedRow.find('#noteLineItem').text();
+                                                  timesheetRowData.day_category=(currentSelectedRow.find('#billableLineItem').text()=="Billable")?true:false;
+                                                  timesheetRowData.lastruntime=res.currentTime;
+                                                  timesheetRowData.timesheet_date=dateFormat(moment.tz(res.currentDate, companyDefaultTimezone).format());
+                                                  timesheetRowData.isRunning=true;
+                                                  timesheetRowData.day_time="0:00";
+                                                  console.log(timesheetRowData);
+                                                  /*addRowToTimesheet(timesheetRowData);*/
+                                                  $.ajax({
+                                                      type: 'POST',
+                                                      url: '/addTimesheet',
+                                                      contentType: 'application/json',
+                                                      dataType: 'json',
+                                                      data: JSON.stringify(timesheetRowData),
+                                                      success: function (response) {
+                                                          console.log(response);
+                                                          if (response.success == true) {
+                                                              $('#addTimesheetLoader').addClass('hide');
+                                                              let reqUserId = response.userId;
+                                                              console.log(reqUserId);
+                                                              /*showGlobalToast('#globalToast', 'success', response.message, 4000);*/
+                                                              window.location.href='/timesheet/'+reqUserId+'#'+moment.tz(res.currentDate, companyDefaultTimezone).format('dddd').toLowerCase();
+                                                              location.reload();
+                                                          } else {
+                                                              $('#addTimesheetLoader').addClass('hide');
+                                                              showGlobalToast('#globalToast', 'error', response.message, 4000);
+                                                          }
+                                                      },
+                                                      error: function (response) {
+                                                          console.log(response);
+                                                          $('#addTimesheetLoader').addClass('hide');
+                                                          showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+                                                      }
+                                                  });
+                                              }
+                                          }
+                                      }
 
-                        } else {
-                            $('#addTimesheetLoader').addClass('hide');
-                            showGlobalToast('#globalToast', 'error', response.message, 4000);
+                                  } else {
+                                      $('#addTimesheetLoader').addClass('hide');
+                                      showGlobalToast('#globalToast', 'error', response.message, 4000);
+                                  }
+                              },
+                              error: function (response) {
+                                  console.log(response);
+                                  hideLoader('#globalLoader');
+                                  $('#addTimesheetLoader').addClass('hide');
+                                  showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+                              }
+                          });
+                        },error: function (response) {
+                            console.log(response);
+                            hideLoader('#globalLoader');
+                            showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
                         }
-                    },
-                    error: function (response) {
-                        console.log(response);
-                        hideLoader('#globalLoader');
-                        $('#addTimesheetLoader').addClass('hide');
-                        showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
-                    }
-                });
+                    });
 
                 }
             }
 
     }
-function stopKwTimerWithLogEntry(lineItemId,ele, id, inputId, modalId){
+function stopKwTimerWithLogEntry(lineItemId,ele, id, inputId, modalId,currentDate){
   showLoader('#globalLoader');
   $.ajax({
       type: 'POST',
@@ -834,7 +853,7 @@ function stopKwTimerWithLogEntry(lineItemId,ele, id, inputId, modalId){
               intervalID = NaN;
               let logSubmittedDate=$("[name=kwTimer]").attr("lineItemDate");
               if(typeof logSubmittedDate=="undefined"){
-                logSubmittedDate=dateFormat(moment.tz(new Date(), companyDefaultTimezone).format());
+                logSubmittedDate=dateFormat(moment.tz(currentDate, companyDefaultTimezone).format());
               }
               $("#logSubmittedDate").text(logSubmittedDate);
               $(inputId).val($($(id)[0]).text());
@@ -883,7 +902,7 @@ function stopTimerForElement(ele, id, inputId, modalId,lineItemId){
 
   });
 }
-function stopKwTimerGlobally(ele, id, inputId, modalId) {
+function stopKwTimerGlobally(ele, id, inputId, modalId,currentDate) {
     // ele=$(ele).find("[stop-timer]");
     let eleToStart=$("#day-tabs");
     $.ajax({
@@ -891,7 +910,8 @@ function stopKwTimerGlobally(ele, id, inputId, modalId) {
         url: '/getGlobalProject',
         contentType: 'application/json',
         success: function (response) {
-            console.log(response);
+            // console.log(response);
+            console.log('current timestamp '+response.currentTimestamp);
             if (response.success == true) {
                 hideLoader('#globalLoader');
                 // $("[timerDiv]").on('click',function(){startKwTimerGlobally(this,'[name=kwTimer]')});
@@ -901,7 +921,7 @@ function stopKwTimerGlobally(ele, id, inputId, modalId) {
                 if(eleToStart.length>0){
 
                     if(lineItemTaskId==globalTaskId){
-                        stopKwTimerWithLogEntry(lineItemId,ele, id, inputId, modalId);
+                        stopKwTimerWithLogEntry(lineItemId,ele, id, inputId, modalId,response.currentTimestamp);
 
                     }else{
                         if(selectedEle!=undefined&&selectedEle!=null){
@@ -914,7 +934,7 @@ function stopKwTimerGlobally(ele, id, inputId, modalId) {
                     }
                 }else{
                     if(lineItemTaskId==globalTaskId){
-                      stopKwTimerWithLogEntry(lineItemId,ele, id, inputId, modalId);
+                      stopKwTimerWithLogEntry(lineItemId,ele, id, inputId, modalId,response.currentTimestamp);
 
                 }else{
                   stopTimerForElement(ele, id, inputId, modalId,lineItemId);

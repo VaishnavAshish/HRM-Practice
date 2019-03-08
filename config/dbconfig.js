@@ -1,5 +1,9 @@
-const { Pool } = require('pg');
+const { Pool,types } = require('pg');
 const connectionString = process.env.DATABASE_URL;
+
+types.setTypeParser(1114, function(stringValue) {
+  return stringValue;
+});
 
 const pool = new Pool({
   connectionString: connectionString,
@@ -13,5 +17,6 @@ pool.on('error', (err, client) => {
   console.error('Unexpected error on idle client', err);
   // process.exit(-1);
 });
+
 
 module.exports = pool;

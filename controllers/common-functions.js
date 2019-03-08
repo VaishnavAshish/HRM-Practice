@@ -2,14 +2,14 @@ const moment = require('moment-timezone');
 var module;
 
 function createTaskAssignment(req, client, err, done, taskId, billRate, costRate, taskData, res, result) {
-    let newDate=moment.tz(new Date(), taskData.companyDefaultTimezone).format();
+    // let newDate=moment.tz(new Date(), taskData.companyDefaultTimezone).format();
     let projectId = req.body.projectId;
     if(!req.body.projectId) {
       projectId = taskData.project_id;
     }
     let userEmail = req.body.userData.userEmail;
     // console.log(userEmail);
-    client.query('INSERT INTO TASK_ASSIGNMENT (task_id,project_id, user_id, user_email, bill_rate, cost_rate, company_id,created_date,updated_date, user_role) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING id', [taskId,projectId,taskData.assigned_user,userEmail, billRate, costRate,req.user.company_id,newDate,newDate,taskData.user_role], function (err, taskAssignList) {
+    client.query('INSERT INTO TASK_ASSIGNMENT (task_id,project_id, user_id, user_email, bill_rate, cost_rate, company_id,created_date,updated_date, user_role) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING id', [taskId,projectId,taskData.assigned_user,userEmail, billRate, costRate,req.user.company_id,'now()','now()',taskData.user_role], function (err, taskAssignList) {
       if (err) {
         console.error(err);
         handleResponse.shouldAbort(err, client, done);
@@ -21,7 +21,7 @@ function createTaskAssignment(req, client, err, done, taskId, billRate, costRate
   }
 
   function createProjectAssignment (req, client, err, done, taskData, billRate, costRate, res, result) {
-    let newDate=moment.tz(new Date(), taskData.companyDefaultTimezone).format();
+    // let newDate=moment.tz(new Date(), taskData.companyDefaultTimezone).format();
     let projectId = req.body.projectId;
     if(!req.body.projectId) {
       projectId = taskData.project_id;
@@ -30,7 +30,7 @@ function createTaskAssignment(req, client, err, done, taskId, billRate, costRate
     if(!req.body.accountId) {
       accountId = taskData.account_id;
     }
-    client.query('INSERT INTO PROJECT_ASSIGNMENT (project_id, user_id, account_id, created_by, bill_rate, cost_rate, company_id,created_date,updated_date, user_role) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING id', [projectId,taskData.assigned_user, accountId, req.user.id, billRate, costRate,req.user.company_id,newDate ,newDate, taskData.user_role], function (err, insertedProjectAssgn) {
+    client.query('INSERT INTO PROJECT_ASSIGNMENT (project_id, user_id, account_id, created_by, bill_rate, cost_rate, company_id,created_date,updated_date, user_role) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING id', [projectId,taskData.assigned_user, accountId, req.user.id, billRate, costRate,req.user.company_id,'now()' ,'now()', taskData.user_role], function (err, insertedProjectAssgn) {
       if (err) {
         console.error(err);
         handleResponse.shouldAbort(err, client, done);
@@ -114,5 +114,5 @@ function createTaskAssignment(req, client, err, done, taskId, billRate, costRate
 
   module.exports.checkTaskAssignment = checkTaskAssignment;
   module.exports.createTaskAssignment = createTaskAssignment;
-  
+
   module.exports.getCompanyAllRoles = getCompanyAllRoles;

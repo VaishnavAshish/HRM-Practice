@@ -132,6 +132,7 @@ exports.getLogin = (req, res) => {
 
 
 exports.getDomain = (req, res) => {
+  console.log('inside get domain')
   if (req.user) {
     if (req.user.user_role.includes('SUPER_ADMIN')) {
       // console.log('SUPER_ADMIN');
@@ -162,6 +163,8 @@ exports.postDomain = (req, res) => {
   } else {
     // console.log('inside');
     pool.connect((err, client, done) => {
+      console.log('error on connecting pool');
+      console.log(err);
       let domainName = req.body.domain+".krow.com";
       client.query('SELECT * FROM company where domain = $1', [domainName], function (err, company) {
         if (err) {

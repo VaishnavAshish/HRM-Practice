@@ -1,3 +1,4 @@
+SET TIMEZONE TO 'UTC';
 CREATE FUNCTION public.create_account_recordid() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
@@ -123,7 +124,7 @@ DECLARE
 	sql9 varchar := 'CREATE SEQUENCE seq_timesheet_' || NEW.id;
 	sql10 varchar := 'CREATE SEQUENCE seq_timesheetline_' || NEW.id;
 	sql11 varchar := 'CREATE SEQUENCE seq_user_' || NEW.id;
-	
+
 BEGIN
 	EXECUTE sql1;
 	EXECUTE sql2;

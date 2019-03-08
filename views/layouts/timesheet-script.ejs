@@ -8,7 +8,9 @@
     $(document).ready(function () {
         showLoader('#globalLoader');
         let url = new URL(window.location.href);
-        companyDefaultTimezone='<%= companyDefaultTimezone %>';
+        companyDefaultTimezone = '<%= companyDefaultTimezone %>';
+        currentTimestamp ='<%= currentTimestamp %>';
+        console.log('currentTimestamp '+currentTimestamp);
         var isUserId = url.pathname.substring(((url.pathname).lastIndexOf('/')+1), (url.pathname).lastIndexOf('#')).length > 0;
         if(isUserId) {
             reqUserId = url.pathname.substring(((url.pathname).lastIndexOf('/')+1), url.pathname.length);
@@ -31,33 +33,41 @@
             });
         }
 
-        let getTodayDay=moment.tz(new Date(), companyDefaultTimezone).format('dddd').toLowerCase();
+        // let getTodayDay=moment.tz(new Date(), companyDefaultTimezone).format('dddd').toLowerCase();
+        let getTodayDay=moment.tz(currentTimestamp, companyDefaultTimezone).format('dddd').toLowerCase();
         $("#todayDiv").attr('href',`/timesheet/${reqUserId}#${getTodayDay}`);
         var todayDay;
         if(weekTab) {
             $('#btn-week-tab').click();
         }
         if(getURLParameter("new_date") != null) {
-            todayDay = new Date(parseInt(getURLParameter("new_date")));/*.getDay()*/
-            todayDay = moment.tz(todayDay, companyDefaultTimezone).format('d')
+            // todayDay = new Date(parseInt(getURLParameter("new_date")));/*.getDay()*/
+            // todayDay = moment.tz(todayDay, companyDefaultTimezone).format('d')
+            // todayDay =  moment.tz(moment(parseInt(getURLParameter("new_date"))).format().split('T')[0],companyDefaultTimezone).format('d');
+            todayDay = moment.tz(parseInt(getURLParameter("new_date")),companyDefaultTimezone).format('d');
 
-            weekStartDate = new Date(parseInt(getURLParameter("new_date")));
-            weekStartDate=moment.tz(weekStartDate, companyDefaultTimezone).format();
+            // weekStartDate = new Date(parseInt(getURLParameter("new_date")));
+            // weekStartDate=moment.tz(weekStartDate, companyDefaultTimezone).format();
 
-            weekEndDate = adjustDays(new Date(weekStartDate), "ADD", 6);
-            weekEndDate = moment.tz(weekEndDate, companyDefaultTimezone).format();
+            weekStartDate = moment.tz(parseInt(getURLParameter("new_date")),companyDefaultTimezone).format();
+
+            weekEndDate = adjustDays(weekStartDate, "ADD", 6);
+            // weekEndDate = moment.tz(weekEndDate, companyDefaultTimezone).format();
             // weekEndDate = new Date(weekStartDate).setDate(new Date(weekStartDate).getDate() + 7);
-            curr = new Date(parseInt(getURLParameter("new_date")));
-            curr = moment.tz(curr, companyDefaultTimezone).format();
+            // curr = new Date(parseInt(getURLParameter("new_date")));
+            // curr = moment.tz(curr, companyDefaultTimezone).format();
+            curr = moment.tz(parseInt(getURLParameter("new_date")),companyDefaultTimezone).format();
+
             $('#active-tab-day').siblings('span').html(getDateWithMonth(curr));
         } else {
-            let currentDateDt=parseInt(moment.tz(new Date(), companyDefaultTimezone).format('D'));
-            let currentDateDay=parseInt(moment.tz(new Date(), companyDefaultTimezone).format('d'));
+
+            let currentDateDt=parseInt(moment.tz(currentTimestamp, companyDefaultTimezone).format('D'));
+            let currentDateDay=parseInt(moment.tz(currentTimestamp, companyDefaultTimezone).format('d'));
 
             /*weekStartDate = new Date().setDate(new Date().getDate() - new Date().getDay());*/
             // weekStartDate=new Date(new Date().setDate(currentDateDt-currentDateDay));
-            weekStartDate=adjustDays(moment.tz(new Date(), companyDefaultTimezone).format(), "SUB", currentDateDay);
-            weekStartDate==moment.tz(weekStartDate, companyDefaultTimezone).format();
+            weekStartDate=adjustDays(moment.tz(currentTimestamp, companyDefaultTimezone).format(), "SUB", currentDateDay);
+            // weekStartDate==moment.tz(weekStartDate, companyDefaultTimezone).format();
             /*weekStartDate=new Date(moment.tz(new Date(), companyDefaultTimezone).format()).setDate(currentDateDt-currentDateDay);*/
             /*weekStartDate=moment.tz(weekStartDate, companyDefaultTimezone).format();*/
             // weekEndDate = new Date(new Date().setDate(currentDateDt + (6 - currentDateDay)));
@@ -67,9 +77,10 @@
             /*weekEndDate = moment.tz(weekEndDate, companyDefaultTimezone).format();*/
 
             /*todayDay = new Date().getDay();*/
-            todayDay=moment.tz(new Date(), companyDefaultTimezone).format('d');
+            // todayDay=moment.tz(new Date(), companyDefaultTimezone).format('d');
+            todayDay=moment.tz(currentTimestamp, companyDefaultTimezone).format('d');
             /*curr = new Date();*/
-            curr=moment.tz(new Date(), companyDefaultTimezone).format();
+            curr=moment.tz(currentTimestamp, companyDefaultTimezone).format();
             $('#active-tab-day').siblings('span').html(getDateWithMonth(curr));
         }
 
@@ -314,7 +325,7 @@
     }*/
 
     function submitDayTimesheet(val) {
-        var timesheet_date = $('#day-tab-ul').find('.slds-is-active').attr('date');
+        var timesheet_date = moment.tz($('#day-tab-ul').find('.slds-is-active').attr('date'), companyDefaultTimezone).format();
         showLoader('#globalLoader');
         $.ajax({
             type: 'POST',
@@ -344,7 +355,7 @@
 
     function updateDayTimesheet(id) {
         showLoader('#globalLoader');
-        var date = $('#day-tab-ul').find('.slds-is-active').attr('date');
+        var date = moment.tz($('#day-tab-ul').find('.slds-is-active').attr('date'), companyDefaultTimezone).format();
         $.ajax({
             type: 'POST',
             url: '/getDayTimesheetData',
@@ -575,7 +586,7 @@
         kwLineCounter=$(ele).closest('.slds-grid').find('time');
         let currentDiv=$("#day-tabs > div").not('.hide');
         let currentDivLi=$("#day-tab-ul li.slds-is-active");
-        let currentDate=dateFormat(moment.tz(new Date(), companyDefaultTimezone).format());
+        let currentDate=dateFormat(moment.tz(currentTimestamp, companyDefaultTimezone).format());
 
         if(currentDivLi.attr('date')== currentDate){
 
@@ -597,7 +608,7 @@
                         selectedEle=ele;
                         intervalID = NaN;
                         let currentLineItemId=$(ele).attr('line_item_id');
-                        let lastRunTimeCal=moment.tz(new Date(), companyDefaultTimezone).format('HH:mm:ss');
+                        let lastRunTimeCal=moment.tz(currentTimestamp, companyDefaultTimezone).format('HH:mm:ss');
                         let updatedLineItem={"line_item_id":currentLineItemId,"lastRunTime":lastRunTimeCal,"isRunning":true};
                         updateCurrentLineItem(updatedLineItem,(success,nores,err)=>{
                             if(success==true){
@@ -687,7 +698,7 @@
                 }else{
 
                     let currentLineItemId=$(ele).attr('line_item_id');
-                    let lastRunTimeCal=moment.tz(new Date(), companyDefaultTimezone).format('HH:mm:ss');
+                    let lastRunTimeCal=moment.tz(currentTimestamp, companyDefaultTimezone).format('HH:mm:ss');
                     let updatedLineItem={"line_item_id":currentLineItemId,"lastRunTime":lastRunTimeCal,"isRunning":true};
                     updateCurrentLineItem(updatedLineItem,(success,nores,err)=>{
                         if(success==true){
@@ -718,7 +729,7 @@
 
 
         } else{
-            let currentDateCal=moment.tz(new Date(), companyDefaultTimezone).format();
+            let currentDateCal=moment.tz(currentTimestamp, companyDefaultTimezone).format();
             let currentDateDiv=$("#day-tabs > div[date="+dateFormat(currentDateCal)+"]");
             let previousTimerButton=currentDateDiv.find('button[title=stop]').not('.hide');
             if(previousTimerButton.length>0){
@@ -746,12 +757,12 @@
                         timesheetRowData.user_role=currentSelectedRow.find('#userRoleLineItem').text();
                         timesheetRowData.day_note=(currentSelectedRow.find('#noteLineItem').text()=="")?' ':currentSelectedRow.find('#noteLineItem').text();
                         timesheetRowData.day_category=(currentSelectedRow.find('#billableLineItem').text()=="Billable")?true:false;
-                        let lastRunTimeCal=moment.tz(new Date(), companyDefaultTimezone).format('HH:mm:ss');
+                        let lastRunTimeCal=moment.tz(currentTimestamp, companyDefaultTimezone).format('HH:mm:ss');
                         timesheetRowData.lastruntime=lastRunTimeCal;
-                        timesheetRowData.timesheet_date=dateFormat(moment.tz(new Date(), companyDefaultTimezone).format());
+                        timesheetRowData.timesheet_date=dateFormat(moment.tz(currentTimestamp, companyDefaultTimezone).format());
                         timesheetRowData.isRunning=true;
                         timesheetRowData.day_time="0:00:00";
-                        timesheetRowData.week_day=moment.tz(new Date(), companyDefaultTimezone).format('d');
+                        timesheetRowData.week_day=moment.tz(currentTimestamp, companyDefaultTimezone).format('d');
                         console.log(timesheetRowData);
                         /*addRowToTimesheet(timesheetRowData);*/
                         $.ajax({
@@ -847,12 +858,12 @@
                 timesheetRowData.user_role=currentSelectedRow.find('#userRoleLineItem').text();
                 timesheetRowData.day_note=(currentSelectedRow.find('#noteLineItem').text()=="")?' ':currentSelectedRow.find('#noteLineItem').text();
                 timesheetRowData.day_category=(currentSelectedRow.find('#billableLineItem').text()=="Billable")?true:false;
-                let lastRunTimeCal =moment.tz(new Date(), companyDefaultTimezone).format('HH:mm:ss');
+                let lastRunTimeCal =moment.tz(currentTimestamp, companyDefaultTimezone).format('HH:mm:ss');
                 timesheetRowData.lastruntime=lastRunTimeCal;
-                timesheetRowData.timesheet_date=dateFormat(moment.tz(new Date(), companyDefaultTimezone).format());
+                timesheetRowData.timesheet_date=dateFormat(moment.tz(currentTimestamp, companyDefaultTimezone).format());
                 timesheetRowData.isRunning=true;
                 timesheetRowData.day_time="0:00";
-                timesheetRowData.week_day=moment.tz(new Date(), companyDefaultTimezone).format('d');
+                timesheetRowData.week_day=moment.tz(currentTimestamp, companyDefaultTimezone).format('d');
                 console.log(timesheetRowData);
                 /*addRowToTimesheet(timesheetRowData);*/
                 $.ajax({
@@ -865,7 +876,7 @@
                         console.log(response);
                         if (response.success == true) {
                             $('#addTimesheetLoader').addClass('hide');
-                            window.location.href='/timesheet/'+reqUserId+'#'+moment.tz(new Date(), companyDefaultTimezone).format('dddd').toLowerCase();
+                            window.location.href='/timesheet/'+reqUserId+'#'+moment.tz(currentTimestamp, companyDefaultTimezone).format('dddd').toLowerCase();
                             /*showGlobalToast('#globalToast', 'success', response.message, 4000);*/
                             location.reload();
                         } else {
@@ -1140,11 +1151,13 @@
         var dat = moment.tz(date, companyDefaultTimezone).valueOf();
         if(type == "ADD"){
             // dat.setTime(dat.getTime() +  (days * 24 * 60 * 60 * 1000));
-            dat = dat +  (days * 24 * 60 * 60 * 1000);
+            // dat = dat +  (days * 24 * 60 * 60 * 1000);
+            dat = moment.tz(dat, companyDefaultTimezone).add(days,'d');
         }
         else{
             // dat.setTime(dat.getTime() -  (days * 24 * 60 * 60 * 1000));
-            dat = dat -  (days * 24 * 60 * 60 * 1000);
+            // dat = dat -  (days * 24 * 60 * 60 * 1000);
+            dat = moment.tz(dat, companyDefaultTimezone).subtract(days,'d')
         }
         dat = moment(dat).tz(companyDefaultTimezone).format();
         return dat;
