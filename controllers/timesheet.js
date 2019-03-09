@@ -18,7 +18,7 @@ shouldAbort = (err, client, done) => {
       }
       // release the client back to the pool
       done();
-    })
+    })F
   }
   return !!err
 }
@@ -73,8 +73,8 @@ function calculateWeekStartDate(current_date,TIMESHEET_WEEK_START_DAY) {
 
 function adjustDays (dateToAdjust,days) {
   var dat = moment.tz(dateToAdjust, companyDefaultTimezone).valueOf();
-  // dat = dat - (days * 24 * 60 * 60 * 1000);
-  dat = moment.tz(dat, companyDefaultTimezone).subtract(days,'d');
+  dat = dat - (days * 24 * 60 * 60 * 1000);
+  // dat = moment.tz(dat, companyDefaultTimezone).subtract(days,'d');
   // dat.setTime(dat.getTime() -  (days * 24 * 60 * 60 * 1000));
   dat = moment(dat).tz(companyDefaultTimezone).format();
   return dat;
