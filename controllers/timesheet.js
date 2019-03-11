@@ -329,8 +329,8 @@ exports.getTimesheet = (req, res) => {
                           /*handleResponse.handleError(res, err, 'Server error : Error in finding timesheet detail data');*/
                         } else {
                           let taskListsDayArr = getTimesheetForDay(timesheetListByDate);
-                          // console.log("timesheetListByDate");
-
+                          console.log("timesheetListByDate");
+                          console.log(JSON.stringify(taskListsDayArr));
                           // console.log(week_start_date +" *************** "+ week_end_date);
 
                             let queryToExec= `SELECT DISTINCT T1.task_id, T1.resource_id, T1.project_id, T1.company_id, T1.project_name, T1.task_name, T2.twh, T2.created_date at time zone '${companyDefaultTimezone}' as created_date, T2.week_day, T2.user_role
