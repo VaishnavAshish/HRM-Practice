@@ -47,8 +47,8 @@ function calculateWeekEndDate(start_date) {
   // var dat = new Date(start_date);
   console.log('calculateWeekEndDate start_date'+start_date);
   let dat = moment.tz(dateFormat(start_date).split('T')[0]+' 23:59:59', companyDefaultTimezone).valueOf();
-  dat = moment.tz(dat, companyDefaultTimezone).add(6,'d');
-  // dat = dat +  (6 * 24 * 60 * 60 * 1000);
+  // dat = moment.tz(dat, companyDefaultTimezone).add(6,'d');
+  dat = dat +  (6 * 24 * 60 * 60 * 1000);
   // dat.setTime(dat.getTime() +  (6 * 24 * 60 * 60 * 1000));
   // console.log('week end date is '+dat);
   dat = moment(dat).tz(companyDefaultTimezone).format();
@@ -313,7 +313,7 @@ exports.getTimesheet = (req, res) => {
                     } else {
                       // console.log("week_start_date");
                       console.log(parseInt(req.query.new_date));
-                      let week_start_date = req.query.new_date != undefined ? moment.tz(moment(parseInt(req.query.new_date)).format().split('T')[0],companyDefaultTimezone).format() : calculateWeekStartDate(dateFormat(currentTimestamp.rows[0].currentdate),'Sun');
+                      let week_start_date = req.query.new_date != undefined ? moment.tz(moment.tz(parseInt(req.query.new_date),companyDefaultTimezone).format().split('T')[0],companyDefaultTimezone).format() : calculateWeekStartDate(dateFormat(currentTimestamp.rows[0].currentdate),'Sun');
                       let week_end_date = calculateWeekEndDate(week_start_date);
                       console.log('week_start_date '+week_start_date);
                       console.log('week_end_date '+week_end_date);
