@@ -46,7 +46,7 @@ function calculateWeekEndDate(start_date) {
   console.log('calculateWeekEndDate called');
   // var dat = new Date(start_date);
   console.log('calculateWeekEndDate start_date'+start_date);
-  let dat = moment.tz(dateFormat(start_date)+' 23:59:59', companyDefaultTimezone).valueOf();
+  let dat = moment.tz(dateFormat(start_date).split('T')[0]+' 23:59:59', companyDefaultTimezone).valueOf();
   dat = moment.tz(dat, companyDefaultTimezone).add(6,'d');
   // dat = dat +  (6 * 24 * 60 * 60 * 1000);
   // dat.setTime(dat.getTime() +  (6 * 24 * 60 * 60 * 1000));
