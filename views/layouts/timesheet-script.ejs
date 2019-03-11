@@ -777,7 +777,7 @@
                                     $('#addTimesheetLoader').addClass('hide');
                                     /*showGlobalToast('#globalToast', 'success', response.message, 4000);*/
                                     window.location.href='/timesheet/'+reqUserId+'#'+moment.tz(new Date(), companyDefaultTimezone).format('dddd').toLowerCase();
-                                    location.reload();
+                                    // location.reload();
                                 } else {
                                     $('#addTimesheetLoader').addClass('hide');
                                     showGlobalToast('#globalToast', 'error', response.message, 4000);
