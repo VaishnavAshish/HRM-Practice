@@ -432,8 +432,8 @@ exports.getProjectListForCompany = (req, res) => {
                       project.rows.forEach(function (data) {
                         // let startDateFormatted = dateFormat(moment.tz(data.start_date, companyDefaultTimezone).format());
                         // let endDateFormatted = dateFormat(moment.tz(data.end_date, companyDefaultTimezone).format());
-                        let startDateFormatted = dateFormat(data.start_date);
-                        let endDateFormatted = dateFormat(data.end_date);
+                        let startDateFormatted = dateFormat(JSON.stringify(data.start_date));
+                        let endDateFormatted = dateFormat(JSON.stringify(data.end_date));
                         data["startDateFormatted"] = startDateFormatted;
                         data["endDateFormatted"] = endDateFormatted;
                       })
