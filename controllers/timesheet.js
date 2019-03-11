@@ -1380,7 +1380,7 @@ exports.getDayTimesheetWithTaskId = (req, res) => {
     // console.log("4 "+req.body.task_id);
     // console.log("5 "+req.body.created_date);
     console.log('Inside getDayTimesheetWithTaskId '+JSON.stringify(req.body));
-    console.log('created_date '+moment.tz(req.body.created_date.split('T')[0], companyDefaultTimezone).format('YYYY-MM-DD hh:mm:ss:mmZ') );
+    console.log('created_date '+moment.tz(req.body.created_date.split(' ')[0].split('T')[0], companyDefaultTimezone).format() );
     if(req.body.user_id==undefined){
       req.body.user_id=req.user.id;
     }
