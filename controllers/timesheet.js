@@ -81,6 +81,19 @@ function adjustDays (dateToAdjust,days) {
   dat = moment(dat).tz(companyDefaultTimezone).format();
   return dat;
 }
+
+function adjustDaysForDate (date, type, days) {
+    var dat = moment.tz(date, companyDefaultTimezone).valueOf();
+    if(type == "ADD"){
+        dat = moment.tz(dat, companyDefaultTimezone).add(days,'d');
+    }
+    else{
+        dat = moment.tz(dat, companyDefaultTimezone).subtract(days,'d')
+    }
+    dat = moment(dat).tz(companyDefaultTimezone).format();
+    return dat;
+}
+
 function createTimesheetWeekObj(timesheetObj,previousTaskId,currentTaskId,timesheetList,week_start_date){
   // console.log('inside createTimesheetWeekObj');
   // console.log(timesheetObj);
@@ -90,8 +103,9 @@ function createTimesheetWeekObj(timesheetObj,previousTaskId,currentTaskId,timesh
       timesheetObj.timesheetObjData=['0.00','0.00','0.00','0.00','0.00','0.00','0.00'];
       timesheetObj.task_id=currentTaskId;
       timesheetObj.project_id=timesheetList.project_id;
-      timesheetObj.week_start_date=week_start_date;
-      timesheetObj.created_date=timesheetList.created_date;
+      timesheetObj.week_start_date = week_start_date;
+      timesheetObj.created_date = adjustDaysForDate(week_start_date,'ADD',timesheetList.week_day);
+      // timesheetObj.created_date=timesheetList.created_date;
       timesheetObj.task_name=timesheetList.task_name;
       timesheetObj.user_role=timesheetList.user_role;
       timesheetObj.project_name=timesheetList.project_name;
@@ -99,7 +113,7 @@ function createTimesheetWeekObj(timesheetObj,previousTaskId,currentTaskId,timesh
       timesheetObj.totalTime+=parseInt(timesheetList.twh);
       timesheetList.twh=minuteToHours(timesheetList.twh);
       timesheetObj.timesheetObjData[timesheetList.week_day]=timesheetList.twh;
-
+      console.log(timesheetObj.created_date);
       previousTaskId=currentTaskId;
       return({
         timesheetObj:timesheetObj,
@@ -335,15 +349,15 @@ exports.getTimesheet = (req, res) => {
                           console.log(JSON.stringify(taskListsDayArr));
                           // console.log(week_start_date +" *************** "+ week_end_date);
 
-                            let queryToExec= `SELECT DISTINCT T1.task_id, T1.resource_id, T1.project_id, T1.company_id, T1.project_name, T1.task_name, T2.twh, T2.created_date at time zone '${companyDefaultTimezone}' as created_date, T2.week_day, T2.user_role
+                            let queryToExec= `SELECT DISTINCT T1.task_id, T1.resource_id, T1.project_id, T1.company_id, T1.project_name, T1.task_name, T2.twh, T2.week_day, T2.user_role
                                               FROM timesheet_line_item T1
                                               JOIN
-                                              (SELECT task_id, SUM(total_work_hours) as twh, created_date at time zone '${companyDefaultTimezone}' as created_date, week_day, user_role,resource_id
+                                              (SELECT task_id, SUM(total_work_hours) as twh, week_day, user_role,resource_id
                                               FROM timesheet_line_item
                                               WHERE company_id=$1 AND resource_id=$2 AND created_date at time zone '${companyDefaultTimezone}' BETWEEN $3 AND $4 AND project_id is not null AND project_name is not null
-                                              GROUP BY task_id,resource_id, user_role, created_date,week_day) T2
+                                              GROUP BY task_id,resource_id, user_role,week_day) T2
                                               ON T1.task_id = T2.task_id AND T1.resource_id = T2.resource_id  AND T1.project_name is not null
-                                              ORDER BY T1.task_id, T2.user_role, created_date`;
+                                              ORDER BY T1.task_id, T2.user_role`;
                             // console.log(queryToExec)
                              client.query(queryToExec,[req.user.company_id, userId, week_start_date, week_end_date], function(err, timesheetListByProject) {
                               if (err) {
