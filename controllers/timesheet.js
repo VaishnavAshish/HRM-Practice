@@ -1235,7 +1235,7 @@ exports.addMultipleTimesheet = (req, res) => {
                     let day_time = hoursToMinutes(data.total_hours);
                     let created_date = moment.tz(data.created_date, companyDefaultTimezone).format();
                     console.log('created_date'+moment.tz(data.created_date, companyDefaultTimezone).format());
-                      client.query('INSERT INTO TIMESHEET_LINE_ITEM (resource_id, project_id, task_id, created_date, total_work_hours, company_id, project_name, task_name, billable, isRunning, description, user_role) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *',[req.user.id, data.project_id, data.task_id, moment.tz(data.created_date, companyDefaultTimezone).format(), day_time, req.user.company_id, data.project_name, data.task_name, data.billable, false, "", data.user_role], function(err, insertedLineItem) {
+                      client.query('INSERT INTO TIMESHEET_LINE_ITEM (resource_id, project_id, task_id, created_date, total_work_hours, company_id, project_name, task_name, billable, isRunning, description, user_role) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *',[req.user.id, data.project_id, data.task_id, moment.tz(data.created_date, companyDefaultTimezone).format(), day_time, req.user.company_id, data.project_name, data.task_name, data.billable, false, "", data.user_role], function(err, insertedLineItem) {
                         if(err) {
                           // console.log("Inside timesheet_line_item insert");
                           console.error(err);
@@ -1387,10 +1387,10 @@ exports.addTimesheet = (req, res) => {
 
 function createTimesheetLineItem(req, res, client, err, done, extraParam, isRunning, callback) {
   console.log('inside create new timesheet line item function timesheet date is '+extraParam.timesheet_date)
-  let queryToExec = 'INSERT INTO TIMESHEET_LINE_ITEM (resource_id, project_id, task_id, created_date, total_work_hours, company_id, project_name, task_name, description, billable, user_role) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *';
+  let queryToExec = 'INSERT INTO TIMESHEET_LINE_ITEM (resource_id, project_id, task_id, created_date, total_work_hours, company_id, project_name, task_name, description, billable, user_role) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *';
   let data = [req.user.id, req.body.project_id, req.body.task_id, moment.tz(extraParam.timesheet_date.split('T')[0], companyDefaultTimezone).format(), extraParam.day_time, req.user.company_id, req.body.day_project, req.body.day_task, req.body.day_note,req.body.day_category, req.body.user_role];
   if(isRunning) {
-    queryToExec = 'INSERT INTO TIMESHEET_LINE_ITEM (resource_id, project_id, task_id, created_date, total_work_hours, company_id, project_name, task_name, description, billable, isRunning,lastruntime, user_role) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING *';
+    queryToExec = 'INSERT INTO TIMESHEET_LINE_ITEM (resource_id, project_id, task_id, created_date, total_work_hours, company_id, project_name, task_name, description, billable, isRunning,lastruntime, user_role) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *';
     data = [req.user.id, req.body.project_id, req.body.task_id, moment.tz(extraParam.timesheet_date.split('T')[0], companyDefaultTimezone).format(), extraParam.day_time, req.user.company_id, req.body.day_project, req.body.day_task, req.body.day_note,req.body.day_category, req.body.isRunning,req.body.lastruntime, req.body.user_role];
   }
   client.query(queryToExec, data, function(err, insertedLineItem) {
