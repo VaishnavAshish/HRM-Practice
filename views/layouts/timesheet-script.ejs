@@ -1368,7 +1368,7 @@
        console.log('reqUserId'+reqUserId);
     //    var billable = $(ele).attr('billable');
        var created_date = dateFormat(adjustDays(week_start_date, "ADD", parseInt(index)));
-
+       console.log(week_start_date+' '+created_date);
         if(project_id != '' && task_id != '' && week_start_date != '') {
             showLoader('#globalLoader');
             $.ajax({
