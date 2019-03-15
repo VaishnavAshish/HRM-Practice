@@ -1491,11 +1491,11 @@ function invoiceHtmlData (req,res,invoiceHtml){
                                                                                             accountDetails.rows[0].country=(accountDetails.rows[0].country==null) ? '' : accountDetails.rows[0].country;
                                                                                             accountDetails.rows[0].zip_code=(accountDetails.rows[0].zip_code==null) ? '' : accountDetails.rows[0].zip_code;
                                                                                         }
-                                                                                        companySetting.rows[0].street = (companySetting.rows[0].street) ? '' : companySetting.rows[0].street;
-                                                                                        companySetting.rows[0].city = (companySetting.rows[0].city) ? '' : companySetting.rows[0].city;
-                                                                                        companySetting.rows[0].state = (companySetting.rows[0].state) ? '' : companySetting.rows[0].state;
-                                                                                        companySetting.rows[0].country = (companySetting.rows[0].country) ? '' : companySetting.rows[0].country;
-                                                                                        companySetting.rows[0].zip_code = (companySetting.rows[0].zip_code) ? '' : companySetting.rows[0].zip_code;
+                                                                                        companySetting.rows[0].street = (companySetting.rows[0].street==null) ? '' : companySetting.rows[0].street;
+                                                                                        companySetting.rows[0].city = (companySetting.rows[0].city==null) ? '' : companySetting.rows[0].city;
+                                                                                        companySetting.rows[0].state = (companySetting.rows[0].state==null) ? '' : companySetting.rows[0].state;
+                                                                                        companySetting.rows[0].country = (companySetting.rows[0].country==null) ? '' : companySetting.rows[0].country;
+                                                                                        companySetting.rows[0].zip_code = (companySetting.rows[0].zip_code==null) ? '' : companySetting.rows[0].zip_code;
 
                                                                                         if(invoiceHtml==true){
                                                                                             /*// console.log('dates are');
