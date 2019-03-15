@@ -10,6 +10,7 @@
         let url = new URL(window.location.href);
         companyDefaultTimezone = '<%= companyDefaultTimezone %>';
         currentTimestamp ='<%= currentTimestamp %>';
+        companyWeekStartDay = '<%= companyWeekStartDay %>'
         console.log('currentTimestamp '+currentTimestamp);
         var isUserId = url.pathname.substring(((url.pathname).lastIndexOf('/')+1), (url.pathname).lastIndexOf('#')).length > 0;
         if(isUserId) {
@@ -34,7 +35,7 @@
         }
 
         // let getTodayDay=moment.tz(new Date(), companyDefaultTimezone).format('dddd').toLowerCase();
-        let getTodayDay=moment.tz(currentTimestamp, companyDefaultTimezone).format('dddd').toLowerCase();
+        let getTodayDay=moment.tz(currentTimestamp, companyDefaultTimezone).format('dddd');
         $("#todayDiv").attr('href',`/timesheet/${reqUserId}#${getTodayDay}`);
         var todayDay;
         if(weekTab) {
@@ -66,13 +67,16 @@
 
             /*weekStartDate = new Date().setDate(new Date().getDate() - new Date().getDay());*/
             // weekStartDate=new Date(new Date().setDate(currentDateDt-currentDateDay));
-            weekStartDate=adjustDays(moment.tz(currentTimestamp, companyDefaultTimezone).format(), "SUB", currentDateDay);
+            // weekStartDate=adjustDays(moment.tz(currentTimestamp, companyDefaultTimezone).format(), "SUB", currentDateDay);
+            weekStartDate = calculateWeekStartDate(moment.tz(currentTimestamp, companyDefaultTimezone).format(),companyWeekStartDay);
             // weekStartDate==moment.tz(weekStartDate, companyDefaultTimezone).format();
             /*weekStartDate=new Date(moment.tz(new Date(), companyDefaultTimezone).format()).setDate(currentDateDt-currentDateDay);*/
             /*weekStartDate=moment.tz(weekStartDate, companyDefaultTimezone).format();*/
             // weekEndDate = new Date(new Date().setDate(currentDateDt + (6 - currentDateDay)));
-            weekEndDate = adjustDays(weekStartDate, "ADD", 6);
-            weekEndDate==moment.tz(weekEndDate, companyDefaultTimezone).format();
+            // weekEndDate = adjustDays(weekStartDate, "ADD", 6);
+            // weekEndDate==moment.tz(weekEndDate, companyDefaultTimezone).format();
+            weekEndDate = calculateWeekEndDate(weekStartDate);
+
             /*weekEndDate = new Date(moment.tz(new Date(), companyDefaultTimezone).format()).setDate(currentDateDt + (6 - currentDateDay));*/
             /*weekEndDate = moment.tz(weekEndDate, companyDefaultTimezone).format();*/
 
@@ -83,6 +87,7 @@
             curr=moment.tz(currentTimestamp, companyDefaultTimezone).format();
             $('#active-tab-day').siblings('span').html(getDateWithMonth(curr));
         }
+        addTabListToUl(weekStartDate);
 
         console.log(weekStartDate + " *** *** ** ** " + weekEndDate);
         var hash = window.location.href.split('#')[1];
@@ -134,10 +139,20 @@
             let currentWeekStart=weekStartDate;
             let date = adjustDays(currentWeekStart, "ADD", index);
             /*date=moment.tz(date, companyDefaultTimezone).format();*/
-            var dateWithMonth = getDateWithMonth(new Date(date), 3);
+            var dateWithMonth = getDateWithMonth(date, 3);
             $(this).html(dateWithMonth);
             $(this).attr('date', dateWithMonth);
         });
+        $.each($('#date-div-parent .text-uppercase.text-thick'), function (index, val) {
+            /*let currentWeekStart=moment.tz(weekStartDate, companyDefaultTimezone).format();*/
+            let currentWeekStart=weekStartDate;
+            let date = adjustDays(currentWeekStart, "ADD", index);
+            /*date=moment.tz(date, companyDefaultTimezone).format();*/
+            var dayOfDate = moment.tz(date, companyDefaultTimezone).format('dd');
+            $(this).html(dayOfDate);
+            // $(this).attr('date', dateWithMonth);
+        });
+
         console.log($('#project_name'));
 
 
@@ -532,7 +547,7 @@
     function stopKwTimerGlobal(ele) {
         $(ele).prev('[start-timer]').removeClass('hide');
         $(ele).addClass('hide');
-        $("[name=kwTimer]").text('Start');
+        // $("[name=kwTimer]").text('Start');
     }
     function updateCurrentLineItem(lineItemData,next){
         $.ajax({
@@ -577,47 +592,112 @@
             }
         });
     }
+    function stopTimesheetForDifferentWeek(lineId,lineItemTaskId,ele){
+      let lineItemData={"line_item_id":lineId,"updateTimer":"stopTimer","isRunning":false};
+      addDataToLineItem(lineItemData,(success,nodata,error)=>{
+          if(success==true){
+              $('#addTimesheetLoader').removeClass('hide');
+              // intervalID = NaN;
+              let timesheetRowData={};
+              timesheetRowDataid=$(ele).attr('line_item_id');
+              let currentSelectedRow=$(ele).closest('div[id='+timesheetRowDataid+']');
+              timesheetRowData.project_id=currentSelectedRow.find('#projectLineItem').attr('pr_id');
+              timesheetRowData.day_project=currentSelectedRow.find('#projectLineItem').text().trim();
+              timesheetRowData.task_id=currentSelectedRow.find('#taskLineItem').attr('tk_id');
+              timesheetRowData.day_task=currentSelectedRow.find('#taskLineItem').text().trim();
+              timesheetRowData.user_role=currentSelectedRow.find('#userRoleLineItem').text().trim();
+              timesheetRowData.day_note=(currentSelectedRow.find('#noteLineItem').text()=="")?' ':currentSelectedRow.find('#noteLineItem').text().trim();
+              timesheetRowData.day_category=(currentSelectedRow.find('#billableLineItem').text()=="Billable")?true:false;
+              // let lastRunTimeCal=moment.tz(currentTimestamp, companyDefaultTimezone).format('HH:mm:ss');
+              // timesheetRowData.lastruntime=lastRunTimeCal;
+              timesheetRowData.timesheet_date=dateFormat(moment.tz(currentTimestamp, companyDefaultTimezone).format());
+              timesheetRowData.isRunning=true;
+              timesheetRowData.day_time="0:00:00";
+              timesheetRowData.week_day=moment.tz(currentTimestamp, companyDefaultTimezone).format('d');
+              console.log(timesheetRowData);
+              /*addRowToTimesheet(timesheetRowData);*/
+              $.ajax({
+                  type: 'POST',
+                  url: '/addTimesheet',
+                  contentType: 'application/json',
+                  dataType: 'json',
+                  data: JSON.stringify(timesheetRowData),
+                  success: function (response) {
+                      console.log(response);
+                      if (response.success == true) {
+                          $('#addTimesheetLoader').addClass('hide');
+                          /*showGlobalToast('#globalToast', 'success', response.message, 4000);*/
+                          window.location.href='/timesheet/'+reqUserId+'#'+moment.tz(currentTimestamp, companyDefaultTimezone).format('dddd').toLowerCase();
+                          // location.reload();
+                      } else {
+                          $('#addTimesheetLoader').addClass('hide');
+                          showGlobalToast('#globalToast', 'error', response.message, 4000);
+                      }
+                  },
+                  error: function (response) {
+                      console.log(response);
+                      $('#addTimesheetLoader').addClass('hide');
+                      showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+                  }
+              });
+
+          }else if(nodata==true){
+              $('#addTimesheetLoader').addClass('hide');
+              showGlobalToast('#globalToast', 'error', response.message, 4000);
+          }else{
+              console.log(response);
+              $('#addTimesheetLoader').addClass('hide');
+              showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+          }
+
+      });
+    }
 
     function startTimer(ele){
 
         console.log('Timer start');
         let idEle=$(ele).closest('.slds-grid').find('time');
         /*idEle=$(idEle).text($(idEle).text()+':00');*/
-        kwLineCounter=$(ele).closest('.slds-grid').find('time');
+        // kwLineCounter=$(ele).closest('.slds-grid').find('time');
+        let currentDate=dateFormat(moment.tz(currentTimestamp, companyDefaultTimezone).format());
         let currentDiv=$("#day-tabs > div").not('.hide');
         let currentDivLi=$("#day-tab-ul li.slds-is-active");
-        let currentDate=dateFormat(moment.tz(currentTimestamp, companyDefaultTimezone).format());
-
+        if(currentDivLi.length == 0){
+          $(`#day-tab-ul li[date=${currentDate}]`).addClass('slds-is-active');
+          currentDivLi=$("#day-tab-ul li.slds-is-active");
+        }
         if(currentDivLi.attr('date')== currentDate){
 
             let previousTimerButton=currentDiv.find('button[title=stop]').not('.hide');
             if(previousTimerButton.length>0){
                 $('#addTimesheetLoader').removeClass('hide');
-                clearInterval(intervalID);
+                // clearInterval(intervalID);
                /* intervalID = NaN;*/
                 previousTimerButton.addClass('hide');
                 $(previousTimerButton).siblings('[start]').removeClass('hide');
-                let updatedHours=$(previousTimerButton).closest('.slds-grid').find('time').text();
-                $(previousTimerButton).closest('.slds-grid').find('time').text(updatedHours.substr(0,updatedHours.lastIndexOf(':')));
+                // let updatedHours=$(previousTimerButton).closest('.slds-grid').find('time').text();
+                $(previousTimerButton).closest('.slds-grid').find('svg').addClass('slds-hide');
+                // $(previousTimerButton).closest('.slds-grid').find('time').text(updatedHours.substr(0,updatedHours.lastIndexOf(':')));
                 let previousLineItemId=previousTimerButton.attr('line_item_id');
                 stopKwTimerGlobal($("[name=globalStop]"));
-                let lineItemData={"line_item_id":previousLineItemId,"updatedHours":updatedHours,"isRunning":false};
+                let lineItemData={"line_item_id":previousLineItemId,"updateTimer":'stopTimer',"isRunning":false};
                 addDataToLineItem(lineItemData,(success,nodata,error)=>{
                     if(success==true){
                         $('#addTimesheetLoader').addClass('hide');
                         selectedEle=ele;
-                        intervalID = NaN;
+                        // intervalID = NaN;
                         let currentLineItemId=$(ele).attr('line_item_id');
-                        let lastRunTimeCal=moment.tz(currentTimestamp, companyDefaultTimezone).format('HH:mm:ss');
-                        let updatedLineItem={"line_item_id":currentLineItemId,"lastRunTime":lastRunTimeCal,"isRunning":true};
+                        // let lastRunTimeCal=moment.tz(currentTimestamp, companyDefaultTimezone).format('HH:mm:ss');
+                        let updatedLineItem={"line_item_id":currentLineItemId,"isRunning":true};
                         updateCurrentLineItem(updatedLineItem,(success,nores,err)=>{
                             if(success==true){
                                 $(ele).addClass('hide');
                                 startKwTimerGlobal($("[name=globalStart]"));
                                 $(ele).next('[stop]').removeClass('hide');
-                                if (isNaN(intervalID)){
-                                    intervalID = setInterval(()=>{incrementTimeOfCount()}, 1000);
-                                }
+                                $(ele).closest('.slds-grid').find('svg').removeClass('slds-hide');
+                                // if (isNaN(intervalID)){
+                                //     intervalID = setInterval(()=>{incrementTimeOfCount()}, 1000);
+                                // }
                             }else if(nores==true){
                                 $('#addTimesheetLoader').addClass('hide');
                                 showGlobalToast('#globalToast', 'error', response.message, 4000);
@@ -657,14 +737,15 @@
                                     }else{
                                         /*selectedEle=ele;*/
                                         $(ele).addClass('hide');
-                                        clearInterval(intervalID);
-                                        intervalID=NaN;
+                                        // clearInterval(intervalID);
+                                        // intervalID=NaN;
                                         startKwTimerGlobal($("[name=globalStart]"));
                                         $(ele).next('[stop]').removeClass('hide');
+                                        $(ele).closest('.slds-grid').find('svg').removeClass('slds-hide');
                                         /*$("[name=kwTimer]").not('.hide').removeAttr('taskId');*/
-                                        if (isNaN(intervalID)){
-                                            intervalID = setInterval(()=>{incrementTimeOfCount()}, 1000);
-                                        }
+                                        // if (isNaN(intervalID)){
+                                        //     intervalID = setInterval(()=>{incrementTimeOfCount()}, 1000);
+                                        // }
                                     }
 
                             } else {
@@ -684,7 +765,7 @@
             }
             else{
                 selectedEle=ele;
-                intervalID = NaN;
+                // intervalID = NaN;
 
                 let lineId=$("[name=kwTimer]").not('.hide').attr('taskId');
                 let lineItemTaskId=$("[name=kwTimer]").not('.hide').attr('lineItemTaskId');
@@ -692,22 +773,24 @@
                     $(ele).addClass('hide');
                     startKwTimerGlobal($("[name=globalStart]"));
                     $(ele).next('[stop]').removeClass('hide');
-                    if (isNaN(intervalID)){
-                        intervalID = setInterval(()=>{incrementTimeOfCount()}, 1000);
-                    }
+                    $(ele).closest('.slds-grid').find('svg').removeClass('slds-hide');
+                    // if (isNaN(intervalID)){
+                    //     intervalID = setInterval(()=>{incrementTimeOfCount()}, 1000);
+                    // }
                 }else{
 
                     let currentLineItemId=$(ele).attr('line_item_id');
                     let lastRunTimeCal=moment.tz(currentTimestamp, companyDefaultTimezone).format('HH:mm:ss');
-                    let updatedLineItem={"line_item_id":currentLineItemId,"lastRunTime":lastRunTimeCal,"isRunning":true};
+                    let updatedLineItem={"line_item_id":currentLineItemId,"isRunning":true};
                     updateCurrentLineItem(updatedLineItem,(success,nores,err)=>{
                         if(success==true){
                             $(ele).addClass('hide');
                             startKwTimerGlobal($("[name=globalStart]"));
                             $(ele).next('[stop]').removeClass('hide');
-                            if (isNaN(intervalID)){
-                                intervalID = setInterval(()=>{incrementTimeOfCount()}, 1000);
-                            }
+                            $(ele).closest('.slds-grid').find('svg').removeClass('slds-hide');
+                            // if (isNaN(intervalID)){
+                            //     intervalID = setInterval(()=>{incrementTimeOfCount()}, 1000);
+                            // }
                         }else if(nores==true){
                             $('#addTimesheetLoader').addClass('hide');
                             showGlobalToast('#globalToast', 'error', response.message, 4000);
@@ -734,19 +817,20 @@
             let previousTimerButton=currentDateDiv.find('button[title=stop]').not('.hide');
             if(previousTimerButton.length>0){
                 $('#addTimesheetLoader').removeClass('hide');
-                clearInterval(intervalID);
+                // clearInterval(intervalID);
                /* intervalID = NaN;*/
                 previousTimerButton.addClass('hide');
                 $(previousTimerButton).siblings('[start]').removeClass('hide');
-                let updatedHours=$(previousTimerButton).closest('.slds-grid').find('time').text();
-                $(previousTimerButton).closest('.slds-grid').find('time').text(updatedHours.substr(0,updatedHours.lastIndexOf(':')));
+                // let updatedHours=$(previousTimerButton).closest('.slds-grid').find('time').text();
+                $(previousTimerButton).closest('.slds-grid').find('svg').addClass('slds-hide');
+                // $(previousTimerButton).closest('.slds-grid').find('time').text(updatedHours.substr(0,updatedHours.lastIndexOf(':')));
                 let previousLineItemId=previousTimerButton.attr('line_item_id');
                 stopKwTimerGlobal($("[name=globalStop]"));
-                let lineItemData={"line_item_id":previousLineItemId,"updatedHours":updatedHours,"isRunning":false};
+                let lineItemData={"line_item_id":previousLineItemId,"updateTimer":"stopTimer","isRunning":false};
                 addDataToLineItem(lineItemData,(success,nodata,error)=>{
                     if(success==true){
                         $('#addTimesheetLoader').removeClass('hide');
-                        intervalID = NaN;
+                        // intervalID = NaN;
                         let timesheetRowData={};
                         timesheetRowDataid=$(ele).attr('line_item_id');
                         let currentSelectedRow=$(ele).closest('div[id='+timesheetRowDataid+']');
@@ -757,8 +841,8 @@
                         timesheetRowData.user_role=currentSelectedRow.find('#userRoleLineItem').text();
                         timesheetRowData.day_note=(currentSelectedRow.find('#noteLineItem').text()=="")?' ':currentSelectedRow.find('#noteLineItem').text();
                         timesheetRowData.day_category=(currentSelectedRow.find('#billableLineItem').text()=="Billable")?true:false;
-                        let lastRunTimeCal=moment.tz(currentTimestamp, companyDefaultTimezone).format('HH:mm:ss');
-                        timesheetRowData.lastruntime=lastRunTimeCal;
+                        // let lastRunTimeCal=moment.tz(currentTimestamp, companyDefaultTimezone).format('HH:mm:ss');
+                        // timesheetRowData.lastruntime=lastRunTimeCal;
                         timesheetRowData.timesheet_date=dateFormat(moment.tz(currentTimestamp, companyDefaultTimezone).format());
                         timesheetRowData.isRunning=true;
                         timesheetRowData.day_time="0:00:00";
@@ -776,7 +860,7 @@
                                 if (response.success == true) {
                                     $('#addTimesheetLoader').addClass('hide');
                                     /*showGlobalToast('#globalToast', 'success', response.message, 4000);*/
-                                    window.location.href='/timesheet/'+reqUserId+'#'+moment.tz(new Date(), companyDefaultTimezone).format('dddd').toLowerCase();
+                                    window.location.href='/timesheet/'+reqUserId+'#'+moment.tz(currentTimestamp, companyDefaultTimezone).format('dddd').toLowerCase();
                                     location.reload();
                                 } else {
                                     $('#addTimesheetLoader').addClass('hide');
@@ -814,20 +898,23 @@
                             if (response.success == true) {
                                 globalTaskId = response.task.id;
                                 if(lineItemTaskId==globalTaskId){
-                                        stopKwTimerGlobally(this, '[name=kwTimer]', '#syncTimer', '#modalAddNewTsheetQuick');
-                                        selectedEle=ele;
-                                    }else{
-                                        /*selectedEle=ele;*/
-                                        $(ele).addClass('hide');
-                                        clearInterval(intervalID);
-                                        intervalID=NaN;
-                                        startKwTimerGlobal($("[name=globalStart]"));
-                                        $(ele).next('[stop]').removeClass('hide');
-                                        /*$("[name=kwTimer]").not('.hide').removeAttr('taskId');*/
-                                        if (isNaN(intervalID)){
-                                            intervalID = setInterval(()=>{incrementTimeOfCount()}, 1000);
-                                        }
-                                    }
+                                    stopKwTimerGlobally(this, '[name=kwTimer]', '#syncTimer', '#modalAddNewTsheetQuick');
+                                    selectedEle=ele;
+                                }else if(currentDateDiv.length ==0){
+                                    stopTimesheetForDifferentWeek(lineId,lineItemTaskId,ele);
+                                }else{
+                                    /*selectedEle=ele;*/
+                                    $(ele).addClass('hide');
+                                    // clearInterval(intervalID);
+                                    // intervalID=NaN;
+                                    startKwTimerGlobal($("[name=globalStart]"));
+                                    $(ele).next('[stop]').removeClass('hide');
+                                    $(ele).closest('.slds-grid').find('svg').removeClass('slds-hide');
+                                    /*$("[name=kwTimer]").not('.hide').removeAttr('taskId');*/
+                                    // if (isNaN(intervalID)){
+                                    //     intervalID = setInterval(()=>{incrementTimeOfCount()}, 1000);
+                                    // }
+                                }
 
                             } else {
                                 showGlobalToast('#globalToast', 'error', response.message, 4000);
@@ -847,19 +934,19 @@
             else{
                 $('#addTimesheetLoader').removeClass('hide');
                 selectedEle=ele;
-                intervalID = NaN;
+                // intervalID = NaN;
                 let timesheetRowData={};
                 timesheetRowDataid=$(ele).attr('line_item_id');
                 let currentSelectedRow=$(ele).closest('div[id='+timesheetRowDataid+']');
                 timesheetRowData.project_id=currentSelectedRow.find('#projectLineItem').attr('pr_id');
-                timesheetRowData.day_project=currentSelectedRow.find('#projectLineItem').text();
+                timesheetRowData.day_project=currentSelectedRow.find('#projectLineItem').text().trim();
                 timesheetRowData.task_id=currentSelectedRow.find('#taskLineItem').attr('tk_id');
-                timesheetRowData.day_task=currentSelectedRow.find('#taskLineItem').text();
-                timesheetRowData.user_role=currentSelectedRow.find('#userRoleLineItem').text();
-                timesheetRowData.day_note=(currentSelectedRow.find('#noteLineItem').text()=="")?' ':currentSelectedRow.find('#noteLineItem').text();
+                timesheetRowData.day_task=currentSelectedRow.find('#taskLineItem').text().trim();
+                timesheetRowData.user_role=currentSelectedRow.find('#userRoleLineItem').text().trim();
+                timesheetRowData.day_note=(currentSelectedRow.find('#noteLineItem').text()=="")?' ':currentSelectedRow.find('#noteLineItem').text().trim();
                 timesheetRowData.day_category=(currentSelectedRow.find('#billableLineItem').text()=="Billable")?true:false;
-                let lastRunTimeCal =moment.tz(currentTimestamp, companyDefaultTimezone).format('HH:mm:ss');
-                timesheetRowData.lastruntime=lastRunTimeCal;
+                // let lastRunTimeCal =moment.tz(currentTimestamp, companyDefaultTimezone).format('HH:mm:ss');
+                // timesheetRowData.lastruntime=lastRunTimeCal;
                 timesheetRowData.timesheet_date=dateFormat(moment.tz(currentTimestamp, companyDefaultTimezone).format());
                 timesheetRowData.isRunning=true;
                 timesheetRowData.day_time="0:00";
@@ -876,9 +963,11 @@
                         console.log(response);
                         if (response.success == true) {
                             $('#addTimesheetLoader').addClass('hide');
-                            window.location.href='/timesheet/'+reqUserId+'#'+moment.tz(currentTimestamp, companyDefaultTimezone).format('dddd').toLowerCase();
+                            window.location.href ='/timesheet/'+reqUserId+'#'+moment.tz(currentTimestamp, companyDefaultTimezone).format('dddd').toLowerCase();
                             /*showGlobalToast('#globalToast', 'success', response.message, 4000);*/
-                            location.reload();
+                            if(document.URL.indexOf('?')==-1){
+                              location.reload();
+                            }
                         } else {
                             $('#addTimesheetLoader').addClass('hide');
                             showGlobalToast('#globalToast', 'error', response.message, 4000);
@@ -1049,18 +1138,20 @@
     }*/
     function stopTimer(ele){
         console.log('Timer stop');
-        let updatedHours=$(ele).closest('.slds-grid').find('time').text();
+        // let updatedHours=$(ele).closest('.slds-grid').find('time').text();
         let lineItemId=$(ele).attr('line_item_id');
-        let lineItemData={"line_item_id":lineItemId,"updatedHours":updatedHours,"isRunning":false};
+        let lineItemData={"line_item_id":lineItemId,"updateTimer":'stopTimer',"isRunning":false};
         addDataToLineItem(lineItemData,(success,nodata,error)=>{
             if(success==true){
                 selectedEle=undefined;
                 $(ele).addClass('hide');
                 $(ele).siblings('button').removeClass('hide');
-                $(ele).closest('.slds-grid').find('time').text(updatedHours.substr(0,updatedHours.lastIndexOf(':')));
+                $(ele).closest('.slds-grid').find('svg').addClass('slds-hide');
+                // $(ele).closest('.slds-grid').find('time').text(updatedHours.substr(0,updatedHours.lastIndexOf(':')));
                 stopKwTimerGlobal($("[name=globalStop]"));
-                clearInterval(intervalID);
-                intervalID = NaN;
+                location.reload();
+                // clearInterval(intervalID);
+                // intervalID = NaN;
 
             }else if(nodata==true){
                 $('#addTimesheetLoader').addClass('hide');
@@ -1095,25 +1186,25 @@
 
     function startKwTimer(ele,id) {
         selectedEle=undefined;
-        $(id).text('0:00:00');
-        kwCounter = $(id);
-        intervalID = NaN;
+        // $(id).text('0:00:00');
+        // kwCounter = $(id);
+        // intervalID = NaN;
         $(ele).addClass('hide');
         $(ele).next('[stop-timer]').removeClass('hide');
-        if (isNaN(intervalID)){
-            intervalID = setInterval(()=>{incrementTime}, 1000);
-        }
+        // if (isNaN(intervalID)){
+        //     intervalID = setInterval(()=>{incrementTime}, 1000);
+        // }
     }
 
     function stopKwTimer(ele, id, inputId, modalId) {
         if(selectedEle==undefined||selectedEle==null){
-            clearInterval(intervalID);
-            intervalID = NaN;
+            // clearInterval(intervalID);
+            // intervalID = NaN;
             openModal(modalId);
-            $(inputId).val($($(id)[0]).text());
+            // $(inputId).val($($(id)[0]).text());
             $(ele).addClass('hide');
             $(ele).prev('[start-timer]').removeClass('hide');
-            $(id).text('Start');
+            // $(id).text('Start');
         }else{
             stopTimer($(selectedEle).next('[stop]'));
         }
@@ -1123,8 +1214,12 @@
         $(val).attr('disabled', 'disabled');
         if($('#btn-timesheet-shift .btn-is-on').html() == "Day") {
             let currDay = $('#day-tab-ul li.slds-is-active').attr('day');
-            if(currDay != 0) {
+            let previousDate = moment.tz(weekStartDate, companyDefaultTimezone).format('d');
+            if(currDay != previousDate) {
                 let prevday = parseInt(currDay) - 1;
+                if(currDay == 0){
+                  prevday = parseInt(currDay) + 6;
+                }
                 $('#day-tab-ul > li').removeClass('slds-is-active');
                 $('#day-tab-ul li[day='+prevday+']').click();
                 hideLoader('#globalLoader');
@@ -1168,9 +1263,13 @@
         $(val).attr('disabled', 'disabled');
         if($('#btn-timesheet-shift .btn-is-on').html() == "Day") {
             let currDay = $('#day-tab-ul li.slds-is-active').attr('day');
+            let nextDate = moment.tz(adjustDays(moment.tz(weekStartDate, companyDefaultTimezone).format(), "ADD", 6),companyDefaultTimezone).format('d');
             console.log(currDay);
-            if(currDay != 6) {
+            if(currDay != nextDate) {
                 let prevday = parseInt(currDay) + 1;
+                if(prevday == 7){
+                  prevday =0;
+                }
                 $('#day-tab-ul > li').removeClass('slds-is-active');
                 $('#day-tab-ul li[day='+prevday+']').click();
                 hideLoader('#globalLoader');
@@ -1317,7 +1416,7 @@
         for (let i = 0; i < 7; i++) {
             inpt += `<div class="slds-col hpd-2">
                         <div class="slds-form-element__control text-center">
-                            <input type="text" class="slds-input hpd-2 text-center" placeholder="0:00" onchange="isDataModified(this);" onblur="formateTime(this);"  week_start_date=`+dateFormat(moment.tz(new Date(weekStartDate), companyDefaultTimezone).format())+` pr_id=`+formData.project_id+` task_id=`+formData.task_id+` index=`+i+` pr_name='`+formData.project_name+`' task_name='`+formData.task_name+`' user_role='`+formData.user_role+`'
+                            <input type="text" class="slds-input hpd-2 text-center" placeholder="0:00" onchange="isDataModified(this);" onblur="formateTime(this);"  week_start_date=`+dateFormat(moment.tz(weekStartDate, companyDefaultTimezone).format())+` pr_id=`+formData.project_id+` task_id=`+formData.task_id+` index=`+i+` pr_name='`+formData.project_name+`' task_name='`+formData.task_name+`' user_role='`+formData.user_role+`'
                             billable='`+formData.timesheet_category+`' added>
                         </div>
                     </div>`;
@@ -1451,6 +1550,20 @@
                                             </div>
                                         </div>`;
                             } else {
+                                let twhInput = `<input type="text" class="slds-input time-hhmm" onpaste="setModified(this);" onkeyup="setModified(this);" onchange="setModified(this);" placeholder="" value="`+minuteToHours(row.total_work_hours)+`">`;
+                                let clockShowing = ``;
+                                if(row.isrunning){
+                                    twhInput = `<input type="text" class="slds-input" disabled placeholder="" value="`+minuteToHours(row.total_work_hours)+`">`;
+                                    clockShowing = `<svg aria-hidden="true" focusable="false"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" width="80%" height="80%"  class="view-inline slds-align_absolute-center">
+                                                        <circle  cx="50%" cy="50%" fill="transparent" r="15.909091" stroke="#ddd" stroke-width="6"></circle>
+                                                        <circle cx="50%" cy="50%" fill="transparent" r="15.909091" stroke="#00cc33" stroke-width="6" stroke-dashoffset="25" >
+                                                            <animate attributeName="stroke-dasharray"   from="0 100" to="100 0" dur="60s" repeatCount="indefinite"/>
+                                                          </circle>
+                                                        <circle  cx="50%" cy="50%" fill="red" r="6"stroke-width="0">
+                                                             <animate attributeName="opacity"   from="0" to="1" dur="60s" repeatCount="indefinite"/>
+                                                        </circle>
+                                                    </svg>`;
+                                }
                                 rowhtm += `<div class="line-top slds-p-around_small" row-div row-id=`+row.id+` saved>
                                                 <div class="text-size-16 text-thick">
                                                     `+row.task_name+`
@@ -1459,7 +1572,7 @@
                                                     Role : Consultant
                                                 </div>
                                                 <div class="slds-grid slds-wrap">
-                                                    <div class="slds-size_1-of-1 slds-medium-size_5-of-12">
+                                                    <div class="slds-size_1-of-1 slds-medium-size_4-of-12">
                                                         <div class="slds-form-element">
                                                             <div class="slds-form-element__control">
                                                                 <textarea class="slds-textarea" placeholder="Note" rows="1" onpaste="setModified(this);" onkeyup="setModified(this);" onchange="setModified(this);">`+row.description+` </textarea>
@@ -1485,12 +1598,15 @@
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    <div class="slds-size_1-of-1 slds-medium-size_1-of-12">
+                                                        ${clockShowing}
+                                                    </div>
                                                     <div class="slds-size_1-of-1 slds-medium-size_4-of-12">
                                                         <div class="slds-grid">
                                                             <div class="slds-p-horizontal_small slds-has-flexi-truncate">
                                                                 <div class="slds-form-element">
                                                                     <div class="slds-form-element__control">
-                                                                        <input type="text" class="slds-input time-hhmm" onpaste="setModified(this);" onkeyup="setModified(this);" onchange="setModified(this);" placeholder="" value="`+minuteToHours(row.total_work_hours)+`">
+                                                                          ${twhInput}
                                                                         <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
                                                                         </div>
                                                                     </div>
@@ -1507,7 +1623,8 @@
                         });
                         $('#week-data-row').html(rowhtm);
                         $('#week-data-row').attr('project-name', $(ele).attr('project-name'));
-                        $('#week-day-edit-modal').html(weekArr[index]);
+                        // $('#week-day-edit-modal').html(weekArr[index]);
+                        $('#week-day-edit-modal').html(moment.tz(created_date, companyDefaultTimezone).format('dddd'));
                         $('#week-date-edit-modal').html(getDateWithMonth(moment.tz(created_date, companyDefaultTimezone).format()));
                         $('#week-project-edit-modal').html($(ele).attr('project-name'));
                         $('#week-task-edit-modal').html($(ele).attr('task-name'));
@@ -1543,24 +1660,25 @@
 
    function submitWeeklyDayTimesheet(ele, modalId) {
        if($('#week-data-row div[saved]').length > 0) {
-            submitWeeklyTimesheetByProjectId(ele);
+            submitWeeklyTimesheetByProjectTaskId(ele);
        } else {
             closeModal(modalId);
             showGlobalToast('#globalToast', 'success', "Nothing to submit", 4000);
        }
    }
 
-    function submitWeeklyTimesheetByProjectId(ele) {
+    function submitWeeklyTimesheetByProjectTaskId(ele) {
         showLoader('#globalLoader');
         var project_id = $(ele).attr('project-id');
+        var task_id = $(ele).attr('task-id');
         var user_role = $(ele).attr('user-role');
         var created_date = $(ele).attr('created-date');
         $.ajax({
             type: 'POST',
-            url: '/submitWeeklyTimesheetByProjectId',
+            url: '/submitWeeklyTimesheetByProjectTaskId',
             contentType: 'application/json',
             dataType: 'json',
-            data: JSON.stringify({"project_id":project_id, "created_date":created_date, "user_role":user_role}),
+            data: JSON.stringify({"project_id":project_id,"task_id":task_id, "created_date":created_date, "user_role":user_role}),
             success: function (response) {
                 if(response.success == true) {
                     location.reload();
@@ -1817,4 +1935,58 @@
         }
         console.log($('#week-data-row [row-div][modified]'));
     }
+function calculateWeekEndDate(start_date) {
+  console.log('calculateWeekEndDate called');
+  // var dat = new Date(start_date);
+  console.log('calculateWeekEndDate start_date'+start_date);
+  let dat = moment.tz(dateFormat(start_date).split('T')[0]+' 23:59:59', companyDefaultTimezone).valueOf();
+  dat = moment.tz(dat, companyDefaultTimezone).add(6,'d');
+  // dat = dat +  (6 * 24 * 60 * 60 * 1000);
+  // dat.setTime(dat.getTime() +  (6 * 24 * 60 * 60 * 1000));
+  // console.log('week end date is '+dat);
+  dat = moment(dat).tz(companyDefaultTimezone).format();
+  return dat;
+}
+
+function calculateWeekStartDate(current_date,TIMESHEET_WEEK_START_DAY) {
+  console.log('calculateWeekStartDate called');
+  let days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+  // let today = new Date().getDay();
+  console.log(current_date+' '+TIMESHEET_WEEK_START_DAY)
+  console.log('current_date'+moment.tz(current_date, companyDefaultTimezone).format());
+  let today = parseInt(moment.tz(current_date, companyDefaultTimezone).format('d'));
+  let weekStartDayValue=days.indexOf(TIMESHEET_WEEK_START_DAY);
+  console.log('weekStartDayValue '+weekStartDayValue)
+  let diffInDays=today-weekStartDayValue;
+  let weekStartDate =0;
+  if(diffInDays<0){
+      weekStartDate = adjustDays(current_date,'SUB',7+diffInDays);
+  }else{
+      weekStartDate = adjustDays(current_date,'SUB',diffInDays);
+  }
+  return(weekStartDate);
+}
+function addTabListToUl(weekStartDate){
+  let currentWeekStart=weekStartDate;
+  $("ul[id=day-tab-ul]").html('');
+  for(let index=0;index<7;index++){
+    let date = adjustDays(currentWeekStart, "ADD", index);
+    /*date=moment.tz(date, companyDefaultTimezone).format();*/
+    var dayOfDate = moment.tz(date, companyDefaultTimezone).format('dddd');
+    // $(this).html(dayOfDate);
+    let tabLi = `<li data-navigation="${dayOfDate}" class="slds-tabs_default__item slds-grow text-center hpd-2 " title="" day=${moment.tz(date, companyDefaultTimezone).format('d')}  onclick="openTabWithUpdate(this, '${dayOfDate}')">
+                    <a class="slds-tabs_default__link text-height-normal" href="javascript:void(0);" tabindex="0" style="height: auto;">
+                        <div class="text-uppercase text-thick vpd-5">
+                            ${dayOfDate.substring(0,3)}
+                        </div>
+                        <div class="bpd-5" total-time>
+                            0:00
+                        </div>
+                    </a>
+                </li>`;
+    $("ul[id=day-tab-ul]").append(tabLi);
+    bindDataNavigationEvent();
+  }
+
+}
 </script>

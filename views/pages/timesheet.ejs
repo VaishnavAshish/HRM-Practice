@@ -303,7 +303,7 @@
                                                                         </div> -->
 
                                                                         <div class="slds-col tsheet-week-time" title="Edit" index='<%= index %>' project-name='<%= weekData.project_name %>' task-name='<%= weekData.task_name %>' week-start-date='<%= weekData.week_start_date %>' task-id='<%= weekData.task_id %>' user-role='<%= weekData.user_role %>' project-id='<%= weekData.project_id %>' onclick="getTaskDetailsForWeek(this, '#modalEditTsheetTime')" saved>
-                                                                            <%= data %>
+                                                                            <%= data.twh %>
                                                                         </div>
 
                                                                 <% }); %>
@@ -475,7 +475,7 @@
                                                                         <div class="slds-grid slds-wrap slds-grid_pull-padded sm-tpd-10">
                                                                             <div class="slds-size_7-of-12  slds-p-horizontal_small">
                                                                                 <div class="slds-grid">
-                                                                                    <div class="slds-no-flex slds-size_1-of-5" remove-on-other-user>
+                                                                                    <div class="slds-no-flex slds-size_1-of-6" remove-on-other-user>
                                                                                     <% if(!timesheetRow.submitted) { %>
                                                                                         <button class="slds-button slds-button_icon slds-button_icon-border-filled" title="start" start line_item_id="<%= timesheetRow.id %>"    onclick="startTimer(this);">
                                                                                             <span class="slds-button__icon">
@@ -489,8 +489,9 @@
                                                                                         </button>
                                                                                     <% } %>
                                                                                     </div>
-                                                                                    <div class="line-left slds-p-horizontal_small slds-m-left_small slds-has-flexi-truncate slds-size_4-of-5">
+                                                                                    <div class="line-left slds-p-horizontal_small slds-m-left_small slds-has-flexi-truncate slds-size_3-of-6">
                                                                                         <time class="text-size-21"><%= timesheetRow.total_work_hours %></time>
+
                                                                                         <ul class="slds-list_horizontal slds-has-dividers_left">
                                                                                             <% if(timesheetRow.billable) { %>
                                                                                                 <li class="slds-item" id="billableLineItem">
@@ -501,6 +502,17 @@
                                                                                                 <li class="slds-item text-green">Submitted</li>
                                                                                             <% } %>
                                                                                         </ul>
+                                                                                    </div>
+                                                                                    <div class="slds-no-flex slds-size_2-of-6" remove-on-other-user>
+                                                                                      <svg aria-hidden="true" focusable="false"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" width="90%" height="90%"  class="view-inline slds-hide">
+                                                                                          <circle  cx="50%" cy="50%" fill="transparent" r="15.909091" stroke="#ddd" stroke-width="6"></circle>
+                                                                                          <circle cx="50%" cy="50%" fill="transparent" r="15.909091" stroke="#00cc33" stroke-width="6" stroke-dashoffset="25" >
+                                                                                              <animate attributeName="stroke-dasharray"   from="0 100" to="100 0" dur="60s" repeatCount="indefinite"/>
+                                                                                            </circle>
+                                                                                          <circle  cx="50%" cy="50%" fill="red" r="6"stroke-width="0">
+                                                                                               <animate attributeName="opacity"   from="0" to="1" dur="60s" repeatCount="indefinite"/>
+                                                                                          </circle>
+                                                                                      </svg>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>

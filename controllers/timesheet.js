@@ -4,7 +4,7 @@ const commonController = require('./common-functions');
 const handleResponse = require('./page-error-handle');
 const moment = require('moment-timezone');
 var setting = require('./company-setting');
-let companyDefaultTimezone;
+let companyDefaultTimezone,companyWeekStartDay;
 /*handleError=(res, reason, message, code) =>{
   // console.log("ERROR: " + reason);
   res.status(code || 500).json({"success":false,"message": message});
@@ -24,7 +24,7 @@ shouldAbort = (err, client, done) => {
 }
 */
 function dateFormat(gDate) {
-  return(gDate.split(' ')[0]);
+  return(gDate.split(' ')[0].split('T')[0]);
 }
 // function dateFormat(gDate) {
   // var today = new Date(gDate);
@@ -43,12 +43,12 @@ function dateFormat(gDate) {
 // }
 
 function calculateWeekEndDate(start_date) {
-  console.log('calculateWeekEndDate called');
+  //console.log('calculateWeekEndDate called');
   // var dat = new Date(start_date);
-  console.log('calculateWeekEndDate start_date'+start_date);
+  // console.log('calculateWeekEndDate start_date'+start_date);
   let dat = moment.tz(dateFormat(start_date).split('T')[0]+' 23:59:59', companyDefaultTimezone).valueOf();
-  // dat = moment.tz(dat, companyDefaultTimezone).add(6,'d');
-  dat = dat +  (6 * 24 * 60 * 60 * 1000);
+  dat = moment.tz(dat, companyDefaultTimezone).add(6,'d');
+  // dat = dat +  (6 * 24 * 60 * 60 * 1000);
   // dat.setTime(dat.getTime() +  (6 * 24 * 60 * 60 * 1000));
   // console.log('week end date is '+dat);
   dat = moment(dat).tz(companyDefaultTimezone).format();
@@ -56,31 +56,32 @@ function calculateWeekEndDate(start_date) {
 }
 
 function calculateWeekStartDate(current_date,TIMESHEET_WEEK_START_DAY) {
-  console.log('calculateWeekStartDate called');
-  let days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  // console.log('calculateWeekStartDate called');
+  let days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
   // let today = new Date().getDay();
-  console.log(current_date)
-  console.log('current_date'+moment.tz(current_date, companyDefaultTimezone).format());
+  // console.log(current_date+' '+TIMESHEET_WEEK_START_DAY)
+  // console.log('current_date'+moment.tz(current_date, companyDefaultTimezone).format());
   let today = parseInt(moment.tz(current_date, companyDefaultTimezone).format('d'));
   let weekStartDayValue=days.indexOf(TIMESHEET_WEEK_START_DAY);
+  // console.log('weekStartDayValue '+weekStartDayValue)
   let diffInDays=today-weekStartDayValue;
   let weekStartDate =0;
   if(diffInDays<0){
-      weekStartDate = adjustDays(current_date,7+diffInDays);
+      weekStartDate = adjustDaysForDate(current_date,'SUB',7+diffInDays);
   }else{
-      weekStartDate = adjustDays(current_date,diffInDays);
+      weekStartDate = adjustDaysForDate(current_date,'SUB',diffInDays);
   }
   return(weekStartDate);
 }
 
-function adjustDays (dateToAdjust,days) {
-  var dat = moment.tz(dateToAdjust, companyDefaultTimezone).valueOf();
-  // dat = dat - (days * 24 * 60 * 60 * 1000);
-  dat = moment.tz(dat, companyDefaultTimezone).subtract(days,'d');
-  // dat.setTime(dat.getTime() -  (days * 24 * 60 * 60 * 1000));
-  dat = moment(dat).tz(companyDefaultTimezone).format();
-  return dat;
-}
+// function adjustDays (dateToAdjust,days) {
+//   var dat = moment.tz(dateToAdjust, companyDefaultTimezone).valueOf();
+//   // dat = dat - (days * 24 * 60 * 60 * 1000);
+//   dat = moment.tz(dat, companyDefaultTimezone).subtract(days,'d');
+//   // dat.setTime(dat.getTime() -  (days * 24 * 60 * 60 * 1000));
+//   dat = moment(dat).tz(companyDefaultTimezone).format();
+//   return dat;
+// }
 
 function adjustDaysForDate (date, type, days) {
     var dat = moment.tz(date, companyDefaultTimezone).valueOf();
@@ -97,23 +98,36 @@ function adjustDaysForDate (date, type, days) {
 function createTimesheetWeekObj(timesheetObj,previousTaskId,currentTaskId,timesheetList,week_start_date){
   // console.log('inside createTimesheetWeekObj');
   // console.log(timesheetObj);
-      console.log('week_start_date ' +week_start_date);
+      // console.log('week_start_date ' +week_start_date);
       timesheetObj={};
       timesheetObj.totalTime=0;
-      timesheetObj.timesheetObjData=['0.00','0.00','0.00','0.00','0.00','0.00','0.00'];
+      // timesheetObj.timesheetObjData=['0.00','0.00','0.00','0.00','0.00','0.00','0.00'];
+      timesheetObj.timesheetObjData=[];
+      for(let i=0;i<7;i++){
+        timesheetObj.timesheetObjData.push({'date':dateFormat(moment.tz(week_start_date, companyDefaultTimezone).add(i,'d').format()),'day':moment.tz(week_start_date, companyDefaultTimezone).add(i,'d').format('d'),'twh':'0:00'})
+      }
       timesheetObj.task_id=currentTaskId;
       timesheetObj.project_id=timesheetList.project_id;
       timesheetObj.week_start_date = week_start_date;
       // timesheetObj.created_date = adjustDaysForDate(week_start_date,'ADD',timesheetList.week_day);
-      timesheetObj.created_date=timesheetList.created_date;
+      // timesheetObj.created_date=timesheetList.created_date;
       timesheetObj.task_name=timesheetList.task_name;
       timesheetObj.user_role=timesheetList.user_role;
       timesheetObj.project_name=timesheetList.project_name;
       timesheetObj.submitted=timesheetList.submitted;
       timesheetObj.totalTime+=parseInt(timesheetList.twh);
       timesheetList.twh=minuteToHours(timesheetList.twh);
-      timesheetObj.timesheetObjData[timesheetList.week_day]=timesheetList.twh;
-      console.log(timesheetObj.created_date);
+      // timesheetObj.timesheetObjData[timesheetList.week_day]=timesheetList.twh;
+      // console.log('date of timesheet line item'+dateFormat(moment.tz(timesheetList.created_date, companyDefaultTimezone).format()));
+      // console.log(timesheetObj.timesheetObjData.filter(timeArr => timeArr.date == dateFormat(moment.tz(timesheetList.created_date, companyDefaultTimezone).format())));
+      timesheetObj.timesheetObjData.filter(timeArr => timeArr.date == dateFormat(moment.tz(timesheetList.created_date, companyDefaultTimezone).format()))
+      .map(resultedData => {
+          // console.log(JSON.stringify(resultedData));
+          resultedData.twh = timesheetList.twh;
+          // console.log(JSON.stringify(resultedData));
+          return resultedData;
+        });
+      // console.log(timesheetObj.timesheetObjData);
       previousTaskId=currentTaskId;
       return({
         timesheetObj:timesheetObj,
@@ -125,8 +139,13 @@ function getTimesheetForWeek(timesheetListArray, week_start_date) {
   let taskListsWeekArr=[];
   let currentTaskId,previousTaskId=-1;
   let timesheetObj={};
+  timesheetObj.timesheetObjData=[];
+  for(let i=0;i<7;i++){
+    timesheetObj.timesheetObjData.push({'date':dateFormat(moment.tz(week_start_date, companyDefaultTimezone).add(i,'d').format()),'day':moment.tz(week_start_date, companyDefaultTimezone).add(i,'d').format('d'),'twh':'0:00'})
+  }
   timesheetObj.totalTime=0;
-  timesheetObj.timesheetObjData=['0.00','0.00','0.00','0.00','0.00','0.00','0.00'];
+  // timesheetObj.timesheetObjData=['0.00','0.00','0.00','0.00','0.00','0.00','0.00'];
+
   timesheetListArray.forEach(function(timesheetList,index){
     currentTaskId=timesheetList.task_id;
 
@@ -137,9 +156,12 @@ function getTimesheetForWeek(timesheetListArray, week_start_date) {
                 // console.log('matching user_role '+timesheetList.user_role+' '+timesheetObj.user_role);
                 timesheetObj.totalTime+=parseInt(timesheetList.twh);
                 // console.log(timesheetObj.timesheetObjData[timesheetList.week_day]!='0.00');
-                // console.log(timesheetList.twh);
-                if(timesheetObj.timesheetObjData[timesheetList.week_day]!='0.00'){
-                  let timesheetObjHours = hoursToMinutes(timesheetObj.timesheetObjData[timesheetList.week_day]);
+                // console.log(timesheetObj);
+                let filteredData = timesheetObj.timesheetObjData.filter(timeArr => timeArr.date == dateFormat(moment.tz(timesheetList.created_date, companyDefaultTimezone).format()))
+                // console.log('filteredData '+JSON.stringify(filteredData));
+                // console.log(filteredData[0].twh)
+                if(filteredData[0].twh !='0:00'){
+                  let timesheetObjHours = hoursToMinutes(filteredData[0].twh);
                   // console.log('timesheetObjHours');
                   // console.log(timesheetObjHours);
                   // console.log(timesheetList.twh+timesheetObjHours);
@@ -148,7 +170,13 @@ function getTimesheetForWeek(timesheetListArray, week_start_date) {
                   timesheetList.twh=minuteToHours(timesheetList.twh);
                 }
                 // console.log(timesheetList.twh);
-                timesheetObj.timesheetObjData[timesheetList.week_day]=timesheetList.twh;
+                timesheetObj.timesheetObjData.filter(timeArr => timeArr.date == dateFormat(moment.tz(timesheetList.created_date, companyDefaultTimezone).format()))
+                .map(resultedData => {
+                    // console.log(JSON.stringify(resultedData));
+                    resultedData.twh = timesheetList.twh;
+                    return resultedData;
+                  });
+                // timesheetObj.timesheetObjData[timesheetList.week_day]=timesheetList.twh;
 
         }else{
           // console.log('Inside not matching user role '+timesheetList.user_role+' '+timesheetObj.user_role);
@@ -184,7 +212,8 @@ function getTimesheetForWeek(timesheetListArray, week_start_date) {
   return taskListsWeekArr;
 }
 
-function getTimesheetForDay(timesheetList) {
+function getTimesheetForDay(timesheetList,currentDateTime) {
+  console.log('inside get timesheet for day');
   var taskListsDayArr = [];
   var tsData = timesheetList.rows;
   for(var i=0; i<tsData.length; i++) {
@@ -203,6 +232,20 @@ function getTimesheetForDay(timesheetList) {
 
       objDay.total_hours += parseFloat(tsData[i].total_work_hours);
       subObjDay.id = tsData[i].id;
+      // console.log('isrunning');
+      // console.log(tsData[i].isrunning);
+      if(tsData[i].isrunning){
+          // console.log('timesheet time for row having same date');
+          // console.log(moment.tz(currentDateTime, companyDefaultTimezone).format());
+          // console.log(moment.tz(tsData[i].lastruntime, companyDefaultTimezone).format());
+          let currentTime = moment.tz(currentDateTime, companyDefaultTimezone).format('hh:mm');
+          let lastruntime = moment.tz(tsData[i].lastruntime, companyDefaultTimezone).format('hh:mm')
+          let differenceOfTime = hoursToMinutes(currentTime) - hoursToMinutes(lastruntime);
+          // console.log('differenceOfTime before update');
+          // console.log(tsData[i].total_work_hours+' '+differenceOfTime);
+          tsData[i].total_work_hours += differenceOfTime;
+          // console.log(tsData[i].total_work_hours+' '+differenceOfTime);
+      }
       subObjDay.total_work_hours = minuteToHours(tsData[i].total_work_hours);
       subObjDay.project_id = tsData[i].project_id;
       subObjDay.project_name = tsData[i].project_name;
@@ -225,6 +268,20 @@ function getTimesheetForDay(timesheetList) {
       objDay.submitted = tsData[i].submitted;
       objDay.total_hours += parseFloat(tsData[i].total_work_hours);
       subObjDay.id = tsData[i].id;
+      // console.log('isrunning');
+      // console.log(subObjDay.isrunning);
+      if(tsData[i].isrunning){
+          // console.log('timesheet time for row having different and new date');
+          // console.log(moment.tz(currentDateTime, companyDefaultTimezone).format());
+          // console.log(moment.tz(tsData[i].lastruntime, companyDefaultTimezone).format());
+          let currentTime = moment.tz(currentDateTime, companyDefaultTimezone).format('hh:mm');
+          let lastruntime = moment.tz(tsData[i].lastruntime, companyDefaultTimezone).format('hh:mm')
+          let differenceOfTime = hoursToMinutes(currentTime) - hoursToMinutes(lastruntime);
+          // console.log('differenceOfTime before update');
+          // console.log(tsData[i].total_work_hours+' '+differenceOfTime);
+          tsData[i].total_work_hours += differenceOfTime;
+          //console.log(tsData[i].total_work_hours+' '+differenceOfTime);
+      }
       subObjDay.total_work_hours = minuteToHours(tsData[i].total_work_hours);
       subObjDay.project_id = tsData[i].project_id;
       subObjDay.project_name = tsData[i].project_name;
@@ -271,7 +328,7 @@ exports.getTimesheetWithPlay = (req,res) =>{
                   let currentTime=moment.tz(currentTimestamp.rows[0].currentdate, companyDefaultTimezone).format('hh:mm:ss');
 
 
-                  client.query('SELECT tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\'  as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category ,EXTRACT(DOW FROM tl.created_date at time zone \''+companyDefaultTimezone+'\') as week_day,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id FROM TIMESHEET_LINE_ITEM tl WHERE company_id=$1 AND isRunning=$2 AND resource_id=$3',[req.user.company_id, true,req.user.id], function(err, timesheetData) {
+                  client.query('SELECT tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\'  as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category ,EXTRACT(DOW FROM tl.created_date at time zone \''+companyDefaultTimezone+'\') as week_day,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime at time zone \''+companyDefaultTimezone+'\'  as lastruntime ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id FROM TIMESHEET_LINE_ITEM tl WHERE company_id=$1 AND isRunning=$2 AND resource_id=$3',[req.user.company_id, true,req.user.id], function(err, timesheetData) {
                     if(err) {
                       console.error(err);
                       handleResponse.shouldAbort(err, client, done);
@@ -319,6 +376,7 @@ exports.getTimesheet = (req, res) => {
       }else{
             let userId = req.params.userId;
             companyDefaultTimezone=result.timezone;
+            companyWeekStartDay = result.weekstartday;
             // console.log('companyDefaultTimezone');
             // console.log(companyDefaultTimezone);
             // console.log(req.params.userId);
@@ -337,8 +395,9 @@ exports.getTimesheet = (req, res) => {
                       /*handleResponse.handleError(res, err, 'Server error : Error in finding project data');*/
                     } else {
                       // console.log("week_start_date");
-                      console.log(parseInt(req.query.new_date));
-                      let week_start_date = req.query.new_date != undefined ? moment.tz(moment.tz(parseInt(req.query.new_date),companyDefaultTimezone).format().split('T')[0],companyDefaultTimezone).format() : calculateWeekStartDate(dateFormat(currentTimestamp.rows[0].currentdate),'Sun');
+                      // console.log(parseInt(req.query.new_date));
+                      // console.log( calculateWeekStartDate(dateFormat(currentTimestamp.rows[0].currentdate),companyWeekStartDay));
+                      let week_start_date = req.query.new_date != undefined ? moment.tz(moment.tz(parseInt(req.query.new_date),companyDefaultTimezone).format().split('T')[0],companyDefaultTimezone).format() : calculateWeekStartDate(dateFormat(currentTimestamp.rows[0].currentdate),companyWeekStartDay);
                       let week_end_date = calculateWeekEndDate(week_start_date);
                       console.log('week_start_date '+week_start_date);
                       console.log('week_end_date '+week_end_date);
@@ -347,17 +406,17 @@ exports.getTimesheet = (req, res) => {
                       // week_end_date=dateFormat(week_end_date);
 
                       // console.log('SELECT * FROM TIMESHEET_LINE_ITEM WHERE company_id=$1 AND resource_id=$2 AND created_date BETWEEN $3 AND $4 AND project_id is not null ORDER BY created_date, task_id, user_role');
-                      console.log(req.user.company_id, userId, week_start_date, week_end_date);
-                      client.query('SELECT tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\'  as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category , EXTRACT(DOW FROM created_date at time zone \''+companyDefaultTimezone+'\') as week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id FROM TIMESHEET_LINE_ITEM tl WHERE company_id=$1 AND resource_id=$2 AND created_date at time zone \''+companyDefaultTimezone+'\'  BETWEEN $3 AND $4 AND project_id is not null ORDER BY created_date, task_id, user_role',[req.user.company_id, userId, week_start_date, week_end_date], function(err, timesheetListByDate) {
+                      // console.log(req.user.company_id, userId, week_start_date, week_end_date);
+                      client.query('SELECT tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\'  as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category , EXTRACT(DOW FROM created_date at time zone \''+companyDefaultTimezone+'\') as week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime at time zone \''+companyDefaultTimezone+'\'  as lastruntime ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id FROM TIMESHEET_LINE_ITEM tl WHERE company_id=$1 AND resource_id=$2 AND created_date at time zone \''+companyDefaultTimezone+'\'  BETWEEN $3 AND $4 AND project_id is not null ORDER BY created_date, task_id, user_role',[req.user.company_id, userId, week_start_date, week_end_date], function(err, timesheetListByDate) {
                         if(err) {
                           console.error(err);
                           handleResponse.shouldAbort(err, client, done);
                           handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : [], timesheetList : [],timesheetWeekData : [] , projectList:[], userRoles : [], timeheet_users : [],companyDefaultTimezone:'',user:req.session.passport.user,error:err},"error","Error in finding timesheet detail data.Please Restart.");
                           /*handleResponse.handleError(res, err, 'Server error : Error in finding timesheet detail data');*/
                         } else {
-                          let taskListsDayArr = getTimesheetForDay(timesheetListByDate);
-                          console.log("timesheetListByDate");
-                          console.log(JSON.stringify(taskListsDayArr));
+                          let taskListsDayArr = getTimesheetForDay(timesheetListByDate,currentTimestamp.rows[0].currentdate);
+                          // console.log("timesheetListByDate");
+                          // console.log(JSON.stringify(taskListsDayArr));
                           // console.log(week_start_date +" *************** "+ week_end_date);
 
                             // let queryToExec= `SELECT DISTINCT T1.task_id, T1.resource_id, T1.project_id, T1.company_id, T1.project_name, T1.task_name, T2.twh, T2.week_day, T2.user_role
@@ -395,11 +454,11 @@ exports.getTimesheet = (req, res) => {
                                       getAllCompanyUsers(req, client, err, done, res, function (users) {
                                       timeheet_users = users;
                                       let taskListsWeekArr = getTimesheetForWeek(timesheetListByProject.rows, dateFormat(week_start_date));
-                                      console.log("Weekly timesheet rows")
-                                      console.log(JSON.stringify(taskListsWeekArr));
+                                      // console.log("Weekly timesheet rows")
+                                      // console.log(JSON.stringify(taskListsWeekArr));
                                       var daysEnum = {"0":"Sunday","1":"Monday", "2":"Tuesday", "3":"Wednesday","4":"Thursday","5":"Friday","6":"Saturday"};
                                       done();
-                                      handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : daysEnum, timesheetList : taskListsDayArr,timesheetWeekData : taskListsWeekArr , user:req.session.passport.user, projectList:projectList.rows, userRoles : userRoles, timeheet_users : timeheet_users, companyDefaultTimezone:companyDefaultTimezone , currentTimestamp:currentTimestamp.rows[0].currentdate },"success","Successfully rendered");
+                                      handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : daysEnum, timesheetList : taskListsDayArr,timesheetWeekData : taskListsWeekArr , user:req.session.passport.user, projectList:projectList.rows, userRoles : userRoles, timeheet_users : timeheet_users, companyDefaultTimezone:companyDefaultTimezone,companyWeekStartDay:companyWeekStartDay , currentTimestamp:currentTimestamp.rows[0].currentdate },"success","Successfully rendered");
                                       });
                                   } else {
                                     done()
@@ -407,7 +466,7 @@ exports.getTimesheet = (req, res) => {
                                       // console.log("Weekly timesheet rows")
                                       // console.log(JSON.stringify(taskListsWeekArr));
                                       var daysEnum = {"0":"Sunday","1":"Monday", "2":"Tuesday", "3":"Wednesday","4":"Thursday","5":"Friday","6":"Saturday"};
-                                      handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : daysEnum, timesheetList : taskListsDayArr,timesheetWeekData : taskListsWeekArr , user:req.session.passport.user, projectList:projectList.rows, userRoles : userRoles, timeheet_users : [],companyDefaultTimezone:companyDefaultTimezone, currentTimestamp:currentTimestamp.rows[0].currentdate },"success","Successfully rendered");
+                                      handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : daysEnum, timesheetList : taskListsDayArr,timesheetWeekData : taskListsWeekArr , user:req.session.passport.user, projectList:projectList.rows, userRoles : userRoles, timeheet_users : [],companyDefaultTimezone:companyDefaultTimezone, companyWeekStartDay:companyWeekStartDay, currentTimestamp:currentTimestamp.rows[0].currentdate },"success","Successfully rendered");
                                   }
                                 })
                               }
@@ -530,16 +589,29 @@ exports.updateDayTimesheetHours = (req, res) => {
 
   if(req.user){
       pool.connect((err, client, done) => {
-        client.query('SELECT tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category ,EXTRACT(DOW FROM tl.created_date at time zone \''+companyDefaultTimezone+'\') as week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime at time zone \''+companyDefaultTimezone+'\' as lastruntime ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id FROM TIMESHEET_LINE_ITEM tl WHERE id=$1',[req.body.line_item_id], function(err, timesheetData) {
+        client.query('SELECT NOW() at time zone \''+companyDefaultTimezone+'\' as currentTimestamp, tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category ,EXTRACT(DOW FROM tl.created_date at time zone \''+companyDefaultTimezone+'\') as week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime at time zone \''+companyDefaultTimezone+'\' as lastruntime ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id FROM TIMESHEET_LINE_ITEM tl WHERE id=$1',[req.body.line_item_id], function(err, timesheetData) {
           if(err) {
             console.error(err);
             handleResponse.shouldAbort(err, client, done);
             handleResponse.handleError(res, err, 'Server error : Error in finding timesheet detail data');
           } else {
             if(timesheetData.rowCount > 0) {
-              if(req.body.updatedHours){
-
-                client.query('UPDATE timesheet_line_item SET total_work_hours=$1,isRunning=$2 WHERE id=$3',[hoursToMinutes(req.body.updatedHours), req.body.isRunning ,req.body.line_item_id], function(err, updatedTimesheetLiRec) {
+              console.log('req.body.isRunning '+req.body.isRunning);
+              if(req.body.isRunning == false){
+                console.log('inside if')
+                let differenceOfTime ;
+                if(moment.tz(timesheetData.rows[0].currentTimestamp,companyDefaultTimezone).format('YYYY-MM-DD') == moment.tz(timesheetData.rows[0].lastruntime,companyDefaultTimezone).format('YYYY-MM-DD')){
+                  differenceOfTime = hoursToMinutes(moment.tz(timesheetData.rows[0].currentTimestamp,companyDefaultTimezone).format('hh:mm')) - hoursToMinutes(moment.tz(timesheetData.rows[0].lastruntime,companyDefaultTimezone).format('hh:mm'))
+                }else{
+                  console.log('inside different dates diffrence');
+                  differenceOfTime = hoursToMinutes('19:00') - hoursToMinutes(moment.tz(timesheetData.rows[0].lastruntime,companyDefaultTimezone).format('hh:mm'))
+                }
+                // let differenceOfTime = hoursToMinutes(moment.tz(timesheetData.rows[0].currentTimestamp,companyDefaultTimezone).format('hh:mm')) - hoursToMinutes(moment.tz(timesheetData.rows[0].lastruntime,companyDefaultTimezone).format('hh:mm'))
+                console.log('differenceOfTime after element stopped '+minuteToHours(differenceOfTime));
+                console.log(moment.tz(timesheetData.rows[0].currentTimestamp,companyDefaultTimezone).format('hh:mm'));
+                console.log(moment.tz(timesheetData.rows[0].lastruntime,companyDefaultTimezone).format('hh:mm'));
+                differenceOfTime += timesheetData.rows[0].total_work_hours;
+                client.query('UPDATE timesheet_line_item SET total_work_hours=$1,isRunning=$2 WHERE id=$3',[differenceOfTime, req.body.isRunning ,req.body.line_item_id], function(err, updatedTimesheetLiRec) {
                   if (err) {
                     handleResponse.shouldAbort(err, client, done);
                     handleResponse.handleError(res, err, 'Server error : Error in updating timesheet detail data');
@@ -550,7 +622,7 @@ exports.updateDayTimesheetHours = (req, res) => {
                   }
                 });
               }else{
-                client.query('UPDATE timesheet_line_item SET lastRunTime=$1,isRunning=$2 WHERE id=$3',[req.body.lastRunTime, req.body.isRunning ,req.body.line_item_id], function(err, updatedTimesheetLiRec) {
+                client.query('UPDATE timesheet_line_item SET lastRunTime=$1,isRunning=$2 WHERE id=$3',['now()', req.body.isRunning ,req.body.line_item_id], function(err, updatedTimesheetLiRec) {
                   if (err) {
                     handleResponse.shouldAbort(err, client, done);
                     handleResponse.handleError(res, err, 'Server error : Error in updating timesheet detail data');
@@ -789,7 +861,7 @@ function createNewObj(lineRow, result) {
 exports.submitDayTimesheet = (req, res) => {
   if(req.user){
       pool.connect((err, client, done) => {
-        client.query('SELECT tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category ,EXTRACT(DOW FROM tl.created_date at time zone \''+companyDefaultTimezone+'\') as week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime at time zone \''+companyDefaultTimezone+'\' as lastruntime ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id FROM TIMESHEET_LINE_ITEM tl WHERE company_id=$1 AND resource_id=$2 AND created_date=$3 ORDER BY project_id, user_role, billable',[req.user.company_id, req.user.id, moment.tz(req.body.date.split('T')[0], companyDefaultTimezone).format()], function(err, lineItemRows) {
+        client.query('SELECT tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category ,EXTRACT(DOW FROM tl.created_date at time zone \''+companyDefaultTimezone+'\') as week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime at time zone \''+companyDefaultTimezone+'\' as lastruntime ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id FROM TIMESHEET_LINE_ITEM tl WHERE company_id=$1 AND resource_id=$2 AND created_date  at time zone \''+companyDefaultTimezone+'\' BETWEEN $3 AND $4 ORDER BY project_id, user_role, billable',[req.user.company_id, req.user.id, moment.tz(req.body.date.split(' ')[0].split('T')[0], companyDefaultTimezone).format(),moment.tz(req.body.date.split(' ')[0].split('T')[0]+' 23:59:59', companyDefaultTimezone).format()], function(err, lineItemRows) {
           if(err) {
             console.error(err);
             handleResponse.shouldAbort(err, client, done);
@@ -870,10 +942,11 @@ exports.submitDayTimesheet = (req, res) => {
   }
 };
 
-exports.submitWeeklyTimesheetByProjectId = (req, res) => {
+exports.submitWeeklyTimesheetByProjectTaskId = (req, res) => {
   if(req.user) {
+    console.log(req.user.company_id+' '+ req.user.id+' '+ req.body.project_id+' '+ req.body.task_id+' '+ req.body.user_role, moment.tz(req.body.created_date.split(' ')[0].split('T')[0], companyDefaultTimezone).format()+' '+moment.tz(req.body.created_date.split(' ')[0].split('T')[0]+' 23:59:59', companyDefaultTimezone).format());
     pool.connect((err, client, done) => {
-      client.query('SELECT tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category ,EXTRACT(DOW FROM tl.created_date at time zone \''+companyDefaultTimezone+'\') as week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime at time zone \''+companyDefaultTimezone+'\' as lastruntime ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id FROM TIMESHEET_LINE_ITEM tl WHERE company_id=$1 AND resource_id=$2 AND project_id=$3 AND user_role=$4 AND created_date=$5',[req.user.company_id, req.user.id, req.body.project_id, req.body.user_role, moment.tz(req.body.created_date.split('T')[0], companyDefaultTimezone).format()], function(err, timesheetLiRec) {
+      client.query('SELECT tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category ,EXTRACT(DOW FROM tl.created_date at time zone \''+companyDefaultTimezone+'\') as week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime at time zone \''+companyDefaultTimezone+'\' as lastruntime ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id FROM TIMESHEET_LINE_ITEM tl WHERE company_id=$1 AND resource_id=$2 AND project_id=$3 AND task_id=$4 AND user_role=$5 AND created_date at time zone \''+companyDefaultTimezone+'\' BETWEEN $6 AND $7',[req.user.company_id, req.user.id, req.body.project_id, req.body.task_id, req.body.user_role, moment.tz(req.body.created_date.split(' ')[0].split('T')[0], companyDefaultTimezone).format(),moment.tz(req.body.created_date.split(' ')[0].split('T')[0]+' 23:59:59', companyDefaultTimezone).format()], function(err, timesheetLiRec) {
         if(err) {
           console.error(err);
           handleResponse.shouldAbort(err, client, done);
@@ -892,14 +965,15 @@ exports.submitWeeklyTimesheetByProjectId = (req, res) => {
                     handleResponse.shouldAbort(err, client, done);
                     handleResponse.handleError(res, err, 'Server error : Error in finding timesheet detail data 2');
                   } else {
-                    client.query('UPDATE TIMESHEET_LINE_ITEM SET submitted=$1, timesheet_id=$2 WHERE company_id=$3 AND resource_id=$4 AND project_id=$5 AND user_role=$6 AND created_date=$7', [true, response.timesheetMasterId, req.user.company_id, req.user.id, req.body.project_id, req.body.user_role, moment.tz(req.body.created_date.split('T')[0], companyDefaultTimezone).format()], function(err, data) {
+                    client.query('UPDATE TIMESHEET_LINE_ITEM SET submitted=$1, timesheet_id=$2 WHERE company_id=$3 AND resource_id=$4 AND project_id=$5 AND task_id=$6 AND user_role=$7 AND created_date at time zone \''+companyDefaultTimezone+'\' BETWEEN $8 AND $9 RETURNING *', [true, response.timesheetMasterId, req.user.company_id, req.user.id, req.body.project_id, req.body.task_id, req.body.user_role, moment.tz(req.body.created_date.split(' ')[0].split('T')[0], companyDefaultTimezone).format(),moment.tz(req.body.created_date.split(' ')[0].split('T')[0]+' 23:59:59', companyDefaultTimezone).format()], function(err, data) {
                       if(err) {
                         // console.log('this.sql');
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);
                         handleResponse.handleError(res, err, 'Server error : Error in finding timesheet detail data 3');
                       } else {
-                        // console.log("Data inserted");
+                        console.log("Data updated");
+                        console.log(data.rows);
                         done();
                         handleResponse.sendSuccess(res,'Successfully submitted your timesheet.',{});
                         /*res.status(200).json({"success": true,"message":"Successfully submitted your timesheet."});*/
@@ -914,7 +988,7 @@ exports.submitWeeklyTimesheetByProjectId = (req, res) => {
                     handleResponse.shouldAbort(err, client, done);
                     handleResponse.handleError(res, err, 'Server error : Error in finding timesheet detail data 2');
                   } else {
-                    client.query('UPDATE TIMESHEET_LINE_ITEM SET submitted=$1, timesheet_id=$2 WHERE company_id=$3 AND resource_id=$4 AND project_id=$5 AND user_role=$6 AND created_date=$7', [true, insertedRec.rows[0].id, req.user.company_id, req.user.id, req.body.project_id, req.body.user_role, moment.tz(req.body.created_date.split('T')[0], companyDefaultTimezone).format()], function(err, data) {
+                    client.query('UPDATE TIMESHEET_LINE_ITEM SET submitted=$1, timesheet_id=$2 WHERE company_id=$3 AND resource_id=$4 AND project_id=$5 AND task_id=$6 AND user_role=$7 AND created_date at time zone \''+companyDefaultTimezone+'\' BETWEEN $8 AND $9 RETURNING *', [true, insertedRec.rows[0].id, req.user.company_id, req.user.id, req.body.project_id, req.body.task_id, req.body.user_role, moment.tz(req.body.created_date.split(' ')[0].split('T')[0], companyDefaultTimezone).format(),moment.tz(req.body.created_date.split(' ')[0].split('T')[0]+' 23:59:59', companyDefaultTimezone).format()], function(err, data) {
                       if(err) {
                         handleResponse.shouldAbort(err, client, done);
                         handleResponse.handleError(res, err, 'Server error : Error in finding timesheet detail data 3');
@@ -1160,14 +1234,25 @@ exports.deleteTimesheetRow = (req, res) => {
                       shouldAbort(err, client, done);
                       handleError(res, err, 'Server error : Error in updating timesheet data');
                     } else { */
-                      client.query('SELECT * FROM TIMESHEET_LINE_ITEM WHERE id=$1',[req.body.timesheet_lineitem_id], function(err, timesheetLiData) {
+                      client.query('SELECT NOW() at time zone \''+companyDefaultTimezone+'\' as currentTimestamp, tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category ,EXTRACT(DOW FROM tl.created_date at time zone \''+companyDefaultTimezone+'\') as week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime at time zone \''+companyDefaultTimezone+'\' as lastruntime ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id FROM TIMESHEET_LINE_ITEM tl WHERE id=$1',[req.body.timesheet_lineitem_id], function(err, timesheetLiData) {
                         if (err) {
                           handleResponse.shouldAbort(err, client, done);
                           handleResponse.handleError(res, err, 'Server error : Error in deleting timesheet detail');
                         } else {
                           if(timesheetLiData.rowCount > 0) {
+                            let differenceOfTime ;
+                            if(moment.tz(timesheetLiData.rows[0].currentTimestamp,companyDefaultTimezone).format('YYYY-MM-DD') == moment.tz(timesheetLiData.rows[0].lastruntime,companyDefaultTimezone).format('YYYY-MM-DD')){
+                              differenceOfTime = hoursToMinutes(moment.tz(timesheetLiData.rows[0].currentTimestamp,companyDefaultTimezone).format('hh:mm')) - hoursToMinutes(moment.tz(timesheetLiData.rows[0].lastruntime,companyDefaultTimezone).format('hh:mm'))
+                            }else{
+                              differenceOfTime = hoursToMinutes('19:00') - hoursToMinutes(moment.tz(timesheetLiData.rows[0].lastruntime,companyDefaultTimezone).format('hh:mm'))
+                            }
+                            console.log('differenceOfTime after deleting element '+minuteToHours(differenceOfTime));
+                            console.log(moment.tz(timesheetLiData.rows[0].currentTimestamp,companyDefaultTimezone).format());
+                            console.log(moment.tz(timesheetLiData.rows[0].lastruntime,companyDefaultTimezone).format());
                             client.query('DELETE FROM TIMESHEET_LINE_ITEM WHERE id=$1',[req.body.timesheet_lineitem_id], function(err, deletedRow) {
                               if (err) {
+                                console.log('Server error : Error in deleting timesheet detail');
+                                console.log(err);
                                 handleResponse.shouldAbort(err, client, done);
                                 handleResponse.handleError(res, err, 'Server error : Error in deleting timesheet detail');
                               } else {
@@ -1178,7 +1263,7 @@ exports.deleteTimesheetRow = (req, res) => {
                                     handleError(res, err, 'Server error : Error in committing transaction');
                                   } else { */
                                     done();
-                                    handleResponse.sendSuccess(res,'Timesheet row deleted successfully',{});
+                                    handleResponse.sendSuccess(res,'Timesheet row deleted successfully',{total_work_hours:minuteToHours(differenceOfTime)});
                                     /*res.status(200).json({"success": true,"message":"success"});*/
                                   /* }
                                 }); */
@@ -1391,7 +1476,7 @@ function createTimesheetLineItem(req, res, client, err, done, extraParam, isRunn
   let data = [req.user.id, req.body.project_id, req.body.task_id, moment.tz(extraParam.timesheet_date.split('T')[0], companyDefaultTimezone).format(), extraParam.day_time, req.user.company_id, req.body.day_project, req.body.day_task, req.body.day_note,req.body.day_category, req.body.user_role];
   if(isRunning) {
     queryToExec = 'INSERT INTO TIMESHEET_LINE_ITEM (resource_id, project_id, task_id, created_date, total_work_hours, company_id, project_name, task_name, description, billable, isRunning,lastruntime, user_role) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *';
-    data = [req.user.id, req.body.project_id, req.body.task_id, moment.tz(extraParam.timesheet_date.split('T')[0], companyDefaultTimezone).format(), extraParam.day_time, req.user.company_id, req.body.day_project, req.body.day_task, req.body.day_note,req.body.day_category, req.body.isRunning,req.body.lastruntime, req.body.user_role];
+    data = [req.user.id, req.body.project_id, req.body.task_id, moment.tz(extraParam.timesheet_date.split('T')[0], companyDefaultTimezone).format(), extraParam.day_time, req.user.company_id, req.body.day_project, req.body.day_task, req.body.day_note,req.body.day_category, req.body.isRunning,'now()', req.body.user_role];
   }
   client.query(queryToExec, data, function(err, insertedLineItem) {
     if(err) {
@@ -1420,15 +1505,16 @@ exports.getDayTimesheetWithTaskId = (req, res) => {
     if(req.body.user_id==undefined){
       req.body.user_id=req.user.id;
     }
+    // console.log(req.user.company_id+' '+req.body.user_id+' '+req.body.project_id+' '+req.body.task_id+' '+moment.tz(req.body.created_date.split('T')[0], companyDefaultTimezone).format()+' '+moment.tz(req.body.created_date.split('T')[0]+' 23:59:59', companyDefaultTimezone).format()+' '+req.body.user_role);
     pool.connect((err, client, done) => {
-      client.query('SELECT tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category ,EXTRACT(DOW FROM tl.created_date at time zone \''+companyDefaultTimezone+'\') as week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime  ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id FROM TIMESHEET_LINE_ITEM tl WHERE company_id=$1 AND resource_id=$2 AND project_id=$3 AND task_id=$4 AND created_date at time zone \''+companyDefaultTimezone+'\'  BETWEEN $5 AND $6 AND user_role=$7',[req.user.company_id, req.body.user_id, req.body.project_id, req.body.task_id, moment.tz(req.body.created_date.split('T')[0], companyDefaultTimezone).format(), moment.tz(req.body.created_date.split('T')[0]+' 23:59:59', companyDefaultTimezone).format(), req.body.user_role], function(err, dayData) {
+      client.query('SELECT tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category ,EXTRACT(DOW FROM tl.created_date at time zone \''+companyDefaultTimezone+'\') as week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime at time zone \''+companyDefaultTimezone+'\'  as lastruntime  ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id FROM TIMESHEET_LINE_ITEM tl WHERE company_id=$1 AND resource_id=$2 AND project_id=$3 AND task_id=$4 AND created_date at time zone \''+companyDefaultTimezone+'\'  BETWEEN $5 AND $6 AND user_role=$7',[req.user.company_id, req.body.user_id, req.body.project_id, req.body.task_id, moment.tz(req.body.created_date.split('T')[0], companyDefaultTimezone).format(), moment.tz(req.body.created_date.split('T')[0]+' 23:59:59', companyDefaultTimezone).format(), req.body.user_role], function(err, dayData) {
         if(err) {
           console.error(err);
           handleResponse.shouldAbort(err, client, done);
           handleResponse.handleError(res, err, 'Server error : Error in finding timesheet detail data');
         } else {
           // console.log("Update Timesheet Data");
-          // console.log(dayData);
+          // console.log(dayData.rows);
           done();
 
           // console.log("taksList");

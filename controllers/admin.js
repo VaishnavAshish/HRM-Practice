@@ -518,9 +518,9 @@ exports.postAddCompany = (req, res) => {
                         handleResponse.handleError(res, err, 'Server Error: Error in adding company to the database');
                       } else {
                         let company_id = company.rows[0].id;
-                        client.query('Insert into SETTING (expense_category,user_role,company_address,invoice_note,currency,timezone,company_id) values ($1,$2,$3,$4,$5,$6,$7)  RETURNING id', [
+                        client.query('Insert into SETTING (expense_category,user_role,company_address,invoice_note,currency,timezone,company_id,weekstartday) values ($1,$2,$3,$4,$5,$6,$7,$8)  RETURNING id', [
                           ['Food'],
-                          ['Manager', 'Developer'], '', '', 'USD', 'America/Los_Angeles', company_id
+                          ['Manager', 'Developer'], '', '', 'USD', 'America/Los_Angeles', company_id , 'sunday'
                         ], function(err, companySetting) {
                           if (err) {
                             handleResponse.shouldAbort(err, client, done);
@@ -603,7 +603,7 @@ sendEmail = (req, res, next) => {
     '<tr>' +
     '<td valign="top" align="center" style="padding-top: 20px; padding-bottom: 10px;">' +
     '<a href="/" target="_blank">' +
-    '<img src="http://multitenant-example-1.herokuapp.com/img/krow-logo.png" alt="">' +
+    '<img src="/img/krow-logo.png" alt="">' +
     '</a>' +
     '</td>' +
     '</tr>' +

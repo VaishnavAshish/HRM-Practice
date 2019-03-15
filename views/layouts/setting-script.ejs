@@ -4,7 +4,7 @@ $(document).ready(function(){
 		let setting=<%- JSON.stringify(setting) %>;
 		console.log(setting);
 		let expenseCat='',userRole='',address='';
-	
+
 		$("#companyStreet").val(setting.street);
 		$("#companyCity").val(setting.city);
 		$("#companyState").val(setting.state);
@@ -12,10 +12,11 @@ $(document).ready(function(){
 		$("#companyZip").val(setting.zip_code);
 		$("#companyCurrency").val(setting.currency);
 		$("#timezone").val(setting.timezone);
-		
+		$("#weekstartday").val(setting.weekstartday);
+
 	<% } %>
 
-	
+
 })
 function addNewExpenseCat(){
 
@@ -34,7 +35,7 @@ function saveCompanyGeneralSetting(){
 	console.log(settingData);
 	$.ajax({
 	      type: 'POST',
-	      url : '/editCompanySetting', 
+	      url : '/editCompanySetting',
 	      contentType: 'application/json',
 	      dataType: 'json',
 	      data:JSON.stringify(settingData),
@@ -44,6 +45,7 @@ function saveCompanyGeneralSetting(){
 						hideLoader('#globalLoader');
 						showGlobalToast('#globalToast', 'success', response.message, 4000);
 					},2000);
+					setTimeout(location.reload(),8000);;
 			   }
 	        },
 	       error: function(response){

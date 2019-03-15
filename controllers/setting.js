@@ -18,14 +18,14 @@ exports.postEditSetting = (req, res) => {
             handleResponse.handleError(res, err, 'Server Error: Error in getting settings');
           } else {
           		if(selectedSetting.rows.length>0){
-          			client.query('UPDATE SETTING set street=$1,city=$2,state=$3,country=$4,zip_code=$5,currency=$6,timezone=$7 where company_id=$8 RETURNING id',[req.body.companyStreet, req.body.companyCity, req.body.companyState, req.body.companyCountry, req.body.companyZip,req.body.companyCurrency,req.body.timezone,req.user.company_id], function(err, updatedSetting) {
+          			client.query('UPDATE SETTING set street=$1,city=$2,state=$3,country=$4,zip_code=$5,currency=$6,timezone=$7,weekstartday=$8 where company_id=$9 RETURNING id',[req.body.companyStreet, req.body.companyCity, req.body.companyState, req.body.companyCountry, req.body.companyZip,req.body.companyCurrency,req.body.timezone,req.body.weekstartday ,req.user.company_id], function(err, updatedSetting) {
   			          if (err){
   			            handleResponse.shouldAbort(err, client, done);
   			            handleResponse.handleError(res, err, 'Server Error: Error in updating settings');
   			          } else {
   			            done();
   			            handleResponse.sendSuccess(res,'settings updated successfully',{});
-  			            
+
   			          }
 		            });
           		}else{
@@ -40,15 +40,15 @@ exports.postEditSetting = (req, res) => {
 			          } else {
 			            done();
 			            handleResponse.sendSuccess(res,'settings inserting successfully',{});
-			            
+
 			          }
 			      });
           		}*/
-		      
+
            }
-      }); 
+      });
   });
-        
+
 };
 
 exports.postEditSettingUserRole = (req, res) => {
@@ -71,7 +71,7 @@ exports.postEditSettingUserRole = (req, res) => {
     			          } else {
     			            done();
     			            handleResponse.sendSuccess(res,'settings updated successfully',{});
-    			            
+
     			          }
     			      });
           		}else{
@@ -85,16 +85,16 @@ exports.postEditSettingUserRole = (req, res) => {
 			          } else {
 			            done();
 			            handleResponse.sendSuccess(res,'settings inserting successfully',{});
-			            
+
 			          }
 			      });
           		}*/
-		      
+
            }
-      }); 
+      });
   });
-        
-}; 
+
+};
 exports.postEditSettingInvoice = (req, res) => {
   // console.log("Inside edit setting post method");
   pool.connect((err, client, done) => {
@@ -111,7 +111,7 @@ exports.postEditSettingInvoice = (req, res) => {
     			          } else {
     			            done();
     			            handleResponse.sendSuccess(res,'settings updated successfully',{});
-    			            
+
     			          }
     			      });
           		}else{
@@ -125,15 +125,15 @@ exports.postEditSettingInvoice = (req, res) => {
 			          } else {
 			            done();
 			            handleResponse.sendSuccess(res,'settings inserting successfully',{});
-			            
+
 			          }
 			      });
           		}*/
-		      
+
            }
-      }); 
+      });
   });
-        
+
 };
 exports.fileupload = (req, res) => {
   // console.log('req.files');
@@ -166,7 +166,7 @@ exports.fileupload = (req, res) => {
                                   res.header('Expires', '-1');
                                   res.header('Pragma', 'no-cache');
                                   return res.status(200).redirect('/org-settings-invoice');
-                                  
+
                                 }
                             });
                         })
@@ -174,18 +174,18 @@ exports.fileupload = (req, res) => {
                           // console.log('err');
                           // console.log(err);
                         });
-                    
+
                 }else{
                   done();
                   return res.status(500).redirect('/org-settings-invoice');
                 }
-            
+
              }
-        }); 
+        });
     });
   }
-  
-        
+
+
 };
 exports.postEditSettingExpense = (req, res) => {
   // console.log("Inside edit setting post method");
@@ -208,7 +208,7 @@ exports.postEditSettingExpense = (req, res) => {
     			          } else {
     			            done();
     			            handleResponse.sendSuccess(res,'settings updated successfully',{});
-    			            
+
     			          }
     			      });
           		}else{
@@ -222,15 +222,15 @@ exports.postEditSettingExpense = (req, res) => {
 			          } else {
 			            done();
 			            handleResponse.sendSuccess(res,'settings inserting successfully',{});
-			            
+
 			          }
 			      });
           		}*/
-		      
+
            }
-      }); 
+      });
   });
-        
+
 };
 
 exports.getSetting = (req, res) => {
@@ -250,8 +250,8 @@ exports.getSetting = (req, res) => {
 		        handleResponse.responseToPage(res,'pages/org-settings-general',{setting:{},setting:companySetting.rows[0],user:req.session.passport.user,timezones:timezones},"success","Successfully rendered");
         	}
       }
-        
-      
+
+
     });
   })
 };
@@ -270,8 +270,8 @@ exports.getSettingUserRole = (req, res) => {
 		        handleResponse.responseToPage(res,'pages/org-settings-userrole',{setting:companySetting.rows[0],user:req.session.passport.user},"success","Successfully rendered");
         	}
       }
-        
-      
+
+
     });
   })
 };
@@ -295,8 +295,8 @@ exports.getSettingInvoice = (req, res) => {
 		        handleResponse.responseToPage(res,'pages/org-settings-invoice',{setting:companySetting.rows[0],user:req.session.passport.user},"success","Successfully rendered");
         	}
       }
-        
-      
+
+
     });
   })
 };
@@ -326,8 +326,8 @@ exports.getCompanyLogo = (req,res) =>{
                              'Content-Length': company_logo.length
                            });
                            res.end(companySetting.rows[0].company_logo);
-                        
-                    
+
+
                   }
                   else{
                       if (!process.env.PWD) {
@@ -354,13 +354,13 @@ exports.getCompanyLogo = (req,res) =>{
                       // console.log(company_logo);
                       res.send(company_logo);*/
                        /*res.sendFile('https://multitenant-example-1.herokuapp.com/img/logo-place-holder.jpg');  */
-                  } 
+                  }
                 }
-                
-              
+
+
           }
-            
-          
+
+
         });
       })
 }
@@ -380,8 +380,8 @@ exports.getSettingExpense = (req, res) => {
 		        handleResponse.responseToPage(res,'pages/org-settings-expense',{setting:companySetting.rows[0],user:req.session.passport.user},"success","Successfully rendered");
         	}
       }
-        
-      
+
+
     });
   })
 };
@@ -408,7 +408,7 @@ exports.checkUserRoleAssignment = (req,res) => {
                   }else{
                       done();
                       handleResponse.sendSuccess(res,'User role is not assigned to company users.',{result:true});
-                  } 
+                  }
               }
           });
         }

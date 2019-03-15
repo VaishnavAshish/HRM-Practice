@@ -41,7 +41,10 @@ function handleHashLinks(){
     var hash = document.URL.substr(document.URL.indexOf('#')+1);
 
     var element  = $('[data-navigation="'+hash+'"]');
-
+    if(document.URL.indexOf('#')!=-1&&element.length==0){
+      window.location.href = document.URL.substr(0,document.URL.indexOf('#')+1)+'dayview';
+      // element = $('[data-navigation="dayview"]');
+    }
     if ( element.is( "button" ) ) {
         element.click();
     } else if(element.is( "li" ) && element.hasClass( "slds-tabs_default__item" )){
@@ -427,7 +430,7 @@ function startKwTimerGlobally(ele,id) {
                             if(res.timesheetData.length>0){
                                 location.reload();
                             }else{
-                                let dayTimeSheetData={'isRunning':true,'lastruntime':response.currentTime};
+                                let dayTimeSheetData={'isRunning':true};
                                 dayTimeSheetData.project_id = response.project.id;
                                 dayTimeSheetData.task_id = globalTaskId;
                                 dayTimeSheetData.day_time = '0:00:00';
@@ -449,16 +452,16 @@ function startKwTimerGlobally(ele,id) {
                                             $("[name=globalStart]").addClass('hide');
                                             // $("[name=globalStart]").css('display','none');
                                             $('[name=globalStop]').removeClass('hide');
-                                            $($(id)[0]).text('0:00:00');
-                                            kwCounter = $(id);
-                                            intervalID = NaN;
+                                            // $($(id)[0]).text('0:00:00');
+                                            // kwCounter = $(id);
+                                            // intervalID = NaN;
                                             // $("[timerDiv]").on('click',function(){stopKwTimerGlobally(this, '[name=kwTimer]', '#syncTimer', '#modalAddNewTsheetQuick')});
                                             $("[name=kwTimer]").attr("taskId",response.line_item.id);
                                             $("[name=kwTimer]").attr("lineItemTaskId",response.line_item.task_id);
                                             /*$("[name=kwTimer]").attr("taskId",response.line_item.id);*/
-                                            if (isNaN(intervalID)){
-                                                intervalID = setInterval(()=>{incrementTime();}, 1000);
-                                            }
+                                            // if (isNaN(intervalID)){
+                                            //     intervalID = setInterval(()=>{incrementTime();}, 1000);
+                                            // }
                                             /*showGlobalToast('#globalToast', 'success', response.message, 4000);
                                             location.reload();*/
                                         } else {
@@ -739,18 +742,19 @@ function addTimeLogEntry(modalId,formId){
                                           if(currentDiv.attr('date')== dateFormat(moment.tz(res.currentDate, companyDefaultTimezone).format())){
                                               addRowToTimesheet(response.line_item);
                                               if(selectedEle!=null&&selectedEle!=undefined){
-                                                  intervalID = NaN;
+                                                  // intervalID = NaN;
                                                   let currentLineItemId=$(selectedEle).attr('line_item_id');
-                                                  let updatedLineItem={"line_item_id":currentLineItemId,"lastRunTime":res.currentTime,"isRunning":true};
+                                                  let updatedLineItem={"line_item_id":currentLineItemId,"isRunning":true};
                                                   updateCurrentLineItem(updatedLineItem,(success,nores,err)=>{
                                                       if(success==true){
                                                           $(selectedEle).addClass('hide');
                                                           $(selectedEle).next('[stop]').removeClass('hide');
+                                                          $(selectedEle).closest('.slds-grid').find('svg').removeClass('slds-hide');
                                                           startKwTimerGlobal($("[name=globalStart]"));
-                                                          $("[name=globalStop]").removeClass('hide');
-                                                          if (isNaN(intervalID)){
-                                                              intervalID = setInterval(function(){incrementTimeOfCount()}, 1000);
-                                                          }
+                                                          // $("[name=globalStop]").removeClass('hide');
+                                                          // if (isNaN(intervalID)){
+                                                          //     intervalID = setInterval(function(){incrementTimeOfCount()}, 1000);
+                                                          // }
                                                       }else if(nores==true){
                                                           $('#addTimesheetLoader').addClass('hide');
                                                           showGlobalToast('#globalToast', 'error', response.message, 4000);
@@ -764,7 +768,7 @@ function addTimeLogEntry(modalId,formId){
                                           }else{
                                               if(selectedEle!=null&&selectedEle!=undefined){
 
-                                                  intervalID = NaN;
+                                                  // intervalID = NaN;
                                                   let timesheetRowData={};
                                                   let ele=selectedEle;
                                                   timesheetRowDataid=$(ele).attr('line_item_id');
@@ -776,7 +780,7 @@ function addTimeLogEntry(modalId,formId){
                                                   timesheetRowData.user_role=currentSelectedRow.find('#userRoleLineItem').text();
                                                   timesheetRowData.day_note=(currentSelectedRow.find('#noteLineItem').text()=="")?' ':currentSelectedRow.find('#noteLineItem').text();
                                                   timesheetRowData.day_category=(currentSelectedRow.find('#billableLineItem').text()=="Billable")?true:false;
-                                                  timesheetRowData.lastruntime=res.currentTime;
+                                                  // timesheetRowData.lastruntime=res.currentTime;
                                                   timesheetRowData.timesheet_date=dateFormat(moment.tz(res.currentDate, companyDefaultTimezone).format());
                                                   timesheetRowData.isRunning=true;
                                                   timesheetRowData.day_time="0:00";
@@ -847,20 +851,21 @@ function stopKwTimerWithLogEntry(lineItemId,ele, id, inputId, modalId,currentDat
           console.log(response);
           if (response.success == true) {
               hideLoader('#globalLoader');
-              if(typeof intervalID!="undefined"){
-                clearInterval(intervalID);
-              }
-              intervalID = NaN;
+              // if(typeof intervalID!="undefined"){
+              //   clearInterval(intervalID);
+              // }
+              // intervalID = NaN;
               let logSubmittedDate=$("[name=kwTimer]").attr("lineItemDate");
               if(typeof logSubmittedDate=="undefined"){
                 logSubmittedDate=dateFormat(moment.tz(currentDate, companyDefaultTimezone).format());
               }
               $("#logSubmittedDate").text(logSubmittedDate);
-              $(inputId).val($($(id)[0]).text());
+              // $(inputId).val($($(id)[0]).text());
+              $(inputId).val(response.total_work_hours);
               $("[name=globalStop]").addClass('hide');
               // $("[name=globalStop]").css('display','none');
               $('[name=globalStart]').removeClass('hide');
-              $(id).text('Start');
+              // $(id).text('Start');
               openModal(modalId);
           } else {
               hideLoader('#globalLoader');
@@ -876,8 +881,8 @@ function stopKwTimerWithLogEntry(lineItemId,ele, id, inputId, modalId,currentDat
   });
 }
 function stopTimerForElement(ele, id, inputId, modalId,lineItemId){
-  let updatedHours=$("[name=kwTimer]").text();
-  let lineItemData={"line_item_id":lineItemId,"updatedHours":updatedHours,"isRunning":false};
+  // let updatedHours=$("[name=kwTimer]").text();
+  let lineItemData={"line_item_id":lineItemId,"updateTimer":'stopTimer',"isRunning":false};
   addDataToLineItem(lineItemData,(success,nodata,error)=>{
       if(success==true){
           /*$(ele).addClass('hide');
