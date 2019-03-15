@@ -223,13 +223,15 @@ exports.postAddInvoiceItem = (req, res) => {
 function getUserBRandCR(req, res, client, err, done, userId, projectId, userRole, taskId, result) {
     // console.log('userId in getUserBRandCR');
     // console.log(userId);
+    console.log('get data for task assignment');
+    console.log(userId+' '+userRole+' '+projectId+' '+taskId);
     client.query('SELECT bill_rate, cost_rate FROM task_assignment where user_id=$1 AND user_role=$2 AND project_id=$3 AND task_id=$4', [userId, userRole, projectId, taskId], function (err, userData) {
     if(err) {
         handleResponse.shouldAbort(err, client, done);
         handleResponse.handleError(res, err, 'Server error : Error in finding br and cr for timesheet data with task_id');
     } else {
-        // console.log('-----userData.rows--');
-        // console.log(userData.rows);
+        console.log('-----userData.rows--');
+        console.log(userData.rows);
         if(userData.rows.length > 0 || userRole == undefined) {
             return result(userData.rows[0]);
         } else {
