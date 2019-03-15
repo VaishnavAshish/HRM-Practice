@@ -509,10 +509,16 @@ function createGroupedObjWithTask(lineItems, callback) {
 }
 
 function calculateBR_CR_andGrouped(req, res, client, err, done, concatData, projectAssignments, callback) {
-
+    console.log('inside calculate br and cr and group');
+    console.log(JSON.stringify(concatData));
+    console.log(JSON.stringify(projectAssignments));
     let projectArr = [];
     concatData.forEach(function (mergedRow, index) {
+        console.log('concatenated data is')
+        console.log(JSON.stringify(mergedRow));
         getUserBRandCR(req, res, client, err, done, mergedRow.resource_id, mergedRow.project_id, mergedRow.user_role, mergedRow.task_id, function(response) {
+            console.log('user bill rate and cost rates are');
+            console.log(JSON.stringify(response));
             let projectObj = {};
             let arrLength = projectArr.length;
             var perMinuteCost = parseInt(response.bill_rate)/60;
@@ -536,6 +542,7 @@ function calculateBR_CR_andGrouped(req, res, client, err, done, concatData, proj
                     return projectAssign.bill_rate;
                 }
             });
+            console.log('unit_price'+unit_price);
             if(index == 0) {
                 projectObj.project_id = mergedRow.project_id;
                 projectObj.totalHours = parseInt(mergedRow.totalHours);
