@@ -68,7 +68,7 @@ exports.postAddProjectRes = (req, res) => {
               }
           }else{
             pool.connect((err, client, done) => {
-                client.query('SELECT pa.id ,pa.company_id ,pa.account_id ,pa.user_id ,pa.project_id ,pa.created_by ,pa.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,pa.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,pa.bill_rate ,pa.cost_rate ,pa.user_role ,pa.record_id FROM PROJECT_ASSIGNMENT pa WHERE company_id=$1 AND project_id=$2 AND user_id=$3',[req.user.company_id, req.body.projectId, req.body.project_user], function(err, projectRes) {
+                client.query('SELECT pa.id ,pa.company_id ,pa.account_id ,pa.user_id ,pa.project_id ,pa.created_by ,pa.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,pa.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,pa.bill_rate ,pa.cost_rate ,pa.user_role ,pa.record_id FROM PROJECT_ASSIGNMENT pa WHERE company_id=$1 AND project_id=$2 AND user_id=$3 AND user_role=$4',[req.user.company_id, req.body.projectId, req.body.project_user,req.body.user_role], function(err, projectRes) {
                     if (err) {
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);
