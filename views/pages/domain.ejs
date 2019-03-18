@@ -41,12 +41,12 @@
                                                 </span>
                                             </div>
                                             <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
-                                         
+
                                             </div>
                                          </div>
                                 </div>
                                 <div class="slds-m-bottom_medium">
-                                    <button class="slds-button slds-button_brand w-full" onclick="validateDomain()">
+                                    <button class="slds-button slds-button_brand w-full" id="validateData" onclick="validateDomain()">
                                         Continue
                                     </button>
                                 </div>
@@ -60,8 +60,20 @@
             </div>
         </main>
         <% include ../layouts/footer %>
-            <% include ../layouts/scripts %>
-                <% include ../layouts/login-script %>
+        <% include ../layouts/scripts %>
+        <% include ../layouts/login-script %>
+        <script>
+        $(document).ready(function () {
+            $('#domain').keydown(function(event){
+                var keyCode = (event.keyCode ? event.keyCode : event.which);
+                if (keyCode == 13) {
+                    $('#validateData').click();
+                }
+            });
+        });
+        </script>
+
     </body>
+
 
 </html>

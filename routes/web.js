@@ -67,6 +67,7 @@ module.exports = function(app) {
      * secure
      */
 
+    
     app.get('/home', passportConfig.isAuthenticated, roleConfig.nocache, function(req, res) {
         console.log('--------req.user redirect------');
         console.log(req.session.passport.user);

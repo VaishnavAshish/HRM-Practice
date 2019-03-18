@@ -119,6 +119,7 @@ app.use((req, res, next) => {
 
 
 app.use('/', express.static(path.join(__dirname, '/public'), {maxAge:'2h' }));
+app.use('/node_modules', express.static(path.join(__dirname, '/node_modules'), {maxAge:'2h' }));
 
 
 /** setup routes **/

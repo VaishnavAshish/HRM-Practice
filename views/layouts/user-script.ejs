@@ -51,6 +51,7 @@ function uploadUserPicture(input){
         reader.onload = function (e) {
         	console.log(e.target.result);
         	$('#userimg').attr('src', e.target.result);
+					$('[img-upload]').removeAttr('disabled');
         }
         reader.readAsDataURL(input.files[0]);
     }

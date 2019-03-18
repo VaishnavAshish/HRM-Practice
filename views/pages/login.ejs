@@ -45,7 +45,7 @@
                                 </div>
                             </div>
                             <div class="slds-m-bottom_medium">
-                                <button class="slds-button slds-button_brand w-full" onclick="login()">
+                                <button class="slds-button slds-button_brand w-full" onclick="login()" id="login">
                                     Login
                                 </button>
                             </div>
@@ -88,6 +88,12 @@
                 showGlobalToast('#globalToast', 'error', 'Invalid user or account already has been approved.', 4000, true);
             }
         }
+        $('#password').keydown(function(event){
+            var keyCode = (event.keyCode ? event.keyCode : event.which);
+            if (keyCode == 13) {
+                $('#login').click();
+            }
+        });
     });
     </script>
 </body>

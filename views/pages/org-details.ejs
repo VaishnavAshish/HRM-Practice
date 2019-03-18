@@ -51,9 +51,6 @@
 
                                 <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
                                     <div class="text-right sm-tpd-15">
-                                        <button class="slds-button slds-button_brand slds-align-top" onclick="updateCompany(<%=company.id;%>)">
-                                            Save Changes
-                                        </button>
                                         <% if(company.archived==true) { %>
                                             <button class="slds-button slds-button_neutral slds-align-top" onclick="activateBeforeConfirm('#globalAlert', 'activate(\'<%= company.id %>\',\'company\')')">
                                                 Restore
@@ -204,6 +201,11 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                                <div class="text-right sm-tpd-15">
+                                  <button class="slds-button slds-button_brand slds-align-top" onclick="updateCompany(<%=company.id;%>)">
+                                      Save Changes
+                                  </button>
                                 </div>
                             </div>
                         </div>
