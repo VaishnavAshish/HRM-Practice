@@ -112,10 +112,11 @@ function updateAccount(accountId){
 		      data:JSON.stringify(accountData),
 		       success : function(response){
 		       		console.log(response);
-					setTimeout(() => {
-						hideLoader('#globalLoader');
-						showGlobalToast('#globalToast', 'success', response.message, 4000);
-					}, 2000);
+							$('[save-btn]').attr("disabled", true);
+							setTimeout(() => {
+								hideLoader('#globalLoader');
+								showGlobalToast('#globalToast', 'success', response.message, 4000);
+							}, 2000);
 
 		        },
 		       error: function(response){
@@ -197,7 +198,7 @@ function findInvoiceByNum(){
           url : '/findInvoiceByCriteria',
           contentType: 'application/json',
           dataType: 'json',
-          data:JSON.stringify({"searchField":searchField}),
+          data:JSON.stringify({"searchField":searchField,"accountArchived":accountArchivestatus}),
            success : function(response){
                if(response.success){
                     hideLoader('#globalLoader');
@@ -207,6 +208,9 @@ function findInvoiceByNum(){
                         response.invoices.forEach(function(invoice){
                             setDataToInvoiceTable(invoice);
                         })
+												if(accountArchivestatus == true) {
+							            removeHrefFromLink($('[target-tab]'));
+							          }
 
                     }else{
                     	$("#noInvoiceFound").removeClass('slds-hide').text('No invoice found with this search crieteria');
@@ -253,7 +257,7 @@ function loadMoreInvoice(){
           url : '/findInvoiceByCriteria',
           contentType: 'application/json',
           dataType: 'json',
-          data:JSON.stringify({"searchField":searchField,"offset":offset}),
+          data:JSON.stringify({"searchField":searchField,"offset":offset,"accountArchived":accountArchivestatus}),
            success : function(response){
                if(response.success){
                     hideLoader('#globalLoader');
@@ -263,7 +267,9 @@ function loadMoreInvoice(){
                         response.invoices.forEach(function(invoice){
                             setDataToInvoiceTable(invoice);
                         })
-
+												if(accountArchivestatus == true) {
+							            removeHrefFromLink($('[target-tab]'));
+							          }
                     }else{
                         showGlobalToast('#globalToast', 'error','No invoice found with this search crieteria', 4000);
                     }
@@ -306,6 +312,9 @@ function loadMoreProject(){
                         response.projects.forEach(function(project){
                             setDataToProjectCard(project);
                         })
+												if(accountArchivestatus==true) {
+							            removeHrefFromLink($('[target-tab]'));
+							          }
                     }else{
                         showGlobalToast('#globalToast', 'error','No project found with this search crieteria', 4000);
                     }
@@ -334,7 +343,7 @@ function findProjectByName(){
     $("#loadMoreProject").show();
 	$("#offsetProject").text("0");
 
-
+		let url = new URL(window.location.href);
     let searchText=$("#searchProjectName").val();
 		let accountId=url.searchParams.get("accountId");
     // let url = new URL(window.location.href);
@@ -355,6 +364,9 @@ function findProjectByName(){
                         response.projects.forEach(function(project){
                             setDataToProjectCard(project);
                         })
+												if(accountArchivestatus==true) {
+							            removeHrefFromLink($('[target-tab]'));
+							          }
                     }else{
                     	$("#noProjectFound").removeClass('slds-hide').text('No project found with this search crieteria');
                         /*showGlobalToast('#globalToast', 'error','No project found with this search crieteria', 4000);*/

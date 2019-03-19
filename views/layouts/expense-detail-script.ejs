@@ -55,7 +55,7 @@ function updateExpense(expenseId){
               if($('#amount').val()<0){
                   addError($('#amount'),'Please enter correct amount');
               }else{
-                 
+
                   showLoader('#globalLoader');
                   clearError('#project', '#err-msg-project')
                     let expenseData={};
@@ -80,6 +80,7 @@ function updateExpense(expenseId){
                       data:JSON.stringify(expenseData),
                        success : function(response){
                           console.log(response);
+                          $('[save-btn]').attr('disabled',true);
                           setTimeout(function () {
                               showGlobalToast('#globalToast', 'success',response.message, 4000);
                               hideLoader('#globalLoader');

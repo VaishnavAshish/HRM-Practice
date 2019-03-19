@@ -138,17 +138,18 @@ function updateUser(userId){
 		      data:JSON.stringify(userData),
 		       success : function(response){
 		       		console.log(response);
+							$('[save-btn]').attr("disabled", true);
 		       		if($('[permission-modified]').length < 1) {
-						   setTimeout(() => {
-								hideLoader('#globalLoader');
+							   setTimeout(() => {
+									hideLoader('#globalLoader');
+									showGlobalToast('#globalToast', 'success', "User details updated successfully", 4000);
+							   }, 2000);
+							} else {
 								showGlobalToast('#globalToast', 'success', "User details updated successfully", 4000);
-						   }, 2000);
-					} else {
-						showGlobalToast('#globalToast', 'success', "User details updated successfully", 4000);
-						setTimeout(() => {
-							location.reload();
-						}, 2000);
-					}
+								setTimeout(() => {
+									location.reload();
+								}, 2000);
+							}
 
 		       		/*showGlobalToast('#globalToast', 'success', response.message, 4000);*/
 

@@ -148,7 +148,7 @@
             let currentWeekStart=weekStartDate;
             let date = adjustDays(currentWeekStart, "ADD", index);
             /*date=moment.tz(date, companyDefaultTimezone).format();*/
-            var dayOfDate = moment.tz(date, companyDefaultTimezone).format('dd');
+            var dayOfDate = moment.tz(date, companyDefaultTimezone).format('ddd');
             $(this).html(dayOfDate);
             // $(this).attr('date', dateWithMonth);
         });
@@ -1487,7 +1487,7 @@
                                 billable = "Billable"
                                 checkedval = "checked=''"
                             }
-                            var deleteBtn = `<button class="slds-button slds-button_icon slds-button_icon-border-filled" title="delete" onclick="deleteDayTimesheet('`+row.id+`', '');">
+                            var deleteBtn = `<button class="slds-button slds-button_icon slds-button_icon-border-filled" title="delete" onclick="deleteDayTimesheet(this);" ts_li_id ="${row.id}" >
                                                 <span class="slds-button__icon">
                                                     <i class=" fa fa-trash text-red" aria-hidden="true"></i>
                                                 </span>

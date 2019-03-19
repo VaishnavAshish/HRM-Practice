@@ -118,7 +118,7 @@ exports.getExpense = (req, res) => {
                                     return ele.id;
                                 });
                             }
-                            client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$3', [req.session.passport.user.company_id, false, false], function(err, project) {
+                            client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$3 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2)', [req.session.passport.user.company_id, false, false], function(err, project) {
                                 if (err) {
                                     handleResponse.shouldAbort(err, client, done);
                                     handleResponse.responseToPage(res, 'pages/expenses-listing', {
@@ -350,7 +350,7 @@ exports.getExpenseDetail = (req, res) => {
                             } else {
                                 // console.log("----------account.rows-------------");
                                 // console.log(account.rows);
-                                client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$3', [req.session.passport.user.company_id, false, false], function(err, project) {
+                                client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$3 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2)', [req.session.passport.user.company_id, false, false], function(err, project) {
                                     if (err) {
                                         handleResponse.shouldAbort(err, client, done);
                                         handleResponse.responseToPage(res, 'pages/expense-details', {

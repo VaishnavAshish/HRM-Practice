@@ -46,9 +46,9 @@
 
                             <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
                                 <div class="text-right sm-tpd-15">
-                                    <button class="slds-button slds-button_brand slds-align-top" onclick="updateExpense('<%= expense.id %>')">
+                                    <!-- <button class="slds-button slds-button_brand slds-align-top" onclick="updateExpense('<%= expense.id %>')">
                                         Save Changes
-                                    </button>
+                                    </button> -->
 
                                     <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteExpense(\'<%= expense.id %>\')')">
                                         Delete
@@ -67,7 +67,7 @@
 
                     <!-- expense details start -->
 
-                    <div class=" slds-card slds-p-around_large sm-pd-10">
+                    <div class=" slds-card slds-p-around_large sm-pd-10" data-modified>
                         <div class="slds-grid slds-wrap slds-gutters">
                             <div class="slds-col slds-size_1-of-1 slds-medium-size_8-of-12">
                                 <div class="">
@@ -332,6 +332,13 @@
                                             <% } %>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-size_1-of-1">
+                              <div class="text-right sm-tpd-15">
+                                  <button class="slds-button slds-button_brand slds-align-top" onclick="updateExpense('<%= expense.id %>')" disabled save-btn>
+                                      Save Changes
+                                  </button>
                                 </div>
                             </div>
                         </div>

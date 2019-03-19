@@ -254,14 +254,15 @@
                                                                                 Restore
                                                                             </span>
                                                                         </a>
-                                                                    <% }else { %>
-                                                                        <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteCompany(\'<%= comp.id %>\')')">
+                                                                    <% } else if(user.company_id == comp.id){
+                                                                    } else { %>
+                                                                        <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteCompany(\'<%= comp.id %>\')','Are you sure you want to delete <%= comp.name %> company.It will delete selected company and users from database and you will loose all information/data for company')">
                                                                                 <span class="slds-truncate sf-text-red" title="">
                                                                                     <i class="fa fa-trash text-red"></i> &nbsp;
                                                                                     Delete
                                                                                 </span>
                                                                             </a>
-                                                                    <% } %>
+                                                                    <% }%>
                                                                 </li>
                                                             </ul>
                                                         </div>

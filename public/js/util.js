@@ -20,11 +20,22 @@ $(document).ready(function(){
     /* following two functions help in navigation and loading appropriate views not tested on all browsers.*/
     handleHashLinks();
     bindDataNavigationEvent();
+    modifyInputEvent($('[data-modified]'));
 });
 
 /* handle navigation when browser back and forward button navigation */
 window.onhashchange = function() {
     handleHashLinks();
+}
+
+function removeHrefFromLink(targetContainer){
+  $("a",targetContainer).removeAttr('href');
+}
+
+function modifyInputEvent(ele){
+  $('input,select,textarea',ele).on('change',function(){
+    $('[save-btn]',ele).removeAttr('disabled');
+  })
 }
 
 function setDateToFlatpicker(inputId, date) {

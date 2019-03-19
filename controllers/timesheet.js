@@ -387,7 +387,7 @@ exports.getTimesheet = (req, res) => {
                   handleResponse.shouldAbort(err, client, done);
                   handleResponse.handleError(res, err, 'Server error : Error in finding current date and time');
                 } else {
-                  client.query('SELECT * FROM PROJECT WHERE  company_id=$1 AND archived=$2 AND isGlobal=$3 AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)',[req.user.company_id, false, false, userId], function(err, projectList) {
+                  client.query('SELECT * FROM PROJECT WHERE  company_id=$1 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND archived=$2 AND isGlobal=$3 AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)',[req.user.company_id, false, false, userId], function(err, projectList) {
                     if(err) {
                       console.error(err);
                       handleResponse.shouldAbort(err, client, done);
@@ -557,8 +557,11 @@ module.exports.getAllCompanyUsers = getAllCompanyUsers;
 // getDayTimesheetData
 exports.getDayTimesheetData = (req, res) => {
   if(req.user){
+      console.log('req.body.date '+req.body.date);
+      console.log( moment.tz(req.body.date.split('T')[0].split(' ')[0], companyDefaultTimezone).format());
+      console.log(moment.tz(req.body.date.split('T')[0].split(' ')[0]+' 23:59:59', companyDefaultTimezone).format())
       pool.connect((err, client, done) => {
-        client.query('SELECT tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category ,EXTRACT(DOW FROM tl.created_date at time zone \''+companyDefaultTimezone+'\') as week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime at time zone \''+companyDefaultTimezone+'\' as lastruntime ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id FROM TIMESHEET_LINE_ITEM tl WHERE company_id=$1 AND id=$2 AND created_date=$3',[req.user.company_id, req.body.id, moment.tz(req.body.date.split('T')[0], companyDefaultTimezone).format()], function(err, timesheetData) {
+        client.query('SELECT tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category ,EXTRACT(DOW FROM tl.created_date at time zone \''+companyDefaultTimezone+'\') as week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime at time zone \''+companyDefaultTimezone+'\' as lastruntime ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id FROM TIMESHEET_LINE_ITEM tl WHERE company_id=$1 AND id=$2 AND created_date BETWEEN $3 AND $4',[req.user.company_id, req.body.id, moment.tz(req.body.date.split('T')[0].split(' ')[0], companyDefaultTimezone).format(), moment.tz(req.body.date.split('T')[0].split(' ')[0]+' 23:59:59', companyDefaultTimezone).format()], function(err, timesheetData) {
           if(err) {
             console.error(err);
             handleResponse.shouldAbort(err, client, done);
@@ -1237,8 +1240,10 @@ exports.deleteTimesheetRow = (req, res) => {
                       client.query('SELECT NOW() at time zone \''+companyDefaultTimezone+'\' as currentTimestamp, tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category ,EXTRACT(DOW FROM tl.created_date at time zone \''+companyDefaultTimezone+'\') as week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime at time zone \''+companyDefaultTimezone+'\' as lastruntime ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id FROM TIMESHEET_LINE_ITEM tl WHERE id=$1',[req.body.timesheet_lineitem_id], function(err, timesheetLiData) {
                         if (err) {
                           handleResponse.shouldAbort(err, client, done);
-                          handleResponse.handleError(res, err, 'Server error : Error in deleting timesheet detail');
+                          handleResponse.handleError(res, err, 'Server error : Error in selecting timesheet detail');
                         } else {
+                          console.log('timesheetLiData.rowCount '+JSON.stringify(timesheetLiData))
+                          console.log('req.body.timesheet_lineitem_id '+req.body.timesheet_lineitem_id);
                           if(timesheetLiData.rowCount > 0) {
                             let differenceOfTime ;
                             if(moment.tz(timesheetLiData.rows[0].currentTimestamp,companyDefaultTimezone).format('YYYY-MM-DD') == moment.tz(timesheetLiData.rows[0].lastruntime,companyDefaultTimezone).format('YYYY-MM-DD')){
@@ -1249,6 +1254,7 @@ exports.deleteTimesheetRow = (req, res) => {
                             console.log('differenceOfTime after deleting element '+minuteToHours(differenceOfTime));
                             console.log(moment.tz(timesheetLiData.rows[0].currentTimestamp,companyDefaultTimezone).format());
                             console.log(moment.tz(timesheetLiData.rows[0].lastruntime,companyDefaultTimezone).format());
+
                             client.query('DELETE FROM TIMESHEET_LINE_ITEM WHERE id=$1',[req.body.timesheet_lineitem_id], function(err, deletedRow) {
                               if (err) {
                                 console.log('Server error : Error in deleting timesheet detail');

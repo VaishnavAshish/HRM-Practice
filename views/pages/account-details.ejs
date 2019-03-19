@@ -55,16 +55,14 @@
 
                                 <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
                                     <div class="text-right sm-tpd-15">
-                                        <button class="slds-button slds-button_brand slds-align-top" onclick="updateAccount('<%= account.id %>')">
-                                            Save Changes
-                                        </button>
+
                                         <% if(account.archived==true) { %>
                                             <button class="slds-button slds-button_neutral slds-align-top" onclick="activateBeforeConfirm('#globalAlert', 'activate(\'<%= account.id %>\',\'account\')')">
                                                 Activate
                                             </button>
                                         <% } else { %>
                                                 <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', '   deleteAccount(\'<%= account.id %>\')')">
-                                                        Dectivate
+                                                        Deactivate
                                                 </button>
 
                                         <% } %>
@@ -97,7 +95,7 @@
                         <!-- header end -->
 
                         <div class="slds-tabs_default__content" target-tab="account-details">
-                            <div class=" slds-card slds-p-around_large sm-pd-10">
+                            <div class=" slds-card slds-p-around_large sm-pd-10" data-modified>
                                 <div class="slds-grid slds-wrap slds-grid_pull-padded">
                                     <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_6-of-12 slds-p-horizontal_small">
                                         <div class="slds-p-bottom_x-small line-bottom">
@@ -451,6 +449,11 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div class="text-right sm-tpd-15">
+                                                <button class="slds-button slds-button_brand slds-align-top" onclick="updateAccount('<%= account.id %>')" disabled save-btn>
+                                                    Save Changes
+                                                </button>
+                                          </div>
                                         </div>
 
                                     </div>
@@ -1166,7 +1169,14 @@
     <% include ../layouts/scripts %>
     <% include ../layouts/account-script %>
     <% include ../layouts/account-det-script %>
-
+    <script>
+      $(document).ready(function(){
+          // modifyInputEvent($('[data-modified]'));
+          if(<%= account.archived %>==true) {
+            removeHrefFromLink($('[target-tab]'));
+          }
+      })
+    </script>
 </body>
 
 </html>

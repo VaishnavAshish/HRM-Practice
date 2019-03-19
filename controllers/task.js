@@ -347,7 +347,7 @@ exports.postEditTask = (req, res) => {
                 if (err) {
                   console.error(err);
                   handleResponse.shouldAbort(err, client, done);
-                  handleResponse.handleError(res, err, 'Server error : Error in finding task data');
+                  handleResponse.handleError(res, err, 'Server error : Error in finding task data for updating');
                 } else {
                   if (taskDetail.rows.length > 0) {
                     // console.log("Assignment id");
@@ -388,7 +388,7 @@ exports.postEditTask = (req, res) => {
                         if (err) {
                           console.error(err);
                           handleResponse.shouldAbort(err, client, done);
-                          handleResponse.handleError(res, err, 'Server error : Error in finding task data');
+                          handleResponse.handleError(res, err, 'Server error : Error in finding project data for task');
                         } else {
                           // console.log("taskData");
                           // console.log(req.body);

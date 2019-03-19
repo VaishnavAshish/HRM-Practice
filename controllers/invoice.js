@@ -1178,74 +1178,87 @@ exports.deleteInvoice = (req, res) => {
 
 exports.findInvoiceByCriteria = (req, res) => {
   // console.log("findInvoiceByCriteria----------------------------------"+req.body.searchField);
-
-  pool.connect((err, client, done) => {
-      let searchCriteriaVal=[req.user.company_id];
-      let whereClause='WHERE company_id=$1 ';
-      if(req.body.searchField.length>0){
-        let searchField=req.body.searchField;
-        searchField.forEach((search,index)=>{
-            whereClause+='AND '+search.fieldName+' $'+(index+2)+' ';
-            searchCriteriaVal.push(search.fieldValue);
-        });
-        /*let queryToExec='SELECT * FROM account WHERE '+req.body.searchField+' like $1 AND company_id=$2';*/
-      }
-      let offset = 0;
-        if (req.body.offset) {
-            offset = req.body.offset;
-        }
-      whereClause+=' AND account_id IN(SELECT id FROM ACCOUNT where company_id=$1 AND archived=$'+(searchCriteriaVal.length+1)+')';
-      searchCriteriaVal.push(false);
-      let queryToExec='SELECT i.id ,i.status ,i.account_id ,i.company_id ,i.created_by ,i.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,i.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,i.archived ,i.account_name ,i.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,i.due_date at time zone \''+companyDefaultTimezone+'\' as due_date ,i.description ,i.project_id ,i.project_name ,i.total_amount ,i.record_id ,i.currency ,i.tax ,(SELECT count(*) FROM INVOICE '+whereClause+') as searchCount FROM INVOICE i '+whereClause+' ORDER BY start_date DESC,record_id OFFSET '+offset+' LIMIT ' + process.env.PAGE_RECORD_NO;
-      // console.log('queryToExec '+queryToExec+' '+searchCriteriaVal);
-      client.query(queryToExec,searchCriteriaVal, function (err,invoiceList) {
-        if (err) {
-          handleResponse.shouldAbort(err, client, done);
-          handleResponse.handleError(res, err, 'Server Error: Error in finding invoice data');
-        }
-        else{
-            client.query('SELECT id,name FROM ACCOUNT WHERE company_id=$1 AND archived=$2', [req.user.company_id, false], function (err, account) {
-              if (err) {
-                handleResponse.shouldAbort(err, client, done);
-                handleResponse.handleError(res, err, 'Server Error: Error in finding account data');
-                /*handleResponse.handleError(res, err, 'Server error : Error in finding account data');*/
-              } else {
-                // console.log("----------account.rows-------------");
-                // console.log(account.rows);
-                let accountIdArr=[];
-                if(account.rows.length>0){
-                  accountIdArr = account.rows.map(function (ele) {
-                      return ele.id;
+  setting.getCompanySetting(req, res ,(err,result)=>{
+     if(err==true){
+       handleResponse.handleError(res, err, 'Server Error: error in finding company setting');
+     }else{
+           companyDefaultTimezone = result.timezone;
+            pool.connect((err, client, done) => {
+                let searchCriteriaVal=[req.user.company_id];
+                let whereClause='WHERE company_id=$1 ';
+                if(req.body.searchField.length>0){
+                  let searchField=req.body.searchField;
+                  searchField.forEach((search,index)=>{
+                      whereClause+='AND '+search.fieldName+' $'+(index+2)+' ';
+                      searchCriteriaVal.push(search.fieldValue);
                   });
+                  /*let queryToExec='SELECT * FROM account WHERE '+req.body.searchField+' like $1 AND company_id=$2';*/
                 }
+                let offset = 0;
+                  if (req.body.offset) {
+                      offset = req.body.offset;
+                  }
+                whereClause+=' AND account_id IN(SELECT id FROM ACCOUNT where company_id=$1 AND archived=$'+(searchCriteriaVal.length+1)+')';
+                console.log('req.body.accountArchived '+req.body.accountArchived)
+                if(req.body.accountArchived){
+                  searchCriteriaVal.push(req.body.accountArchived);
+                }else{
+                  searchCriteriaVal.push(false);
+                }
+                let queryToExec='SELECT i.id ,i.status ,i.account_id ,i.company_id ,i.created_by ,i.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,i.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,i.archived ,i.account_name ,i.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,i.due_date at time zone \''+companyDefaultTimezone+'\' as due_date ,i.description ,i.project_id ,i.project_name ,i.total_amount ,i.record_id ,i.currency ,i.tax ,(SELECT count(*) FROM INVOICE '+whereClause+') as searchCount FROM INVOICE i '+whereClause+' ORDER BY start_date DESC,record_id OFFSET '+offset+' LIMIT ' + process.env.PAGE_RECORD_NO;
+                console.log('queryToExec '+queryToExec+' '+searchCriteriaVal);
+                client.query(queryToExec,searchCriteriaVal, function (err,invoiceList) {
+                  if (err) {
+                    handleResponse.shouldAbort(err, client, done);
+                    handleResponse.handleError(res, err, 'Server Error: Error in finding invoice data');
+                  }
+                  else{
+                      client.query('SELECT id,name FROM ACCOUNT WHERE company_id=$1 AND archived=$2', [req.user.company_id, req.body.accountArchived], function (err, account) {
+                        if (err) {
+                          handleResponse.shouldAbort(err, client, done);
+                          handleResponse.handleError(res, err, 'Server Error: Error in finding account data');
+                          /*handleResponse.handleError(res, err, 'Server error : Error in finding account data');*/
+                        } else {
+                          // console.log("----------account.rows-------------");
+                          // console.log(account.rows);
+                          let accountIdArr=[];
+                          if(account.rows.length>0){
+                            accountIdArr = account.rows.map(function (ele) {
+                                return ele.id;
+                            });
+                          }
 
-                let invoiceListArr = [];
-                let searchCount = 0;
-                if(invoiceList.rows.length>0){
-                    invoiceList.rows.forEach(function (invoice) {
-                        if(accountIdArr.includes(invoice.account_id)) {
-                            // invoice['startDateFormatted'] = invoice.start_date == null ? null : dateFormat(moment.tz(invoice.start_date, companyDefaultTimezone).format());
-                            // invoice['dueDateFormatted'] = invoice.due_date == null ? '' : dateFormat(moment.tz(invoice.due_date, companyDefaultTimezone).format());
-                            invoice['startDateFormatted'] = invoice.start_date == null ? null : dateFormat(invoice.start_date);
-                            invoice['dueDateFormatted'] = invoice.due_date == null ? '' : dateFormat(invoice.due_date);
-                            invoiceListArr.push(invoice);
+                          let invoiceListArr = [];
+                          let searchCount = 0;
+                          console.log('------------invoiceList.rows--------------');
+                          console.log(invoiceList.rows);
+                          if(invoiceList.rows.length>0){
+                              invoiceList.rows.forEach(function (invoice) {
+                                  if(accountIdArr.includes(invoice.account_id)) {
+                                      // invoice['startDateFormatted'] = invoice.start_date == null ? null : dateFormat(moment.tz(invoice.start_date, companyDefaultTimezone).format());
+                                      // invoice['dueDateFormatted'] = invoice.due_date == null ? '' : dateFormat(moment.tz(invoice.due_date, companyDefaultTimezone).format());
+                                      invoice['startDateFormatted'] = invoice.start_date == null ? null : dateFormat(invoice.start_date);
+                                      invoice['dueDateFormatted'] = invoice.due_date == null ? '' : dateFormat(invoice.due_date);
+                                      invoiceListArr.push(invoice);
+                                  }
+                              });
+                              searchCount=invoiceList.rows[0].searchcount;
+                          }
+                          // console.log("invoiceList");
+                          // console.log(invoiceListArr);
+                          done();
+
+                          handleResponse.sendSuccess(res,'Invoices searched successfully',{invoices: invoiceListArr,count:searchCount});
+
+
                         }
-                    });
-                    searchCount=invoiceList.rows[0].searchcount;
-                }
-                // console.log("invoiceList");
-                // console.log(invoiceListArr);
-                done();
+                      });
+                  }
+                });
 
-                handleResponse.sendSuccess(res,'Invoices searched successfully',{invoices: invoiceListArr,count:searchCount});
-
-
-              }
-            });
-        }
-      });
-
-    })
+              })
+            }
+          });
 };
 exports.findInvoiceForAccount = (req, res) => {
   // console.log("findInvoiceForAccount----------------------------------"+req.body.searchText);

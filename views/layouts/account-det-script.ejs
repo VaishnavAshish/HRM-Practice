@@ -1,6 +1,6 @@
 <script>
 $(document).ready(function(){
-
+	accountArchivestatus = <%= account.archived %>
 	$("#offsetProject").text(parseInt($("#pageRecordNo").text()));
 	$("#offsetInvoice").text(parseInt($("#pageRecordNo").text()));
 	let noOfRecord=parseInt($("#offsetProject").text());

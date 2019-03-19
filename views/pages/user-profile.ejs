@@ -32,19 +32,15 @@
                                 </div>
                             </div>
 
-                            <div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-p-horizontal_small">
-                                <div class="slds-text-align_right sm-tpd-10 sm-text-left">
-                                    <button class="slds-button slds-button_brand slds-align-top" onclick="updateUser(<%= userObj.id %>)">
-                                        Save Changes
-                                    </button>
-                                </div>
-                            </div>
+                            <!-- <div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-p-horizontal_small">
+
+                            </div> -->
 
                         </div>
                     </div>
                     <!-- header end -->
 
-                    <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                    <div class="slds-grid slds-wrap slds-grid_pull-padded" data-modified >
                         <div class="slds-size_1-of-1 slds-medium-size_12-of-12 slds-p-horizontal_small">
                             <div class="slds-card slds-p-around_large sm-pd-10 slds-m-bottom_large">
                                 <div class="">
@@ -77,8 +73,9 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                                <div>Image may take time to upload and reflect changes.</div>
                                                 <div class="text-right tpd-15">
-                                                    <button class="slds-button  slds-button_brand slds-align-top" type="submit">
+                                                    <button class="slds-button  slds-button_brand slds-align-top" type="submit" disabled img-upload>
                                                         Upload File
                                                     </button>
                                                 </div>
@@ -161,6 +158,13 @@
 
                                                 </div>
                                             </div>
+                                        </div>
+                                        <div class="slds-form-element slds-m-bottom_medium">
+                                          <div class="slds-text-align_right sm-tpd-10 sm-text-left">
+                                              <button class="slds-button slds-button_brand slds-align-top" onclick="updateUser(<%= userObj.id %>)" disabled save-btn>
+                                                  Save Changes
+                                              </button>
+                                          </div>
                                         </div>
                                     </div>
                                 </div>
@@ -248,7 +252,11 @@
 
     <% include ../layouts/scripts %>
     <% include ../layouts/user-script %>
-
+    <!-- <script>
+      $(document).ready(function(){
+          modifyInputEvent($('[data-modified]'));
+      })
+    </script> -->
 </body>
 
 </html>

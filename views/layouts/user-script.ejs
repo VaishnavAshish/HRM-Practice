@@ -26,6 +26,7 @@ function updateUser(userId){
 		      data:JSON.stringify(userData),
 		       success : function(response){
 					   console.log(response);
+						 $('[save-btn]').attr("disabled", true);
 					   setTimeout(() => {
 						   hideLoader('#globalLoader');
 						   showGlobalToast('#globalToast', 'success', 'Profile updated successfully', 4000);

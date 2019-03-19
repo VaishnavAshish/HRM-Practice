@@ -113,6 +113,7 @@ function updateInvoiceDetails(invoiceId, formId) {
             success : function(response){
                 console.log(response);
                 if(response.success == true) {
+                  $('[save-btn]').attr('disabled',true);
                   showGlobalToast('#globalToast', 'success', 'Successfully updated invoice data.', 4000);
                     setTimeout( function() {
                         hideLoader('#globalLoader');

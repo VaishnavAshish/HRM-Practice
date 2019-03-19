@@ -130,113 +130,125 @@ exports.findProjectByCriteria = (req, res) => {
 
 exports.findProjectByName = (req, res) => {
   // console.log("findProjectByName----------------------------------"+req.body.searchText);
-  let offset=0;
-  let searchCount=0;
-  pool.connect((err, client, done) => {
-      // console.log('accountId'+req.body.accountId+' ');
-      if(req.body.accountId!=undefined&&req.body.accountId!=null&&req.body.accountId!=''){
-          // console.log('inside if');
-          if(req.body.offset){
-            offset=req.body.offset;
-          }
-          client.query('SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id,(SELECT count(*) from PROJECT WHERE name ilike $1 AND company_id= $2 AND archived=$3 AND isGlobal=$4 AND account_id=$5) as searchcount FROM PROJECT p WHERE name like $1 AND company_id= $2 AND archived=$3 AND isGlobal=$4 AND account_id=$5 ORDER BY start_date DESC,name OFFSET '+offset+' LIMIT '+process.env.PAGE_RECORD_NO, ['%'+req.body.searchText+'%',req.user.company_id, false,false,req.body.accountId], function (err, project) {
-          if (err) {
-            handleResponse.shouldAbort(err, client, done);
-            handleResponse.handleError(res, err, 'Server Error: Error in finding project data for the account');
-            /*handleResponse.handleError(res, err, 'Server error : Error in finding project data');*/
-          } else {
-              if(project.rows.length>0){
-                // console.log("----------project.rows------------- 1");
-                project.rows.forEach(function (data, index) {
-                  // data["start_date"] = (data.start_date==null)?'':dateFormat(moment.tz(data.start_date, companyDefaultTimezone).format())
-                  // data["end_date"] = (data.end_date==null)?'':dateFormat(moment.tz(data.end_date, companyDefaultTimezone).format())
-                  data["start_date"] = (data.start_date==null)?'':dateFormat(data.start_date)
-                  data["end_date"] = (data.end_date==null)?'':dateFormat(data.end_date)
+  setting.getCompanySetting(req, res ,(err,result)=>{
+     if(err==true){
+       // console.log('error in setting');
+       // console.log(err);
+      //  handleResponse.responseToPage(res,'pages/projects-listing',{projects: [], totalCount: 0,notStartedCount:0, inProgressCount :0, atRiskCount :0, completedCount:0,user:req.session.passport.user, error:err},"error"," Server error : Error in finding company setting");
+       handleResponse.handleError(res, err, 'Server Error: error in finding company setting');
+     }else{
+         companyDefaultTimezone=result.timezone;
+          let offset=0;
+          let searchCount=0;
+          pool.connect((err, client, done) => {
+              // console.log('accountId'+req.body.accountId+' ');
+              if(req.body.accountId!=undefined&&req.body.accountId!=null&&req.body.accountId!=''){
+                  // console.log('inside if');
+                  if(req.body.offset){
+                    offset=req.body.offset;
+                  }
+                  client.query('SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id,(SELECT count(*) from PROJECT WHERE name ilike $1 AND company_id= $2 AND archived=$3 AND isGlobal=$4 AND account_id=$5) as searchcount FROM PROJECT p WHERE name like $1 AND company_id= $2 AND archived=$3 AND isGlobal=$4 AND account_id=$5 ORDER BY start_date DESC,name OFFSET '+offset+' LIMIT '+process.env.PAGE_RECORD_NO, ['%'+req.body.searchText+'%',req.user.company_id, false,false,req.body.accountId], function (err, project) {
+                  if (err) {
+                    handleResponse.shouldAbort(err, client, done);
+                    handleResponse.handleError(res, err, 'Server Error: Error in finding project data for the account');
+                    /*handleResponse.handleError(res, err, 'Server error : Error in finding project data');*/
+                  } else {
+                      if(project.rows.length>0){
+                        // console.log("----------project.rows------------- 1");
+                        project.rows.forEach(function (data, index) {
+                          // data["start_date"] = (data.start_date==null)?'':dateFormat(moment.tz(data.start_date, companyDefaultTimezone).format())
+                          // data["end_date"] = (data.end_date==null)?'':dateFormat(moment.tz(data.end_date, companyDefaultTimezone).format())
+                          data["start_date"] = (data.start_date==null)?'':dateFormat(data.start_date)
+                          data["end_date"] = (data.end_date==null)?'':dateFormat(data.end_date)
 
-                  if(project.rows.length==(index+1)){
-                    searchCount=project.rows[0].searchcount;
-                    done();
-                    handleResponse.sendSuccess(res,'Projects searched successfully',{projects: project.rows,count:searchCount});
+                          if(project.rows.length==(index+1)){
+                            searchCount=project.rows[0].searchcount;
+                            done();
+                            handleResponse.sendSuccess(res,'Projects searched successfully',{projects: project.rows,count:searchCount});
+                          }
+                        });
+                      }else{
+                        console.log(project.rows);
+                        done();
+                        handleResponse.sendSuccess(res,'Projects searched successfully',{projects: project.rows,count:searchCount});
+
+                      }
+                  }
+                });
+              }else{
+                  if(req.body.offset){
+                    offset=req.body.offset;
+                  }
+                  let whereClause ='WHERE name ilike $1 AND company_id=$2 AND isGlobal=$3 AND archived=$4 AND account_id In (SELECT id from ACCOUNT WHERE company_id=$2 AND archived=$4 ) ';
+                  let searchFieldVal=['%'+req.body.searchText+'%',req.user.company_id, false,false];
+                  let innerQuery='SELECT count(*) from PROJECT '+whereClause;
+                  let queryToExec='' ;
+                  if(req.body.status){
+                    innerQuery+=' AND status ilike $5';
+                    queryToExec='SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id,('+innerQuery+') as searchcount FROM PROJECT p '+whereClause+' AND status ilike $5 ';
+                    searchFieldVal.push(req.body.status);
+                  }else{
+                    queryToExec='SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id,('+innerQuery+') as searchcount FROM PROJECT p '+whereClause;
+                  }
+                  queryToExec+=' ORDER BY start_date DESC,name OFFSET '+offset+' LIMIT '+process.env.PAGE_RECORD_NO;
+                  // console.log('---------queryToExec for filter-------'+req.body.status);
+                  // console.log(queryToExec);
+                  client.query(queryToExec, searchFieldVal, function (err, project) {
+                  if (err) {
+                    handleResponse.shouldAbort(err, client, done);
+                    handleResponse.handleError(res, err, 'Server Error: Error in finding project data');
+                    /*handleResponse.handleError(res, err, 'Server error : Error in finding project data');*/
+                  } else {
+                    client.query('SELECT * FROM ACCOUNT where company_id=$1 AND archived=$2', [req.user.company_id, false], function (err, accountList) {
+                      if (err) {
+                        handleResponse.shouldAbort(err, client, done);
+                        handleResponse.handleError(res, err, 'Server error : Error in finding account data');
+                      } else {
+                            let accountIdArr=[];
+                              if(accountList.rows.length>0){
+                                accountIdArr = accountList.rows.map(function (ele) {
+                                    return ele.id;
+                                });
+                              }
+                            let projectArr=[];
+
+                            let account={};
+                            if(project.rows.length>0){
+                              // console.log("----------project.rows------------- 2");
+                              project.rows.forEach(function (data) {
+                                if(accountIdArr.includes(data.account_id)){
+                                    // data["start_date"] = (data.start_date==null)?'':dateFormat(moment.tz(data.start_date, companyDefaultTimezone).format());
+                                    // data["end_date"] =  (data.end_date==null)?'':dateFormat(moment.tz(data.end_date, companyDefaultTimezone).format());
+                                    data["start_date"] = (data.start_date==null)?'':dateFormat(data.start_date);
+                                    data["end_date"] =  (data.end_date==null)?'':dateFormat(data.end_date);
+                                    if(data.account_id){
+                                        if(accountList.rows.length>0){
+                                          account=accountList.rows.filter(acc => acc.id==data.account_id);
+                                          if(account.length>0){
+                                            // console.log('account '+account);
+                                            data.account_name=account[0].name;
+                                          }
+                                        }
+                                      }else{
+                                        data.account_name='';
+                                      }
+                                    projectArr.push(data);
+                                }
+                              });
+                              searchCount=project.rows[0].searchcount;
+                            }
+                            // console.log(projectArr);
+                            done();
+                            handleResponse.sendSuccess(res,'Projects searched successfully',{projects: projectArr,count:searchCount});
+                      }
+                    });
+                    /*res.render('pages/projects-listing', { projects: project.rows, user: req.session.passport.user, error: err });*/
                   }
                 });
               }
-              // console.log(project.rows);
-              done();
-              handleResponse.sendSuccess(res,'Projects searched successfully',{projects: project.rows,count:searchCount});
+            })
           }
         });
-      }else{
-          if(req.body.offset){
-            offset=req.body.offset;
-          }
-          let whereClause ='WHERE name ilike $1 AND company_id=$2 AND isGlobal=$3 AND archived=$4 AND account_id In (SELECT id from ACCOUNT WHERE company_id=$2 AND archived=$4 ) ';
-          let searchFieldVal=['%'+req.body.searchText+'%',req.user.company_id, false,false];
-          let innerQuery='SELECT count(*) from PROJECT '+whereClause;
-          let queryToExec='' ;
-          if(req.body.status){
-            innerQuery+=' AND status ilike $5';
-            queryToExec='SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id,('+innerQuery+') as searchcount FROM PROJECT p '+whereClause+' AND status ilike $5 ';
-            searchFieldVal.push(req.body.status);
-          }else{
-            queryToExec='SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id,('+innerQuery+') as searchcount FROM PROJECT p '+whereClause;
-          }
-          queryToExec+=' ORDER BY start_date DESC,name OFFSET '+offset+' LIMIT '+process.env.PAGE_RECORD_NO;
-          // console.log('---------queryToExec for filter-------'+req.body.status);
-          // console.log(queryToExec);
-          client.query(queryToExec, searchFieldVal, function (err, project) {
-          if (err) {
-            handleResponse.shouldAbort(err, client, done);
-            handleResponse.handleError(res, err, 'Server Error: Error in finding project data');
-            /*handleResponse.handleError(res, err, 'Server error : Error in finding project data');*/
-          } else {
-            client.query('SELECT * FROM ACCOUNT where company_id=$1 AND archived=$2', [req.user.company_id, false], function (err, accountList) {
-              if (err) {
-                handleResponse.shouldAbort(err, client, done);
-                handleResponse.handleError(res, err, 'Server error : Error in finding account data');
-              } else {
-                    let accountIdArr=[];
-                      if(accountList.rows.length>0){
-                        accountIdArr = accountList.rows.map(function (ele) {
-                            return ele.id;
-                        });
-                      }
-                    let projectArr=[];
-
-                    let account={};
-                    if(project.rows.length>0){
-                      // console.log("----------project.rows------------- 2");
-                      project.rows.forEach(function (data) {
-                        if(accountIdArr.includes(data.account_id)){
-                            // data["start_date"] = (data.start_date==null)?'':dateFormat(moment.tz(data.start_date, companyDefaultTimezone).format());
-                            // data["end_date"] =  (data.end_date==null)?'':dateFormat(moment.tz(data.end_date, companyDefaultTimezone).format());
-                            data["start_date"] = (data.start_date==null)?'':dateFormat(data.start_date);
-                            data["end_date"] =  (data.end_date==null)?'':dateFormat(data.end_date);
-                            if(data.account_id){
-                                if(accountList.rows.length>0){
-                                  account=accountList.rows.filter(acc => acc.id==data.account_id);
-                                  if(account.length>0){
-                                    // console.log('account '+account);
-                                    data.account_name=account[0].name;
-                                  }
-                                }
-                              }else{
-                                data.account_name='';
-                              }
-                            projectArr.push(data);
-                        }
-                      });
-                      searchCount=project.rows[0].searchcount;
-                    }
-                    // console.log(projectArr);
-                    done();
-                    handleResponse.sendSuccess(res,'Projects searched successfully',{projects: projectArr,count:searchCount});
-              }
-            });
-            /*res.render('pages/projects-listing', { projects: project.rows, user: req.session.passport.user, error: err });*/
-          }
-        });
-      }
-  })
 };
 
 exports.getProject = (req, res) => {
@@ -252,7 +264,8 @@ exports.getProject = (req, res) => {
           // console.log(companyDefaultTimezone);
           pool.connect((err, client, done) => {
             whereClause='WHERE company_id=$1 AND archived=$2 AND account_id In (SELECT id from ACCOUNT WHERE company_id=$1 AND archived=$2)';
-            client.query('SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id,(SELECT count(*) FROM PROJECT '+whereClause+' AND isGlobal=$3) as totalCount,(SELECT count(*) FROM PROJECT '+whereClause+' AND isGlobal=$3 AND status ilike $4) as notStartedCount,(SELECT count(*) FROM PROJECT '+whereClause+' AND isGlobal=$3 AND status ilike $5) as inProgressCount,(SELECT count(*) FROM PROJECT '+whereClause+' AND isGlobal=$3 AND status ilike $6) as atRiskCount,(SELECT count(*) FROM PROJECT '+whereClause+' AND isGlobal=$3 AND status ilike $7) as completedCount FROM PROJECT p '+whereClause+' AND isGlobal=$3 AND status ilike $5 ORDER BY start_date DESC,name OFFSET 0 LIMIT '+process.env.PAGE_RECORD_NO, [req.session.passport.user.company_id, false,false,'%Not Started%','%In Progress%','%At Risk%','%Completed%'], function (err, project) {
+            client.query('SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id,(SELECT count(*) FROM PROJECT '+whereClause+' AND isGlobal=$3) as totalCount,(SELECT count(*) FROM PROJECT '+whereClause+' AND isGlobal=$3 AND status ilike $4) as notStartedCount,(SELECT count(*) FROM PROJECT '+whereClause+' AND isGlobal=$3 AND status ilike $5) as inProgressCount,(SELECT count(*) FROM PROJECT '+whereClause+' AND isGlobal=$3 AND status ilike $6) as atRiskCount,(SELECT count(*) FROM PROJECT '+whereClause+
+            ' AND isGlobal=$3 AND status ilike $7) as completedCount FROM PROJECT p '+whereClause+' AND isGlobal=$3 ORDER BY start_date DESC,name ', [req.session.passport.user.company_id, false,false,'%Not Started%','%In Progress%','%At Risk%','%Completed%'], function (err, project) {
               if (err) {
                 handleResponse.shouldAbort(err, client, done);
                 handleResponse.responseToPage(res,'pages/projects-listing',{projects: [], totalCount: 0,notStartedCount:0, inProgressCount :0, atRiskCount :0, completedCount:0,user:req.session.passport.user, error:err},"error"," Server error : Error in finding project data");
@@ -276,7 +289,8 @@ exports.getProject = (req, res) => {
                         let projectArr=[];
                         if(project.rows.length>0){
                             project.rows.forEach(function (data) {
-                                if(accountIdArr.includes(data.account_id)){
+                                //console.log(data.status);
+                                if(accountIdArr.includes(data.account_id) && data.status.includes('In Progress')){
                                   let startDateFormatted = '';
                                   let endDateFormatted = '';
                                   if(data.start_date != null) {
@@ -319,7 +333,7 @@ exports.getProject = (req, res) => {
                         projectAtRisk=projectArr.filter(pro => pro.status=="At Risk");
                         projectCompleted=projectArr.filter(pro => pro.status=="Completed");*/
                         done();
-                        handleResponse.responseToPage(res,'pages/projects-listing',{projects: projectArr, totalCount: allProjectCount,notStartedCount:notStartedCount, inProgressCount :inProgressCount, atRiskCount :atRiskCount, completedCount:completedCount,user:req.session.passport.user, error:err, accounts:accountList.rows},"success","Successfully rendered");
+                        handleResponse.responseToPage(res,'pages/projects-listing',{projects: projectArr.length>process.env.PAGE_RECORD_NO?projectArr.slice(0, process.env.PAGE_RECORD_NO-1):projectArr, totalCount: allProjectCount,notStartedCount:notStartedCount, inProgressCount :inProgressCount, atRiskCount :atRiskCount, completedCount:completedCount,user:req.session.passport.user, error:err, accounts:accountList.rows},"success","Successfully rendered");
                   }
                 });
                 /*res.render('pages/projects-listing', { projects: project.rows, user: req.session.passport.user, error: err });*/
@@ -418,8 +432,8 @@ exports.getProjectListForCompany = (req, res) => {
        handleResponse.handleError(res, err, 'Server error : Error in finding company setting data');
      }else{
          companyDefaultTimezone=result.timezone;
-         // console.log('companyDefaultTimezone');
-         // console.log(companyDefaultTimezone);
+         console.log('companyDefaultTimezone');
+         console.log(companyDefaultTimezone);
           pool.connect((err, client, done) => {
             client.query('SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id FROM PROJECT p WHERE company_id=$1 AND archived=$2 AND isGlobal=$3', [req.user.company_id, false, false], function (err, project) {
               if (err) {

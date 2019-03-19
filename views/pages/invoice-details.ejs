@@ -72,9 +72,9 @@
                                 <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
                                     <div class="text-right sm-tpd-15">
 
-                                        <button class="slds-button slds-button_brand slds-align-top" onclick="updateInvoiceDetails('<%= invoiceDetails.id %>', '#invoice-details-form')">
+                                        <!-- <button class="slds-button slds-button_brand slds-align-top" onclick="updateInvoiceDetails('<%= invoiceDetails.id %>', '#invoice-details-form')">
                                             Save Invoice
-                                        </button>
+                                        </button> -->
 
 
                                             <button class="slds-button slds-button_neutral" onclick="window.location.href='/invoice-html-view/<%= invoiceDetails.id %>'">
@@ -101,7 +101,7 @@
                             <div class="slds-badge slds-badge_inverse text-size-13 slds-p-around_x-small max-w-250 text-center">Status: Draft</div>
                         </div> -->
                         <div class=" slds-card slds-p-around_large sm-pd-10 slds-m-bottom_large">
-                            <form id="invoice-details-form">
+                            <div id="invoice-details-form" data-modified>
                                 <div class="slds-grid slds-wrap slds-gutters">
                                     <div class="slds-col slds-size_1-of-1 slds-medium-size_8-of-12">
                                         <div class="rpd-100 md-rpd-0">
@@ -272,7 +272,12 @@
                                         </div>
                                     </div>
                                 </div>
-                            </form>
+                                <div class="text-right sm-tpd-15">
+                                    <button class="slds-button slds-button_brand slds-align-top" onclick="updateInvoiceDetails('<%= invoiceDetails.id %>', '#invoice-details-form')" disabled save-btn>
+                                        Save Invoice
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         <!-- details end -->
                         <!-- invoice items start -->

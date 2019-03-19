@@ -81,6 +81,7 @@
                     success : function(response){
                         console.log(response);
                         if(response.success == true) {
+                            $('[save-btn]').attr('disabled',true);
                             setTimeout(() => {
                                 hideLoader('#globalLoader');
                                 showGlobalToast('#globalToast', 'success', "Task details updated successfully", 4000);

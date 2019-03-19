@@ -54,9 +54,9 @@
 
                                 <div class="slds-size_1-of-1 slds-medium-size_1-of-2" notSuperAdmin>
                                     <div class="text-right sm-tpd-15">
-                                        <button class="slds-button slds-button_brand slds-align-top" onclick="updateUser(<%=resource.id;%>)">
+                                        <!-- <button class="slds-button slds-button_brand slds-align-top" onclick="updateUser(<%=resource.id;%>)" disabled save-btn>
                                             Save Changes
-                                        </button>
+                                        </button> -->
                                         <% if(resource.archived==true) { %>
                                             <button class="slds-button slds-button_neutral slds-align-top" onclick="activateBeforeConfirm('#globalAlert', 'activate(\'<%=resource.id;%>\',\'users\')')" >
                                                 Activate
@@ -75,7 +75,7 @@
                         </div>
                         <!-- header end -->
 
-                            <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                            <div class="slds-grid slds-wrap slds-grid_pull-padded" data-modified>
                                 <%if (isSuperAdmin) { %>
                                         <div class="slds-size_1-of-1 slds-medium-size_12-of-12   slds-p-horizontal_small">
                                 <% }else { %>
@@ -88,8 +88,6 @@
                                     </div>
                                 </div>
                                 <div class="slds-p-top_medium">
-
-
 
                                         <div class="slds-grid slds-wrap slds-gutters">
                                             <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
@@ -134,6 +132,10 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <% var disableInput ='';
+                                        if (isSuperAdmin) {
+                                          disableInput = 'disabled'
+                                        } %>
                                         <div class="slds-grid slds-wrap slds-gutters">
                                             <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
                                                 <div class="slds-form-element slds-m-bottom_medium">
@@ -141,7 +143,7 @@
                                                         First Name
                                                     </label>
                                                     <div class="slds-form-element__control">
-                                                        <input type="text" id="first_name" class="slds-input" placeholder="" required="" value="<%=resource.first_name;%>">
+                                                        <input type="text" id="first_name" class="slds-input" placeholder="" required="" value="<%=resource.first_name;%>" <%=disableInput%>>
                                                         <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
                                                         </div>
                                                     </div>
@@ -153,7 +155,7 @@
                                                         Last Name
                                                     </label>
                                                     <div class="slds-form-element__control">
-                                                        <input type="text" id="last_name" class="slds-input" placeholder="" required="" value="<%=resource.last_name;%>">
+                                                        <input type="text" id="last_name" class="slds-input" placeholder="" required="" value="<%=resource.last_name;%>" <%=disableInput%>>
                                                         <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
                                                         </div>
                                                     </div>
@@ -168,7 +170,7 @@
                                                         Phone
                                                     </label>
                                                     <div class="slds-form-element__control">
-                                                        <input type="text" id="phone" class="slds-input" placeholder="" required="" value="<%=resource.phone;%>">
+                                                        <input type="text" id="phone" class="slds-input" placeholder="" required="" value="<%=resource.phone;%>" <%=disableInput%>>
                                                         <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
                                                         </div>
                                                     </div>
@@ -180,7 +182,7 @@
                                                         Mobile
                                                     </label>
                                                     <div class="slds-form-element__control">
-                                                        <input type="text" id="mobile" class="slds-input" placeholder="" required="" value="<%=resource.mobile;%>">
+                                                        <input type="text" id="mobile" class="slds-input" placeholder="" required="" value="<%=resource.mobile;%>" <%=disableInput%>>
                                                         <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
                                                         </div>
                                                     </div>
@@ -295,7 +297,7 @@
                                             Manage Access
                                         </div>
                                     </div>
-                                    <div class="slds-p-top_medium">
+                                    <div class="slds-p-top_medium slds-p-bottom_medium">
                                         <div class="slds-form-element slds-m-bottom_large">
                                             <div class="slds-form-element__control">
                                                 <span class="slds-checkbox">
@@ -409,6 +411,11 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                                <div class="slds-p-top_xx-large text-right sm-tpd-15">
+                                    <button class="slds-button slds-button_brand slds-align-top" onclick="updateUser(<%=resource.id;%>)" disabled="" save-btn="">
+                                      Save Changes
+                                    </button>
                                 </div>
                             </div>
                         </div>

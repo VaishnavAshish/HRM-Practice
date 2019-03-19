@@ -497,7 +497,11 @@
                                                                                                 <li class="slds-item" id="billableLineItem">
                                                                                                     Billable
                                                                                                 </li>
-                                                                                            <% } %>
+                                                                                            <% } else { %>
+                                                                                                <li class="slds-item" id="billableLineItem">
+                                                                                                    Non Billable
+                                                                                                </li>
+                                                                                              <% } %>
                                                                                             <% if(timesheetRow.submitted) { %>
                                                                                                 <li class="slds-item text-green">Submitted</li>
                                                                                             <% } %>

@@ -80,6 +80,7 @@
                 success : function(response){
                     console.log(response);
                     if(response.success == true) {
+                        $('[save-btn]').attr('disabled',true);
                         setTimeout( function () {
                             hideLoader('#globalLoader')
                             // showGlobalToast('#globalToast', 'success', response.message, 4000);

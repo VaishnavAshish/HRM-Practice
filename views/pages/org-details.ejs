@@ -55,8 +55,9 @@
                                             <button class="slds-button slds-button_neutral slds-align-top" onclick="activateBeforeConfirm('#globalAlert', 'activate(\'<%= company.id %>\',\'company\')')">
                                                 Restore
                                             </button>
-                                        <% }else { %>
-                                            <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteCompany(\'<%= company.id %>\')')">
+                                        <% }else if(user.company_id == company.id) {
+                                          } else { %>
+                                            <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteCompany(\'<%= company.id %>\')','Are you sure you want to delete <%= company.name %> company.It will delete selected company and users from database and you will loose all information/data for company')">
                                                 Delete
                                             </button>
                                         <% } %>
@@ -86,7 +87,7 @@
 
 
                     <div class="slds-tabs_default__content" target-tab="org-details">
-                        <div class=" slds-card slds-p-around_large sm-pd-10">
+                        <div class=" slds-card slds-p-around_large sm-pd-10" data-modified>
 
                             <div class="slds-grid slds-wrap slds-grid_pull-padded">
                                 <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_6-of-12 slds-p-horizontal_small">
@@ -203,7 +204,7 @@
                                     </div>
                                 </div>
                                 <div class="text-right sm-tpd-15">
-                                  <button class="slds-button slds-button_brand slds-align-top" onclick="updateCompany(<%=company.id;%>)">
+                                  <button class="slds-button slds-button_brand slds-align-top" onclick="updateCompany(<%=company.id;%>)" disabled save-btn>
                                       Save Changes
                                   </button>
                                 </div>
@@ -420,11 +421,16 @@
             </div>
         </div>
     </main>
-        <% include ../modals/modal-add-new-resource %>
-        <% include ../layouts/footer %>
+    <% include ../modals/modal-add-new-resource %>
+    <% include ../layouts/footer %>
     <% include ../layouts/scripts %>
     <% include ../layouts/org-detail-script %>
     <% include ../layouts/res-detail-script %>
+    <script>
+      $(document).ready(function(){
+          modifyInputEvent($('[data-modified]'));
+      })
+    </script>
 </body>
 
 </html>

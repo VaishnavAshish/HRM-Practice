@@ -128,9 +128,12 @@
         }
     }
 
-    function deleteBeforeConfirm(modalId, methodName) {
+    function deleteBeforeConfirm(modalId, methodName,msg) {
         console.log(methodName);
         $('p[alert-message]',modalId).text('Are you sure you want to delete this item?');
+        if(msg){
+          $('p[alert-message]',modalId).text(msg);
+        }
         openModal(modalId);
         $('[btn-confirm]', modalId).attr('method', methodName);
     }
