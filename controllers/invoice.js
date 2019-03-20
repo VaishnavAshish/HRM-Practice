@@ -404,10 +404,11 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
                                     handleResponse.handleError(res, err, 'Server error : Error in finding timesheet data');
                                 }  else {
                                     if(lineItems.rows.length>0) {
-                                        // console.log(JSON.stringify(lineItems.rows));
+                                        console.log('lineitem data is')
+                                        console.log(JSON.stringify(lineItems.rows));
                                         createGroupedObjWithTask(lineItems.rows, function (concatData) {
-                                            // console.log("response get");
-                                            // console.log(concatData);
+                                            console.log("response get");
+                                            console.log("concatdata"+JSON.stringify(concatData));
                                             client.query('SELECT pa.id ,pa.company_id ,pa.account_id ,pa.user_id ,pa.project_id ,pa.created_by ,pa.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,pa.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,pa.bill_rate ,pa.cost_rate ,pa.user_role ,pa.record_id FROM PROJECT_ASSIGNMENT pa WHERE project_id=$1 AND company_id=$2', [req.body.projectId, req.user.company_id], function (err, projectAssignments) {
                                                 if (err) {
                                                     handleResponse.shouldAbort(err, client, done);

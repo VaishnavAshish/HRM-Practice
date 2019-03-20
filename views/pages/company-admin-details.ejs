@@ -93,7 +93,7 @@
                                     </div>
                                 </div>
                                 <div class="slds-m-bottom_medium">
-                                    <button class="slds-button slds-button_brand w-full" type="button" onclick="userSignup()">
+                                    <button class="slds-button slds-button_brand w-full" type="button" onclick="userSignup()" id="validateAndSignup">
                                         Signup
                                     </button>
                                 </div>
@@ -118,6 +118,14 @@
         <% include ../layouts/footer %>
         <% include ../layouts/scripts %>
         <% include ../layouts/signup-script %>
+        <script>
+        $('#con-password').keydown(function(event){
+            var keyCode = (event.keyCode ? event.keyCode : event.which);
+            if (keyCode == 13) {
+                $('#validateAndSignup').click();
+            }
+        });
+        </script>
     </body>
 
 </html>

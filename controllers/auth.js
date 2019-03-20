@@ -163,9 +163,10 @@ exports.postDomain = (req, res) => {
   } else {
     // console.log('inside');
     pool.connect((err, client, done) => {
-      console.log('error on connecting pool');
-      console.log(err);
+      // console.log('error on connecting pool');
+      // console.log(err);
       let domainName = req.body.domain+".krow.com";
+      console.log('domainName '+domainName);
       client.query('SELECT * FROM company where domain = $1', [domainName], function (err, company) {
         if (err) {
           handleResponse.shouldAbort(err, client, done);

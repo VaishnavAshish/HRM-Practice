@@ -7,9 +7,9 @@
 			/*let companyLogoImg=window.atob(setting.company_logo);*/
 			/*$("#companyLogoImg").attr('src',setting.company_logo);*/
 			/*$("#companyLogoImg").attr('src',`data:image/png;base64,${setting.company_logo}`);*/
-			
-			
-		<% } %> 
+
+
+		<% } %>
 	})
 	function renderImage(){
 		window.location.href='/getCompanyLogo';
@@ -32,13 +32,14 @@
 		console.log(defaultInvoiceNote);
 		$.ajax({
 		      type: 'POST',
-		      url : '/editCompanySettingInvoice', 
+		      url : '/editCompanySettingInvoice',
 		      contentType: 'application/json',
 		      dataType: 'json',
 		      data:JSON.stringify({"defaultInvoiceNote":defaultInvoiceNote}),
 		       success : function(response){
 				   if(response.success){
 						/*hideLoader('#globalLoader');*/
+						$('[save-btn]').attr('disabled',true);
 						setTimeout(function(){
 							hideLoader('#globalLoader');
 							showGlobalToast('#globalToast', 'success', response.message, 4000);
@@ -62,6 +63,7 @@
 	        reader.onload = function (e) {
 	        	console.log(e.target.result);
 	        	$('#companyLogoImg').attr('src', e.target.result);
+						$("[img-upload]").removeAttr('disabled');
 	        }
 	        reader.readAsDataURL(input.files[0]);
 	    }

@@ -142,6 +142,11 @@
             var dateWithMonth = getDateWithMonth(date, 3);
             $(this).html(dateWithMonth);
             $(this).attr('date', dateWithMonth);
+            console.log(date+' '+currentTimestamp)
+            if(dateFormat(date) == dateFormat(currentTimestamp)){
+              $(this).closest('.slds-col').addClass('current-date');
+              $('#day-tab-ul [date=' + dateFormat(currentTimestamp) + ']').addClass('current-date');
+            }
         });
         $.each($('#date-div-parent .text-uppercase.text-thick'), function (index, val) {
             /*let currentWeekStart=moment.tz(weekStartDate, companyDefaultTimezone).format();*/
