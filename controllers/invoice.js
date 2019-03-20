@@ -545,6 +545,7 @@ function calculateBR_CR_andGrouped(req, res, client, err, done, concatData, proj
                 }
             });
             console.log('unit_price'+unit_price);
+            console.log(projectObj.resource_id+' '+mergedRow.resource_id);
             if(index == 0) {
                 projectObj.project_id = mergedRow.project_id;
                 projectObj.totalHours = parseInt(mergedRow.totalHours);
