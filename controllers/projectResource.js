@@ -46,8 +46,8 @@ exports.postAddProjectRes = (req, res) => {
       if(err==true){
         // console.log('error in setting');
         // console.log(err);
-        handleResponse.handleError(res, errors, "Server Error : Error in find company setting.");
-        /*handleResponse.handleError(res, err, 'Server Error: error in finding company setting');*/
+        handleResponse.handleError(res, errors, " Error in find company setting.");
+        /*handleResponse.handleError(res, err, ' error in finding company setting');*/
       }else{
 
         companyDefaultTimezone=result.timezone;
@@ -62,9 +62,9 @@ exports.postAddProjectRes = (req, res) => {
           if (errors) {
             if(errors.length>0){
                 // console.log(errors[0].msg);
-                handleResponse.handleError(res, errors, "Server Error :"+errors[0].msg);
+                handleResponse.handleError(res, errors, ""+errors[0].msg);
               }else{
-                 handleResponse.handleError(res, errors, "Server Error : Error in validating data.");
+                 handleResponse.handleError(res, errors, " Error in validating data.");
               }
           }else{
             pool.connect((err, client, done) => {
@@ -72,7 +72,7 @@ exports.postAddProjectRes = (req, res) => {
                     if (err) {
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);
-                        handleResponse.handleError(res, err, 'Server error : Error in finding project assigment');
+                        handleResponse.handleError(res, err, ' Error in finding project assigment');
                     } else {
                         // console.log('projectRes >>>>>>>>>>>>>');
                         // console.log(projectRes.rows.length);
@@ -85,7 +85,7 @@ exports.postAddProjectRes = (req, res) => {
                                 if (err) {
                                   console.error(err);
                                   handleResponse.shouldAbort(err, client, done);
-                                  handleResponse.handleError(res, err, 'Server error : Error in adding project assigned to user in the database');
+                                  handleResponse.handleError(res, err, ' Error in adding project assigned to user in the database');
                                 } else {
                                     done();
                                     // console.log('insertedRecord  >>>>>>>>>>>>>');
@@ -113,7 +113,7 @@ exports.postAddProjectRes = (req, res) => {
     let userId = req.body.userId;
     let user_role = req.body.user_role;
     if(projectId==''||projectId==null||projectId==undefined) {
-      handleResponse.handleError(res, "incorrect project id", "Server Error : Project id is not correct");
+      handleResponse.handleError(res, "incorrect project id", " Project id is not correct");
     } else if(userId==''||userId==null||userId==undefined) {
       handleResponse.handleError(res, "incorrect user id", "user id is not correct");
     } else {
@@ -122,7 +122,7 @@ exports.postAddProjectRes = (req, res) => {
                     if (err) {
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);
-                        handleResponse.handleError(res, err, 'Server error : Error in finding project assignment data');
+                        handleResponse.handleError(res, err, ' Error in finding project assignment data');
                     } else {
                         // console.log('projectRes >>>>>>>>>>>>>');
                         // console.log(projectRes.rows[0]);
@@ -135,7 +135,7 @@ exports.postAddProjectRes = (req, res) => {
                                 if (err) {
                                     console.error(err);
                                     handleResponse.shouldAbort(err, client, done);
-                                    handleResponse.handleError(res, err, 'Server error : Error in deleting project assigned to user');
+                                    handleResponse.handleError(res, err, ' Error in deleting project assigned to user');
                                 } else {
                                     done();
                                     handleResponse.sendSuccess(res,'User removed from the project successfully',{});

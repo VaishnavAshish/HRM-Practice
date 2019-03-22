@@ -59,7 +59,7 @@ function dateFormat(gDate) {
       client.query(queryToExec,[req.body.searchText+'%',req.user.company_id], function (err, accounts) {
         if (err) {
           handleResponse.shouldAbort(err, client, done);
-          handleResponse.handleError(res, err, 'Server Error: Error in finding account data');
+          handleResponse.handleError(res, err, ' Error in finding account data');
         }
         else{
             // console.log(JSON.stringify(accounts.rows));
@@ -100,7 +100,7 @@ exports.findAccountByCriteria = (req, res) => {
       client.query(queryToExec,searchCriteriaVal, function (err, accounts) {
         if (err) {
           handleResponse.shouldAbort(err, client, done);
-          handleResponse.handleError(res, err, 'Server Error: Error in finding account data');
+          handleResponse.handleError(res, err, ' Error in finding account data');
         }
         else{
             let searchCount=0;
@@ -138,8 +138,8 @@ exports.getAccount = (req, res) => {
       if(err==true){
         // console.log('error in setting');
         // console.log(err);
-        handleResponse.responseToPage(res,'pages/accounts-listing',{accounts:[], totalCount:0,activeCount:0, archivedCount:0 ,user:req.session.passport.user,error:err},"error","Server Error: error in finding company setting");
-        /*handleResponse.handleError(res, err, 'Server Error: error in finding company setting');*/
+        handleResponse.responseToPage(res,'pages/accounts-listing',{accounts:[], totalCount:0,activeCount:0, archivedCount:0 ,user:req.session.passport.user,error:err},"error"," error in finding company setting");
+        /*handleResponse.handleError(res, err, ' error in finding company setting');*/
       }else{
 
         companyDefaultTimezone=result.timezone;
@@ -196,7 +196,7 @@ exports.getAccountDetail = (req, res) => {
      if(err==true){
        // console.log('error in setting');
        // console.log(err);
-       handleResponse.handleError(res, err, 'Server error : Error in finding company setting data');
+       handleResponse.handleError(res, err, ' Error in finding company setting data');
      }else{
          companyDefaultTimezone=result.timezone;
         // console.log('getAccountDetail-------------' + req.query.accountId);
@@ -211,7 +211,7 @@ exports.getAccountDetail = (req, res) => {
                   console.error(err);
                   handleResponse.shouldAbort(err, client, done);
                   handleResponse.responseToPage(res,'pages/account-details',{account:{}, projects:[], invoices:[], projectTotalCount:0,invoiceTotalCount:0,user:req.session.passport.user, error:err},"error","Error in finding account.Please Restart.");
-                  /*handleResponse.handleError(res, err, 'Server Error: Error in finding account');*/
+                  /*handleResponse.handleError(res, err, ' Error in finding account');*/
                 } else {
                   console.error('getAccount>>>>>>>>>>>>>');
                   // console.log(account.rows);
@@ -222,7 +222,7 @@ exports.getAccountDetail = (req, res) => {
                       console.error(err);
                       handleResponse.shouldAbort(err, client, done);
                       handleResponse.responseToPage(res,'pages/account-details',{account:{}, projects:[], invoices:[], projectTotalCount:0,invoiceTotalCount:0,user:req.session.passport.user, error:err},"error","Error in finding projects.Please Restart.");
-                      /*handleResponse.handleError(res, err, 'Server Error: Error in finding projects');*/
+                      /*handleResponse.handleError(res, err, ' Error in finding projects');*/
                     } else {
                         let projectIdArr=[];
                           if(projectList.rows.length>0){
@@ -322,9 +322,9 @@ exports.postEditAccount = (req, res) => {
         if (errors) {
           if(errors.length>0){
             // console.log(errors[0].msg);
-            handleResponse.handleError(res, errors, "Server Error :"+errors[0].msg);
+            handleResponse.handleError(res, errors, ""+errors[0].msg);
           }else{
-             handleResponse.handleError(res, errors, "Server Error : Error in validating data.");
+             handleResponse.handleError(res, errors, " Error in validating data.");
           }
 
         }else{
@@ -335,7 +335,7 @@ exports.postEditAccount = (req, res) => {
               if (err) {
                 console.error(err);
                 handleResponse.shouldAbort(err, client, done);
-                handleResponse.handleError(res, err, 'Server Error: Error in finding account');
+                handleResponse.handleError(res, err, ' Error in finding account');
               } else {
                 // console.log('getAccount>>>>>>>>>>>>>');
                 // console.log(account.rows[0]);
@@ -345,7 +345,7 @@ exports.postEditAccount = (req, res) => {
                   if (err) {
                     console.error(err);
                     handleResponse.shouldAbort(err, client, done);
-                    handleResponse.handleError(res, err, 'Server Error: Error in updating account');
+                    handleResponse.handleError(res, err, ' Error in updating account');
                   } else {
                     // console.log('Updated account >>>>>>>>>>>>>');
                     // console.log(updatedData);
@@ -384,9 +384,9 @@ exports.postAddAccount = (req, res) => {
         if (errors) {
           if(errors.length>0){
             // console.log(errors[0].msg);
-            handleResponse.handleError(res, errors, "Server Error :"+errors[0].msg);
+            handleResponse.handleError(res, errors, ""+errors[0].msg);
           }else{
-             handleResponse.handleError(res, errors, "Server Error : Error in validating data.");
+             handleResponse.handleError(res, errors, " Error in validating data.");
           }
         } else {
           let first_name = req.body.first_name;
@@ -396,7 +396,7 @@ exports.postAddAccount = (req, res) => {
               if(err==true){
                 // console.log('error in setting');
                 // console.log(err);
-                handleResponse.handleError(res, err, 'Server Error: error in finding company setting');
+                handleResponse.handleError(res, err, ' error in finding company setting');
               }else{
 
                 companyDefaultTimezone=result.timezone;*/
@@ -413,12 +413,12 @@ exports.postAddAccount = (req, res) => {
                     client.query('BEGIN', (err) => {
                       if (err){
                         handleResponse.shouldAbort(err, client, done);
-                        handleResponse.handleError(res, err, 'Server Error: error in connecting to database');
+                        handleResponse.handleError(res, err, ' error in connecting to database');
                       } else {
                         client.query('SELECT a.id ,a.name ,a.first_name ,a.last_name ,a.email ,a.archived ,a.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,a.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,a.company_id ,a.street ,a.city ,a.state ,a.country ,a.zip_code ,a.record_id ,a.currency FROM ACCOUNT a where a.company_id = $1 AND a.name = $2',[req.session.passport.user.company_id, account_name], function(err, existingAccount) {
                           if (err){
                             handleResponse.shouldAbort(err, client, done);
-                            handleResponse.handleError(res, err, 'Server Error: Error in finding accounts');
+                            handleResponse.handleError(res, err, ' Error in finding accounts');
                           } else {
                             // console.log("existingAccount-----------");
                             // console.log(existingAccount);
@@ -430,13 +430,13 @@ exports.postAddAccount = (req, res) => {
                               client.query('Insert INTO ACCOUNT (name,first_name,last_name, email,created_date,modified_date,currency,company_id) values ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id',[account_name,first_name,last_name,email,'now()','now()',req.body.currency, req.session.passport.user.company_id], function(err, insertedAccount) {
                                   if (err){
                                     handleResponse.shouldAbort(err, client, done);
-                                    handleResponse.handleError(res, err, 'Server Error: Error in adding account');
+                                    handleResponse.handleError(res, err, ' Error in adding account');
                                   } else {
                                     client.query('COMMIT', (err) => {
                                       if (err) {
                                         console.error('Error committing transaction', err.stack)
                                         handleResponse.shouldAbort(err, client, done);
-                                        handleResponse.handleError(res, err, 'Server Error: Error in committing transaction');
+                                        handleResponse.handleError(res, err, ' Error in committing transaction');
                                       } else {
                                         done();
                                         handleResponse.sendSuccess(res,'Account added successfully',{});
@@ -473,7 +473,7 @@ exports.deleteAccount = (req,res) =>{
               if (err) {
                 console.error(err);
                 handleResponse.shouldAbort(err, client, done);
-                handleResponse.handleError(res, err, 'Server Error: Error in deleting account.');
+                handleResponse.handleError(res, err, ' Error in deleting account.');
               } else {
                 console.error('Affected ID>>>>>>>>>>>>>');
                 // console.log(archivedAccount.rows[0]);

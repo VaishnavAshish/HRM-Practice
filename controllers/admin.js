@@ -72,7 +72,7 @@ exports.getResourceDetail = (req, res) => {
     if (err == true) {
       // console.log('error in setting');
       // console.log(err);
-      handleResponse.handleError(res, err, 'Server error : Error in finding company setting data');
+      handleResponse.handleError(res, err, ' Error in finding company setting data');
     } else {
       companyDefaultTimezone = result.timezone;
       let userId = req.query.userid;
@@ -99,7 +99,7 @@ exports.getResourceDetail = (req, res) => {
                 company: req.query.comp_name,
                 user: req.session.passport.user,
                 error: err
-              }, "error", "Server Error: Error in finding user");
+              }, "error", " Error in finding user");
 
             } else {
               client.query('SELECT user_role FROM SETTING WHERE company_id=$1', [resource.rows[0].company_id], function(err, userRoleList) {
@@ -166,7 +166,7 @@ exports.getCompanyDetail = (req, res) => {
             userRoleList: [],
             user: req.session.passport.user,
             error: err
-          }, "error", "Server Error: Company id is not correct");
+          }, "error", " Company id is not correct");
           /*handleResponse.handleError(res, 'incorrect company id', 'company id is not correct ');*/
         } else {
           // console.log('getCompanyDetail-------------' + req.query.companyid)
@@ -183,8 +183,8 @@ exports.getCompanyDetail = (req, res) => {
                   userRoleList: [],
                   user: req.session.passport.user,
                   error: err
-                }, "error", "Server Error: Error in finding company");
-                /*handleResponse.handleError(res, err, 'Server Error: Error in finding company');*/
+                }, "error", " Error in finding company");
+                /*handleResponse.handleError(res, err, ' Error in finding company');*/
                 /*res.render('pages/org-details', { company: companies.rows[0], user: req.session.passport.user, error: err });*/
               } else {
                 console.log('companyDefaultTimezone' + companyDefaultTimezone);
@@ -200,8 +200,8 @@ exports.getCompanyDetail = (req, res) => {
                       userRoleList: [],
                       user: req.session.passport.user,
                       error: err
-                    }, "error", "Server Error: Error in finding users for the company");
-                    /*handleResponse.handleError(res, err, 'Server Error: Error in finding users for the company');*/
+                    }, "error", " Error in finding users for the company");
+                    /*handleResponse.handleError(res, err, ' Error in finding users for the company');*/
                   } else {
                     client.query('SELECT user_role FROM SETTING WHERE company_id=$1', [req.query.companyid], function(err, userRoleList) {
                       if (err) {
@@ -300,8 +300,8 @@ exports.getUserProfile = (req, res) => {
               userObj: {},
               user: req.session.passport.user,
               error: err
-            }, "error", "Server Error: Error in finding user");
-            /*handleResponse.handleError(res, err, 'Server Error: Error in finding user');*/
+            }, "error", " Error in finding user");
+            /*handleResponse.handleError(res, err, ' Error in finding user');*/
           }
           if (users.rows.length > 0) {
 
@@ -338,7 +338,7 @@ exports.getCompanyProfile = (req, res) => {
             user: req.session.passport.user,
             error: err
           }, "error", " Error in finding company");
-          /*handleResponse.handleError(res, err, 'Server Error: Error in finding company');*/
+          /*handleResponse.handleError(res, err, ' Error in finding company');*/
         }
 
         if (companies.rows.length > 0) {
@@ -396,7 +396,7 @@ exports.getAllCompanyResources = (req, res) => {
               user: req.session.passport.user,
               error: err
             }, "error", " Error in finding user for the company");
-            /*handleResponse.handleError(res, err, 'Server Error: Error in finding user for the company');*/
+            /*handleResponse.handleError(res, err, ' Error in finding user for the company');*/
           } else {
             client.query('SELECT user_role FROM SETTING WHERE company_id=$1', [req.user.company_id], function(err, userRoleList) {
               if (err) {
@@ -480,9 +480,9 @@ exports.postAddCompany = (req, res) => {
   if (err) {
     if (err.length > 0) {
       // console.log(err[0].msg);
-      handleResponse.handleError(res, err, "Server Error :" + err[0].msg);
+      handleResponse.handleError(res, err, "" + err[0].msg);
     } else {
-      handleResponse.handleError(res, err, "Server Error : Error in validating data.");
+      handleResponse.handleError(res, err, " Error in validating data.");
     }
     /*req.flash('errors', errors);
     return res.redirect('/addCompany');*/
@@ -500,12 +500,12 @@ exports.postAddCompany = (req, res) => {
       client.query('BEGIN', (err) => {
         if (err) {
           handleResponse.shouldAbort(err, client, done);
-          handleResponse.handleError(res, err, 'Server Error: Error in connecting to database.');
+          handleResponse.handleError(res, err, ' Error in connecting to database.');
         } else {
           client.query('SELECT * FROM COMPANY where domain = $1', [req.body.domain], function(err, existingDomain) {
             if (err) {
               handleResponse.shouldAbort(err, client, done);
-              handleResponse.handleError(res, err, 'Server Error: Error in finding company');
+              handleResponse.handleError(res, err, ' Error in finding company');
             } else {
               if (existingDomain.rows.length > 0) {
                 // console.log(existingDomain);
@@ -515,7 +515,7 @@ exports.postAddCompany = (req, res) => {
                 /*client.query('SELECT * FROM USERS where email = $1', [req.body.adminEmail], function (err, user) {
                   if (err) {
                     handleResponse.shouldAbort(err, client, done);
-                    handleResponse.handleError(res, err, 'Server Error: Error in finding user for the company');
+                    handleResponse.handleError(res, err, ' Error in finding user for the company');
                   } else {
                     if(user.rows.length > 0) {
                       done();
@@ -532,37 +532,37 @@ exports.postAddCompany = (req, res) => {
                     client.query('Insert into COMPANY (name, domain,created_date,modified_date, add_status, token) values ($1,$2,$3,$4,$5,$6)  RETURNING id, domain', [req.body.orgName, req.body.domain, 'now()', 'now()', 'Approval Pending', token], function(err, company) {
                       if (err) {
                         handleResponse.shouldAbort(err, client, done);
-                        handleResponse.handleError(res, err, 'Server Error: Error in adding company to the database');
+                        handleResponse.handleError(res, err, ' Error in adding company to the database');
                       } else {
                         let company_id = company.rows[0].id;
                         client.query('Insert into SETTING (expense_category,user_role,company_address,invoice_note,currency,timezone,company_id,weekstartday) values ($1,$2,$3,$4,$5,$6,$7,$8)  RETURNING id', [
                           ['Food'],
-                          ['Manager', 'Developer'], '', '', 'USD', 'America/Los_Angeles', company_id , 'sunday'
+                          ['Consultant', 'Developer'], '', '', 'USD', 'America/Los_Angeles', company_id , 'sunday'
                         ], function(err, companySetting) {
                           if (err) {
                             handleResponse.shouldAbort(err, client, done);
-                            handleResponse.handleError(res, err, 'Server Error: Error in adding company to the database');
+                            handleResponse.handleError(res, err, ' Error in adding company to the database');
                           } else {
                             client.query('Insert into PROJECT (name,company_id,isGlobal) values ($1,$2,$3)  RETURNING id', ['global project', company.rows[0].id, true], function(err, globalProject) {
                               if (err) {
                                 handleResponse.shouldAbort(err, client, done);
-                                handleResponse.handleError(res, err, 'Server Error: Error in adding company project to the database');
+                                handleResponse.handleError(res, err, ' Error in adding company project to the database');
                               } else {
                                 client.query('Insert into TASK (name, project_id, company_id) values ($1,$2,$3)  RETURNING id', ['global task', globalProject.rows[0].id, company.rows[0].id], function(err, task) {
                                   if (err) {
                                     handleResponse.shouldAbort(err, client, done);
-                                    handleResponse.handleError(res, err, 'Server Error: Error in adding company task to the database');
+                                    handleResponse.handleError(res, err, ' Error in adding company task to the database');
                                   } else {
                                     client.query('Insert into USERS( password, email, company_id, user_role,created_date,modified_date,add_status, password_reset_token, role,permissions) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING id', [req.body.adminPass, req.body.adminEmail, company.rows[0].id, '{"ADMIN"}', 'now()', 'now()', 'Invited', token, "Manager", '{"timesheetEntry","expenseManager","projectManager","invoiceManager","timesheetApprover","expenseApprover"}'], function(err, addedUser) {
                                       if (err) {
                                         handleResponse.shouldAbort(err, client, done);
-                                        handleResponse.handleError(res, err, 'Server Error: Error in adding admin user to the database');
+                                        handleResponse.handleError(res, err, ' Error in adding admin user to the database');
                                       } else {
                                         client.query('COMMIT', (err) => {
                                           if (err) {
                                             // console.log('Error committing transaction', err.stack)
                                             handleResponse.shouldAbort(err, client, done);
-                                            handleResponse.handleError(res, err, 'Server Error: Error in committing transaction');
+                                            handleResponse.handleError(res, err, ' Error in committing transaction');
                                           } else {
                                             done();
                                             if (req.body.isSignup) {
@@ -571,7 +571,7 @@ exports.postAddCompany = (req, res) => {
                                               sendEmail(req, res, function(error, info) {
                                                 // console.log('callback');
                                                 if (error) {
-                                                  handleResponse.handleError(res, error, 'Server Error: Error in sending email');
+                                                  handleResponse.handleError(res, error, ' Error in sending email');
                                                 } else {
                                                   handleResponse.sendSuccess(res, 'mail sent', {});
                                                   /*res.status(200).json({ "success": true, "message": "mail sent" });*/
@@ -746,7 +746,7 @@ sendEmail = (req, res, next) => {
       client.query(queryToExec,[req.body.searchText+'%'], function (err, companies) {
         if (err) {
           handleResponse.shouldAbort(err, client, done);
-          handleResponse.handleError(res, err, 'Server Error: Error in finding company data');
+          handleResponse.handleError(res, err, ' Error in finding company data');
         }
         else{
             // console.log(JSON.stringify(companies.rows));
@@ -792,7 +792,7 @@ exports.findCompanyByCriteria = (req, res) => {
     client.query(queryToExec, searchCriteriaVal, function(err, companies) {
       if (err) {
         handleResponse.shouldAbort(err, client, done);
-        handleResponse.handleError(res, err, 'Server Error: Error in finding company data');
+        handleResponse.handleError(res, err, ' Error in finding company data');
       } else {
         let searchCount = 0;
         // console.log(JSON.stringify(companies.rows));
@@ -832,7 +832,7 @@ exports.getCompany = (req, res) => {
         user: req.session.passport.user,
         error: err
       }, "error", " Error in finding company setting");
-      /*handleResponse.handleError(res, err, 'Server Error: error in finding company setting');*/
+      /*handleResponse.handleError(res, err, ' error in finding company setting');*/
     } else {
 
       companyDefaultTimezone = result.timezone;
@@ -852,7 +852,7 @@ exports.getCompany = (req, res) => {
               user: req.session.passport.user,
               error: err
             }, "error", " Error in finding company data");
-            /*handleResponse.handleError(res, err, 'Server Error: Error in finding company data');*/
+            /*handleResponse.handleError(res, err, ' Error in finding company data');*/
           } else {
             // console.log('---------------companies.rows-------------------');
             // console.log(companies.rows);
@@ -897,7 +897,7 @@ exports.deleteCompany = (req, res) => {
         client.query('SELECT c.id ,c.name ,c.domain ,c.archived ,c.created_date at time zone \'' + companyDefaultTimezone + '\' as created_date ,c.modified_date at time zone \'' + companyDefaultTimezone + '\' as modified_date ,c.street ,c.city ,c.state ,c.country ,c.zip_code ,c.add_status ,c.token FROM company c WHERE id =$1', [req.body.companyId], function(err, company) {
           if (err) {
             done();
-            handleResponse.handleError(res, err, 'Server Error: Error in deleting company');
+            handleResponse.handleError(res, err, ' Error in deleting company');
           } else {
             if (parseInt(company.rows[0].id) == parseInt('999999999999999')) {
               done();
@@ -906,7 +906,7 @@ exports.deleteCompany = (req, res) => {
               client.query('UPDATE company SET archived=true where id =$1', [req.body.companyId], function(err, company) {
                 if (err) {
                   done();
-                  handleResponse.handleError(res, err, 'Server Error: Error in deleting company');
+                  handleResponse.handleError(res, err, ' Error in deleting company');
                 } else {
                   done();
                   handleResponse.sendSuccess(res, 'Company deleted successfully', {});
@@ -938,9 +938,9 @@ exports.updateCompany = (req, res) => {
     if (err) {
       if (errors.length > 0) {
         // console.log(errors[0].msg);
-        handleResponse.handleError(res, errors, "Server Error :" + errors[0].msg);
+        handleResponse.handleError(res, errors, "" + errors[0].msg);
       } else {
-        handleResponse.handleError(res, errors, "Server Error : Error in validating data.");
+        handleResponse.handleError(res, errors, " Error in validating data.");
       }
     } else {
       // let newDate=moment.tz(new Date(), companyDefaultTimezone).format();
@@ -953,7 +953,7 @@ exports.updateCompany = (req, res) => {
             client.query('UPDATE company set name=$1,domain=$2,street=$3,city=$4,state=$5,country=$6,zip_code=$7,modified_date=$8 where id=$9  RETURNING id, domain', [req.body.name, req.body.domain, req.body.street, req.body.city, req.body.state, req.body.country, req.body.zip_code, 'now()', req.body.id], function(err, company) {
               if (err) {
                 handleResponse.shouldAbort(err, client, done);
-                handleResponse.handleError(res, err, 'Server Error: Error in updating company data.');
+                handleResponse.handleError(res, err, ' Error in updating company data.');
               } else {
                 // console.log("company------------");
                 // console.log(company);
@@ -961,7 +961,7 @@ exports.updateCompany = (req, res) => {
                   if (err) {
                     console.error('Error committing transaction', err.stack)
                     handleResponse.shouldAbort(err, client, done);
-                    handleResponse.handleError(res, err, 'Server Error: Error in committing transaction');
+                    handleResponse.handleError(res, err, ' Error in committing transaction');
                   } else {
                     done();
                     handleResponse.sendSuccess(res, 'Company updated successfully', {});
@@ -989,7 +989,7 @@ exports.postActivate = (req, res) => {
       if (err) {
         console.error(err);
         handleResponse.shouldAbort(err, client, done);
-        handleResponse.handleError(res, err, 'Server Error: Error in activating object.');
+        handleResponse.handleError(res, err, ' Error in activating object.');
       } else {
         console.error('Affected ID>>>>>>>>>>>>>');
         // console.log(unarchivedObject.rows[0]);
@@ -1013,7 +1013,7 @@ exports.getCurrentTimestamp = (req, res) => {
           if (err) {
             console.error(err);
             handleResponse.shouldAbort(err, client, done);
-            handleResponse.handleError(res, err, 'Server error : Error in finding current date and time');
+            handleResponse.handleError(res, err, ' Error in finding current date and time');
           } else {
             // currentTimestamp.rows[0].currentdate = JSON.stringify(currentTimestamp.rows[0].currentdate);
             // let currentTime=moment.tz(new Date(), companyDefaultTimezone).format('hh:mm:ss');

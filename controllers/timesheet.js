@@ -319,7 +319,7 @@ exports.getTimesheetWithPlay = (req,res) =>{
               if(err) {
                 console.error(err);
                 handleResponse.shouldAbort(err, client, done);
-                handleResponse.handleError(res, err, 'Server error : Error in finding current date and time');
+                handleResponse.handleError(res, err, ' Error in finding current date and time');
               } else {
                   // currentTimestamp.rows[0].currentdate = JSON.stringify(currentTimestamp.rows[0].currentdate);
                   // let currentTime=moment.tz(new Date(), companyDefaultTimezone).format('hh:mm:ss');
@@ -332,7 +332,7 @@ exports.getTimesheetWithPlay = (req,res) =>{
                     if(err) {
                       console.error(err);
                       handleResponse.shouldAbort(err, client, done);
-                      handleResponse.handleError(res, err, 'Server error : Error in finding timesheet detail data');
+                      handleResponse.handleError(res, err, ' Error in finding timesheet detail data');
                     } else {
                       // console.log("selected Timesheet Data which is playing ");
                       // console.log('timesheetData  '+JSON.stringify(timesheetData.rows));
@@ -385,14 +385,14 @@ exports.getTimesheet = (req, res) => {
                 if(err) {
                   console.error(err);
                   handleResponse.shouldAbort(err, client, done);
-                  handleResponse.handleError(res, err, 'Server error : Error in finding current date and time');
+                  handleResponse.handleError(res, err, ' Error in finding current date and time');
                 } else {
                   client.query('SELECT * FROM PROJECT WHERE  company_id=$1 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND archived=$2 AND isGlobal=$3 AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)',[req.user.company_id, false, false, userId], function(err, projectList) {
                     if(err) {
                       console.error(err);
                       handleResponse.shouldAbort(err, client, done);
                       handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : [], timesheetList : [],timesheetWeekData : [] , projectList:[], userRoles : [], timeheet_users : [],companyDefaultTimezone:'',user:req.session.passport.user,error:err},"error","Error in finding project data.Please Restart.");
-                      /*handleResponse.handleError(res, err, 'Server error : Error in finding project data');*/
+                      /*handleResponse.handleError(res, err, ' Error in finding project data');*/
                     } else {
                       // console.log("week_start_date");
                       // console.log(parseInt(req.query.new_date));
@@ -412,7 +412,7 @@ exports.getTimesheet = (req, res) => {
                           console.error(err);
                           handleResponse.shouldAbort(err, client, done);
                           handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : [], timesheetList : [],timesheetWeekData : [] , projectList:[], userRoles : [], timeheet_users : [],companyDefaultTimezone:'',user:req.session.passport.user,error:err},"error","Error in finding timesheet detail data.Please Restart.");
-                          /*handleResponse.handleError(res, err, 'Server error : Error in finding timesheet detail data');*/
+                          /*handleResponse.handleError(res, err, ' Error in finding timesheet detail data');*/
                         } else {
                           let taskListsDayArr = getTimesheetForDay(timesheetListByDate,currentTimestamp.rows[0].currentdate);
                           // console.log("timesheetListByDate");
@@ -493,7 +493,7 @@ function getUserTaksAssignmentRoles(req, client, err, done, res, result) {
   client.query('SELECT DISTINCT user_role, project_id, task_id FROM TASK_ASSIGNMENT WHERE user_id=$1 AND company_id=$2',[req.params.userId, req.user.company_id], function(err, userRoles) {
     if (err) {
       handleResponse.shouldAbort(err, client, done);
-      handleResponse.handleError(res, err, 'Server error : Error in updating timesheet detail data');
+      handleResponse.handleError(res, err, ' Error in updating timesheet detail data');
     } else {
       done();
       // console.log("user.rows");
@@ -527,7 +527,7 @@ function getUserProjectAssignmentRoles(req, client, err, done, res, result) {
   client.query('SELECT DISTINCT user_role FROM PROJECT_ASSIGNMENT WHERE user_id=$1 AND company_id=$2',[req.user.id, req.user.company_id], function(err, userRoles) {
     if (err) {
       handleResponse.shouldAbort(err, client, done);
-      handleResponse.handleError(res, err, 'Server error : Error in updating timesheet detail data');
+      handleResponse.handleError(res, err, ' Error in updating timesheet detail data');
     } else {
       done();
       // console.log("user.rows");
@@ -545,7 +545,7 @@ function getAllCompanyUsers(req, client, err, done, res, result) {
   client.query('SELECT id, role, email FROM users WHERE company_id=$1 AND archived=$2',[req.user.company_id, false], function(err, userRoles) {
     if (err) {
       handleResponse.shouldAbort(err, client, done);
-      handleResponse.handleError(res, err, 'Server error : Error in updating timesheet detail data');
+      handleResponse.handleError(res, err, ' Error in updating timesheet detail data');
     } else {
       return result(userRoles.rows);
     }
@@ -565,7 +565,7 @@ exports.getDayTimesheetData = (req, res) => {
           if(err) {
             console.error(err);
             handleResponse.shouldAbort(err, client, done);
-            handleResponse.handleError(res, err, 'Server error : Error in finding timesheet detail data');
+            handleResponse.handleError(res, err, ' Error in finding timesheet detail data');
           } else {
             // console.log("Update Timesheet Data");
             // console.log(timesheetData);
@@ -596,7 +596,7 @@ exports.updateDayTimesheetHours = (req, res) => {
           if(err) {
             console.error(err);
             handleResponse.shouldAbort(err, client, done);
-            handleResponse.handleError(res, err, 'Server error : Error in finding timesheet detail data');
+            handleResponse.handleError(res, err, ' Error in finding timesheet detail data');
           } else {
             if(timesheetData.rowCount > 0) {
               console.log('req.body.isRunning '+req.body.isRunning);
@@ -617,7 +617,7 @@ exports.updateDayTimesheetHours = (req, res) => {
                 client.query('UPDATE timesheet_line_item SET total_work_hours=$1,isRunning=$2 WHERE id=$3',[differenceOfTime, req.body.isRunning ,req.body.line_item_id], function(err, updatedTimesheetLiRec) {
                   if (err) {
                     handleResponse.shouldAbort(err, client, done);
-                    handleResponse.handleError(res, err, 'Server error : Error in updating timesheet detail data');
+                    handleResponse.handleError(res, err, ' Error in updating timesheet detail data');
                   } else {
                     done();
                     handleResponse.sendSuccess(res,'update timesheet data successfully',{});
@@ -628,7 +628,7 @@ exports.updateDayTimesheetHours = (req, res) => {
                 client.query('UPDATE timesheet_line_item SET lastRunTime=$1,isRunning=$2 WHERE id=$3',['now()', req.body.isRunning ,req.body.line_item_id], function(err, updatedTimesheetLiRec) {
                   if (err) {
                     handleResponse.shouldAbort(err, client, done);
-                    handleResponse.handleError(res, err, 'Server error : Error in updating timesheet detail data');
+                    handleResponse.handleError(res, err, ' Error in updating timesheet detail data');
                   } else {
                     done();
                     handleResponse.sendSuccess(res,'update timesheet data successfully',{});
@@ -660,13 +660,13 @@ exports.updateDayTimesheetData = (req, res) => {
           if(err) {
             console.error(err);
             handleResponse.shouldAbort(err, client, done);
-            handleResponse.handleError(res, err, 'Server error : Error in finding timesheet detail data');
+            handleResponse.handleError(res, err, ' Error in finding timesheet detail data');
           } else {
             if(timesheetData.rowCount > 0) {
               client.query('UPDATE timesheet_line_item SET project_id=$1, task_id=$2, total_work_hours=$3, project_name=$4, task_name=$5, description=$6, billable=$7 WHERE id=$8',[req.body.project_id, req.body.task_id, hoursToMinutes(req.body.total_work_hours_formatted), req.body.project_name, req.body.task_name, req.body.description, req.body.category, req.body.timesheet_lineitem_id], function(err, updatedTimesheetLiRec) {
                 if (err) {
                   handleResponse.shouldAbort(err, client, done);
-                  handleResponse.handleError(res, err, 'Server error : Error in updating timesheet detail data');
+                  handleResponse.handleError(res, err, ' Error in updating timesheet detail data');
                 } else {
                   done();
                   handleResponse.sendSuccess(res,'update timesheet data successfully',{});
@@ -698,7 +698,7 @@ exports.updateWeeklyTimesheetData = (req, res) => {
           client.query('UPDATE timesheet_line_item SET total_work_hours=$1, description=$2, billable=$3 WHERE id=$4',[hoursToMinutes(line_item_data.time), line_item_data.notes, line_item_data.billable, line_item_data.id], function(err, updatedTimesheetLiRec) {
             if (err) {
               handleResponse.shouldAbort(err, client, done);
-              handleResponse.handleError(res, err, 'Server error : Error in updating timesheet detail data');
+              handleResponse.handleError(res, err, ' Error in updating timesheet detail data');
             } else {
               if((index+1) == reqArr.length) {
                 done();
@@ -868,7 +868,7 @@ exports.submitDayTimesheet = (req, res) => {
           if(err) {
             console.error(err);
             handleResponse.shouldAbort(err, client, done);
-            handleResponse.handleError(res, err, 'Server error : Error in finding timesheet detail data 1');
+            handleResponse.handleError(res, err, ' Error in finding timesheet detail data 1');
           } else {
             // lineItemRows.rows
             createTimesheetRows(lineItemRows.rows, function (mainArr) {
@@ -893,14 +893,14 @@ exports.submitDayTimesheet = (req, res) => {
                     if(err) {
                       console.error(err);
                       handleResponse.shouldAbort(err, client, done);
-                      handleResponse.handleError(res, err, 'Server error : Error in finding timesheet detail data 2');
+                      handleResponse.handleError(res, err, ' Error in finding timesheet detail data 2');
                     } else {
                       var query = client.query('UPDATE TIMESHEET_LINE_ITEM SET submitted=$1, timesheet_id=$2 WHERE id IN '+lineArr,[true, mergedRow.timesheet_id], function(err, data) {
                         if(err) {
                           // console.log('this.sql');
                           console.error(err.stack);
                           handleResponse.shouldAbort(err, client, done);
-                          handleResponse.handleError(res, err, 'Server error : Error in finding timesheet detail data 3');
+                          handleResponse.handleError(res, err, ' Error in finding timesheet detail data 3');
                         } else {
                           if(mainArr.length === (ind+1)) {
                             // console.log("Data inserted");
@@ -917,12 +917,12 @@ exports.submitDayTimesheet = (req, res) => {
                     if(err) {
                       console.error(err);
                       handleResponse.shouldAbort(err, client, done);
-                      handleResponse.handleError(res, err, 'Server error : Error in finding timesheet detail data 2');
+                      handleResponse.handleError(res, err, ' Error in finding timesheet detail data 2');
                     } else {
                       var query = client.query('UPDATE TIMESHEET_LINE_ITEM SET submitted=$1, timesheet_id=$2 WHERE id IN '+lineArr,[true, insertedRec.rows[0].id], function(err, data) {
                         if(err) {
                           handleResponse.shouldAbort(err, client, done);
-                          handleResponse.handleError(res, err, 'Server error : Error in finding timesheet detail data 3');
+                          handleResponse.handleError(res, err, ' Error in finding timesheet detail data 3');
                         } else {
                           if(mainArr.length === (ind+1)) {
                             // console.log("Data inserted");
@@ -953,7 +953,7 @@ exports.submitWeeklyTimesheetByProjectTaskId = (req, res) => {
         if(err) {
           console.error(err);
           handleResponse.shouldAbort(err, client, done);
-          handleResponse.handleError(res, err, 'Server error : Error in finding timesheet detail data');
+          handleResponse.handleError(res, err, ' Error in finding timesheet detail data');
         } else {
           // console.log("Selected timesheets");
           // console.log(timesheetLiRec.rows);
@@ -966,14 +966,14 @@ exports.submitWeeklyTimesheetByProjectTaskId = (req, res) => {
                   if(err) {
                     console.error(err);
                     handleResponse.shouldAbort(err, client, done);
-                    handleResponse.handleError(res, err, 'Server error : Error in finding timesheet detail data 2');
+                    handleResponse.handleError(res, err, ' Error in finding timesheet detail data 2');
                   } else {
                     client.query('UPDATE TIMESHEET_LINE_ITEM SET submitted=$1, timesheet_id=$2 WHERE company_id=$3 AND resource_id=$4 AND project_id=$5 AND task_id=$6 AND user_role=$7 AND created_date at time zone \''+companyDefaultTimezone+'\' BETWEEN $8 AND $9 RETURNING *', [true, response.timesheetMasterId, req.user.company_id, req.user.id, req.body.project_id, req.body.task_id, req.body.user_role, moment.tz(req.body.created_date.split(' ')[0].split('T')[0], companyDefaultTimezone).format(),moment.tz(req.body.created_date.split(' ')[0].split('T')[0]+' 23:59:59', companyDefaultTimezone).format()], function(err, data) {
                       if(err) {
                         // console.log('this.sql');
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);
-                        handleResponse.handleError(res, err, 'Server error : Error in finding timesheet detail data 3');
+                        handleResponse.handleError(res, err, ' Error in finding timesheet detail data 3');
                       } else {
                         console.log("Data updated");
                         console.log(data.rows);
@@ -989,12 +989,12 @@ exports.submitWeeklyTimesheetByProjectTaskId = (req, res) => {
                   if(err) {
                     console.error(err);
                     handleResponse.shouldAbort(err, client, done);
-                    handleResponse.handleError(res, err, 'Server error : Error in finding timesheet detail data 2');
+                    handleResponse.handleError(res, err, ' Error in finding timesheet detail data 2');
                   } else {
                     client.query('UPDATE TIMESHEET_LINE_ITEM SET submitted=$1, timesheet_id=$2 WHERE company_id=$3 AND resource_id=$4 AND project_id=$5 AND task_id=$6 AND user_role=$7 AND created_date at time zone \''+companyDefaultTimezone+'\' BETWEEN $8 AND $9 RETURNING *', [true, insertedRec.rows[0].id, req.user.company_id, req.user.id, req.body.project_id, req.body.task_id, req.body.user_role, moment.tz(req.body.created_date.split(' ')[0].split('T')[0], companyDefaultTimezone).format(),moment.tz(req.body.created_date.split(' ')[0].split('T')[0]+' 23:59:59', companyDefaultTimezone).format()], function(err, data) {
                       if(err) {
                         handleResponse.shouldAbort(err, client, done);
-                        handleResponse.handleError(res, err, 'Server error : Error in finding timesheet detail data 3');
+                        handleResponse.handleError(res, err, ' Error in finding timesheet detail data 3');
                       } else {
                         // console.log("Data inserted");
                         done();
@@ -1009,7 +1009,7 @@ exports.submitWeeklyTimesheetByProjectTaskId = (req, res) => {
             // client.query('UPDATE timesheet_line_item SET project_id=$1, task_id=$2, total_work_hours=$3, project_name=$4, task_name=$5, description=$6, category=$7 WHERE id=$8',[req.body.project_id, req.body.task_id, new_total_hours, req.body.project_name, req.body.task_name, req.body.description, req.body.category, req.body.timesheet_lineitem_id], function(err, updatedTimesheetLiRec) {
             // if(err) {
             //   handleResponse.shouldAbort(err, client, done);
-            //   handleResponse.handleError(res, err, 'Server error : Error in updating timesheet detail data');
+            //   handleResponse.handleError(res, err, ' Error in updating timesheet detail data');
             // } else {
             //     done();
             //     handleResponse.sendSuccess(res,'Timesheet updated successfully',{});
@@ -1061,7 +1061,7 @@ exports.submitMultipleTimesheet = (req, res) => {
             if(err) {
               console.error(err);
               handleResponse.shouldAbort(err, client, done);
-              handleResponse.handleError(res, err, 'Server error : Error in finding timesheet detail data 3');
+              handleResponse.handleError(res, err, ' Error in finding timesheet detail data 3');
             } else {
         //       // console.log("Timesheet Arr");
         //       // console.log(timesheetData);
@@ -1069,7 +1069,7 @@ exports.submitMultipleTimesheet = (req, res) => {
                 client.query('SELECT project_id, billable, created_date at time zone'+companyDefaultTimezone+', project_name, user_role, SUM(total_work_hours) AS hours  FROM TIMESHEET_LINE_ITEM WHERE company_id=$1 AND resource_id=$2 AND created_date=$3 AND task_id=$4 AND user_role=$5 AND submitted=$6 GROUP BY project_id, billable, project_name, created_date, user_role order by project_id, user_role, billable',[req.user.company_id, req.user.id, moment.tz(timesheet.created_date.split('T')[0], companyDefaultTimezone).format(), timesheet.task_id, timesheet.user_role, false], function(err, insertRecord) {
                   if (err) {
                     handleResponse.shouldAbort(err, client, done);
-                    handleResponse.handleError(res, err, 'Server error : Error in updating timesheet detail data 4');
+                    handleResponse.handleError(res, err, ' Error in updating timesheet detail data 4');
                   } else {
                     if(insertRecord.rowCount > 0) {
                       createMergedRow(insertRecord.rows, function (insertRow) {
@@ -1077,12 +1077,12 @@ exports.submitMultipleTimesheet = (req, res) => {
                         client.query('INSERT INTO TIMESHEET (resource_id, company_id, project_id, project_name, created_date, total_billable_hours, total_nonbill_hours, total_hours, last_updated_date, user_role) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING id, project_id, user_role', [req.user.id, req.user.company_id, insertRow.project_id, insertRow.project_name, insertRow.created_date, insertRow.bill_hours, insertRow.nonbill_hours, insertRow.total_hours, 'now()', insertRow.user_role], function(err, insertedRec) {
                           if (err) {
                             handleResponse.shouldAbort(err, client, done);
-                            handleResponse.handleError(res, err, 'Server error : Error in updating timesheet detail data 4');
+                            handleResponse.handleError(res, err, ' Error in updating timesheet detail data 4');
                           } else {
                             client.query('UPDATE TIMESHEET_LINE_ITEM SET timesheet_id=$1, submitted=$2  WHERE company_id=$3 AND resource_id=$4 AND created_date=$5 AND task_id=$6 AND user_role=$7',[insertedRec.rows[0].id, true, req.user.company_id, req.user.id, moment.tz(insertRow.created_date.split('T')[0], companyDefaultTimezone).format(), timesheet.task_id, insertRow.user_role], function(err, timesheetUpdatedData) {
                             if (err) {
                               handleResponse.shouldAbort(err, client, done);
-                              handleResponse.handleError(res, err, 'Server error : Error in updating timesheet detail data 4');
+                              handleResponse.handleError(res, err, ' Error in updating timesheet detail data 4');
                             } else {
                               // console.log("After all done");
                               // console.log(req.body.length+" ****** "+(index+1));
@@ -1146,25 +1146,25 @@ exports.updateTimesheet = (req, res) => {
         if(err) {
           console.error(err);
           shouldAbort(err, client, done);
-          handleError(res, err, 'Server error : Error in finding timesheet data');
+          handleError(res, err, ' Error in finding timesheet data');
         } else {
           if(timesheetRec.rowCount > 0) { */
             client.query('SELECT * FROM TIMESHEET_LINE_ITEM WHERE id=$1',[req.body.timesheet_lineitem_id], function(err, timesheetLiRec) {
               if(err) {
                 console.error(err);
                 handleResponse.shouldAbort(err, client, done);
-                handleResponse.handleError(res, err, 'Server error : Error in finding timesheet detail data');
+                handleResponse.handleError(res, err, ' Error in finding timesheet detail data');
               } else {
                 if(timesheetLiRec.rowCount > 0) {
                   client.query('UPDATE timesheet_line_item SET project_id=$1, task_id=$2, total_work_hours=$3, project_name=$4, task_name=$5, description=$6, category=$7 WHERE id=$8',[req.body.project_id, req.body.task_id, new_total_hours, req.body.project_name, req.body.task_name, req.body.description, req.body.category, req.body.timesheet_lineitem_id], function(err, updatedTimesheetLiRec) {
                   if(err) {
                     handleResponse.shouldAbort(err, client, done);
-                    handleResponse.handleError(res, err, 'Server error : Error in updating timesheet detail data');
+                    handleResponse.handleError(res, err, ' Error in updating timesheet detail data');
                   } else {
                       /* client.query('UPDATE TIMESHEET SET project_id=$1, total_billable_hours=$2, total_nonbill_hours=$3, total_hours=$4, project_name=$5, last_updated_date=$6 WHERE id=$7;',[req.body.project_id, ], function(err, timesheetRec) {
                         if (err) {
                           shouldAbort(err, client, done);
-                          handleError(res, err, 'Server error : Error in updating timesheet data');
+                          handleError(res, err, ' Error in updating timesheet data');
                         } else {
 
                         }
@@ -1196,18 +1196,18 @@ exports.deleteTimesheetRow = (req, res) => {
       /* client.query('BEGIN', (err) => {
         if (err){
           shouldAbort(err, client, done);
-          handleError(res, err, 'Server error : Error in connecting to the database');
+          handleError(res, err, ' Error in connecting to the database');
         } else { */
           /* client.query('SELECT * FROM TIMESHEET WHERE id=$1',[req.body.timesheet_id], function(err, timesheetData) {
             if (err) {
               shouldAbort(err, client, done);
-              handleError(res, err, 'Server error : Error in finding timesheet data');
+              handleError(res, err, ' Error in finding timesheet data');
             } else {
               client.query('SELECT * FROM TIMESHEET_LINE_ITEM WHERE id=$1',[req.body.timesheet_lineitem_id], function(err, timesheetLiData) {
                 if(err) {
                   console.error(err);
                   shouldAbort(err, client, done);
-                  handleError(res, err, 'Server error : Error in finding timeheet detail data');
+                  handleError(res, err, ' Error in finding timeheet detail data');
                 } else {
                   let old_bill_hours = timesheetData.rows[0].total_billable_hours;
                   let old_nonbill_hours = timesheetData.rows[0].total_nonbill_hours;
@@ -1235,12 +1235,12 @@ exports.deleteTimesheetRow = (req, res) => {
                   client.query('UPDATE timesheet SET total_billable_hours=$1, total_nonbill_hours=$2, total_hours=$3 WHERE id=$4',[new_bill_hours, new_nonbill_hours,new_total_hours, req.body.timesheet_id], function(err, timesheetData) {
                     if (err) {
                       shouldAbort(err, client, done);
-                      handleError(res, err, 'Server error : Error in updating timesheet data');
+                      handleError(res, err, ' Error in updating timesheet data');
                     } else { */
                       client.query('SELECT NOW() at time zone \''+companyDefaultTimezone+'\' as currentTimestamp, tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category ,EXTRACT(DOW FROM tl.created_date at time zone \''+companyDefaultTimezone+'\') as week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime at time zone \''+companyDefaultTimezone+'\' as lastruntime ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id FROM TIMESHEET_LINE_ITEM tl WHERE id=$1',[req.body.timesheet_lineitem_id], function(err, timesheetLiData) {
                         if (err) {
                           handleResponse.shouldAbort(err, client, done);
-                          handleResponse.handleError(res, err, 'Server error : Error in selecting timesheet detail');
+                          handleResponse.handleError(res, err, ' Error in selecting timesheet detail');
                         } else {
                           console.log('timesheetLiData.rowCount '+JSON.stringify(timesheetLiData))
                           console.log('req.body.timesheet_lineitem_id '+req.body.timesheet_lineitem_id);
@@ -1257,16 +1257,16 @@ exports.deleteTimesheetRow = (req, res) => {
 
                             client.query('DELETE FROM TIMESHEET_LINE_ITEM WHERE id=$1',[req.body.timesheet_lineitem_id], function(err, deletedRow) {
                               if (err) {
-                                console.log('Server error : Error in deleting timesheet detail');
+                                console.log(' Error in deleting timesheet detail');
                                 console.log(err);
                                 handleResponse.shouldAbort(err, client, done);
-                                handleResponse.handleError(res, err, 'Server error : Error in deleting timesheet detail');
+                                handleResponse.handleError(res, err, ' Error in deleting timesheet detail');
                               } else {
                                 /* client.query('COMMIT', (err) => {
                                   if (err) {
                                     console.error('Error committing transaction', err.stack);
                                     shouldAbort(err, client, done);
-                                    handleError(res, err, 'Server error : Error in committing transaction');
+                                    handleError(res, err, ' Error in committing transaction');
                                   } else { */
                                     done();
                                     handleResponse.sendSuccess(res,'Timesheet row deleted successfully',{total_work_hours:minuteToHours(differenceOfTime)});
@@ -1277,7 +1277,7 @@ exports.deleteTimesheetRow = (req, res) => {
                             });
                           }else{
                             done();
-                            handleResponse.handleError(res,err,'Server Error:No timesheet with this id exits');
+                            handleResponse.handleError(res,err,'No timesheet with this id exits');
                           }
                         }
                       });
@@ -1308,7 +1308,7 @@ exports.addMultipleTimesheet = (req, res) => {
         /* client.query('BEGIN', (err) => {
           if (err) {
             shouldAbort(err, client, done);
-            handleError(res, err, 'Server error : Error in connecting to the database.');
+            handleError(res, err, ' Error in connecting to the database.');
           } else { */
             if(req.body.day_task != '' && req.body.day_project != '') {
               // console.log("Inside if");
@@ -1317,7 +1317,7 @@ exports.addMultipleTimesheet = (req, res) => {
                   if(err) {
                     // console.log(err);
                     handleResponse.shouldAbort(err, client, done);
-                    handleResponse.handleError(res, err, 'Server error : Error in finding project.');
+                    handleResponse.handleError(res, err, ' Error in finding project.');
                   } else { */
                     // console.log("Inside select project");
                     // console.log('inside isRunning');
@@ -1331,7 +1331,7 @@ exports.addMultipleTimesheet = (req, res) => {
                           // console.log("Inside timesheet_line_item insert");
                           console.error(err);
                           handleResponse.shouldAbort(err, client, done);
-                          handleResponse.handleError(res, err, 'Server error : Error in adding timesheet detail to the database.');
+                          handleResponse.handleError(res, err, ' Error in adding timesheet detail to the database.');
                         } else {
 
                           if(weekData.length == (index + 1)) {
@@ -1374,7 +1374,7 @@ exports.addTimesheet = (req, res) => {
         /* client.query('BEGIN', (err) => {
           if (err) {
             shouldAbort(err, client, done);
-            handleError(res, err, 'Server error : Error in connecting to the database.');
+            handleError(res, err, ' Error in connecting to the database.');
           } else { */
             if(req.body.day_task != '' && req.body.day_project != '') {
               // console.log("Inside if");
@@ -1382,7 +1382,7 @@ exports.addTimesheet = (req, res) => {
                 if(err) {
                   // console.log(err);
                   handleResponse.shouldAbort(err, client, done);
-                  handleResponse.handleError(res, err, 'Server error : Error in finding project.');
+                  handleResponse.handleError(res, err, ' Error in finding project.');
                 } else {
                   projectData = {};
                   projectData.project_id = req.body.project_id;
@@ -1404,7 +1404,7 @@ exports.addTimesheet = (req, res) => {
                         if (err) {
                           console.error(err);
                           handleResponse.shouldAbort(err, client, done);
-                          handleResponse.handleError(res, err, 'Server error : Error in finding task data');
+                          handleResponse.handleError(res, err, ' Error in finding task data');
                         } else {
                           extraParams = {};
                           extraParams.assigned_user = req.user.id;
@@ -1489,7 +1489,7 @@ function createTimesheetLineItem(req, res, client, err, done, extraParam, isRunn
       // console.log("Inside timesheet_line_item insert");
       console.error(err);
       handleResponse.shouldAbort(err, client, done);
-      handleResponse.handleError(res, err, 'Server error : Error in adding exports.add detail to the database.');
+      handleResponse.handleError(res, err, ' Error in adding exports.add detail to the database.');
     } else {
       return callback(insertedLineItem.rows[0]);
     }
@@ -1517,7 +1517,7 @@ exports.getDayTimesheetWithTaskId = (req, res) => {
         if(err) {
           console.error(err);
           handleResponse.shouldAbort(err, client, done);
-          handleResponse.handleError(res, err, 'Server error : Error in finding timesheet detail data');
+          handleResponse.handleError(res, err, ' Error in finding timesheet detail data');
         } else {
           // console.log("Update Timesheet Data");
           // console.log(dayData.rows);

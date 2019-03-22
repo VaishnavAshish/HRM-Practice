@@ -57,7 +57,7 @@ function dateFormat(gDate) {
 getCompany = (companyid,next) => {
 
     if(companyid==''||companyid==null||companyid==undefined){
-        handleResponse.handleError(res, 'incorrect company id', 'Server Error : Company id is not correct ');
+        handleResponse.handleError(res, 'incorrect company id', ' Company id is not correct ');
     }else{
       // console.log('getCompanyName-------------' + companyid)
       pool.connect((err, client, done) => {
@@ -79,7 +79,7 @@ getCompany = (companyid,next) => {
 getCompanyId = (domain,next) => {
 
     if(domain==''||domain==null||domain==undefined){
-        handleResponse.handleError(res, 'incorrect company domain', 'Server error : Company domain is not correct ');
+        handleResponse.handleError(res, 'incorrect company domain', ' Company domain is not correct ');
     }else{
       // console.log('getCompanyId-------------' + domain)
       pool.connect((err, client, done) => {
@@ -110,14 +110,14 @@ exports.postResetPassword = (req, res) => {
   else{
       getCompanyId(req.body.domain,function(err,companyId){
           if(err){
-              handleResponse.handleError(res, err, 'Server error : Error in finding company id with the given domain');
+              handleResponse.handleError(res, err, ' Error in finding company id with the given domain');
           }else{
             req.companyId=companyId;
             pool.connect((err, client, done) => {
                 client.query('SELECT * FROM users where email = $1 AND company_id=$2', [req.body.email,companyId], function (err, existingUser) {
                 if (err) {
                   handleResponse.shouldAbort(err, client, done);
-                  handleResponse.handleError(res, err, 'Server error : Error in finding user data');
+                  handleResponse.handleError(res, err, ' Error in finding user data');
                 } else {
                   // console.log("existingUser-----------");
                   // console.log(existingUser.rows);
@@ -130,7 +130,7 @@ exports.postResetPassword = (req, res) => {
                             if (err) {
                               // console.log(err);
                               handleResponse.shouldAbort(err, client, done);
-                              handleResponse.handleError(res, err, 'Server error : Error in updating user data');
+                              handleResponse.handleError(res, err, ' Error in updating user data');
                             } else {
                                 // console.log('--------user after update is--------');
                                 // console.log(user.rows[0].email);
@@ -140,7 +140,7 @@ exports.postResetPassword = (req, res) => {
                                 /*  // console.log('callback');
                                   if(error){
                                       handleResponse.shouldAbort(err, client, done);
-                                      handleResponse.handleError(res, error, 'Server error : Error in sending email to user');
+                                      handleResponse.handleError(res, error, ' Error in sending email to user');
                                   }else{
                                 */      handleResponse.sendSuccess(res,'Password reset email send successfully',{});
                                       /*res.status(200).json({ "success": true,"message":"success" });*/
@@ -153,7 +153,7 @@ exports.postResetPassword = (req, res) => {
 
                   } else {
                     done();
-                    handleResponse.handleError(res, 'incorrect email id', 'Server Error :User with this email does not exists.');
+                    handleResponse.handleError(res, 'incorrect email id', 'User with this email does not exists.');
                   }
               }
             });
@@ -170,7 +170,7 @@ exports.postAddResource = (req, res) => {
       if(err==true){
         // console.log('error in setting');
         // console.log(err);
-        handleResponse.handleError(res, err, 'Server Error: error in finding company setting');
+        handleResponse.handleError(res, err, ' error in finding company setting');
 
       }else{
         companyDefaultTimezone=result.timezone;
@@ -195,12 +195,12 @@ exports.postAddResource = (req, res) => {
                   client.query('BEGIN', (err) => {
                     if (err) {
                       handleResponse.shouldAbort(err, client, done);
-                      handleResponse.handleError(res, err, 'Server error : Error in connecting to the database');
+                      handleResponse.handleError(res, err, ' Error in connecting to the database');
                     } else {
                       client.query('SELECT u.id ,u.email ,u.password ,u.username ,u.company_id ,u.user_role ,u.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,u.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,u.first_name ,u.last_name ,u.phone ,u.mobile ,u.designation ,u.archived ,u.password_reset_token ,u.add_status ,u.bill_rate ,u.cost_rate ,u.permissions ,u.role ,u.record_id FROM users u where u.email = $1 AND u.company_id=$2', [req.body.email,req.user.company_id], function (err, existingUser) {
                         if (err) {
                           handleResponse.shouldAbort(err, client, done);
-                          handleResponse.handleError(res, err, 'Server error : Error in finding user data');
+                          handleResponse.handleError(res, err, ' Error in finding user data');
                         } else {
                           // let created_date = moment.tz(new Date(), companyDefaultTimezone).format();
                           // console.log("existingUser-----------");
@@ -208,7 +208,7 @@ exports.postAddResource = (req, res) => {
 
                           if (existingUser.rows.length > 0) {
                             done();
-                            handleResponse.handleError(res, 'User adding error', 'Server Error : User with this email already exists.');
+                            handleResponse.handleError(res, 'User adding error', ' User with this email already exists.');
                           } else {
                             let createRandomToken = randomBytesAsync(16)
                                   .then(buf => buf.toString('hex'));
@@ -222,19 +222,19 @@ exports.postAddResource = (req, res) => {
                                   if (err) {
                                     // console.log(err);
                                     handleResponse.shouldAbort(err, client, done);
-                                    handleResponse.handleError(res, err, 'Server error : Error in adding user data to the database');
+                                    handleResponse.handleError(res, err, ' Error in adding user data to the database');
                                   } else {
                                     client.query('COMMIT', (err) => {
                                       if (err) {
                                         console.error('Error committing transaction', err.stack)
                                         handleResponse.shouldAbort(err, client, done);
-                                        handleResponse.handleError(res, err, 'Server error : Error in committing transaction to the database.');
+                                        handleResponse.handleError(res, err, ' Error in committing transaction to the database.');
                                       } else {
                                         done();
                                         // console.log(user);
                                         getCompany(companyId,function(err,company){
                                           if(err){
-                                              handleResponse.handleError(res, err, 'Server error : Error in finding company with the given id');
+                                              handleResponse.handleError(res, err, ' Error in finding company with the given id');
                                           }else{
                                             // console.log(company);
                                             req.company=company;
@@ -243,7 +243,7 @@ exports.postAddResource = (req, res) => {
                                               // console.log('callback');
                                               if(error){
                                                   handleResponse.shouldAbort(err, client, done);
-                                                  handleResponse.handleError(res, error, 'Server error : Error in sending invitation email.');
+                                                  handleResponse.handleError(res, error, ' Error in sending invitation email.');
                                               }else{
                                                   handleResponse.sendSuccess(res,'Resource added successfully',{});
                                                   /*res.status(200).json({ "success": true,"message":"success" });    */
@@ -260,7 +260,7 @@ exports.postAddResource = (req, res) => {
                             })
                             .catch(err=>{
                               console.log(err);
-                              handleResponse.handleError(res, err, 'Server error : Error in generating random token');
+                              handleResponse.handleError(res, err, ' Error in generating random token');
                             });
 
                           }
@@ -486,7 +486,7 @@ exports.deleteResource = (req, res) => {
       if(err==true){
         // console.log('error in setting');
         // console.log(err);
-        handleResponse.handleError(res, err, 'Server Error: error in finding company setting');
+        handleResponse.handleError(res, err, ' error in finding company setting');
 
       }else{
         companyDefaultTimezone=result.timezone;
@@ -494,14 +494,14 @@ exports.deleteResource = (req, res) => {
         // console.log(companyDefaultTimezone);
         let resourceId=req.body.resourceId;
         if(resourceId==''||resourceId==null||resourceId==undefined){
-          handleResponse.handleError(res, "incorrect resource id", "Server error : Resource id is not correct");
+          handleResponse.handleError(res, "incorrect resource id", " Resource id is not correct");
         }else{
             pool.connect((err, client, done) => {
               // console.log(req.body.resourceId);
               client.query('SELECT * FROM users WHERE id=$1', [req.body.resourceId], function (err, userDetails) {
                 if (err) {
                   handleResponse.shouldAbort(err, client, done);
-                  handleResponse.handleError(res, err, 'Server error : Error in deleting resource.');
+                  handleResponse.handleError(res, err, ' Error in deleting resource.');
                 }else{
                   if(userDetails.rows[0].user_role.includes('ADMIN') || parseInt(req.body.resourceId) == parseInt(req.user.id)) {
                     handleResponse.shouldAbort(err, client, done);
@@ -510,7 +510,7 @@ exports.deleteResource = (req, res) => {
                     client.query('UPDATE users SET archived=true where id =$1', [req.body.resourceId], function (err, resource) {
                       if (err) {
                         handleResponse.shouldAbort(err, client, done);
-                        handleResponse.handleError(res, err, 'Server error : Error in deleting resource.');
+                        handleResponse.handleError(res, err, ' Error in deleting resource.');
                       }else{
                         done();
                         handleResponse.sendSuccess(res,'Resource deleted successfully',{});
@@ -533,7 +533,7 @@ exports.updateResource = (req, res) => {
       if(err==true){
         // console.log('error in setting');
         // console.log(err);
-        handleResponse.handleError(res, err, 'Server Error: error in finding company setting');
+        handleResponse.handleError(res, err, ' error in finding company setting');
 
       }else{
         companyDefaultTimezone=result.timezone;
@@ -555,14 +555,14 @@ exports.updateResource = (req, res) => {
             client.query('BEGIN', (err) => {
               if (err) {
                 handleResponse.shouldAbort(err, client, done);
-                handleResponse.handleError(res, err, 'Server error : Error in connecting to database .');
+                handleResponse.handleError(res, err, ' Error in connecting to database .');
               } else {
                 let permissions=(req.body.permissions)?req.body.permissions:req.user.permissions;
                 // let newDate=moment.tz(new Date(), companyDefaultTimezone).format();
                 client.query('SELECT * FROM USERS WHERE id=$1',[req.body.id], function (err, selectedUser) {
                   if (err) {
                     handleResponse.shouldAbort(err, client, done);
-                    handleResponse.handleError(res, err, 'Server error : Error in updating resource data');
+                    handleResponse.handleError(res, err, ' Error in updating resource data');
                   } else {
                     // console.log('-----------selectedUser----------');
                     // console.log(selectedUser.rows[0]);
@@ -572,7 +572,7 @@ exports.updateResource = (req, res) => {
                     client.query('UPDATE users set email=$1,first_name=$2,last_name=$3,phone=$4,mobile=$5,modified_date=$6,bill_rate=$7,cost_rate=$8,permissions=$9,role=$10 where id=$11  RETURNING *', [req.body.email, req.body.first_name, req.body.last_name, req.body.phone, req.body.mobile, 'now()',req.body.bill_rate,req.body.cost_rate,permissions,req.body.user_role, req.body.id], function (err, resource) {
                       if (err) {
                         handleResponse.shouldAbort(err, client, done);
-                        handleResponse.handleError(res, err, 'Server error : Error in updating resource data');
+                        handleResponse.handleError(res, err, ' Error in updating resource data');
                       } else {
                         // console.log("resource------------");
                         // console.log(resource);
@@ -580,7 +580,7 @@ exports.updateResource = (req, res) => {
                           if (err) {
                             handleResponse.shouldAbort(err, client, done);
                             console.error('Error committing transaction', err.stack);
-                            handleResponse.handleError(res, err, 'Server error : Error in committing transaction');
+                            handleResponse.handleError(res, err, ' Error in committing transaction');
                           }else{
                             let userData=resource.rows[0];
                             if(userData.id==req.user.id){
@@ -592,19 +592,19 @@ exports.updateResource = (req, res) => {
                                           req.session.destroy((error) => {
                                             if (error) {
                                               // console.log('Error : Failed to destroy the session during logout.', err);
-                                              handleResponse.handleError(res, error, 'Server Error: Failed to destroy the session during logout.');
+                                              handleResponse.handleError(res, error, ' Failed to destroy the session during logout.');
                                             }else{
                                               req.user = null;
                                              /* window.history.forward();*/
                                               /*shouldAbort(err, client, done);*/
-                                              handleResponse.handleError(res, err, 'Server Error: Error in user logout before logging in another user.');
+                                              handleResponse.handleError(res, err, ' Error in user logout before logging in another user.');
                                               /*res.redirect('/login?error=2&domain=' + domain);*/
                                             }
                                           });
                                         } catch (err) {
                                           console.debug("--------3333-" + err);
 
-                                          handleResponse.handleError(res, err, 'Server Error: Error in user logout');
+                                          handleResponse.handleError(res, err, ' Error in user logout');
                                           /*res.redirect('/login?error=3&domain=' + domain);*/
                                         }
                                     }else{
@@ -652,7 +652,7 @@ exports.findResourceByCriteria = (req, res) => {
       if(err==true){
         // console.log('error in setting');
         // console.log(err);
-        handleResponse.handleError(res, err, 'Server Error: error in finding company setting');
+        handleResponse.handleError(res, err, ' error in finding company setting');
 
       }else{
         companyDefaultTimezone=result.timezone;
@@ -672,7 +672,7 @@ exports.findResourceByCriteria = (req, res) => {
             client.query('SELECT name FROM company WHERE id=$1',[company_id], function (err, company) {
               if (err) {
                 handleResponse.shouldAbort(err, client, done);
-                handleResponse.handleError(res, err, 'Server Error: Error in finding company data');
+                handleResponse.handleError(res, err, ' Error in finding company data');
               }else{
 
                     let offset=0;
@@ -693,7 +693,7 @@ exports.findResourceByCriteria = (req, res) => {
                     client.query(queryToExec,searchCriteriaVal, function (err,users) {
                       if (err) {
                         handleResponse.shouldAbort(err, client, done);
-                        handleResponse.handleError(res, err, 'Server Error: Error in finding resource data');
+                        handleResponse.handleError(res, err, ' Error in finding resource data');
                       }
                       else{
                           let searchCount=0;
@@ -736,7 +736,7 @@ exports.findUserByEmail = (req, res) => {
       if(err==true){
         // console.log('error in setting');
         // console.log(err);
-        handleResponse.handleError(res, err, 'Server Error: error in finding company setting');
+        handleResponse.handleError(res, err, ' error in finding company setting');
 
       }else{
         companyDefaultTimezone=result.timezone;
@@ -748,7 +748,7 @@ exports.findUserByEmail = (req, res) => {
               if (err) {
                 handleResponse.shouldAbort(err, client, done);
                 /*handleResponse.responseToPage(res,'pages/org-listing',{user:req.session.passport.user, error:err},"error"," Error in finding company data");*/
-                handleResponse.handleError(res, err, 'Server Error: Error in finding company data');
+                handleResponse.handleError(res, err, ' Error in finding company data');
               }else{
                 let offset=0;
                 if(req.body.offset){
@@ -760,7 +760,7 @@ exports.findUserByEmail = (req, res) => {
                   if (err) {
                     handleResponse.shouldAbort(err, client, done);
                     /*handleResponse.responseToPage(res,'pages/org-listing',{user:req.session.passport.user, error:err},"error"," Error in finding company data");*/
-                    handleResponse.handleError(res, err, 'Server Error: Error in finding company users');
+                    handleResponse.handleError(res, err, ' Error in finding company users');
                   }
                   else{
                       let searchCount=0;

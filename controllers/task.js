@@ -52,7 +52,7 @@ exports.findTaskByName = (req, res) => {
       if(err==true){
         // console.log('error in setting');
         // console.log(err);
-        handleResponse.handleError(res, err, 'Server Error: error in finding company setting');
+        handleResponse.handleError(res, err, ' error in finding company setting');
       }else{
 
         companyDefaultTimezone=result.timezone;
@@ -69,14 +69,14 @@ exports.findTaskByName = (req, res) => {
           client.query(queryToExec,['%'+req.body.searchText+'%',req.user.company_id,req.body.project_id], function (err, tasks) {
             if (err) {
               handleResponse.shouldAbort(err, client, done);
-              handleResponse.handleError(res, err, 'Server Error: Error in finding task data');
+              handleResponse.handleError(res, err, ' Error in finding task data');
             }
             else{
 
               client.query('SELECT distinct on (task_id) task_id, user_email, updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date FROM TASK_ASSIGNMENT WHERE project_id=$1 AND company_id=$2 order by task_id, updated_date desc', [req.body.project_id, req.user.company_id], function (err, taskAssList) {
                 if (err) {
                   handleResponse.shouldAbort(err, client, done);
-                  handleResponse.handleError(res, err, 'Server Error: Error in finding task data');
+                  handleResponse.handleError(res, err, ' Error in finding task data');
                 } else {
                   // console.log(JSON.stringify(tasks.rows));
                   let searchCount=0;
@@ -120,26 +120,38 @@ exports.postAddTask = (req, res) => {
     if(err==true){
       // console.log('error in setting');
       // console.log(err);
-      handleResponse.handleError(res, err, 'Server error : Error in finding company setting');
-      /*handleResponse.handleError(res, err, 'Server Error: error in finding company setting');*/
+      handleResponse.handleError(res, err, ' Error in finding company setting');
+      /*handleResponse.handleError(res, err, ' error in finding company setting');*/
     } else {
       companyDefaultTimezone=result.timezone;
       // var today = moment.tz(new Date(), companyDefaultTimezone).format('Y-MM-DD');
       // var dd = parseInt(moment.tz(new Date(), companyDefaultTimezone).format('D'));
       // var mm = parseInt(moment.tz(new Date(), companyDefaultTimezone).format('M')); //January is 0!
       // var yyyy = parseInt(moment.tz(new Date(), companyDefaultTimezone).format('Y'));
-      console.log(req.body.taskData.start_date);
-      console.log(req.body.taskData.end_date);
-      req.body.taskData.start_date = moment.tz(req.body.taskData.start_date.split('T')[0], companyDefaultTimezone).format();
-      req.body.taskData.due_date = moment.tz(req.body.taskData.due_date.split('T')[0], companyDefaultTimezone).format();
-      console.log(req.body.taskData.start_date);
-      console.log(req.body.taskData.end_date);
-      if (!req.body.taskData.start_date) {
-        req.body.taskData.start_date = null;
+      console.log('req.body.taskData.start_date');
+      console.log('req.body.taskData.end_date');
+      // req.body.taskData.start_date = moment.tz(req.body.taskData.start_date.split('T')[0], companyDefaultTimezone).format();
+      // req.body.taskData.due_date = moment.tz(req.body.taskData.due_date.split('T')[0], companyDefaultTimezone).format();
+      console.log(typeof req.body.taskData.start_date);
+      console.log(req.body.taskData.start_date!=' ');
+      // console.log(req.body.taskData.due_date);
+      if (req.body.taskData.start_date!=null && req.body.taskData.start_date!='') {
+        req.body.taskData.start_date = moment.tz(req.body.taskData.start_date.split('T')[0], companyDefaultTimezone).format();
+      }else{
+        req.body.taskData.start_date=null;
       }
-      if (!req.body.taskData.due_date) {
-        req.body.taskData.due_date = null;
+      if (req.body.taskData.due_date!=null && req.body.taskData.due_date!='') {
+        req.body.taskData.due_date = moment.tz(req.body.taskData.due_date.split('T')[0], companyDefaultTimezone).format();
+      }else{
+        req.body.taskData.due_date=null;
       }
+      console.log(req.body.taskData.start_date);
+      // if (!req.body.taskData.start_date) {
+      //   req.body.taskData.start_date = null;
+      // }
+      // if (!req.body.taskData.due_date) {
+      //   req.body.taskData.due_date = null;
+      // }
       if (!req.body.taskData.estimate_hours) {
         req.body.taskData.estimate_hours = 0;
       }
@@ -151,7 +163,7 @@ exports.postAddTask = (req, res) => {
           if (err) {
             console.error(err);
             handleResponse.shouldAbort(err, client, done);
-            handleResponse.handleError(res, err, 'Server error : Error in finding task data');
+            handleResponse.handleError(res, err, ' Error in finding task data');
           } else {
             if (taskList.rows.length > 0) {
               done();
@@ -212,7 +224,7 @@ function createTaskRecord(req, client, err, done, taskData, res, callback) {
   client.query('Insert INTO TASK (project_id, name, start_date, end_date, estimated_hours, description, company_id, percent_completed, status, billable,project_name, assigned_user_id) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING id', [req.body.projectId, req.body.taskData.task_name, req.body.taskData.start_date, req.body.taskData.due_date, req.body.taskData.estimate_hours, req.body.taskData.task_desc, req.user.company_id, 0, 'Not Started', req.body.taskData.billable, req.body.projectName,taskData.assigned_user_id], function (err, insertedTask) {
     if(err) {
       handleResponse.shouldAbort(err, client, done);
-      handleResponse.handleError(res, err, 'Server error : Error in adding task to the database');
+      handleResponse.handleError(res, err, ' Error in adding task to the database');
     } else {
       return callback(insertedTask.rows[0].id);
     }
@@ -237,7 +249,7 @@ function updateTaskRecord(req, client, err, done, res, taskData, callback) {
     if (err) {
       console.error(err);
       handleResponse.shouldAbort(err, client, done);
-      handleResponse.handleError(res, err, 'Server error : Error in updating task.');
+      handleResponse.handleError(res, err, ' Error in updating task.');
     } else {
       return callback(updatedData.rows[0].id);
     }
@@ -251,8 +263,8 @@ exports.getTaskDetails = (req, res) => {
       if(err==true){
         // console.log('error in setting');
         // console.log(err);
-        handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.session.passport.user, error:err},"error","Server Error: error in finding company setting");
-        /*handleResponse.handleError(res, err, 'Server Error: error in finding company setting');*/
+        handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.session.passport.user, error:err},"error"," error in finding company setting");
+        /*handleResponse.handleError(res, err, ' error in finding company setting');*/
       }else{
 
         companyDefaultTimezone=result.timezone;
@@ -264,8 +276,8 @@ exports.getTaskDetails = (req, res) => {
                 if (err) {
                   console.error(err);
                   handleResponse.shouldAbort(err, client, done);
-                  handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.session.passport.user, error:err},"error","Server error : Error in finding task data");
-                  /*handleResponse.handleError(res, err, 'Server error : Error in finding task data');*/
+                  handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.session.passport.user, error:err},"error"," Error in finding task data");
+                  /*handleResponse.handleError(res, err, ' Error in finding task data');*/
                 } else {
                   if(taskDetail.rows.length>0){
                       let taskId=taskDetail.rows[0].id;
@@ -273,20 +285,20 @@ exports.getTaskDetails = (req, res) => {
                       if (err) {
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);
-                        handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.session.passport.user, error:err},"error","Server error : Error in finding task data");
-                        /*handleResponse.handleError(res, err, 'Server error : Error in finding task data');*/
+                        handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.session.passport.user, error:err},"error"," Error in finding task data");
+                        /*handleResponse.handleError(res, err, ' Error in finding task data');*/
                       } else {
                           client.query('SELECT id,email,bill_rate,cost_rate, role as user_role FROM USERS WHERE id NOT IN (SELECT user_id FROM PROJECT_ASSIGNMENT WHERE project_id=$1) AND company_id=$2 AND archived=$3', [taskDetail.rows[0].project_id,req.user.company_id,false], function (err, userList) {
                             if (err) {
                               console.error(err);
                               handleResponse.shouldAbort(err, client, done);
-                              handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.session.passport.user, error:err},"error","Server error : Error in finding users data");
+                              handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.session.passport.user, error:err},"error"," Error in finding users data");
                             } else {
                               client.query('SELECT u.id, u.email, pa.bill_rate, pa.cost_rate, pa.user_role, pa.id as assignment_id from PROJECT_ASSIGNMENT pa INNER JOIN users u ON pa.user_id = u.id AND pa.company_id = u.company_id AND u.archived = $1 AND pa.project_id = $2', [false, taskDetail.rows[0].project_id], function (err, resList) {
                                 if (err) {
                                   console.error(err);
                                   handleResponse.shouldAbort(err, client, done);
-                                  handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.session.passport.user, error:err},"error","Server error : Error in finding users data");
+                                  handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.session.passport.user, error:err},"error"," Error in finding users data");
                                 } else {
                                     // console.log("taskDetail");
                                     // console.log(taskDetail);
@@ -294,8 +306,15 @@ exports.getTaskDetails = (req, res) => {
                                     let userListCombined=[];
                                     // let startDateFormatted = dateFormat(moment.tz(taskDetail.rows[0].start_date, companyDefaultTimezone).format());
                                     // let endDateFormatted = dateFormat(moment.tz(taskDetail.rows[0].end_date, companyDefaultTimezone).format());
-                                    let startDateFormatted = dateFormat(taskDetail.rows[0].start_date);
-                                    let endDateFormatted = dateFormat(taskDetail.rows[0].end_date);
+
+                                    let startDateFormatted = taskDetail.rows[0].start_date;
+                                    if(taskDetail.rows[0].start_date != null) {
+                                      startDateFormatted = dateFormat(taskDetail.rows[0].start_date);
+                                    }
+                                    let endDateFormatted = taskDetail.rows[0].end_date;
+                                    if(taskDetail.rows[0].end_date != null) {
+                                      endDateFormatted = dateFormat(taskDetail.rows[0].end_date);
+                                    }
                                     taskDetail.rows[0]["startDateFormatted"] = startDateFormatted;
                                     taskDetail.rows[0]["endDateFormatted"] = endDateFormatted;
                                     if(taskAssignDetail.rows.length>0){
@@ -337,7 +356,7 @@ exports.postEditTask = (req, res) => {
       if(err==true){
         // console.log('error in setting');
         // console.log(err);
-        handleResponse.handleError(res, err, 'Server Error: error in finding company setting');
+        handleResponse.handleError(res, err, ' error in finding company setting');
       }else{
 
         companyDefaultTimezone=result.timezone;
@@ -347,7 +366,7 @@ exports.postEditTask = (req, res) => {
                 if (err) {
                   console.error(err);
                   handleResponse.shouldAbort(err, client, done);
-                  handleResponse.handleError(res, err, 'Server error : Error in finding task data for updating');
+                  handleResponse.handleError(res, err, ' Error in finding task data for updating');
                 } else {
                   if (taskDetail.rows.length > 0) {
                     // console.log("Assignment id");
@@ -388,7 +407,7 @@ exports.postEditTask = (req, res) => {
                         if (err) {
                           console.error(err);
                           handleResponse.shouldAbort(err, client, done);
-                          handleResponse.handleError(res, err, 'Server error : Error in finding project data for task');
+                          handleResponse.handleError(res, err, ' Error in finding project data for task');
                         } else {
                           // console.log("taskData");
                           // console.log(req.body);
@@ -416,7 +435,7 @@ exports.postEditTask = (req, res) => {
               })
             });
           } else{
-            handleResponse.handleError(res, "incorrect task id", "Server error : Task id is not correct");
+            handleResponse.handleError(res, "incorrect task id", " Task id is not correct");
           }
       }
     });
@@ -427,7 +446,7 @@ exports.deleteTask = (req, res) => {
       if(err==true){
         // console.log('error in setting');
         // console.log(err);
-        handleResponse.handleError(res, err, 'Server Error: error in finding company setting');
+        handleResponse.handleError(res, err, ' error in finding company setting');
       }else{
 
         companyDefaultTimezone=result.timezone;
@@ -442,14 +461,14 @@ exports.deleteTask = (req, res) => {
                 if (err) {
                   console.error(err);
                   handleResponse.shouldAbort(err, client, done);
-                  handleResponse.handleError(res, err, 'Server error : Error in finding task data');
+                  handleResponse.handleError(res, err, ' Error in finding task data');
                 } else {
                   if (taskDetail.rows.length > 0) {
                     client.query('UPDATE TASK SET archived = $1 WHERE id=$2 AND company_id=$3', [true, req.body.taskId, req.user.company_id], function (err, archivedTask) {
                       if (err) {
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);
-                        handleResponse.handleError(res, err, 'Server error : Error in deleting task');
+                        handleResponse.handleError(res, err, ' Error in deleting task');
                       } else {
                         console.error('Affected ID>>>>>>>>>>>>>');
                         // console.log(archivedTask.rows);
@@ -465,7 +484,7 @@ exports.deleteTask = (req, res) => {
               })
             });
           }  else{
-                handleResponse.handleError(res, "incorrect task id", "Server Error : Task id is not correct");
+                handleResponse.handleError(res, "incorrect task id", " Task id is not correct");
               }
       }
     });
@@ -477,7 +496,7 @@ exports.getTaskList = (req, res, callback) => {
       if(err==true){
         // console.log('error in setting');
         // console.log(err);
-        handleResponse.handleError(res, err, 'Server Error: error in finding company setting');
+        handleResponse.handleError(res, err, ' error in finding company setting');
       }else{
         companyDefaultTimezone=result.timezone;
         pool.connect((err, client, done) => {
@@ -485,7 +504,7 @@ exports.getTaskList = (req, res, callback) => {
             if (err) {
               console.error(err);
               handleResponse.shouldAbort(err, client, done);
-              handleResponse.handleError(res, err, 'Server error : Error in finding task data');
+              handleResponse.handleError(res, err, ' Error in finding task data');
             } else {
               // console.log("req.body.getTaskList");
               // console.log(req.body.getTaskList)

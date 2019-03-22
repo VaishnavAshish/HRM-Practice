@@ -8,12 +8,12 @@ exports.getCompanySetting=(req,res,cb)=>{
   /*// console.log(moment.tz.names());*/
 	pool.connect((err, client, done) => {
         client.query('SELECT * FROM SETTING WHERE company_id=$1',[req.user.company_id], function(err, companySetting) {
-          if (err) { 
+          if (err) {
           	console.error('err in getting settings');
             console.error(err);
             handleResponse.shouldAbort(err, client, done);
             return cb(true,null);
-            /*handleResponse.handleError(res, err, 'Server Error: Error in finding company setting');*/
+            /*handleResponse.handleError(res, err, ' Error in finding company setting');*/
           } else {
           	done();
           	// console.log('------company setting----')

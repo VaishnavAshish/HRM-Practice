@@ -15,13 +15,13 @@ exports.postEditSetting = (req, res) => {
     client.query('SELECT * FROM SETTING where company_id=$1',[req.user.company_id], function(err, selectedSetting) {
           if (err){
             handleResponse.shouldAbort(err, client, done);
-            handleResponse.handleError(res, err, 'Server Error: Error in getting settings');
+            handleResponse.handleError(res, err, ' Error in getting settings');
           } else {
           		if(selectedSetting.rows.length>0){
           			client.query('UPDATE SETTING set street=$1,city=$2,state=$3,country=$4,zip_code=$5,currency=$6,timezone=$7,weekstartday=$8 where company_id=$9 RETURNING id',[req.body.companyStreet, req.body.companyCity, req.body.companyState, req.body.companyCountry, req.body.companyZip,req.body.companyCurrency,req.body.timezone,req.body.weekstartday ,req.user.company_id], function(err, updatedSetting) {
   			          if (err){
   			            handleResponse.shouldAbort(err, client, done);
-  			            handleResponse.handleError(res, err, 'Server Error: Error in updating settings');
+  			            handleResponse.handleError(res, err, ' Error in updating settings');
   			          } else {
   			            done();
   			            handleResponse.sendSuccess(res,'settings updated successfully',{});
@@ -30,13 +30,13 @@ exports.postEditSetting = (req, res) => {
 		            });
           		}else{
                 done();
-                handleResponse.handleError(res, err, 'Server Error: Error in finding company setting');
+                handleResponse.handleError(res, err, ' Error in finding company setting');
               }
               /*else{
       				client.query('Insert INTO SETTING (company_id,company_address,currency,expense_category,user_role,timezone) values ($1,$2,$3,$4,$5,$6) RETURNING id',[req.user.company_id,company_address,req.body.companyCurrency,['Food'],['Manager'],req.body.timezone], function(err, updatedSetting) {
 			          if (err){
 			            handleResponse.shouldAbort(err, client, done);
-			            handleResponse.handleError(res, err, 'Server Error: Error in inserting settings');
+			            handleResponse.handleError(res, err, ' Error in inserting settings');
 			          } else {
 			            done();
 			            handleResponse.sendSuccess(res,'settings inserting successfully',{});
@@ -58,7 +58,7 @@ exports.postEditSettingUserRole = (req, res) => {
     client.query('SELECT * FROM SETTING where company_id=$1',[req.user.company_id], function(err, selectedSetting) {
           if (err){
             handleResponse.shouldAbort(err, client, done);
-            handleResponse.handleError(res, err, 'Server Error: Error in getting settings');
+            handleResponse.handleError(res, err, ' Error in getting settings');
           } else {
       			if(req.body.userRole.length<=0){
       				req.body.userRole=['Manager'];
@@ -67,7 +67,7 @@ exports.postEditSettingUserRole = (req, res) => {
           			client.query('UPDATE SETTING set user_role=$1 where company_id=$2 RETURNING id',[req.body.userRole, req.user.company_id], function(err, updatedSetting) {
     			          if (err){
     			            handleResponse.shouldAbort(err, client, done);
-    			            handleResponse.handleError(res, err, 'Server Error: Error in updating settings');
+    			            handleResponse.handleError(res, err, ' Error in updating settings');
     			          } else {
     			            done();
     			            handleResponse.sendSuccess(res,'settings updated successfully',{});
@@ -76,12 +76,12 @@ exports.postEditSettingUserRole = (req, res) => {
     			      });
           		}else{
                 done();
-                handleResponse.handleError(res, err, 'Server Error: Error in finding company setting');
+                handleResponse.handleError(res, err, ' Error in finding company setting');
               }/*else{
       				client.query('Insert INTO SETTING (company_id,user_role,expense_category) values ($1,$2,$3) RETURNING id',[req.user.company_id,req.body.userRole,['Food']], function(err, updatedSetting) {
 			          if (err){
 			            handleResponse.shouldAbort(err, client, done);
-			            handleResponse.handleError(res, err, 'Server Error: Error in inserting settings');
+			            handleResponse.handleError(res, err, ' Error in inserting settings');
 			          } else {
 			            done();
 			            handleResponse.sendSuccess(res,'settings inserting successfully',{});
@@ -101,13 +101,13 @@ exports.postEditSettingInvoice = (req, res) => {
     client.query('SELECT * FROM SETTING where company_id=$1',[req.user.company_id], function(err, selectedSetting) {
           if (err){
             handleResponse.shouldAbort(err, client, done);
-            handleResponse.handleError(res, err, 'Server Error: Error in getting settings');
+            handleResponse.handleError(res, err, ' Error in getting settings');
           } else {
               if(selectedSetting.rows.length>0){
           			client.query('UPDATE SETTING set invoice_note=$1 where company_id=$2 RETURNING id',[req.body.defaultInvoiceNote,req.user.company_id], function(err, updatedSetting) {
     			          if (err){
     			            handleResponse.shouldAbort(err, client, done);
-    			            handleResponse.handleError(res, err, 'Server Error: Error in updating settings');
+    			            handleResponse.handleError(res, err, ' Error in updating settings');
     			          } else {
     			            done();
     			            handleResponse.sendSuccess(res,'settings updated successfully',{});
@@ -116,12 +116,12 @@ exports.postEditSettingInvoice = (req, res) => {
     			      });
           		}else{
                 done();
-                handleResponse.handleError(res, err, 'Server Error: Error in finding company setting');
+                handleResponse.handleError(res, err, ' Error in finding company setting');
               }/*else{
       				client.query('Insert INTO SETTING (company_id,invoice_note,expense_category,user_role) values ($1,$2,$3,$4) RETURNING id',[req.user.company_id,req.body.defaultInvoiceNote,['Food'],['Manager']], function(err, updatedSetting) {
 			          if (err){
 			            handleResponse.shouldAbort(err, client, done);
-			            handleResponse.handleError(res, err, 'Server Error: Error in inserting settings');
+			            handleResponse.handleError(res, err, ' Error in inserting settings');
 			          } else {
 			            done();
 			            handleResponse.sendSuccess(res,'settings inserting successfully',{});
@@ -142,7 +142,7 @@ exports.fileupload = (req, res) => {
     // console.log('No file uploaded');
     /*return res.status(400).send('No files were uploaded.');*/
     return res.status(500).redirect('/org-settings-invoice');
-    /*handleResponse.handleError(res, 'No files were uploaded', 'Server Error: No files were uploaded');*/
+    /*handleResponse.handleError(res, 'No files were uploaded', ' No files were uploaded');*/
   }else{
     pool.connect((err, client, done) => {
       client.query('SELECT * FROM SETTING where company_id=$1',[req.user.company_id], function(err, selectedSetting) {
@@ -194,7 +194,7 @@ exports.postEditSettingExpense = (req, res) => {
     client.query('SELECT * FROM SETTING where company_id=$1',[req.user.company_id], function(err, selectedSetting) {
           if (err){
             handleResponse.shouldAbort(err, client, done);
-            handleResponse.handleError(res, err, 'Server Error: Error in getting settings');
+            handleResponse.handleError(res, err, ' Error in getting settings');
           } else {
   				// console.log('Inside expense category '+req.body.expCategory.length);
 	  			if(req.body.expCategory.length<=0){
@@ -204,7 +204,7 @@ exports.postEditSettingExpense = (req, res) => {
               			client.query('UPDATE SETTING set expense_category=$1 where company_id=$2 RETURNING id',[req.body.expCategory,req.user.company_id], function(err, updatedSetting) {
     			          if (err){
     			            handleResponse.shouldAbort(err, client, done);
-    			            handleResponse.handleError(res, err, 'Server Error: Error in updating settings');
+    			            handleResponse.handleError(res, err, ' Error in updating settings');
     			          } else {
     			            done();
     			            handleResponse.sendSuccess(res,'settings updated successfully',{});
@@ -213,12 +213,12 @@ exports.postEditSettingExpense = (req, res) => {
     			      });
           		}else{
                 done();
-                handleResponse.handleError(res, err, 'Server Error: Error in finding company setting');
+                handleResponse.handleError(res, err, ' Error in finding company setting');
               }/*else{
       				client.query('Insert INTO SETTING (company_id,expense_category,user_role) values ($1,$2,$3) RETURNING id',[req.user.company_id,req.body.expCategory,['Manager']], function(err, updatedSetting) {
 			          if (err){
 			            handleResponse.shouldAbort(err, client, done);
-			            handleResponse.handleError(res, err, 'Server Error: Error in inserting settings');
+			            handleResponse.handleError(res, err, ' Error in inserting settings');
 			          } else {
 			            done();
 			            handleResponse.sendSuccess(res,'settings inserting successfully',{});
@@ -240,7 +240,7 @@ exports.getSetting = (req, res) => {
     client.query('SELECT * FROM SETTING WHERE company_id=$1', [req.user.company_id], function (err, companySetting) {
       if (err) {
         handleResponse.shouldAbort(err, client, done);
-        handleResponse.responseToPage(res,'pages/org-settings-general',{setting:{},user:req.session.passport.user, error:err,timezones:timezones},"error"," Server error : Error in finding setting data");
+        handleResponse.responseToPage(res,'pages/org-settings-general',{setting:{},user:req.session.passport.user, error:err,timezones:timezones},"error","  Error in finding setting data");
       } else {
         	if(companySetting.rows.length<0){
 			  	    done();
@@ -260,7 +260,7 @@ exports.getSettingUserRole = (req, res) => {
     client.query('SELECT user_role FROM SETTING WHERE company_id=$1', [req.user.company_id], function (err, companySetting) {
       if (err) {
         handleResponse.shouldAbort(err, client, done);
-        handleResponse.responseToPage(res,'pages/org-settings-userrole',{setting:{},user:req.session.passport.user, error:err},"error"," Server error : Error in finding setting data");
+        handleResponse.responseToPage(res,'pages/org-settings-userrole',{setting:{},user:req.session.passport.user, error:err},"error","  Error in finding setting data");
       } else {
         	if(companySetting.rows.length<0){
 			  	done();
@@ -280,7 +280,7 @@ exports.getSettingInvoice = (req, res) => {
     client.query("SELECT invoice_note, company_logo FROM SETTING WHERE company_id=$1", [req.user.company_id], function (err, companySetting) {
       if (err) {
         handleResponse.shouldAbort(err, client, done);
-        handleResponse.responseToPage(res,'pages/org-settings-invoice',{setting:{},user:req.session.passport.user, error:err},"error"," Server error : Error in finding setting data");
+        handleResponse.responseToPage(res,'pages/org-settings-invoice',{setting:{},user:req.session.passport.user, error:err},"error","  Error in finding setting data");
       } else {
           if(companySetting.rows.length<0){
               done();
@@ -305,7 +305,7 @@ exports.getCompanyLogo = (req,res) =>{
         client.query("SELECT company_logo,contenttype FROM SETTING WHERE company_id=$1", [req.user.company_id], function (err, companySetting) {
           if (err) {
             handleResponse.shouldAbort(err, client, done);
-            handleResponse.responseToPage(res,'pages/org-settings-invoice',{setting:{},user:req.session.passport.user, error:err},"error"," Server error : Error in finding setting data");
+            handleResponse.responseToPage(res,'pages/org-settings-invoice',{setting:{},user:req.session.passport.user, error:err},"error","  Error in finding setting data");
           } else {
                 /*companySetting.rows[0].company_logo=companySetting.rows[0].company_logo.toString('base64');*/
                 // console.log('--------------------------------AJAY ----------');
@@ -370,7 +370,7 @@ exports.getSettingExpense = (req, res) => {
     client.query('SELECT expense_category FROM SETTING WHERE company_id=$1', [req.user.company_id], function (err, companySetting) {
       if (err) {
         handleResponse.shouldAbort(err, client, done);
-        handleResponse.responseToPage(res,'pages/org-settings-expense',{setting:{},user:req.session.passport.user, error:err},"error"," Server error : Error in finding setting data");
+        handleResponse.responseToPage(res,'pages/org-settings-expense',{setting:{},user:req.session.passport.user, error:err},"error","  Error in finding setting data");
       } else {
         	if(companySetting.rows.length<0){
 			  	done();
@@ -391,7 +391,7 @@ exports.checkUserRoleAssignment = (req,res) => {
     client.query('SELECT * FROM USERS WHERE company_id=$1 AND archived=$2 AND role=$3', [req.user.company_id,false,req.body.role], function (err, assignedUserRole) {
       if (err) {
         handleResponse.shouldAbort(err, client, done);
-        handleResponse.handleError(res, err, 'Server Error: Error in getting user roles');
+        handleResponse.handleError(res, err, ' Error in getting user roles');
       } else {
           if(assignedUserRole.rows.length>0){
               done();
@@ -400,7 +400,7 @@ exports.checkUserRoleAssignment = (req,res) => {
             client.query('SELECT * FROM project_assignment WHERE company_id=$1 AND user_role=$2', [req.user.company_id,req.body.role], function (err, assignedUserRoleProject) {
               if (err) {
                 handleResponse.shouldAbort(err, client, done);
-                handleResponse.handleError(res, err, 'Server Error: Error in getting user roles');
+                handleResponse.handleError(res, err, ' Error in getting user roles');
               } else {
                 if(assignedUserRoleProject.rows.length>0){
                       done();
@@ -423,7 +423,7 @@ exports.checkExpenseCategoryAssign = (req,res) => {
     client.query('SELECT * FROM EXPENSE WHERE company_id=$1 AND archived=$2 AND category=$3', [req.user.company_id,false,req.body.expenseCat], function (err, assignedExpCat) {
       if (err) {
         handleResponse.shouldAbort(err, client, done);
-        handleResponse.handleError(res, err, 'Server Error: Error in getting expense catgory');
+        handleResponse.handleError(res, err, ' Error in getting expense catgory');
       } else {
           if(assignedExpCat.rows.length>0){
               done();

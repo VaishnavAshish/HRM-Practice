@@ -70,7 +70,7 @@ exports.getExpense = (req, res) => {
             projects: [],
             user: req.session.passport.user,
             error: err
-        }, "error", " Server Error:Error in finding company settings");
+        }, "error", " Error in finding company settings");
       }else{
         companyDefaultTimezone=result.timezone;
         // console.log('companyDefaultTimezone');
@@ -91,8 +91,8 @@ exports.getExpense = (req, res) => {
                         projects: [],
                         user: req.session.passport.user,
                         error: err
-                    }, "error", "Server Error:Error in finding expense data");
-                    /*handleResponse.handleError(res, err, 'Server error : Error in finding expense data');*/
+                    }, "error", "Error in finding expense data");
+                    /*handleResponse.handleError(res, err, ' Error in finding expense data');*/
                 } else {
                     client.query('SELECT id,name,currency FROM ACCOUNT WHERE company_id=$1 AND archived=$2', [req.session.passport.user.company_id, false], function(err, account) {
                         if (err) {
@@ -108,7 +108,7 @@ exports.getExpense = (req, res) => {
                                 user: req.session.passport.user,
                                 error: err
                             }, "error", " Error in finding account data");
-                            /*handleResponse.handleError(res, err, 'Server error : Error in finding account data');*/
+                            /*handleResponse.handleError(res, err, ' Error in finding account data');*/
                         } else {
                             // console.log("----------account.rows-------------");
                             // console.log(account.rows);
@@ -132,7 +132,7 @@ exports.getExpense = (req, res) => {
                                         user: req.session.passport.user,
                                         error: err
                                     }, "error", " Error in finding project data");
-                                    /*handleResponse.handleError(res, err, 'Server error : Error in finding project data');*/
+                                    /*handleResponse.handleError(res, err, ' Error in finding project data');*/
                                 } else {
                                     client.query('SELECT expense_category FROM SETTING WHERE company_id=$1', [req.user.company_id], function (err, expCatList) {
                                     if (err) {
@@ -301,7 +301,7 @@ exports.getExpenseDetail = (req, res) => {
           expCatList:[],
           user: req.session.passport.user,
           error: err
-      }, "error", " Server Error:Error in finding company settings");
+      }, "error", " Error in finding company settings");
 
     }else{
       companyDefaultTimezone=result.timezone;
@@ -315,8 +315,8 @@ exports.getExpenseDetail = (req, res) => {
                 expCatList:[],
                 user: req.session.passport.user,
                 error: err
-            }, "error", " Server error: Expense id is not correct");
-            /*handleResponse.handleError(res, 'incorrect expense id', 'Server Error : Expense id is not correct');*/
+            }, "error", "  Expense id is not correct");
+            /*handleResponse.handleError(res, 'incorrect expense id', ' Expense id is not correct');*/
         } else {
             pool.connect((err, client, done) => {
                 client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id FROM EXPENSE e where id=$1 AND company_id=$2', [req.query.expenseId, req.user.company_id], function(err, expense) {
@@ -331,7 +331,7 @@ exports.getExpenseDetail = (req, res) => {
                             user: req.session.passport.user,
                             error: err
                         }, "error", " Error in finding expense data");
-                        /*handleResponse.handleError(res, err, 'Server error : Error in finding expense data');*/
+                        /*handleResponse.handleError(res, err, ' Error in finding expense data');*/
                     } else {
                         console.error('getExpense>>>>>>>>>>>>>');
                         // console.log(expense.rows[0]);
@@ -346,7 +346,7 @@ exports.getExpenseDetail = (req, res) => {
                                     user: req.session.passport.user,
                                     error: err
                                 }, "error", " Error in finding account data");
-                                /*handleResponse.handleError(res, err, 'Server error : Error in finding account data');*/
+                                /*handleResponse.handleError(res, err, ' Error in finding account data');*/
                             } else {
                                 // console.log("----------account.rows-------------");
                                 // console.log(account.rows);
@@ -361,7 +361,7 @@ exports.getExpenseDetail = (req, res) => {
                                             user: req.session.passport.user,
                                             error: err
                                         }, "error", " Error in finding project data");
-                                        /*handleResponse.handleError(res, err, 'Server error : Error in finding project data');*/
+                                        /*handleResponse.handleError(res, err, ' Error in finding project data');*/
                                     } else {
                                         client.query('SELECT expense_category FROM SETTING WHERE company_id=$1', [req.user.company_id], function (err, expCatList) {
                                         if (err) {
@@ -435,9 +435,9 @@ exports.postEditExpense = (req, res) => {
 
             if (errors.length > 0) {
                 // console.log(errors[0].msg);
-                handleResponse.handleError(res, errors, "Server Error :" + errors[0].msg);
+                handleResponse.handleError(res, errors, "" + errors[0].msg);
             } else {
-                handleResponse.handleError(res, errors, "Server Error : Error in validating data.");
+                handleResponse.handleError(res, errors, " Error in validating data.");
             }
 
         } else {
@@ -450,7 +450,7 @@ exports.postEditExpense = (req, res) => {
                     if (err) {
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);
-                        handleResponse.handleError(res, err, 'Server error : Error in finding expense data');
+                        handleResponse.handleError(res, err, ' Error in finding expense data');
                     } else {
                         // console.log('getExpense>>>>>>>>>>>>>');
                         // console.log(expense.rows[0]);
@@ -460,7 +460,7 @@ exports.postEditExpense = (req, res) => {
                             if (err) {
                                 console.error(err);
                                 handleResponse.shouldAbort(err, client, done);
-                                handleResponse.handleError(res, err, 'Server error : Error in updating expense data');
+                                handleResponse.handleError(res, err, ' Error in updating expense data');
                             } else {
                                 done();
                                 // console.log('Updated expense >>>>>>>>>>>>>');
@@ -492,9 +492,9 @@ exports.postAddExpense = (req, res) => {
         if (errors) {
             if (errors.length > 0) {
                 // console.log(errors[0].msg);
-                handleResponse.handleError(res, errors, "Server Error :" + errors[0].msg);
+                handleResponse.handleError(res, errors, "" + errors[0].msg);
             } else {
-                handleResponse.handleError(res, errors, "Server Error : Error in validating data.");
+                handleResponse.handleError(res, errors, " Error in validating data.");
             }
         } else {
             /*var createdDate = new Date(Date.now());*/
@@ -505,7 +505,7 @@ exports.postAddExpense = (req, res) => {
                 client.query('Insert INTO EXPENSE (tax,tax_amount,note,status,category,amount,billable,created_date,modified_date,expense_date,project_id,account_id,company_id,currency,user_id, total_amount) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING id', [ req.body.tax, req.body.tax_no, req.body.note, "Draft", req.body.category, req.body.amount, req.body.billable, 'now()', 'now()', moment.tz(req.body.expense_date.split('T')[0], companyDefaultTimezone).format(), req.body.project_id, req.body.account_id, req.session.passport.user.company_id, req.body.currency, req.user.id, total_expense_amount], function(err, insertedExpense) {
                     if (err) {
                         handleResponse.shouldAbort(err, client, done);
-                        handleResponse.handleError(res, err, 'Server error : Error in adding expense data to the database');
+                        handleResponse.handleError(res, err, ' Error in adding expense data to the database');
                         /*// console.log(err);*/
                     } else {
                         // console.log('insertedExpense' + JSON.stringify(insertedExpense));
@@ -533,7 +533,7 @@ function deleteExpenseNotInvoiced(req,res,client,done){
         if (err) {
             console.error(err);
             handleResponse.shouldAbort(err, client, done);
-            handleResponse.handleError(res, err, 'Server error : Error in deleting expense.');
+            handleResponse.handleError(res, err, ' Error in deleting expense.');
         } else {
             console.error('Affected ID>>>>>>>>>>>>>');
             // console.log(archivedExpense.rows[0]);
@@ -548,14 +548,14 @@ exports.deleteExpense = (req, res) => {
     // console.log('Archived Expense-------------' + req.body.expenseId);
     let expenseId = req.body.expenseId;
     if (expenseId == '' || expenseId == null || expenseId == undefined) {
-        handleResponse.handleError(res, 'incorrect expense id', 'Server Error : Expense id is not correct');
+        handleResponse.handleError(res, 'incorrect expense id', ' Expense id is not correct');
     } else {
         pool.connect((err, client, done) => {
             client.query('SELECT * FROM EXPENSE WHERE id=$1', [req.body.expenseId], function(err, expenseDetail) {
                 if (err) {
                     console.error(err);
                     handleResponse.shouldAbort(err, client, done);
-                    handleResponse.handleError(res, err, 'Server error : Error in getting expense detail.');
+                    handleResponse.handleError(res, err, ' Error in getting expense detail.');
                 } else {
                     // console.log('expenseDetail.rows '+expenseDetail.rows.length);
                     if(expenseDetail.rows.length>0){
@@ -607,13 +607,13 @@ exports.findExpenseByCriteria = (req, res) => {
         client.query(queryToExec, searchCriteriaVal, function(err, expense) {
             if (err) {
                 handleResponse.shouldAbort(err, client, done);
-                handleResponse.handleError(res, err, 'Server Error: Error in finding expense data');
+                handleResponse.handleError(res, err, ' Error in finding expense data');
             } else {
                 client.query('SELECT id,name FROM ACCOUNT WHERE company_id=$1 AND archived=$2', [req.user.company_id, false], function(err, account) {
                     if (err) {
                         handleResponse.shouldAbort(err, client, done);
-                        handleResponse.handleError(res, err, 'Server Error: Error in finding account data');
-                        /*handleResponse.handleError(res, err, 'Server error : Error in finding account data');*/
+                        handleResponse.handleError(res, err, ' Error in finding account data');
+                        /*handleResponse.handleError(res, err, ' Error in finding account data');*/
                     } else {
                         // console.log("----------account.rows-------------");
                         // console.log(account.rows);
@@ -626,7 +626,7 @@ exports.findExpenseByCriteria = (req, res) => {
                         client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2', [req.user.company_id, false], function(err, project) {
                             if (err) {
                                 handleResponse.shouldAbort(err, client, done);
-                                handleResponse.handleError(res, err, 'Server error : Error in finding project data');
+                                handleResponse.handleError(res, err, ' Error in finding project data');
                             } else {
                                 client.query('SELECT email,id FROM USERS WHERE company_id=$1', [req.user.company_id], function (err, userEmailList) {
                                 if (err) {
@@ -726,7 +726,7 @@ exports.findExpenseForAccount = (req, res) => {
             client.query(queryToExec, ['%'+req.body.searchText + '%', req.user.company_id, false], function(err, accounts) {
                 if (err) {
                     handleResponse.shouldAbort(err, client, done);
-                    handleResponse.handleError(res, err, 'Server Error: Error in finding account data');
+                    handleResponse.handleError(res, err, ' Error in finding account data');
                 } else {
                     if (accounts.rows.length > 0) {
                         // console.log(JSON.stringify(accounts.rows));
@@ -747,8 +747,8 @@ exports.findExpenseForAccount = (req, res) => {
                                 client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND account_id = ANY($3::bigint[]) AND isGlobal=$4', [req.user.company_id, false, accountId,false], function(err, project) {
                                   if (err) {
                                     handleResponse.shouldAbort(err, client, done);
-                                    handleResponse.handleError(res, err, 'Server Error: Error in finding project for account');
-                                    /*handleResponse.handleError(res, err, 'Server error : Error in finding project data');*/
+                                    handleResponse.handleError(res, err, ' Error in finding project for account');
+                                    /*handleResponse.handleError(res, err, ' Error in finding project data');*/
                                   } else {
                                     let projectIdArr = [];
                                     if (project.rows.length > 0) {
@@ -770,7 +770,7 @@ exports.findExpenseForAccount = (req, res) => {
                                       if (err) {
                                         handleResponse.shouldAbort(err, client, done);
                                         /*handleResponse.responseToPage(res,'pages/org-listing',{user:req.session.passport.user, error:err},"error"," Error in finding company data");*/
-                                        handleResponse.handleError(res, err, 'Server Error: Error in finding expense for account');
+                                        handleResponse.handleError(res, err, ' Error in finding expense for account');
                                       } else {
                                         client.query('SELECT email,id FROM USERS WHERE company_id=$1', [req.user.company_id], function (err, userEmailList) {
                                           if (err) {
@@ -838,7 +838,7 @@ exports.findExpenseForAccount = (req, res) => {
                         // });
                     } else {
                         handleResponse.shouldAbort(err, client, done);
-                        handleResponse.handleError(res, err, 'Server Error: Cannot find account with this name');
+                        handleResponse.handleError(res, err, ' Cannot find account with this name');
                     }
                 }
             });
@@ -859,14 +859,14 @@ exports.findExpenseForAccount = (req, res) => {
             client.query(queryToExec, searchFieldVal, function(err, expense) {
                 if (err) {
                     handleResponse.shouldAbort(err, client, done);
-                    handleResponse.handleError(res, err, 'Server Error: Error in finding expense data');
-                    /*handleResponse.handleError(res, err, 'Server error : Error in finding expense data');*/
+                    handleResponse.handleError(res, err, ' Error in finding expense data');
+                    /*handleResponse.handleError(res, err, ' Error in finding expense data');*/
                 } else {
                     client.query('SELECT id,name FROM ACCOUNT WHERE company_id=$1 AND archived=$2', [req.session.passport.user.company_id, false], function(err, account) {
                         if (err) {
                             handleResponse.shouldAbort(err, client, done);
-                            handleResponse.handleError(res, err, 'Server Error: Error in finding account data');
-                            /*handleResponse.handleError(res, err, 'Server error : Error in finding account data');*/
+                            handleResponse.handleError(res, err, ' Error in finding account data');
+                            /*handleResponse.handleError(res, err, ' Error in finding account data');*/
                         } else {
 
                             // console.log("----------account.rows-------------");
@@ -880,7 +880,7 @@ exports.findExpenseForAccount = (req, res) => {
                             client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2', [req.session.passport.user.company_id, false], function(err, project) {
                                 if (err) {
                                     handleResponse.shouldAbort(err, client, done);
-                                    handleResponse.handleError(res, err, 'Server Error: Error in finding project data');
+                                    handleResponse.handleError(res, err, ' Error in finding project data');
                                 } else {
                                     client.query('SELECT email,id FROM USERS WHERE company_id=$1', [req.user.company_id], function (err, userEmailList) {
                                     if (err) {

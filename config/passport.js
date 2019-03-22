@@ -220,7 +220,7 @@ passport.use('user', new LocalStrategy({ usernameField: 'email',passReqToCallbac
   let domain=req.body.domain;
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
   pool.connect((err, client, poolDone) => {
-    client.query("Select id, name from company where domain=$1", [domain], function(err, company) {
+    client.query("Select id, name from company where domain=$1 AND archived=$2", [domain,false], function(err, company) {
       if (err) {
         // console.log('err-----------' + JSON.stringify(err));
         /*poolDone();*/
@@ -259,7 +259,7 @@ passport.use('user', new LocalStrategy({ usernameField: 'email',passReqToCallbac
                 // console.log(user);
                 // console.log("**********************user*********************");
                 poolDone();
-                return done(null, user);
+                return done(null, user.rows[0]);
               }
               // console.log('inside compare');
               poolDone();
@@ -277,6 +277,7 @@ passport.use('user', new LocalStrategy({ usernameField: 'email',passReqToCallbac
 var tokens = {}
 
 function consumeRememberMeToken(token, fn) {
+  console.log('consume remember me token');
   var uid = tokens[token];
   // invalidate the single-use token
   delete tokens[token];
@@ -284,11 +285,13 @@ function consumeRememberMeToken(token, fn) {
 }
 
 function saveRememberMeToken(token, uid, fn) {
+  console.log('save remember me token');
   tokens[token] = uid;
   return fn();
 }
 
 function findById(id, fn) {
+  console.log('find for id '+id)
   var idx = id - 1;
   if (users[idx]) {
     fn(null, users[idx]);
@@ -299,7 +302,7 @@ function findById(id, fn) {
 
 passport.use(new RememberMeStrategy(
   function(token, done) {
-    // console.log('inside remember me strategy')
+    console.log('inside remember me strategy')
     consumeRememberMeToken(token, function(err, uid) {
       if (err) { return done(err); }
       if (!uid) { return done(null, false); }
@@ -315,7 +318,7 @@ passport.use(new RememberMeStrategy(
 ));
 
 function issueToken(user, done) {
-  var token = utils.randomString(64);
+  var token = randomString(64);
   saveRememberMeToken(token, user.id, function(err) {
     if (err) { return done(err); }
     return done(null, token);
@@ -845,7 +848,7 @@ exports.isAuthenticated = (req, res, next) => {
               client.query('SELECT * FROM users where id = $1', [req.user.id], function (err, existingUser) {
               if (err) {
                 handleResponse.shouldAbort(err, client, done);
-                handleResponse.handleError(res, err, 'Server error : Error in finding user data');
+                handleResponse.handleError(res, err, ' Error in finding user data');
               } else {
                   // console.log('------existingUser.rows[0]--------');
                   // console.log(existingUser.rows[0]);
@@ -858,18 +861,18 @@ exports.isAuthenticated = (req, res, next) => {
                             req.session.destroy((error) => {
                               if (error) {
                                 // console.log('Error : Failed to destroy the session during logout.', err);
-                                handleResponse.handleError(res, error, 'Server Error: Failed to destroy the session during logout.');
+                                handleResponse.handleError(res, error, ' Failed to destroy the session during logout.');
                               }else{
                                 req.user = null;
 
-                                handleResponse.handleError(res, err, 'Server Error: Error in user logout before logging in another user.');
+                                handleResponse.handleError(res, err, ' Error in user logout before logging in another user.');
 
                               }
                             });
                           } catch (err) {
                             console.debug("--------3333-" + err);
 
-                            handleResponse.handleError(res, err, 'Server Error: Error in user logout');
+                            handleResponse.handleError(res, err, ' Error in user logout');
                           }
                       }else{
                         userData.domain = req.user.domain;

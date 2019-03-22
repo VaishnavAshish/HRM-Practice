@@ -55,33 +55,33 @@ exports.getLogin = (req, res) => {
         client.query('BEGIN', (err) => {
           if(err) {
             handleResponse.shouldAbort(err, client, done);
-            handleResponse.responseToPage(res,'pages/login',{domain: req.query.domain,isAuthenticate : false},"error","Server Error: Error in connecting to the database");
-            /*handleResponse.handleError(res, err, 'Server Error: Error in connecting to the database');*/
+            handleResponse.responseToPage(res,'pages/login',{domain: req.query.domain,isAuthenticate : false},"error"," Error in connecting to the database");
+            /*handleResponse.handleError(res, err, ' Error in connecting to the database');*/
           } else {
             client.query('SELECT * FROM COMPANY where domain = $1 AND token=$2', [req.query.domain, req.query.token], function (err, company) {
               if (err) {
                 handleResponse.shouldAbort(err, client, done);
-                handleResponse.responseToPage(res,'pages/login',{domain: req.query.domain,isAuthenticate : false},"error","Server Error: Error in finding company data");
-                /*handleResponse.handleError(res, err, 'Server Error: Error in finding company data');*/
+                handleResponse.responseToPage(res,'pages/login',{domain: req.query.domain,isAuthenticate : false},"error"," Error in finding company data");
+                /*handleResponse.handleError(res, err, ' Error in finding company data');*/
               } else {
                 if(company.rows.length > 0) {
                   client.query('UPDATE COMPANY SET add_status=$1, token=$2 where id=$3', ['Approved', null, company.rows[0].id], function (err) {
                     if(err) {
                       handleResponse.shouldAbort(err, client, done);
-                      handleResponse.responseToPage(res,'pages/login',{domain: req.query.domain,isAuthenticate : false},"error","Server Error: Error in updating company data");
-                      /*handleResponse.handleError(res, err, 'Server Error: Error in updating company data');*/
+                      handleResponse.responseToPage(res,'pages/login',{domain: req.query.domain,isAuthenticate : false},"error"," Error in updating company data");
+                      /*handleResponse.handleError(res, err, ' Error in updating company data');*/
                     } else {
                       client.query('UPDATE USERS SET add_status=$1, password_reset_token=$2 where company_id=$3 AND password_reset_token=$4', ['Joined', null, company.rows[0].id, req.query.token], function (err) {
                         if(err) {
                           handleResponse.shouldAbort(err, client, done);
-                          handleResponse.responseToPage(res,'pages/login',{domain: req.query.domain,isAuthenticate : false},"error","Server Error: Error in updating user data");
-                          /*handleResponse.handleError(res, err, 'Server Error: Error in updaing user data');*/
+                          handleResponse.responseToPage(res,'pages/login',{domain: req.query.domain,isAuthenticate : false},"error"," Error in updating user data");
+                          /*handleResponse.handleError(res, err, ' Error in updaing user data');*/
                         } else {
                           client.query('COMMIT', (err) => {
                             if (err) {
                               handleResponse.shouldAbort(err, client, done);
-                              handleResponse.responseToPage(res,'pages/login',{domain: req.query.domain,isAuthenticate : false},"error","Server Error: Error in committing transaction");
-                              /*handleResponse.handleError(res, err, 'Server Error: Error in committing transaction');*/
+                              handleResponse.responseToPage(res,'pages/login',{domain: req.query.domain,isAuthenticate : false},"error"," Error in committing transaction");
+                              /*handleResponse.handleError(res, err, ' Error in committing transaction');*/
                             } else {
                               done();
                               handleResponse.responseToPage(res,'pages/login',{domain: req.query.domain,isAuthenticate : true},"success","Successfully rendered");
@@ -99,8 +99,8 @@ exports.getLogin = (req, res) => {
                   client.query('SELECT * FROM COMPANY where domain = $1 AND add_status=$2', [req.query.domain, 'Approved'], function (err, getComp) {
                     if(err) {
                       handleResponse.shouldAbort(err, client, done);
-                      handleResponse.responseToPage(res,'pages/login',{domain: req.query.domain,isAuthenticate : false},"error","Server Error: Error in finding company");
-                      /*handleResponse.handleError(res, err, 'Server Error: Error in finding company');*/
+                      handleResponse.responseToPage(res,'pages/login',{domain: req.query.domain,isAuthenticate : false},"error"," Error in finding company");
+                      /*handleResponse.handleError(res, err, ' Error in finding company');*/
                     } else {
                       if(getComp.rows.length > 0) {
                         done();
@@ -156,9 +156,9 @@ exports.postDomain = (req, res) => {
   if (errors) {
     if(errors.length>0){
         // console.log(errors[0].msg);
-        handleResponse.handleError(res, errors, "Server Error :"+errors[0].msg);
+        handleResponse.handleError(res, errors, ""+errors[0].msg);
       }else{
-         handleResponse.handleError(res, errors, "Server Error : Error in validating data.");
+         handleResponse.handleError(res, errors, " Error in validating data.");
       }
   } else {
     // console.log('inside');
@@ -170,7 +170,7 @@ exports.postDomain = (req, res) => {
       client.query('SELECT * FROM company where domain = $1 AND archived=$2', [domainName,false], function (err, company) {
         if (err) {
           handleResponse.shouldAbort(err, client, done);
-          handleResponse.handleError(res, err, 'Server Error: Error in finding company data');
+          handleResponse.handleError(res, err, ' Error in finding company data');
         } else {
           done();
           if (company.rows.length > 0) {
@@ -199,12 +199,36 @@ exports.postDomain = (req, res) => {
  * POST /login
  * Sign in using email and password.
  */
+ function randomString(len) {
+   var buf = []
+     , chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+     , charlen = chars.length;
+
+   for (var i = 0; i < len; ++i) {
+     buf.push(chars[getRandomInt(0, charlen - 1)]);
+   }
+
+   return buf.join('');
+ };
+
+ function getRandomInt(min, max) {
+   return Math.floor(Math.random() * (max - min + 1)) + min;
+ }
 function issueToken(user, done) {
-  var token = utils.randomString(64);
+  console.log('user');
+  console.log(user);
+  var token = randomString(64);
   saveRememberMeToken(token, user.id, function(err) {
     if (err) { return done(err); }
     return done(null, token);
   });
+}
+var tokens = {}
+
+function saveRememberMeToken(token, uid, fn) {
+  console.log('save remember me token');
+  tokens[token] = uid;
+  return fn();
 }
 
 exports.postLogin = (req, res, next) => {
@@ -218,9 +242,9 @@ exports.postLogin = (req, res, next) => {
   if (errors) {
      if(errors.length>0){
         // console.log(errors[0].msg);
-        handleResponse.handleError(res, errors, "Server Error :"+errors[0].msg);
+        handleResponse.handleError(res, errors, ""+errors[0].msg);
       }else{
-         handleResponse.handleError(res, errors, "Server Error : Error in validating data.");
+         handleResponse.handleError(res, errors, " Error in validating data.");
       }
   }
   // else if (req.body.email.indexOf(domain) == -1) {
@@ -240,18 +264,25 @@ exports.postLogin = (req, res, next) => {
 
            handleResponse.handleError(res, err, err);
         } else {
+          // console.log('req.body.remember_me '+user.id);
           if (req.body.remember_me) {
-            // console.log('inside remember_me');
-            issueToken(req.user, function(err, token) {
-              if (err) { return next(err); }
-              res.cookie('remember_me', token, { path: '/', httpOnly: true, maxAge: 604800000 });
-              return next();
+            console.log('inside remember_me');
+            issueToken(user, function(err, token) {
+              // if (err) { return next(err); }
+              // console.log(token);
+              // res.cookie('remember_me', token, { path: '/', httpOnly: true, maxAge: 604800000 });
+              // return next();
+              if (err) {
+                handleResponse.handleError(res, err, err);
+              }else{
+                res.cookie('remember_me', token, { path: '/', httpOnly: true, maxAge: 604800000 });
+              }
             });
           }
           // console.log("user============================123");
           // console.log(user);
           if (user) {
-            let userData = user.rows[0];
+            let userData = user;
 
             req.logIn(userData, (err) => {
               userData.domain = domain;
@@ -264,19 +295,19 @@ exports.postLogin = (req, res, next) => {
                   req.session.destroy((error) => {
                     if (error) {
                       // console.log('Error : Failed to destroy the session during logout.', err);
-                      handleResponse.handleError(res, error, 'Server Error: Failed to destroy the session during logout.');
+                      handleResponse.handleError(res, error, ' Failed to destroy the session during logout.');
                     }else{
                       req.user = null;
                      /* window.history.forward();*/
                       /*shouldAbort(err, client, done);*/
-                      handleResponse.handleError(res, err, 'Server Error: Error in user logout before logging in another user.');
+                      handleResponse.handleError(res, err, ' Error in user logout before logging in another user.');
                       /*res.redirect('/login?error=2&domain=' + domain);*/
                     }
                   });
                 } catch (err) {
                   console.debug("--------3333-" + err);
 
-                  handleResponse.handleError(res, err, 'Server Error: Error in user logout');
+                  handleResponse.handleError(res, err, ' Error in user logout');
                   /*res.redirect('/login?error=3&domain=' + domain);*/
                 }
               }else{
@@ -290,7 +321,7 @@ exports.postLogin = (req, res, next) => {
             });
           } else {
 
-            handleResponse.handleError(res, err, 'Server Error: Error in user authentication');
+            handleResponse.handleError(res, err, ' Error in user authentication');
             /*res.redirect('/login?error=4&domain=' + domain);*/
           }
 
@@ -564,16 +595,16 @@ exports.logout = (req, res) => {
 exports.getReset = (req, res, next) => {
   let token=req.params.token;
   if(token==""||token==null||token==undefined){
-    handleResponse.responseToPage(res,'pages/update-password',{ resource:{},error:err},"error","Server Error:Token is incorrect or not defined.");
-    /*handleResponse.handleError(res, err, 'Server Error: Token is incorrect or not defined');*/
+    handleResponse.responseToPage(res,'pages/update-password',{ resource:{},error:err},"error","Token is incorrect or not defined.");
+    /*handleResponse.handleError(res, err, ' Token is incorrect or not defined');*/
   }else{
 
     pool.connect((err, client, done) => {
         client.query('SELECT * FROM users where password_reset_token=$1', [req.params.token], function (err, resource) {
           if (err) {
             handleResponse.shouldAbort(err, client, done);
-            handleResponse.responseToPage(res,'pages/update-password',{ resource:{},error:err},"error","Server Error:Error in finding user data.");
-            /*handleResponse.handleError(res, err, 'Server Error: Error in finding user data');*/
+            handleResponse.responseToPage(res,'pages/update-password',{ resource:{},error:err},"error","Error in finding user data.");
+            /*handleResponse.handleError(res, err, ' Error in finding user data');*/
           } else {
             res.clearCookie('remember_me');
             req.logout();
@@ -581,8 +612,8 @@ exports.getReset = (req, res, next) => {
               if (error) {
                 // console.log('Error : Failed to destroy the session during logout.', err);
                 handleResponse.shouldAbort(err, client, done);
-                handleResponse.responseToPage(res,'pages/update-password',{resource:{},error:err},"error","Server Error:Failed to destroy the session during logout.");
-                /*handleResponse.handleError(res, error, 'Server Error:Failed to destroy the session during logout.');*/
+                handleResponse.responseToPage(res,'pages/update-password',{resource:{},error:err},"error","Failed to destroy the session during logout.");
+                /*handleResponse.handleError(res, error, 'Failed to destroy the session during logout.');*/
               }else{
                 req.user = null;
                 // console.log('--------resource with token is:------');
@@ -621,9 +652,9 @@ exports.postReset = (req, res, next) => {
   if (errors) {
     if(errors.length>0){
         // console.log(errors[0].msg);
-        handleResponse.handleError(res, errors, "Server Error :"+errors[0].msg);
+        handleResponse.handleError(res, errors, ""+errors[0].msg);
       }else{
-         handleResponse.handleError(res, errors, "Server Error : Error in validating data.");
+         handleResponse.handleError(res, errors, " Error in validating data.");
       }
   }
   else {
@@ -634,12 +665,12 @@ exports.postReset = (req, res, next) => {
         client.query('UPDATE users set password=$1,password_reset_token=$2,add_status=$3 where id=$4 RETURNING *',[req.body.password,null,"Approved",req.body.id], function (err, resource) {
           if (err) {
             handleResponse.shouldAbort(err, client, done);
-            handleResponse.handleError(res, err, 'Server error : Failed to update user information');
+            handleResponse.handleError(res, err, ' Failed to update user information');
           } else {
             client.query('SELECT domain FROM company WHERE id=$1',[resource.rows[0].company_id], function (err, companyDomain) {
             if (err) {
               handleResponse.shouldAbort(err, client, done);
-              handleResponse.handleError(res, err, 'Server error : Failed to update user information');
+              handleResponse.handleError(res, err, ' Failed to update user information');
             } else {
                 // console.log('------updated user after password reset  is --------');
                 // console.log(resource.rows);
@@ -770,7 +801,7 @@ exports.getUserPicture = (req,res) =>{
         client.query("SELECT user_img,contenttype FROM USERS WHERE id=$1", [req.params.userid], function (err, userDetail) {
           if (err) {
             handleResponse.shouldAbort(err, client, done);
-            handleResponse.responseToPage(res,'pages/user-profile',{userObj: {},user:req.session.passport.user, error:err},"error","Server Error: Error in finding user data");
+            handleResponse.responseToPage(res,'pages/user-profile',{userObj: {},user:req.session.passport.user, error:err},"error"," Error in finding user data");
           }
           else {
             done();
@@ -819,7 +850,7 @@ exports.fileUserImage = (req, res) => {
     // console.log('No file uploaded');
     /*return res.status(400).send('No files were uploaded.');*/
     return res.status(500).redirect('/user-profile');
-    /*handleResponse.handleError(res, 'No files were uploaded', 'Server Error: No files were uploaded');*/
+    /*handleResponse.handleError(res, 'No files were uploaded', ' No files were uploaded');*/
   }else{
     pool.connect((err, client, done) => {
       client.query('SELECT * FROM USERS where id=$1',[req.user.id], function(err, selectedUser) {

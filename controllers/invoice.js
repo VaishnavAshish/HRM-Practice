@@ -69,7 +69,7 @@ exports.getInvoice = (req, res) => {
         // console.log('error in setting');
         // console.log(err);
         handleResponse.responseToPage(res,'pages/invoices-listing',{accounts: [], invoiceList: [],totalCount:0, draftCount:0, paidCount:0,user:req.session.passport.user, error:err},"error"," Error in finding account data");
-        /*handleResponse.handleError(res, err, 'Server Error: error in finding company setting');*/
+        /*handleResponse.handleError(res, err, ' error in finding company setting');*/
       }else{
             companyDefaultTimezone = result.timezone;
             companyDefaultCurrency =result.currency;
@@ -83,7 +83,7 @@ exports.getInvoice = (req, res) => {
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);
                         handleResponse.responseToPage(res,'pages/invoices-listing',{accounts: [], invoiceList: [],totalCount:0, draftCount:0, paidCount:0,user:req.session.passport.user, error:err},"error"," Error in finding account data");
-                        /*handleResponse.handleError(res, err, 'Server error : Error in finding account data');*/
+                        /*handleResponse.handleError(res, err, ' Error in finding account data');*/
                     } else {
 
                         let accountIdArr = accountList.rows.map(function (ele) {
@@ -97,7 +97,7 @@ exports.getInvoice = (req, res) => {
                                 console.error(err);
                                 handleResponse.shouldAbort(err, client, done);
                                 handleResponse.responseToPage(res,'pages/invoices-listing',{accounts: [], invoiceList: [],totalCount:0, draftCount:0, paidCount:0,user:req.session.passport.user, error:err},"error"," Error in finding invoice data");
-                                /*handleResponse.handleError(res, err, 'Server error : Error in finding invoice data');*/
+                                /*handleResponse.handleError(res, err, ' Error in finding invoice data');*/
                             } else {
                                 let invoiceListArr = [];
                                 /*let draftInvoice=[];
@@ -142,7 +142,7 @@ exports.postAddInvoice = (req, res) => {
                 if (err) {
                   console.error(err);
                   handleResponse.shouldAbort(err, client, done);
-                  handleResponse.handleError(res, err, 'Server error : Error in finding default invoice for the company');
+                  handleResponse.handleError(res, err, ' Error in finding default invoice for the company');
                 }
                 else {
                     let companySetting=defaultCompanySetting.rows[0];
@@ -151,7 +151,7 @@ exports.postAddInvoice = (req, res) => {
                         if (err) {
                             console.error(err);
                             handleResponse.shouldAbort(err, client, done);
-                            handleResponse.handleError(res, err, 'Server error : Error in adding invoice data to the database');
+                            handleResponse.handleError(res, err, ' Error in adding invoice data to the database');
                         } else {
                             done();
                             handleResponse.sendSuccess(res,'Invoice added successfully',{"id": invoiceId.rows[0].id});
@@ -184,7 +184,7 @@ exports.postAddInvoiceItem = (req, res) => {
                             if (err) {
                                 console.error(err);
                                 handleResponse.shouldAbort(err, client, done);
-                                handleResponse.handleError(res, err, 'Server error : Error in updating invoice line item data');
+                                handleResponse.handleError(res, err, ' Error in updating invoice line item data');
                             } else {
                                 // console.log(invoiceLineItem);
                                 count++;
@@ -200,7 +200,7 @@ exports.postAddInvoiceItem = (req, res) => {
                             if (err) {
                                 console.error(err);
                                 handleResponse.shouldAbort(err, client, done);
-                                handleResponse.handleError(res, err, 'Server error : Error in adding invoice line item data to the database');
+                                handleResponse.handleError(res, err, ' Error in adding invoice line item data to the database');
                             } else {
                                 // console.log(invoiceLineItem);
                                 count++;
@@ -215,7 +215,7 @@ exports.postAddInvoiceItem = (req, res) => {
                 });
           });
     } else{
-        handleResponse.handleError(res, err, 'Server error : Invoice item data is empty');
+        handleResponse.handleError(res, err, ' Invoice item data is empty');
     }
 
 };
@@ -228,7 +228,7 @@ function getUserBRandCR(req, res, client, err, done, userId, projectId, userRole
     client.query('SELECT bill_rate, cost_rate FROM task_assignment where user_id=$1 AND user_role=$2 AND project_id=$3 AND task_id=$4', [userId, userRole, projectId, taskId], function (err, userData) {
     if(err) {
         handleResponse.shouldAbort(err, client, done);
-        handleResponse.handleError(res, err, 'Server error : Error in finding br and cr for timesheet data with task_id');
+        handleResponse.handleError(res, err, ' Error in finding br and cr for timesheet data with task_id');
     } else {
         console.log('-----userData.rows--');
         console.log(userData.rows);
@@ -238,7 +238,7 @@ function getUserBRandCR(req, res, client, err, done, userId, projectId, userRole
             client.query('SELECT bill_rate, cost_rate FROM users where id=$1', [userId], function (err, userBrCr) {
                 if(err) {
                     handleResponse.shouldAbort(err, client, done);
-                    handleResponse.handleError(res, err, 'Server error : Error in finding br and cr for timesheet data with user_id');
+                    handleResponse.handleError(res, err, ' Error in finding br and cr for timesheet data with user_id');
                 } else {
                     return result(userBrCr.rows[0]);
                 }
@@ -252,7 +252,7 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
      if(err==true){
        // console.log('error in setting');
        // console.log(err);
-       handleResponse.handleError(res, err, 'Server error : Error in finding company setting data');
+       handleResponse.handleError(res, err, ' Error in finding company setting data');
      }else{
          companyDefaultTimezone=result.timezone;
         // console.log("Inside timesheet add");
@@ -263,9 +263,9 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
           if (errors) {
             if(errors.length>0){
                 // console.log(errors[0].msg);
-                handleResponse.handleError(res, errors, "Server Error :"+errors[0].msg);
+                handleResponse.handleError(res, errors, ""+errors[0].msg);
               }else{
-                 handleResponse.handleError(res, errors, "Server Error : Error in validating data.");
+                 handleResponse.handleError(res, errors, " Error in validating data.");
               }
           }else{
 
@@ -277,7 +277,7 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
                             if (err) {
                                 console.error(err);
                                 handleResponse.shouldAbort(err, client, done);
-                                handleResponse.handleError(res, err, 'Server error : Error in finding currency from project for timesheet data');
+                                handleResponse.handleError(res, err, ' Error in finding currency from project for timesheet data');
                             } else {
                                 if(projectDetails.rowCount > 0) {
                                     let projectData = {};
@@ -313,7 +313,7 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
                                 if (err) {
                                     console.error(err);
                                     handleResponse.shouldAbort(err, client, done);
-                                    handleResponse.handleError(res, err, 'Server error : Error in finding timesheet data with start_date');
+                                    handleResponse.handleError(res, err, ' Error in finding timesheet data with start_date');
                                 }  else {
                                     if(lineItems.rows.length>0) {
                                         // console.log(JSON.stringify(lineItems.rows));
@@ -325,7 +325,7 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
                                                   if (err) {
                                                       console.error(err);
                                                       handleResponse.shouldAbort(err, client, done);
-                                                      handleResponse.handleError(res, err, 'Server error : Error in adding invoice line item data to the database');
+                                                      handleResponse.handleError(res, err, ' Error in adding invoice line item data to the database');
                                                   } else {
                                                       // console.log("Line Item inserted");
                                                       createRecordArr(projectRow.lineItemIds, function (lineItemIds) {
@@ -334,7 +334,7 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
                                                               if (err) {
                                                                   console.error(err);
                                                                   handleResponse.shouldAbort(err, client, done);
-                                                                  handleResponse.handleError(res, err, 'Server error : Error in updating timesheet data');
+                                                                  handleResponse.handleError(res, err, ' Error in updating timesheet data');
                                                               } else {
                                                                   done();
                                                                   handleResponse.sendSuccess(res,'Invoice line item for timesheet data added successfully',{});
@@ -351,7 +351,7 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
                                           client.query('SELECT pa.id ,pa.company_id ,pa.account_id ,pa.user_id ,pa.project_id ,pa.created_by ,pa.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,pa.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,pa.bill_rate ,pa.cost_rate ,pa.user_role ,pa.record_id FROM PROJECT_ASSIGNMENT pa WHERE project_id=$1 AND company_id=$2', [req.body.projectId, req.user.company_id], function (err, projectAssignments) {
                                               if (err) {
                                                   handleResponse.shouldAbort(err, client, done);
-                                                  handleResponse.handleError(res, err, 'Server error : Error in finding project assginment for timesheet data');
+                                                  handleResponse.handleError(res, err, ' Error in finding project assginment for timesheet data');
                                               } else {
                                                   calculateBR_CR_andGrouped(req, res, client, err, done, concatData, projectAssignments.rows, function(projectRows) {
                                                       // console.log("Grouped and calculate data");
@@ -361,7 +361,7 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
                                                               if (err) {
                                                                   console.error(err);
                                                                   handleResponse.shouldAbort(err, client, done);
-                                                                  handleResponse.handleError(res, err, 'Server error : Error in adding invoice line item data to the database');
+                                                                  handleResponse.handleError(res, err, ' Error in adding invoice line item data to the database');
                                                               } else {
                                                                   // console.log("Line Item inserted");
                                                                   createRecordArr(projectRow.lineItemIds, function (lineItemIds) {
@@ -370,7 +370,7 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
                                                                           if (err) {
                                                                               console.error(err);
                                                                               handleResponse.shouldAbort(err, client, done);
-                                                                              handleResponse.handleError(res, err, 'Server error : Error in updating timesheet data');
+                                                                              handleResponse.handleError(res, err, ' Error in updating timesheet data');
                                                                           } else {
                                                                               if(projectRows.length == (index+1)) {
                                                                                   done();
@@ -390,7 +390,7 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
                                     } else {
                                         // console.log("Step 18");
                                         done();
-                                        handleResponse.handleError(res, 'timesheet not found', 'Server Error : No timesheet associated with this project is left for invoicing');
+                                        handleResponse.handleError(res, 'timesheet not found', ' No timesheet associated with this project is left for invoicing');
                                     }
                                 }
                             });
@@ -401,7 +401,7 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
                                 if (err) {
                                     console.error(err);
                                     handleResponse.shouldAbort(err, client, done);
-                                    handleResponse.handleError(res, err, 'Server error : Error in finding timesheet data');
+                                    handleResponse.handleError(res, err, ' Error in finding timesheet data');
                                 }  else {
                                     if(lineItems.rows.length>0) {
                                         console.log('lineitem data is')
@@ -412,7 +412,7 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
                                             client.query('SELECT pa.id ,pa.company_id ,pa.account_id ,pa.user_id ,pa.project_id ,pa.created_by ,pa.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,pa.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,pa.bill_rate ,pa.cost_rate ,pa.user_role ,pa.record_id FROM PROJECT_ASSIGNMENT pa WHERE project_id=$1 AND company_id=$2', [req.body.projectId, req.user.company_id], function (err, projectAssignments) {
                                                 if (err) {
                                                     handleResponse.shouldAbort(err, client, done);
-                                                    handleResponse.handleError(res, err, 'Server error : Error in finding project assginment for timesheet data');
+                                                    handleResponse.handleError(res, err, ' Error in finding project assginment for timesheet data');
                                                 } else {
                                                     calculateBR_CR_andGrouped(req, res, client, err, done, concatData, projectAssignments.rows, function(projectRows) {
                                                         // console.log("Grouped and calculate data");
@@ -422,7 +422,7 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
                                                                 if (err) {
                                                                     console.error(err);
                                                                     handleResponse.shouldAbort(err, client, done);
-                                                                    handleResponse.handleError(res, err, 'Server error : Error in adding invoice line item data to the database');
+                                                                    handleResponse.handleError(res, err, ' Error in adding invoice line item data to the database');
                                                                 } else {
                                                                     // console.log("Line Item inserted");
                                                                     createRecordArr(projectRow.lineItemIds, function (lineItemIds) {
@@ -431,7 +431,7 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
                                                                             if (err) {
                                                                                 console.error(err);
                                                                                 handleResponse.shouldAbort(err, client, done);
-                                                                                handleResponse.handleError(res, err, 'Server error : Error in updating timesheet data');
+                                                                                handleResponse.handleError(res, err, ' Error in updating timesheet data');
                                                                             } else {
                                                                                 if(projectRows.length == (index+1)) {
                                                                                     done();
@@ -450,7 +450,7 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
                                     } else {
                                         // console.log("Step 18");
                                         done();
-                                        handleResponse.handleError(res, 'timesheet not found', 'Server Error : No timesheet associated with this project is left for invoicing');
+                                        handleResponse.handleError(res, 'timesheet not found', ' No timesheet associated with this project is left for invoicing');
                                     }
                                 }
                             });
@@ -662,7 +662,7 @@ exports.insertExpenseInvoiceItem = (req, res) => {
      if(err==true){
        // console.log('error in setting');
        // console.log(err);
-       handleResponse.handleError(res, err, 'Server error : Error in finding company setting data');
+       handleResponse.handleError(res, err, ' Error in finding company setting data');
      }else{
          companyDefaultTimezone=result.timezone;
         req.assert('accountId', 'Account cannot be blank').notEmpty();
@@ -680,7 +680,7 @@ exports.insertExpenseInvoiceItem = (req, res) => {
                         if (err) {
                             console.error(err);
                             handleResponse.shouldAbort(err, client, done);
-                            handleResponse.handleError(res, err, 'Server error : Error in finding expense data');
+                            handleResponse.handleError(res, err, ' Error in finding expense data');
                         }  else {
                             // console.log("Step 2");
                             // console.log('expense list to be invoiced is '+JSON.stringify(expenseList));
@@ -713,7 +713,7 @@ exports.insertExpenseInvoiceItem = (req, res) => {
                             } else {
                                 // console.log("Step 5");
                                 done();
-                                handleResponse.handleError(res, 'expense not found', 'Server Error : No expense associated with this project is left for invoicing');
+                                handleResponse.handleError(res, 'expense not found', ' No expense associated with this project is left for invoicing');
                             }
                         }
                     });
@@ -723,7 +723,7 @@ exports.insertExpenseInvoiceItem = (req, res) => {
                         if (err) {
                             console.error(err);
                             handleResponse.shouldAbort(err, client, done);
-                            handleResponse.handleError(res, err, 'Server error : Error in finding expense data');
+                            handleResponse.handleError(res, err, ' Error in finding expense data');
                         }  else {
                             // console.log('expense list to be invoiced is '+JSON.stringify(expenseList));
                             let count=0;
@@ -752,7 +752,7 @@ exports.insertExpenseInvoiceItem = (req, res) => {
                                 });
                             } else {
                                 done();
-                                handleResponse.handleError(res, 'expense not found', 'Server Error : No expense associated with this project is left for invoicing');
+                                handleResponse.handleError(res, 'expense not found', ' No expense associated with this project is left for invoicing');
                             }
                         }
                     });
@@ -790,7 +790,7 @@ function addInvoiceLineItem(req, res, client, err, done, data, result) {
         if (err) {
             console.error(err);
             handleResponse.shouldAbort(err, client, done);
-            handleResponse.handleError(res, err, 'Server error : Error in adding invoice line item data to the database');
+            handleResponse.handleError(res, err, ' Error in adding invoice line item data to the database');
         } else {
             // console.log("inserted invoiceLineItem");
             // console.log();
@@ -806,7 +806,7 @@ function updateExpenseRecord(req, res, client, err, done, expense, result) {
         if (err) {
             console.error(err);
             handleResponse.shouldAbort(err, client, done);
-            handleResponse.handleError(res, err, 'Server error : Error in updating expense data');
+            handleResponse.handleError(res, err, ' Error in updating expense data');
         } else {
             // console.log("updated expense");
             return result(true);
@@ -819,7 +819,7 @@ function getUserDetails(req, res, client, err, done, result) {
         if (err) {
             console.error(err);
             handleResponse.shouldAbort(err, client, done);
-            /*handleResponse.handleError(res, err, 'Server error : Error in finding invoice data');*/
+            /*handleResponse.handleError(res, err, ' Error in finding invoice data');*/
         } else {
             return result(userDetails.rows);
         }
@@ -842,7 +842,7 @@ exports.getInvoiceDetails = (req, res) => {
         // console.log('error in setting');
         // console.log(err);
         handleResponse.responseToPage(res,'pages/invoices-listing',{accounts: [], invoiceList: [],totalCount:0, draftCount:0, paidCount:0,user:req.session.passport.user, error:err},"error"," Error in finding account data");
-        /*handleResponse.handleError(res, err, 'Server Error: error in finding company setting');*/
+        /*handleResponse.handleError(res, err, ' error in finding company setting');*/
       }else{
             companyDefaultTimezone = result.timezone;
             companyDefaultCurrency =result.currency;
@@ -852,7 +852,7 @@ exports.getInvoiceDetails = (req, res) => {
             // console.log(companyDefaultCurrency);
             let invoiceId=req.query.invoiceId;
             if(invoiceId==''||invoiceId==null||invoiceId==undefined){
-                handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.session.passport.user, userList:[], error:err},"error","Server error : Invoice id is not correct");
+                handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.session.passport.user, userList:[], error:err},"error"," Invoice id is not correct");
             }else{
 
                 pool.connect((err, client, done) => {
@@ -860,8 +860,8 @@ exports.getInvoiceDetails = (req, res) => {
                         if (err) {
                             console.error(err);
                             handleResponse.shouldAbort(err, client, done);
-                            handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.session.passport.user, userList:[], error:err},"error","Server error : Error in finding invoice data");
-                            /*handleResponse.handleError(res, err, 'Server error : Error in finding invoice data');*/
+                            handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.session.passport.user, userList:[], error:err},"error"," Error in finding invoice data");
+                            /*handleResponse.handleError(res, err, ' Error in finding invoice data');*/
                         }  else {
                             if(invoiceDetails.rows.length>0){
                                 // console.log('account id is '+invoiceDetails.rows[0].account_id)
@@ -869,16 +869,16 @@ exports.getInvoiceDetails = (req, res) => {
                                     if (err) {
                                         console.error(err);
                                             handleResponse.shouldAbort(err, client, done);
-                                            handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.session.passport.user, userList:[], error:err},"error","Server error : Error in finding project data");
-                                            /*handleResponse.handleError(res, err, 'Server error : Error in finding project data');*/
+                                            handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.session.passport.user, userList:[], error:err},"error"," Error in finding project data");
+                                            /*handleResponse.handleError(res, err, ' Error in finding project data');*/
                                         }  else {
                                                 // console.log('projects are '+JSON.stringify(projects));
                                                 client.query('SELECT il.id ,il.type ,il.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,il.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,il.item_date at time zone \''+companyDefaultTimezone+'\' as item_date ,il.archived ,il.hours ,il.unit_price ,il.cost_rate ,il.note ,il.amount ,il.tax ,il.total_amount ,il.timesheet_id ,il.expense_id ,il.project_id ,il.account_id ,il.invoice_id ,il.company_id ,il.user_id ,il.user_role ,il.quantity ,il.record_id ,il.currency ,il.timesheet_row_id FROM INVOICE_LINE_ITEM il WHERE company_id=$1 AND invoice_id=$2 AND archived=$3', [req.user.company_id, req.query.invoiceId, false], function (err, invoiceItems) {
                                                 if (err) {
                                                     console.error(err);
                                                     handleResponse.shouldAbort(err, client, done);
-                                                    handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.session.passport.user, userList:[], error:err},"error","Server error : Error in finding invoice line item data");
-                                                    /*handleResponse.handleError(res, err, 'Server error : Error in finding invoice line item data');*/
+                                                    handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.session.passport.user, userList:[], error:err},"error"," Error in finding invoice line item data");
+                                                    /*handleResponse.handleError(res, err, ' Error in finding invoice line item data');*/
                                                 } else {
                                                     let invoice_total_amount=0;
                                                     if (invoiceItems.rows.length > 0) {
@@ -927,8 +927,8 @@ exports.getInvoiceDetails = (req, res) => {
                                                         if (err) {
                                                             console.error(err);
                                                             handleResponse.shouldAbort(err, client, done);
-                                                            handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.session.passport.user, userList:[], error:err},"error","Server error : Error in updating invoice data");
-                                                            /*handleResponse.handleError(res, err, 'Server error : Error in updating invoice data');*/
+                                                            handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.session.passport.user, userList:[], error:err},"error"," Error in updating invoice data");
+                                                            /*handleResponse.handleError(res, err, ' Error in updating invoice data');*/
                                                         } else {
 
                                                             getUserDetails(req, res, client, err, done, function (response) {
@@ -965,9 +965,9 @@ exports.postInvoiceItemDetail = (req, res) => {
       if (errors) {
         if(errors.length>0){
             // console.log(errors[0].msg);
-            handleResponse.handleError(res, errors, "Server Error :"+errors[0].msg);
+            handleResponse.handleError(res, errors, ""+errors[0].msg);
           }else{
-             handleResponse.handleError(res, errors, "Server Error : Error in validating data.");
+             handleResponse.handleError(res, errors, " Error in validating data.");
           }
       }else{
 
@@ -978,7 +978,7 @@ exports.postInvoiceItemDetail = (req, res) => {
                 if (err) {
                     console.error(err);
                     handleResponse.shouldAbort(err, client, done);
-                    handleResponse.handleError(res, err, 'Server error : Error in finding invoice line item data');
+                    handleResponse.handleError(res, err, ' Error in finding invoice line item data');
                 } else {
                     // console.log(invoiceItemDetails);
                     let item_date=moment.tz(req.body.item_date, companyDefaultTimezone).format();
@@ -988,7 +988,7 @@ exports.postInvoiceItemDetail = (req, res) => {
                         if (err) {
                             console.error(err);
                             handleResponse.shouldAbort(err, client, done);
-                            handleResponse.handleError(res, err, 'Server error : Error in updating invoice line item data');
+                            handleResponse.handleError(res, err, ' Error in updating invoice line item data');
                         } else {
                             done();
                             // console.log('Updated Invoice Item>>>>>>>>>>>>>');
@@ -1016,7 +1016,7 @@ exports.postInvoiceDetails = (req, res) => {
             if (err) {
                 console.error(err);
                 handleResponse.shouldAbort(err, client, done);
-                handleResponse.handleError(res, err, 'Server error : Error in finding invoice data');
+                handleResponse.handleError(res, err, ' Error in finding invoice data');
             } else {
                 client.query('UPDATE INVOICE SET  due_date=$1, description=$2, updated_date=$3, currency=$4, total_amount=$7, tax=$8 WHERE id=$5 AND company_id=$6', [moment.tz(req.body.due_date.split('T')[0], companyDefaultTimezone).format(), req.body.description, 'now()',req.body.currency , req.body.invoiceId, req.user.company_id, req.body.total_amount, req.body.tax_per], function (err, updatedData) {
                     // console.log('Error >>>>>>>>>>>>>');
@@ -1024,7 +1024,7 @@ exports.postInvoiceDetails = (req, res) => {
                     if (err) {
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);
-                        handleResponse.handleError(res, err, 'Server error : Error in updating invoice data');
+                        handleResponse.handleError(res, err, ' Error in updating invoice data');
                     } else {
                         done();
                         // console.log('Updated Invoice >>>>>>>>>>>>>');
@@ -1043,7 +1043,7 @@ exports.deleteInvoiceItem = (req, res) => {
         // console.log('Archived Invoice item-------------' + req.body.invoiceItemId);
         let invoiceItemId=req.body.invoiceItemId;
         if(invoiceItemId==''||invoiceItemId==null||invoiceItemId==undefined){
-            handleResponse.handleError(res, 'incorrect invoice item id', 'Server Error : Invoice item id is not correct');
+            handleResponse.handleError(res, 'incorrect invoice item id', ' Invoice item id is not correct');
         } else {
             pool.connect((err, client, done) => {
                 // console.log("Inv Type");
@@ -1051,7 +1051,7 @@ exports.deleteInvoiceItem = (req, res) => {
                 if(req.body.deleteRecord == "TIMESHEET") {
                     client.query('SELECT * FROM invoice_line_item WHERE id=$1', [req.body.invoiceItemId], function (err, lineItemDetails) {
                        if (err) {
-                        handleResponse.handleError(res, 'incorrect invoice item id', 'Server Error : Invoice item id is not correct');
+                        handleResponse.handleError(res, 'incorrect invoice item id', ' Invoice item id is not correct');
                        } else {
                             let timesheetIds = '';
                             lineItemDetails.rows[0].timesheet_row_id.forEach(function (lineId, index) {
@@ -1095,7 +1095,7 @@ exports.deleteInvoiceItem = (req, res) => {
                         if (err) {
                             console.error(err);
                             handleResponse.shouldAbort(err, client, done);
-                            handleResponse.handleError(res, err, 'Server error : Error in deleting invoice line item.');
+                            handleResponse.handleError(res, err, ' Error in deleting invoice line item.');
                         } else {
                             done();
                             handleResponse.sendSuccess(res,'Invoice detail data deleted successfully',{});
@@ -1116,7 +1116,7 @@ function unInvoicedTimesheetLineItem(done, res, err, client, timesheetIds, resul
         if (err) {
             console.error(err);
             handleResponse.shouldAbort(err, client, done);
-            handleResponse.handleError(res, err, 'Server error : Error in deleting invoice line item.');
+            handleResponse.handleError(res, err, ' Error in deleting invoice line item.');
         } else {
             return result(true);
         }
@@ -1128,7 +1128,7 @@ function unInvoicedExpense(done, res, err, client, expenseId, result) {
         if (err) {
             console.error(err);
             handleResponse.shouldAbort(err, client, done);
-            handleResponse.handleError(res, err, 'Server error : Error in deleting invoice line item.');
+            handleResponse.handleError(res, err, ' Error in deleting invoice line item.');
         } else {
             return result(true);
         }
@@ -1142,7 +1142,7 @@ function deleteInvoiceLineItem(done, res, err, client, lineItemId, result) {
         if (err) {
             console.error(err);
             handleResponse.shouldAbort(err, client, done);
-            handleResponse.handleError(res, err, 'Server error : Error in deleting invoice line item.');
+            handleResponse.handleError(res, err, ' Error in deleting invoice line item.');
         } else {
             return result(true);
         }
@@ -1154,7 +1154,7 @@ exports.deleteInvoice = (req, res) => {
         // console.log('Archived Invoice -------------' + req.body.invoiceId);
         let invoiceId=req.body.invoiceId;
         if(invoiceId==''||invoiceId==null||invoiceId==undefined){
-             handleResponse.handleError(res, 'incorrect invoice id', 'Server Error : Invoice id is not correct');
+             handleResponse.handleError(res, 'incorrect invoice id', ' Invoice id is not correct');
         }else{
 
             pool.connect((err, client, done) => {
@@ -1162,7 +1162,7 @@ exports.deleteInvoice = (req, res) => {
                     if (err) {
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);
-                        handleResponse.handleError(res, err, 'Server error : Error in deleting invoice.');
+                        handleResponse.handleError(res, err, ' Error in deleting invoice.');
                     } else {
                         console.error('Affected ID>>>>>>>>>>>>>');
                         // console.log(archivedInvoice.rows[0]);
@@ -1183,7 +1183,7 @@ exports.findInvoiceByCriteria = (req, res) => {
   // console.log("findInvoiceByCriteria----------------------------------"+req.body.searchField);
   setting.getCompanySetting(req, res ,(err,result)=>{
      if(err==true){
-       handleResponse.handleError(res, err, 'Server Error: error in finding company setting');
+       handleResponse.handleError(res, err, ' error in finding company setting');
      }else{
            companyDefaultTimezone = result.timezone;
             pool.connect((err, client, done) => {
@@ -1213,14 +1213,14 @@ exports.findInvoiceByCriteria = (req, res) => {
                 client.query(queryToExec,searchCriteriaVal, function (err,invoiceList) {
                   if (err) {
                     handleResponse.shouldAbort(err, client, done);
-                    handleResponse.handleError(res, err, 'Server Error: Error in finding invoice data');
+                    handleResponse.handleError(res, err, ' Error in finding invoice data');
                   }
                   else{
                       client.query('SELECT id,name FROM ACCOUNT WHERE company_id=$1 AND archived=$2', [req.user.company_id, req.body.accountArchived], function (err, account) {
                         if (err) {
                           handleResponse.shouldAbort(err, client, done);
-                          handleResponse.handleError(res, err, 'Server Error: Error in finding account data');
-                          /*handleResponse.handleError(res, err, 'Server error : Error in finding account data');*/
+                          handleResponse.handleError(res, err, ' Error in finding account data');
+                          /*handleResponse.handleError(res, err, ' Error in finding account data');*/
                         } else {
                           // console.log("----------account.rows-------------");
                           // console.log(account.rows);
@@ -1276,7 +1276,7 @@ exports.findInvoiceForAccount = (req, res) => {
           client.query(queryToExec,['%'+req.body.searchText+'%',req.user.company_id,false], function (err, accounts) {
             if (err) {
               handleResponse.shouldAbort(err, client, done);
-              handleResponse.handleError(res, err, 'Server Error: Error in finding account data');
+              handleResponse.handleError(res, err, ' Error in finding account data');
             }else{
               if(accounts.rows.length>0){
                 let invoiceList=[];
@@ -1299,7 +1299,7 @@ exports.findInvoiceForAccount = (req, res) => {
                         if (err) {
                           handleResponse.shouldAbort(err, client, done);
                           /*handleResponse.responseToPage(res,'pages/org-listing',{user:req.session.passport.user, error:err},"error"," Error in finding company data");*/
-                          handleResponse.handleError(res, err, 'Server Error: Error in finding invoice for account');
+                          handleResponse.handleError(res, err, ' Error in finding invoice for account');
                         }
                         else{
                             if(invoices.rows.length>0){
@@ -1322,7 +1322,7 @@ exports.findInvoiceForAccount = (req, res) => {
                 // });
               }else{
                 handleResponse.shouldAbort(err, client, done);
-                handleResponse.handleError(res, err, 'Server Error: Cannot find account with this name');
+                handleResponse.handleError(res, err, ' Cannot find account with this name');
               }
             }
           });
@@ -1332,8 +1332,8 @@ exports.findInvoiceForAccount = (req, res) => {
                 if (err) {
                     console.error(err);
                     handleResponse.shouldAbort(err, client, done);
-                    handleResponse.handleError(res, err, 'Server Error: Error in finding account data');
-                    /*handleResponse.handleError(res, err, 'Server error : Error in finding account data');*/
+                    handleResponse.handleError(res, err, ' Error in finding account data');
+                    /*handleResponse.handleError(res, err, ' Error in finding account data');*/
                 } else {
                     let accountIdArr=[];
                     if(accountList.rows.length>0){
@@ -1352,8 +1352,8 @@ exports.findInvoiceForAccount = (req, res) => {
                         if (err) {
                             console.error(err);
                             handleResponse.shouldAbort(err, client, done);
-                            handleResponse.handleError(res, err, 'Server Error: Error in finding invoice data');
-                            /*handleResponse.handleError(res, err, 'Server error : Error in finding invoice data');*/
+                            handleResponse.handleError(res, err, ' Error in finding invoice data');
+                            /*handleResponse.handleError(res, err, ' Error in finding invoice data');*/
                         } else {
                             invoiceListArr=[];
                             let searchCount=0;
@@ -1390,7 +1390,7 @@ function invoiceHtmlData (req,res,invoiceHtml){
          // console.log('error in setting');
          // console.log(err);
          handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.session.passport.user, error:err},"error"," Error in fetching company setting ");
-         /*handleResponse.handleError(res, err, 'Server Error: error in finding company setting');*/
+         /*handleResponse.handleError(res, err, ' error in finding company setting');*/
        }else{
              companyDefaultTimezone = result.timezone;
             pool.connect((err, client, done) => {
@@ -1929,7 +1929,7 @@ let account_address = `<strong>${accountDetails.name}</strong><BR />
     };
     pdf.create(pdfHTML, options).toStream(function (err, stream) {
         if (err) {
-            handleResponse.handleError(res, err, 'Server Error: Error in generating pdf data');
+            handleResponse.handleError(res, err, ' Error in generating pdf data');
         }
         else{
 
@@ -1954,7 +1954,7 @@ exports.generateHtml= (req, res) => {
     var html = fs.readFileSync('views/pages/invoice-pdf-template.html', 'utf8');
     pdf.create(html).toStream(function (err, stream) {
         if (err) {
-            handleResponse.handleError(res, err, 'Server Error: Error in generating pdf data');
+            handleResponse.handleError(res, err, ' Error in generating pdf data');
         }
         else{
 

@@ -13,7 +13,7 @@ function createTaskAssignment(req, client, err, done, taskId, billRate, costRate
       if (err) {
         console.error(err);
         handleResponse.shouldAbort(err, client, done);
-        handleResponse.handleError(res, err, 'Server error : Error in inserting task assignment data');
+        handleResponse.handleError(res, err, ' Error in inserting task assignment data');
       } else {
         return result(true,res);
       }
@@ -34,7 +34,7 @@ function createTaskAssignment(req, client, err, done, taskId, billRate, costRate
       if (err) {
         console.error(err);
         handleResponse.shouldAbort(err, client, done);
-        handleResponse.handleError(res, err, 'Server error : Error in inserting task assignment data');
+        handleResponse.handleError(res, err, ' Error in inserting task assignment data');
       } else {
         return result(insertedProjectAssgn.rows[0],res);
       }
@@ -58,7 +58,7 @@ function createTaskAssignment(req, client, err, done, taskId, billRate, costRate
         // console.log(">>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<");
         console.error(err);
         handleResponse.shouldAbort(err, client, done);
-        handleResponse.handleError(res, err, 'Server error : Error in inserting task assignment data');
+        handleResponse.handleError(res, err, ' Error in inserting task assignment data');
       } else {
         // console.log("fetch project assignment");
         // console.log(assignedUser);
@@ -80,7 +80,7 @@ function createTaskAssignment(req, client, err, done, taskId, billRate, costRate
         // console.log(">>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<");
         console.error(err);
         handleResponse.shouldAbort(err, client, done);
-        handleResponse.handleError(res, err, 'Server error : Error in inserting task assignment data');
+        handleResponse.handleError(res, err, ' Error in inserting task assignment data');
       } else {
         // console.log("fetch project assignment");
         // console.log(assignedUser);
