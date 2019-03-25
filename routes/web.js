@@ -67,7 +67,7 @@ module.exports = function(app) {
      * secure
      */
 
-    
+
     app.get('/home', passportConfig.isAuthenticated, roleConfig.nocache, function(req, res) {
         console.log('--------req.user redirect------');
         console.log(req.session.passport.user);
@@ -126,6 +126,8 @@ module.exports = function(app) {
     app.post('/addExpense', passportConfig.isAuthenticated, expenseController.postAddExpense);
     app.post('/deleteExpense', passportConfig.isAuthenticated, expenseController.deleteExpense);
     app.post('/editExpense', passportConfig.isAuthenticated, expenseController.postEditExpense);
+    app.post('/submitExpense', passportConfig.isAuthenticated, expenseController.submitExpense);
+
 
     //app.get('/project', passportConfig.isAuthenticated, projectController.getProject);
     app.get('/addProject', passportConfig.isAuthenticated, projectController.getAddProject);

@@ -18,7 +18,13 @@ $(document).ready(function(){
     $('#category').val(category);
 
     console.log(status);
+    if($("[expenseSubmit]").attr("expenseSubmit")=="true"){
+      disableInput($("[expenseSubmit]"));
+    }
 });
+function disableInput(ele){
+  $('input,select,textarea',ele).attr('disabled',true);
+}
 function deleteExpense(expenseId){
         showLoader('#globalLoader');
         console.log('expense id is '+expenseId);
@@ -44,6 +50,32 @@ function deleteExpense(expenseId){
             }
         });
     }
+function submitExpense(expenseId){
+    showLoader('#globalLoader');
+    console.log('expense id is '+expenseId);
+    $.ajax({
+      type: 'POST',
+      url : '/submitExpense',
+      contentType: 'application/json',
+      dataType: 'json',
+      data:JSON.stringify({"expenseId":expenseId}),
+       success : function(response){
+            console.log(response);
+            hideLoader('#globalLoader');
+             /*window.history.back();*/
+            showGlobalToast('#globalToast', 'success', response.message, 4000);
+            $("[submitted]").attr('disabled',true);
+            // window.location.href="/expenses-listing";
+             /*window.location.href = document.referrer;*/
+
+        },
+       error: function(response){
+            hideLoader('#globalLoader');
+            console.log(response.responseJSON.message);
+            showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+        }
+    });
+}
 function updateExpense(expenseId){
 
         console.log('expense id is '+expenseId);

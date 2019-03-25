@@ -299,14 +299,24 @@
                                                                 </li>
                                                                 <li class="slds-has-divider_top-space" role="separator"></li>
                                                                 <li class="slds-dropdown__item" role="presentation">
-
+                                                                  <% if(user.permissions.indexOf('expenseApprover')==-1) { %>
+                                                                    <% if(!expense.submitted) { %>
+                                                                      <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteExpense(\'<%= expense.id %>\')')">
+                                                                          <span class="slds-truncate" title="">
+                                                                              <i class="fa fa-trash text-red"></i> &nbsp;
+                                                                              Delete
+                                                                          </span>
+                                                                      </a>
+                                                                    <% } %>
+                                                                  <% } else if(!expense.invoiced) { %>
+                                                                    <% console.log('expense.invoiced '+expense.invoiced); %>
                                                                     <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteExpense(\'<%= expense.id %>\')')">
                                                                         <span class="slds-truncate" title="">
                                                                             <i class="fa fa-trash text-red"></i> &nbsp;
                                                                             Delete
                                                                         </span>
                                                                     </a>
-
+                                                                  <% } %>
                                                                 </li>
                                                             </ul>
                                                         </div>

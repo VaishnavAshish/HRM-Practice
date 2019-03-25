@@ -850,6 +850,7 @@ function addTimeLogEntry(modalId,formId){
             }
 
     }
+
 function stopKwTimerWithLogEntry(lineItemId,ele, id, inputId, modalId,currentDate){
   showLoader('#globalLoader');
   $.ajax({

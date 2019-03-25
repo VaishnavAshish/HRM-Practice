@@ -1,9 +1,9 @@
 const pg = require("pg");
-var pool = require('./../config/dbconfig');
-var handleResponse = require('./page-error-handle');
+const pool = require('./../config/dbconfig');
+const handleResponse = require('./page-error-handle');
 const request = require('request');
 const pdf = require('html-pdf');
-var fs = require('fs');
+const fs = require('fs');
 const Fixer = require('fixer-node')
 const fixer = new Fixer('bb5ebdb737191fd21bb0866be1706d33')
 const moment = require('moment-timezone');
@@ -676,7 +676,7 @@ exports.insertExpenseInvoiceItem = (req, res) => {
             pool.connect((err, client, done) => {
                 // console.log("Step 1");
                 if(req.body.start_date!=null&&req.body.start_date!=undefined&&req.body.start_date!='') {
-                    client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id FROM EXPENSE e WHERE company_id=$1 AND account_id=$2 AND project_id=$3 AND invoiced=$4 AND expense_date>=$5 AND expense_date<=$6 AND billable=$7', [req.user.company_id, req.body.accountId, req.body.projectId,false,moment.tz(req.body.start_date.split('T')[0], companyDefaultTimezone).format(),moment.tz(req.body.end_date.split('T')[0], companyDefaultTimezone).format(),true], function (err, expenseList) {
+                    client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id FROM EXPENSE e WHERE company_id=$1 AND account_id=$2 AND project_id=$3 AND invoiced=$4 AND expense_date>=$5 AND expense_date<=$6 AND billable=$7 AND submitted=$8', [req.user.company_id, req.body.accountId, req.body.projectId,false,moment.tz(req.body.start_date.split('T')[0], companyDefaultTimezone).format(),moment.tz(req.body.end_date.split('T')[0], companyDefaultTimezone).format(),true,true], function (err, expenseList) {
                         if (err) {
                             console.error(err);
                             handleResponse.shouldAbort(err, client, done);
@@ -719,7 +719,7 @@ exports.insertExpenseInvoiceItem = (req, res) => {
                     });
                 } else {
                     // pool.connect((err, client, done) => {
-                    client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id FROM EXPENSE e WHERE company_id=$1 AND account_id=$2 AND project_id=$3 AND invoiced=$4 AND billable=$5', [req.user.company_id, req.body.accountId, req.body.projectId,false,true], function (err, expenseList) {
+                    client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id FROM EXPENSE e WHERE company_id=$1 AND account_id=$2 AND project_id=$3 AND invoiced=$4 AND billable=$5 AND submitted=$6', [req.user.company_id, req.body.accountId, req.body.projectId,false,true,true], function (err, expenseList) {
                         if (err) {
                             console.error(err);
                             handleResponse.shouldAbort(err, client, done);
@@ -1574,6 +1574,8 @@ function isComma(string) {
 }
 function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companySetting, projects,companyName) {
     console.log('inside generate pdf '+invoiceDetails.currency);
+    // console.log(companySettingFile.getCompanyLogoJSON(req, res));
+
     let tableRow='';
     let sumOfTotalAmount = 0.0;
     let taxAmount = 0;
@@ -1631,7 +1633,8 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
     }
     sumOfTotalAmount=sumOfTotalAmount.toFixed(2);
     totalPaidAmount=totalPaidAmount.toFixed(2);
-    let company_logo = Buffer.from('base64' , companySetting.company_logo);
+    // let company_logo = Buffer.from('base64' , companySetting.company_logo);
+    // console.log('company_logo in invoice');
     // console.log(company_logo);
     /*let company_logo = companySetting.company_logo;*/
     let contenttype = companySetting.contenttype;
@@ -1738,7 +1741,7 @@ let account_address = `<strong>${accountDetails.name}</strong><BR />
                                         <tr>
                                             <td class="">
                                                 <div class="text-uppercase text-center">
-                                                    <h1>${companyName}</h1>
+                                                    <img src="data:image/jpeg;base64, ${Buffer.from(companySetting.company_logo).toString('base64')}" alt="company_logo" class="max-w-150" height='80' width='80'>
                                                 </div>
                                             </td>
                                             <td width="15%">
@@ -1927,6 +1930,8 @@ let account_address = `<strong>${accountDetails.name}</strong><BR />
     // });
     var options = { format: 'Letter',height: "14.5in",width: "11in"
     };
+    console.log('hmtl is:');
+    console.log(pdfHTML);
     pdf.create(pdfHTML, options).toStream(function (err, stream) {
         if (err) {
             handleResponse.handleError(res, err, ' Error in generating pdf data');

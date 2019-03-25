@@ -1470,6 +1470,10 @@
        var user_role = $(ele).attr('user-role');
        reqUserId= $("[user-email]").attr('selectedresourceid');
        console.log('reqUserId'+reqUserId);
+       if(!reqUserId){
+         reqUserId = <%= user.id %>;
+       }
+       console.log(<%= user.id %>);
     //    var billable = $(ele).attr('billable');
        var created_date = dateFormat(adjustDays(week_start_date, "ADD", parseInt(index)));
        console.log(week_start_date+' '+created_date);
@@ -1816,6 +1820,10 @@
         var dayTimeSheetData = createJSONForFormData(formId);
         var task_id = $('#day_task option:selected').attr('task_id');
         var project_id = $('#day_project option:selected').attr('pr_id');
+        console.log('dayTimeSheetData.day_time');
+        console.log(dayTimeSheetData.day_time);
+        console.log(parseInt(dayTimeSheetData.day_time.split(':')[0]));
+        console.log(parseFloat(dayTimeSheetData.day_time.split(':')[1]));
         if ($('#day_project option:selected').val() == '' || $('#day_project option:selected').val() == null || $('#day_project option:selected').val() == undefined) {
             addError('#day_project', "Please select any project");
         } else {
@@ -1823,7 +1831,7 @@
                 clearError('#day_project');
                 addError('#day_task', "Please select any task");
             } else {
-                if (dayTimeSheetData.day_time == '' || dayTimeSheetData.day_time == null || dayTimeSheetData.day_time == undefined || parseInt(dayTimeSheetData.day_time) <= 0) {
+                if (dayTimeSheetData.day_time == '' || dayTimeSheetData.day_time == null || dayTimeSheetData.day_time == undefined || (parseInt(dayTimeSheetData.day_time.split(':')[0]) <= 0 && parseInt(dayTimeSheetData.day_time.split(':')[1]) <= 0)) {
                     clearError('#day_task');
                     addError('#day_time', "Enter valid hours");
                 } else {

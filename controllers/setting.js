@@ -300,6 +300,7 @@ exports.getSettingInvoice = (req, res) => {
     });
   })
 };
+
 exports.getCompanyLogo = (req,res) =>{
     pool.connect((err, client, done) => {
         client.query("SELECT company_logo,contenttype FROM SETTING WHERE company_id=$1", [req.user.company_id], function (err, companySetting) {

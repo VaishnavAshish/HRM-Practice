@@ -78,7 +78,7 @@ exports.getExpense = (req, res) => {
         pool.connect((err, client, done) => {
             whereClause='WHERE company_id=$1 AND archived=$2 AND project_id IN (SELECT id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$5) AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2 AND user_id=$6)';
             // console.log('queryToExec '+'SELECT e.*,(select count(*) from EXPENSE '+whereClause+') as totalCount,(select count(*) from EXPENSE '+whereClause+' AND status ilike $3) as draftCount,(select count(*) from EXPENSE '+whereClause+' AND status ilike $4) as approvedCount FROM EXPENSE e '+whereClause+' ORDER BY expense_date,record_id OFFSET 0 LIMIT ' + process.env.PAGE_RECORD_NO+' searchCrieteriaValue'+req.user.company_id, false, 'Draft', 'Approved',false, user_id);
-            client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id ,(select count(*) from EXPENSE '+whereClause+') as totalCount,(select count(*) from EXPENSE '+whereClause+' AND status ilike $3) as draftCount,(select count(*) from EXPENSE '+whereClause+' AND status ilike $4) as approvedCount FROM EXPENSE e '+whereClause+' ORDER BY expense_date DESC,record_id OFFSET 0 LIMIT ' + process.env.PAGE_RECORD_NO, [req.user.company_id, false, 'Draft', 'Approved',false, user_id], function(err, expense) {
+            client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id,e.submitted ,(select count(*) from EXPENSE '+whereClause+') as totalCount,(select count(*) from EXPENSE '+whereClause+' AND status ilike $3) as draftCount,(select count(*) from EXPENSE '+whereClause+' AND status ilike $4) as approvedCount FROM EXPENSE e '+whereClause+' ORDER BY expense_date DESC,record_id OFFSET 0 LIMIT ' + process.env.PAGE_RECORD_NO, [req.user.company_id, false, 'Draft', 'Approved',false, user_id], function(err, expense) {
                 if (err) {
                     handleResponse.shouldAbort(err, client, done);
                     handleResponse.responseToPage(res, 'pages/expenses-listing', {
@@ -118,7 +118,7 @@ exports.getExpense = (req, res) => {
                                     return ele.id;
                                 });
                             }
-                            client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$3 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2)', [req.session.passport.user.company_id, false, false], function(err, project) {
+                            client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$3 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)', [req.session.passport.user.company_id, false, false,req.params.userId], function(err, project) {
                                 if (err) {
                                     handleResponse.shouldAbort(err, client, done);
                                     handleResponse.responseToPage(res, 'pages/expenses-listing', {
@@ -319,7 +319,7 @@ exports.getExpenseDetail = (req, res) => {
             /*handleResponse.handleError(res, 'incorrect expense id', ' Expense id is not correct');*/
         } else {
             pool.connect((err, client, done) => {
-                client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id FROM EXPENSE e where id=$1 AND company_id=$2', [req.query.expenseId, req.user.company_id], function(err, expense) {
+                client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id,e.submitted FROM EXPENSE e where id=$1 AND company_id=$2', [req.query.expenseId, req.user.company_id], function(err, expense) {
                     if (err) {
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);
@@ -419,6 +419,31 @@ exports.getExpenseDetail = (req, res) => {
         }
     }
   });
+};
+
+exports.submitExpense = (req, res) => {
+
+  pool.connect((err, client, done) => {
+      client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id FROM EXPENSE e where id=$1 AND company_id=$2', [req.body.expenseId, req.user.company_id], function(err, expense) {
+          if (err) {
+              console.error(err);
+              handleResponse.shouldAbort(err, client, done);
+              handleResponse.handleError(res, err, ' Error in finding expense data');
+          } else {
+              client.query('UPDATE EXPENSE SET submitted=$1 WHERE id=$2', [true,req.body.expenseId], function(err, updatedData) {
+                  if (err) {
+                      console.error(err);
+                      handleResponse.shouldAbort(err, client, done);
+                      handleResponse.handleError(res, err, ' Error in submitting expense data');
+                  } else {
+                      done();
+                      handleResponse.sendSuccess(res, 'Expense submitted successfully', {});
+                  }
+              });
+          }
+      })
+  });
+
 };
 
 

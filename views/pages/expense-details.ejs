@@ -46,13 +46,49 @@
 
                             <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
                                 <div class="text-right sm-tpd-15">
-                                    <!-- <button class="slds-button slds-button_brand slds-align-top" onclick="updateExpense('<%= expense.id %>')">
-                                        Save Changes
-                                    </button> -->
+                                  <% if(user.permissions.indexOf('expenseApprover')==-1) { %>
+                                      <% if(!expense.submitted){ %>
+                                        <button class="slds-button slds-button_brand slds-align-top" onclick="submitExpense('<%= expense.id %>')" submitted>
+                                            Submit
+                                        </button>
+                                        <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteExpense(\'<%= expense.id %>\')')" submitted>
+                                            Delete
+                                        </button>
 
-                                    <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteExpense(\'<%= expense.id %>\')')">
-                                        Delete
-                                    </button>
+                                      <% } else { %>
+                                        <button class="slds-button slds-button_brand slds-align-top" onclick="submitExpense('<%= expense.id %>')" disabled submitted >
+                                            Submit
+                                        </button>
+                                        <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteExpense(\'<%= expense.id %>\')')" disabled submitted>
+                                            Delete
+                                        </button>
+                                      <% } %>
+                                  <% } else { %>
+                                      <% if(!expense.invoiced){ %>
+                                        <% if(!expense.submitted) { %>
+                                            <button class="slds-button slds-button_brand slds-align-top" onclick="submitExpense('<%= expense.id %>')" submitted>
+                                                Submit
+                                            </button>
+                                        <% } else { %>
+                                          <button class="slds-button slds-button_brand slds-align-top" onclick="submitExpense('<%= expense.id %>')" disabled submitted>
+                                              Submit
+                                          </button>
+                                        <% } %>
+                                        <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteExpense(\'<%= expense.id %>\')')" submitted>
+                                            Delete
+                                        </button>
+
+                                      <% } else { %>
+                                        <button class="slds-button slds-button_brand slds-align-top" onclick="submitExpense('<%= expense.id %>')" disabled submitted >
+                                            Submit
+                                        </button>
+                                        <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteExpense(\'<%= expense.id %>\')')" disabled submitted>
+                                            Delete
+                                        </button>
+                                      <% } %>
+                                  <% } %>
+
+
 
 
                                 </div>
@@ -67,7 +103,8 @@
 
                     <!-- expense details start -->
 
-                    <div class=" slds-card slds-p-around_large sm-pd-10" data-modified>
+                    <div class=" slds-card slds-p-around_large sm-pd-10" data-modified expenseSubmit= "<%= (user.permissions.indexOf('expenseApprover')==-1) ? expense.submitted :expense.invoiced %>"" >
+                      <% console.log('user data '+ (user.permissions.indexOf('expenseApprover')==-1) ? "expense.submitted"+expense.submitted :"expense.invoiced"+expense.invoiced ); %>
                         <div class="slds-grid slds-wrap slds-gutters">
                             <div class="slds-col slds-size_1-of-1 slds-medium-size_8-of-12">
                                 <div class="">
@@ -81,7 +118,7 @@
                                                     <span class="slds-input__icon slds-input__icon_right">
                                                         <i class="fa fa-calendar"></i>
                                                     </span>
-                                                    <input type="date" id="expense_date" class="slds-input open-date-pik" value="<%= expense.expense_date%>">
+                                                    <input type="date" id="expense_date" class="slds-input open-date-pik" value="<%= expense.expense_date%>" >
                                                 </div>
                                                 <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
