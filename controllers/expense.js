@@ -350,7 +350,7 @@ exports.getExpenseDetail = (req, res) => {
                             } else {
                                 // console.log("----------account.rows-------------");
                                 // console.log(account.rows);
-                                client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$3 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2)', [req.session.passport.user.company_id, false, false], function(err, project) {
+                                client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$3 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)', [req.session.passport.user.company_id, false, false,req.params.userId], function(err, project) {
                                     if (err) {
                                         handleResponse.shouldAbort(err, client, done);
                                         handleResponse.responseToPage(res, 'pages/expense-details', {
@@ -648,7 +648,7 @@ exports.findExpenseByCriteria = (req, res) => {
                                 return ele.id;
                             });
                         }
-                        client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2', [req.user.company_id, false], function(err, project) {
+                        client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$3 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)', [req.user.company_id, false,false,req.params.userId], function(err, project) {
                             if (err) {
                                 handleResponse.shouldAbort(err, client, done);
                                 handleResponse.handleError(res, err, ' Error in finding project data');
@@ -769,7 +769,7 @@ exports.findExpenseForAccount = (req, res) => {
                                 // console.log('-----------accountId------');
                                 // console.log(accountId);
                                 // let accountName = account.name;
-                                client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND account_id = ANY($3::bigint[]) AND isGlobal=$4', [req.user.company_id, false, accountId,false], function(err, project) {
+                                client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND account_id = ANY($3::bigint[]) AND isGlobal=$4 AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$5)', [req.user.company_id, false, accountId,false,req.params.userId], function(err, project) {
                                   if (err) {
                                     handleResponse.shouldAbort(err, client, done);
                                     handleResponse.handleError(res, err, ' Error in finding project for account');
@@ -902,7 +902,7 @@ exports.findExpenseForAccount = (req, res) => {
                                     return ele.id;
                                 });
                             }
-                            client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2', [req.session.passport.user.company_id, false], function(err, project) {
+                            client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$3 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)', [req.session.passport.user.company_id, false,false,req.params.userId], function(err, project) {
                                 if (err) {
                                     handleResponse.shouldAbort(err, client, done);
                                     handleResponse.handleError(res, err, ' Error in finding project data');

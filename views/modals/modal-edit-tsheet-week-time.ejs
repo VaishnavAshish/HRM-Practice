@@ -1,4 +1,4 @@
-<!-- modal edit timesheet week view time entry start-->        
+<!-- modal edit timesheet week view time entry start-->
 <div id="modalEditTsheetTime">
     <section role="dialog" tabindex="-1" class="slds-modal">
         <div class="slds-modal__container">
@@ -8,26 +8,26 @@
                         <i class="fa fa-times text-size-21"></i>
                     </span>
                 </button>
-               
+
                 <div class=" text-left">
                     <div class="slds-text-heading_medium slds-p-bottom_xx-small">
                         <strong id="week-day-edit-modal"></strong>
-                        <span id="week-date-edit-modal"></span> 
+                        <span id="week-date-edit-modal"></span>
                     </div>
                     <div class="text-gray">
                         <i class="fa fa-folder-open"></i>
                         <span class="text-uppercase text-size-11" id="week-project-edit-modal">
-                            
+
                         </span>
                     </div>
                     <div class="text-size-16 text-thick" id="week-task-edit-modal">
-                        
+
                     </div>
                 </div>
             </header>
             <div class="slds-modal__content">
-                
-                
+
+
                 <div class="slds-p-around_small bg-dull" remove-on-other-user>
                     <form id="add-record-weekly-timesheet-form">
                         <div class="slds-grid slds-wrap">
@@ -38,7 +38,7 @@
                                        </div>
                                    </div>
                                </div>
-   
+
                                <div class="slds-size_1-of-1 slds-medium-size_3-of-12">
                                    <div class="slds-grid slds-grid_vertical-align-center slds-p-top_xx-small">
                                        <div class="slds-col--bump-left slds-p-horizontal_medium">
@@ -72,7 +72,7 @@
                                        </div>
                                    </div>
                                </div>
-                           </div> 
+                           </div>
                     </form>
                 </div>
                 <div>
@@ -81,22 +81,22 @@
                     </div>
                     <form id="update-existing-weekly-data-form">
                         <div id="week-data-row">
-                            <!-- row --> 
-    
+                            <!-- row -->
+
                         </div>
                     </form>
-                    
-                    
+
+
                 </div>
             </div>
             <div class="hide" id="updateWeeklyTimesheetLoader">
                 <% include ../layouts/local-loader %>
             </div>
             <footer class="slds-modal__footer">
-                <div class="slds-grid" remove-on-other-user>
-                    <div class="slds-has-flexi-truncate">
-                        <div class="text-left">
-                        <button class="slds-button slds-button_brand" id="btn-submit-week-timesheet" onclick="submitWeeklyDayTimesheet(this);">Submit</button>    
+                <div class="slds-grid" >
+                    <div class="slds-has-flexi-truncate" >
+                        <div class="text-left" remove-on-other-user>
+                        <button class="slds-button slds-button_brand" id="btn-submit-week-timesheet" onclick="submitWeeklyDayTimesheet(this);">Submit</button>
                         </div>
                     </div>
                     <div class="slds-no-flex">
@@ -110,4 +110,4 @@
     </section>
     <div class="slds-backdrop"></div>
 </div>
-<!-- modal edit timesheet week view time entry end-->   
+<!-- modal edit timesheet week view time entry end-->

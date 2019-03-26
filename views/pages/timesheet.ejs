@@ -476,17 +476,32 @@
                                                                             <div class="slds-size_7-of-12  slds-p-horizontal_small">
                                                                                 <div class="slds-grid">
                                                                                     <div class="slds-no-flex slds-size_1-of-6" remove-on-other-user>
-                                                                                    <% if(!timesheetRow.submitted) { %>
-                                                                                        <button class="slds-button slds-button_icon slds-button_icon-border-filled" title="start" start line_item_id="<%= timesheetRow.id %>"    onclick="startTimer(this);">
-                                                                                            <span class="slds-button__icon">
-                                                                                                <i class=" fa fa-play text-blue" aria-hidden="true"></i>
-                                                                                            </span>
-                                                                                        </button>
-                                                                                        <button class="slds-button slds-button_icon slds-button_icon-border-filled hide" title="stop" stop line_item_id="<%= timesheetRow.id %>" onclick="stopTimer(this);">
-                                                                                             <span class="slds-button__icon">
-                                                                                                <i class=" fa fa-stop text-red" aria-hidden="true"></i>
-                                                                                            </span>
-                                                                                        </button>
+                                                                                    <% if(user.permissions.indexOf('timesheetApprover')==-1) { %>
+                                                                                      <% if(!timesheetRow.submitted) { %>
+                                                                                          <button class="slds-button slds-button_icon slds-button_icon-border-filled" title="start" start line_item_id="<%= timesheetRow.id %>"    onclick="startTimer(this);">
+                                                                                              <span class="slds-button__icon">
+                                                                                                  <i class=" fa fa-play text-blue" aria-hidden="true"></i>
+                                                                                              </span>
+                                                                                          </button>
+                                                                                          <button class="slds-button slds-button_icon slds-button_icon-border-filled hide" title="stop" stop line_item_id="<%= timesheetRow.id %>" onclick="stopTimer(this);">
+                                                                                               <span class="slds-button__icon">
+                                                                                                  <i class=" fa fa-stop text-red" aria-hidden="true"></i>
+                                                                                              </span>
+                                                                                          </button>
+                                                                                      <% } %>
+                                                                                    <% } else { %>
+                                                                                      <% if(!timesheetRow.invoiced) { %>
+                                                                                          <button class="slds-button slds-button_icon slds-button_icon-border-filled" title="start" start line_item_id="<%= timesheetRow.id %>"    onclick="startTimer(this);">
+                                                                                              <span class="slds-button__icon">
+                                                                                                  <i class=" fa fa-play text-blue" aria-hidden="true"></i>
+                                                                                              </span>
+                                                                                          </button>
+                                                                                          <button class="slds-button slds-button_icon slds-button_icon-border-filled hide" title="stop" stop line_item_id="<%= timesheetRow.id %>" onclick="stopTimer(this);">
+                                                                                               <span class="slds-button__icon">
+                                                                                                  <i class=" fa fa-stop text-red" aria-hidden="true"></i>
+                                                                                              </span>
+                                                                                          </button>
+                                                                                      <% } %>
                                                                                     <% } %>
                                                                                     </div>
                                                                                     <div class="line-left slds-p-horizontal_small slds-m-left_small slds-has-flexi-truncate slds-size_3-of-6">
@@ -520,9 +535,27 @@
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
-                                                                            <% if(!timesheetRow.submitted) { %>
+                                                                            <% if(user.permissions.indexOf('timesheetApprover')==-1) { %>
+                                                                              <% if(!timesheetRow.submitted) { %>
+                                                                                  <div class="slds-size_5-of-12  slds-p-horizontal_small">
+                                                                                      <div class="text-right" >
+                                                                                          <button class="slds-button slds-button_icon slds-m-right_small" title="edit"  onclick="updateDayTimesheet(`<%= timesheetRow.id %>`);">
+                                                                                              <span class="slds-button__icon">
+                                                                                                  <i class=" fa fa-pen text-blue" aria-hidden="true"></i>
+                                                                                              </span>
+                                                                                          </button>
+                                                                                          <button class="slds-button slds-button_icon" title="delete" ts_li_id="<%= timesheetRow.id %>" onclick="deleteDayTimesheet(this);">
+                                                                                              <span class="slds-button__icon">
+                                                                                                  <i class=" fa fa-trash text-red" aria-hidden="true"></i>
+                                                                                              </span>
+                                                                                          </button>
+                                                                                      </div>
+                                                                                  </div>
+                                                                              <% } %>
+                                                                            <% } else { %>
+                                                                              <% if(!timesheetRow.invoiced) { %>
                                                                                 <div class="slds-size_5-of-12  slds-p-horizontal_small">
-                                                                                    <div class="text-right" remove-on-other-user>
+                                                                                    <div class="text-right" >
                                                                                         <button class="slds-button slds-button_icon slds-m-right_small" title="edit"  onclick="updateDayTimesheet(`<%= timesheetRow.id %>`);">
                                                                                             <span class="slds-button__icon">
                                                                                                 <i class=" fa fa-pen text-blue" aria-hidden="true"></i>
@@ -535,6 +568,7 @@
                                                                                         </button>
                                                                                     </div>
                                                                                 </div>
+                                                                              <% } %>
                                                                             <% } %>
                                                                         </div>
                                                                     </div>

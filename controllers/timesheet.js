@@ -250,6 +250,7 @@ function getTimesheetForDay(timesheetList,currentDateTime) {
       subObjDay.project_id = tsData[i].project_id;
       subObjDay.project_name = tsData[i].project_name;
       subObjDay.description = tsData[i].description;
+      subObjDay.invoiced = tsData[i].invoiced;
       subObjDay.user_role = tsData[i].user_role;
       subObjDay.category = tsData[i].category;
       subObjDay.billable = tsData[i].billable;
@@ -286,6 +287,7 @@ function getTimesheetForDay(timesheetList,currentDateTime) {
       subObjDay.project_id = tsData[i].project_id;
       subObjDay.project_name = tsData[i].project_name;
       subObjDay.description = tsData[i].description;
+      subObjDay.invoiced = tsData[i].invoiced;
       subObjDay.user_role = tsData[i].user_role;
       subObjDay.category = tsData[i].category;
       subObjDay.billable = tsData[i].billable;
@@ -663,7 +665,7 @@ exports.updateDayTimesheetData = (req, res) => {
             handleResponse.handleError(res, err, ' Error in finding timesheet detail data');
           } else {
             if(timesheetData.rowCount > 0) {
-              client.query('UPDATE timesheet_line_item SET project_id=$1, task_id=$2, total_work_hours=$3, project_name=$4, task_name=$5, description=$6, billable=$7 WHERE id=$8',[req.body.project_id, req.body.task_id, hoursToMinutes(req.body.total_work_hours_formatted), req.body.project_name, req.body.task_name, req.body.description, req.body.category, req.body.timesheet_lineitem_id], function(err, updatedTimesheetLiRec) {
+              client.query('UPDATE timesheet_line_item SET project_id=$1, task_id=$2, total_work_hours=$3, project_name=$4, task_name=$5, description=$6 WHERE id=$7',[req.body.project_id, req.body.task_id, hoursToMinutes(req.body.total_work_hours_formatted), req.body.project_name, req.body.task_name, req.body.description, req.body.timesheet_lineitem_id], function(err, updatedTimesheetLiRec) {
                 if (err) {
                   handleResponse.shouldAbort(err, client, done);
                   handleResponse.handleError(res, err, ' Error in updating timesheet detail data');
@@ -689,8 +691,8 @@ exports.updateDayTimesheetData = (req, res) => {
 
 exports.updateWeeklyTimesheetData = (req, res) => {
   let reqArr = req.body.data;
-  // console.log("updae req data");
-  // console.log(reqArr);
+  console.log("updateWeeklyTimesheetData data");
+  console.log(reqArr);
   if(req.user){
     pool.connect((err, client, done) => {
       if(reqArr.length > 0) {
@@ -1478,8 +1480,11 @@ exports.addTimesheet = (req, res) => {
 
 function createTimesheetLineItem(req, res, client, err, done, extraParam, isRunning, callback) {
   console.log('inside create new timesheet line item function timesheet date is '+extraParam.timesheet_date)
+  console.log(req.params)
+  let userId = req.params.userId ? req.params.userId:req.user.id;
+  console.log('user id while inserting timesheet is '+userId);
   let queryToExec = 'INSERT INTO TIMESHEET_LINE_ITEM (resource_id, project_id, task_id, created_date, total_work_hours, company_id, project_name, task_name, description, billable, user_role) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *';
-  let data = [req.user.id, req.body.project_id, req.body.task_id, moment.tz(extraParam.timesheet_date.split('T')[0], companyDefaultTimezone).format(), extraParam.day_time, req.user.company_id, req.body.day_project, req.body.day_task, req.body.day_note,req.body.day_category, req.body.user_role];
+  let data = [userId, req.body.project_id, req.body.task_id, moment.tz(extraParam.timesheet_date.split('T')[0], companyDefaultTimezone).format(), extraParam.day_time, req.user.company_id, req.body.day_project, req.body.day_task, req.body.day_note,req.body.day_category, req.body.user_role];
   if(isRunning) {
     queryToExec = 'INSERT INTO TIMESHEET_LINE_ITEM (resource_id, project_id, task_id, created_date, total_work_hours, company_id, project_name, task_name, description, billable, isRunning,lastruntime, user_role) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *';
     data = [req.user.id, req.body.project_id, req.body.task_id, moment.tz(extraParam.timesheet_date.split('T')[0], companyDefaultTimezone).format(), extraParam.day_time, req.user.company_id, req.body.day_project, req.body.day_task, req.body.day_note,req.body.day_category, req.body.isRunning,'now()', req.body.user_role];
