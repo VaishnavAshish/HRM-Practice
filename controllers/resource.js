@@ -493,6 +493,7 @@ exports.deleteResource = (req, res) => {
         // console.log('companyDefaultTimezone');
         // console.log(companyDefaultTimezone);
         let resourceId=req.body.resourceId;
+        console.log('resourceId '+resourceId);
         if(resourceId==''||resourceId==null||resourceId==undefined){
           handleResponse.handleError(res, "incorrect resource id", " Resource id is not correct");
         }else{
