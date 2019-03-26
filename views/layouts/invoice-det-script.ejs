@@ -250,10 +250,17 @@
             return;
         }
         var deleteRecord = "lineItem";
-        if(type == "Expense") {
-            deleteRecord = "EXPENSE";
-        } else if (type == "Timesheet") {
-            deleteRecord = "TIMESHEET";
+        // if(type == "Expense") {
+        //     deleteRecord = "EXPENSE";
+        // } else if (type == "Timesheet") {
+        //     deleteRecord = "TIMESHEET";
+        // }
+        if(expenseId){
+          deleteRecord = "EXPENSE";
+        }else if(timesheetId){
+          deleteRecord = "TIMESHEET";
+        }else{
+          deleteRecord = "OTHERS";
         }
         console.log(JSON.stringify({"invoiceItemId":invoiceItemId, "timesheetId":timesheetId, "expenseId":expenseId, "deleteRecord":deleteRecord}));
         showLoader('#globalLoader');
@@ -359,6 +366,94 @@
         }
 
     }
+
+    function addInvoiceLineItem(modalId){
+      clearError("select[id=invoice-type]");
+      clearError("input[id=invoice-quantity]");
+      clearError("input[id=invoice-unit-price]");
+      let invoice_line_type=$("select[id=invoice-type]").val();
+      let invoice_quantity = $("input[id=invoice-quantity]").val();
+      let invoice_unit_price = $("input[id=invoice-unit-price]").val();
+      let description = $("textarea[id=invoice-description]").val();
+      if(invoice_line_type==""||invoice_line_type==null||invoice_line_type==undefined){
+          addError("select[id=invoice-type]","Please select any invoice line item type ");
+      }else if(invoice_quantity==""||invoice_quantity==null||invoice_quantity==undefined){
+          addError("input[id=invoice-quantity]","Please enter the quantity ");
+      }else if(invoice_unit_price==""||invoice_unit_price==null||invoice_unit_price==undefined){
+          addError("input[id=invoice-unit-price]","Please enter the unit price ");
+      }else{
+        clearError("select[id=invoice-type]");
+        clearError("input[id=invoice-quantity]");
+        clearError("input[id=invoice-unit-price]");
+        showLoader('#globalLoader');
+        $.ajax({
+            type: 'POST',
+            url : '/insertNewInvoiceItem',
+            contentType: 'application/json',
+            dataType: 'json',
+            data : JSON.stringify({"invoice_line_type":invoice_line_type,"invoice_quantity":invoice_quantity,"invoice_unit_price":invoice_unit_price,"description":description,"accountId":invoice_account_id, "invoiceId":invoice_item_id,}),
+            success : function(response){
+                if(response.success == true) {
+                    console.log(response);
+                    closeModal(modalId);
+                    hideLoader('#globalLoader');
+                    location.reload();
+                } else {
+                    closeModal(modalId);
+                    hideLoader('#globalLoader');
+                    showGlobalToast('#globalToast', 'error', response.message, 4000);
+                }
+            },
+            error: function(response){
+                    console.log(response);
+                    closeModal(modalId);
+                    hideLoader('#globalLoader');
+                    showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+            }
+        });
+
+      }
+    }
+
+    function addProjectInvoiceItem(modalId){
+        clearError("#invoice-fixed-project");
+        let project=$("#invoice-fixed-project").val();
+        let project_type = $("#invoice-fixed-project option:selected").attr('pr_type');
+        if(project==""||project==null||project==undefined){
+            addError("#invoice-fixed-project","Please select any project");
+        }else{
+            clearError("#invoice-fixed-project");
+            showLoader('#globalLoader');
+            $.ajax({
+                type: 'POST',
+                url : '/insertTimesheetInvoiceItem',
+                contentType: 'application/json',
+                dataType: 'json',
+                data : JSON.stringify({"projectId":project, "accountId":invoice_account_id, "invoiceId":invoice_item_id, "project_type":project_type}),
+                success : function(response){
+                    if(response.success == true) {
+                        console.log(response);
+                        closeModal(modalId);
+                        hideLoader('#globalLoader');
+                        location.reload();
+                    } else {
+                        closeModal(modalId);
+                        hideLoader('#globalLoader');
+                        showGlobalToast('#globalToast', 'error', response.message, 4000);
+                    }
+                },
+                error: function(response){
+                        console.log(response);
+                        closeModal(modalId);
+                        hideLoader('#globalLoader');
+                        showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+                }
+            });
+
+        }
+
+    }
+
     function addTimeInvoiceItem(modalId){
         clearError("#invoice-time-project");
         clearError("#time_start_date");

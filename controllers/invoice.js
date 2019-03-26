@@ -247,6 +247,46 @@ function getUserBRandCR(req, res, client, err, done, userId, projectId, userRole
     }
     });
 }
+exports.insertNewInvoiceItem = (req, res) => {
+  setting.getCompanySetting(req, res ,(err,result)=>{
+     if(err==true){
+       handleResponse.handleError(res, err, ' Error in finding company setting data');
+     }else{
+         companyDefaultTimezone=result.timezone;
+         pool.connect((err, client, done) => {
+           client.query('SELECT currency FROM invoice WHERE id=$1', [req.body.invoiceId], function (err, invoiceDetail) {
+               if (err) {
+                   console.error(err);
+                   handleResponse.shouldAbort(err, client, done);
+                   handleResponse.handleError(res, err, ' Error in finding invoice data for inserting new line item. ');
+               } else {
+                   if(invoiceDetail.rowCount>0){
+                     let invoiceLineData = {};
+                     invoiceLineData.amount = parseFloat(req.body.invoice_unit_price)*parseFloat(req.body.invoice_quantity);
+                     invoiceLineData.user_id = req.user.id;
+                     invoiceLineData.quantity = parseFloat(req.body.invoice_unit_price);
+                     invoiceLineData.unit_price = parseFloat(req.body.invoice_quantity);
+                     invoiceLineData.note = req.body.description;
+                     invoiceLineData.id = null;
+                     invoiceLineData.user_role = '';
+                     invoiceLineData.type = req.body.invoice_line_type;
+                     invoiceLineData.currency = invoiceDetail.rows[0].currency;
+                     // ['Expense', new Date(), req.body.projectId, req.body.accountId, req.body.invoiceId, req.user.company_id, new Date(), new Date(), data.amount, data.user_id, data.quantity, data.amount, data.note, data.id, data.user_role]
+                     addInvoiceLineItem(req, res, client, err, done, invoiceLineData, function (result) {
+                         if(result) {
+                             handleResponse.sendSuccess(res,'New invoice line item added successfully',{});
+                         }
+                     });
+                   }else{
+                     handleResponse.shouldAbort('Error in finding invoice data', client, done);
+                     handleResponse.handleError(res, 'Error in finding invoice data', 'Error in finding invoice data.');
+                   }
+                 }
+             });           // INSERT INTO INVOICE_LINE_ITEM (type,item_date,project_id,account_id,invoice_id,company_id,created_date, updated_date, total_amount, user_id, quantity, unit_price, note, expense_id, user_role)
+         });
+    }
+  })
+}
 exports.insertTimesheetInvoiceItem = (req, res) => {
   setting.getCompanySetting(req, res ,(err,result)=>{
      if(err==true){
@@ -254,7 +294,7 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
        // console.log(err);
        handleResponse.handleError(res, err, ' Error in finding company setting data');
      }else{
-         companyDefaultTimezone=result.timezone;
+       companyDefaultTimezone=result.timezone;
         // console.log("Inside timesheet add");
         req.assert('accountId', 'Account cannot be blank').notEmpty();
         req.assert('projectId', 'Project cannot be blank').notEmpty();
@@ -273,33 +313,47 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
               // console.log(req.body.project_type);
                 if(req.body.project_type == "fixed_fee") {
                     pool.connect((err, client, done) => {
-                        client.query('SELECT *,(SELECT currency FROM ACCOUNT WHERE id=$2) as currency FROM project WHERE id=$1', [req.body.projectId,req.body.accountId], function (err, projectDetails) {
-                            if (err) {
-                                console.error(err);
-                                handleResponse.shouldAbort(err, client, done);
-                                handleResponse.handleError(res, err, ' Error in finding currency from project for timesheet data');
-                            } else {
-                                if(projectDetails.rowCount > 0) {
-                                    let projectData = {};
-                                    projectData.amount = projectDetails.rows[0].project_cost != null ? parseInt(projectDetails.rows[0].project_cost) : 0;
-                                    projectData.user_id = req.user.id;
-                                    projectData.quantity = 1;
-                                    projectData.unit_price = projectDetails.rows[0].project_cost != null ? parseInt(projectDetails.rows[0].project_cost) : 0;
-                                    projectData.note = '';
-                                    projectData.id = null;
-                                    projectData.user_role = '';
-                                    projectData.type = 'Fixed Fee Project';
-                                    projectData.currency = projectDetails.rows[0].currency;
-                                    // ['Expense', new Date(), req.body.projectId, req.body.accountId, req.body.invoiceId, req.user.company_id, new Date(), new Date(), data.amount, data.user_id, data.quantity, data.amount, data.note, data.id, data.user_role]
-                                    addInvoiceLineItem(req, res, client, err, done, projectData, function (result) {
-                                        if(result) {
-                                            handleResponse.sendSuccess(res,'Invoice line item for timesheet data added successfully',{});
-                                        }
-                                    });
-                                    // INSERT INTO INVOICE_LINE_ITEM (type,item_date,project_id,account_id,invoice_id,company_id,created_date, updated_date, total_amount, user_id, quantity, unit_price, note, expense_id, user_role)
-                                }
+                      client.query('SELECT * FROM invoice_line_item WHERE project_id=$1', [req.body.projectId], function (err, invoiceLineItemDetail) {
+                          if (err) {
+                              console.error(err);
+                              handleResponse.shouldAbort(err, client, done);
+                              handleResponse.handleError(res, err, ' Error in finding line item for fixed fee project ');
+                          } else {
+                            if(invoiceLineItemDetail.rowCount>0){
+                              handleResponse.shouldAbort(err, client, done);
+                              handleResponse.handleError(res, err, "Invoice for this project had already been added.Please review invoice detail.");
+                            }else{
+                              client.query('SELECT *,(SELECT currency FROM ACCOUNT WHERE id=$2) as currency FROM project WHERE id=$1', [req.body.projectId,req.body.accountId], function (err, projectDetails) {
+                                  if (err) {
+                                      console.error(err);
+                                      handleResponse.shouldAbort(err, client, done);
+                                      handleResponse.handleError(res, err, ' Error in finding currency from project for timesheet data');
+                                  } else {
+                                      if(projectDetails.rowCount > 0) {
+                                          let projectData = {};
+                                          projectData.amount = projectDetails.rows[0].project_cost != null ? parseInt(projectDetails.rows[0].project_cost) : 0;
+                                          projectData.user_id = req.user.id;
+                                          projectData.quantity = 1;
+                                          projectData.unit_price = projectDetails.rows[0].project_cost != null ? parseInt(projectDetails.rows[0].project_cost) : 0;
+                                          projectData.note = '';
+                                          projectData.id = null;
+                                          projectData.user_role = '';
+                                          projectData.type = 'Fixed Fee Project';
+                                          projectData.currency = projectDetails.rows[0].currency;
+                                          // ['Expense', new Date(), req.body.projectId, req.body.accountId, req.body.invoiceId, req.user.company_id, new Date(), new Date(), data.amount, data.user_id, data.quantity, data.amount, data.note, data.id, data.user_role]
+                                          addInvoiceLineItem(req, res, client, err, done, projectData, function (result) {
+                                              if(result) {
+                                                  handleResponse.sendSuccess(res,'Invoice line item for timesheet data added successfully',{});
+                                              }
+                                          });
+                                          // INSERT INTO INVOICE_LINE_ITEM (type,item_date,project_id,account_id,invoice_id,company_id,created_date, updated_date, total_amount, user_id, quantity, unit_price, note, expense_id, user_role)
+                                      }
+                                    }
+                                });
                             }
-                        });
+
+                          }
+                      });
                     });
                 } else {
                     // let newDate=moment.tz(new Date(), companyDefaultTimezone).format()
@@ -886,7 +940,9 @@ exports.getInvoiceDetails = (req, res) => {
                                                             // lineItem["item_date"] = dateFormat(moment.tz(lineItem.item_date, companyDefaultTimezone).format());
                                                             lineItem["item_date"] = dateFormat(lineItem.item_date);
                                                             lineItem.inv_qauntity = lineItem.quantity;
-                                                            if(lineItem.type == "Timesheet") {
+                                                            console.log('lineItem');
+                                                            console.log(lineItem);
+                                                            if(lineItem.type == "Timesheet" && lineItem.timesheet_row_id) {
                                                                 lineItem.inv_qauntity = minuteToHours(lineItem.quantity);
                                                             }
                                                             console.log(lineItem.total_amount+' '+typeof(lineItem.total_amount)+' '+parseFloat(lineItem.total_amount));

@@ -21,9 +21,10 @@
                         <div class="slds-form-element__control">
                             <div class="slds-select_container">
                                 <select class="slds-select" id="invoice-time-project" reset='value'>
-                                    <% if(projects.length >0) {%>
+                                    <% if(projects.length >0) { %>
+                                    <% let unfixedProjects = projects.filter(pro => pro.type != "fixed_fee"); %>
                                         <option value=""> </option>
-                                        <% projects.forEach(function(project) { %>
+                                        <% unfixedProjects.forEach(function(project) { %>
                                             <option pr_type="<%= project.type %>" pr_id="<%= project.id %>" value="<%= project.id %>"><%= project.name %></option>
                                         <% }); %>
                                     <% } else { %>

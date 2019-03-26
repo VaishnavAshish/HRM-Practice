@@ -287,6 +287,7 @@ module.exports = function(app) {
     app.post('/editInvoiceItem', passportConfig.isAuthenticated, invoiceController.postInvoiceItemDetail);
     app.post('/insertExpenseInvoiceItem', passportConfig.isAuthenticated, invoiceController.insertExpenseInvoiceItem);
     app.post('/insertTimesheetInvoiceItem', passportConfig.isAuthenticated, invoiceController.insertTimesheetInvoiceItem);
+    app.post('/insertNewInvoiceItem', passportConfig.isAuthenticated, invoiceController.insertNewInvoiceItem);
 
 
 

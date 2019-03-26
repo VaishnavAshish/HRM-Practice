@@ -293,6 +293,7 @@
                                                 <div class="text-right sm-tpd-15">
                                                     <button class="slds-button slds-button_outline-brand" onclick="openModal('#modalAddInvoiceTsheet', true);">Add Timesheet</button>
                                                     <button class="slds-button slds-button_outline-brand" onclick="openModal('#modalAddInvoiceExpenses', true);">Add Expenses</button>
+                                                    <button class="slds-button slds-button_outline-brand" onclick="openModal('#modalAddInvoiceFixedFee', true);">Add Fix Amount</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -493,7 +494,11 @@
                                                         <div class=" slds-no-flex slds-p-horizontal_small invoice-col" style="width:45%">
                                                             <div class="slds-form-element slds-m-bottom_small">
                                                                 <div class="slds-form-element__control">
+                                                                  <% if(projectObj.length<=0) { %>
+                                                                    <textarea class="slds-textarea" disabled rows="1"> <%= item.note %></textarea>
+                                                                  <% } else { %>
                                                                     <textarea class="slds-textarea" disabled rows="1">Project: <%= projectObj[0].name %> &#13;&#10; Resource: <%= userObj[0].email %> <% if(item.user_role.length > 0) {%> (<%= item.user_role %>) <% } %> &#13;&#10; Note: <%= item.note %></textarea>
+                                                                  <% } %>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -549,6 +554,7 @@
                                                                 </div>
                                                             </div>
                                                         </div> -->
+
                                                         <div class=" slds-no-flex slds-p-horizontal_small invoice-col" style="width:10%">
                                                             <div class="tpd-5">
                                                               <% var currency_symbols = currencyWithSymbolArray.filter(function(currency){
@@ -600,6 +606,14 @@
 
 
                                         </ul>
+                                        <div class="slds-col--bump-left slds-p-around_xx-small">
+                                          <div class="">
+                                              <button class="slds-button slds-button_neutral slds-align-top" onclick="openModal('#modalAddNewInvItem', true)">
+                                                <i class="fa fa-plus"></i>
+                                                <span class="sm-hide">Add Row</span>
+                                              </button>
+                                          </div>
+                                        </div>
                                         <div class="slds-p-top_small line-top">
                                             <div class="slds-grid slds-wrap slds-grid_pull-padded">
                                                 <div class="slds-size_1-of-1 slds-medium-size_1-of-2 slds-p-horizontal_small">
@@ -719,6 +733,7 @@
         <% include ../modals/modal-add-new-invoice-item %>
         <% include ../modals/modal-add-invoice-timesheet %>
         <% include ../modals/modal-add-invoice-expenses %>
+        <% include ../modals/modal-add-invoice-fixed-fee %>
         <% include ../layouts/footer %>
     </main>
 

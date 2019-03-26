@@ -504,6 +504,7 @@ exports.deleteResource = (req, res) => {
                   handleResponse.shouldAbort(err, client, done);
                   handleResponse.handleError(res, err, ' Error in deleting resource.');
                 }else{
+                  console.log('user details are '+JSON.stringify(userDetails.rows[0]));
                   if(userDetails.rows[0].user_role.includes('ADMIN') || parseInt(req.body.resourceId) == parseInt(req.user.id)) {
                     handleResponse.shouldAbort(err, client, done);
                     handleResponse.handleError(res, err, 'You can not delete this user.');
