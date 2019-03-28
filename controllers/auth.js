@@ -215,7 +215,7 @@ exports.postDomain = (req, res) => {
    return Math.floor(Math.random() * (max - min + 1)) + min;
  }
 function issueToken(user, done) {
-  console.log('user');
+  console.log('user in auth');
   console.log(user);
   var token = randomString(64);
   saveRememberMeToken(token, user.id, function(err) {
@@ -223,11 +223,13 @@ function issueToken(user, done) {
     return done(null, token);
   });
 }
-var tokens = {}
+// var tokens = {}
 
 function saveRememberMeToken(token, uid, fn) {
-  console.log('save remember me token');
+  console.log('save remember me token in auth');
   tokens[token] = uid;
+  console.log('tokens ins ave remember me');
+  console.log(tokens);
   return fn();
 }
 
@@ -312,7 +314,7 @@ exports.postLogin = (req, res, next) => {
                 }
               }else{
                   // console.log('inside login user is ' + JSON.stringify(userData));
-                  let pages = userrole.setupPagePermissions(userData, req);
+                  let pages = userrole.setupPagePermissions(userData, req.user);
                   // console.log("userData=========================");
                   userData.pages = pages;
                   // console.log(userData);

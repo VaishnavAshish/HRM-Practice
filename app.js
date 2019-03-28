@@ -75,7 +75,7 @@ app.use(session({
   secret:'jW8aor76jpPX',
   resave: false,
   saveUninitialized: true,
-  cookie: { maxAge: 1209600000 }, // two weeks in milliseconds
+  cookie: { maxAge: 7200000 }, // two weeks in milliseconds
   secure : true
 }));
 app.use(passport.initialize());

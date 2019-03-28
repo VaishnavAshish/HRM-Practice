@@ -17,23 +17,23 @@ exports.nocache = (req, res, next) => {
 }
 
 
-exports.setupPagePermissions = (userData, req) => {
+exports.setupPagePermissions = (userData, user) => {
 	var pages = new Array();
 	if (userData.user_role.includes('SUPER_ADMIN')) {
 	  pages.push({ label: 'Companies', url: '/org-listing' });
 	} else if (userData.user_role.includes('ADMIN')) {
 	  pages.push({ label: 'Accounts', url: '/accounts-listing' });
 	  pages.push({ label: 'Team', url: '/resources-listing' });
-	  
+
 	  if(userData.permissions.includes('projectManager')){
 		pages.push({ label: 'Projects', url: '/projects-listing' });
 	  }
 	  if(userData.permissions.includes('timesheetEntry')){
-		pages.push({ label: 'Timesheets', url: '/timesheet/'+req.user.id });
+		pages.push({ label: 'Timesheets', url: '/timesheet/'+user.id });
 	  }
 	  if(userData.permissions.includes('expenseManager')){
 		// pages.push({ label: 'Expenses', url: '/expenses-listing' });
-			pages.push({ label: 'Expenses', url: '/expenses-listing/'+req.user.id });
+			pages.push({ label: 'Expenses', url: '/expenses-listing/'+user.id });
 	  }
 	  if(userData.permissions.includes('invoiceManager')){
 		pages.push({ label: 'Invoices', url: '/invoices-listing' });
@@ -44,11 +44,11 @@ exports.setupPagePermissions = (userData, req) => {
 		  pages.push({ label: 'Projects', url: '/projects-listing' });
 	  }
 	  if(userData.permissions.includes('timesheetEntry')){
-		  pages.push({ label: 'Timesheets', url: '/timesheet/'+req.user.id });
+		  pages.push({ label: 'Timesheets', url: '/timesheet/'+user.id });
 	  }
 	  if(userData.permissions.includes('expenseManager')){
 		  // pages.push({ label: 'Expenses', url: '/expenses-listing' });
-		  pages.push({ label: 'Expenses', url: '/expenses-listing/'+req.user.id });
+		  pages.push({ label: 'Expenses', url: '/expenses-listing/'+user.id });
 	  }
 	  if(userData.permissions.includes('invoiceManager')){
 		  pages.push({ label: 'Invoices', url: '/invoices-listing' });
@@ -64,7 +64,7 @@ exports.permit = (req, res,next) => {
 	// console.log(page);
   	return ((urole in role)&&(role[urole].includes(page)));
   };
-  
+
   // console.log('Inside permit');
   	let url=req.url.split("?").shift() ;
   	let page=url.substring(url.indexOf("/")+1);
@@ -72,7 +72,7 @@ exports.permit = (req, res,next) => {
     if (req.user && req.user.user_role && isAllowed(req.user.user_role[0].toLowerCase(),page)){
     	// console.log('url is '+req.url);
     	// console.log('Inside user checked '+req.user.user_role[0]);
-  	    return next(); 
+  	    return next();
      }
     else {
     	assigned(req,res,result=>{
@@ -85,7 +85,7 @@ exports.permit = (req, res,next) => {
     		}
     	})
     }
-  
+
 };
 assigned = (req, res, done) => {
   const isAssigned = (permissions,page) => {
@@ -105,7 +105,7 @@ assigned = (req, res, done) => {
   	}
   	return false;
   };
-  
+
   // console.log('Inside assigned');
   	let url=req.url.split("?").shift() ;
   	let page=url.substring(url.indexOf("/")+1);
@@ -129,13 +129,12 @@ assigned = (req, res, done) => {
 
   	if (req.user && req.user.permissions && isAssigned(req.user.permissions,page)){
     	 // console.log('Inside user checked assignement'+req.user.permissions);
-	     return done(true); 
+	     return done(true);
     }
     else {
 		  // console.log('Inside user unchecked assignement');
     	return done(false);
     }
-    
- 
-}
 
+
+}

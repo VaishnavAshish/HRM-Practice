@@ -612,7 +612,7 @@ exports.updateResource = (req, res) => {
                                     }else{
                                       userData.domain = req.user.domain;
                                       // console.log('inside relogin after update user is ' + JSON.stringify(userData));
-                                      var pages = userrole.setupPagePermissions(userData, req);
+                                      var pages = userrole.setupPagePermissions(userData, req.user);
                                       // console.log("userData=========================");
                                       userData.pages = pages;
                                       // console.log(userData);

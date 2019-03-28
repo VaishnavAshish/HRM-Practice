@@ -274,7 +274,7 @@ passport.use('user', new LocalStrategy({ usernameField: 'email',passReqToCallbac
 }));
 
 
-var tokens = {}
+global.tokens = {}
 
 function consumeRememberMeToken(token, fn) {
   console.log('consume remember me token');
@@ -291,13 +291,26 @@ function saveRememberMeToken(token, uid, fn) {
 }
 
 function findById(id, fn) {
-  console.log('find for id '+id)
-  var idx = id - 1;
-  if (users[idx]) {
-    fn(null, users[idx]);
-  } else {
-    fn(new Error('User ' + id + ' does not exist'));
-  }
+  console.log('find for id '+id);
+  pool.connect((err, client, poolDone) => {
+    if(err) {
+      console.log(err);
+    } else {
+      let queryToExec='SELECT * FROM users where id=$1';
+      client.query(queryToExec,[id], function(err, userD) {
+        if(err) {
+          shouldAbort(err, client, poolDone);
+          fn(new Error('User ' + id + ' does not exist'));
+        } else {
+          poolDone();
+          console.log('findById');
+          console.log(userD.rows[0]);
+          userD.rows[0].pages = userrole.setupPagePermissions(userD.rows[0],userD.rows[0]);
+          fn(null, userD.rows[0]);
+        }
+      });
+    }
+  });
 }
 
 passport.use(new RememberMeStrategy(
@@ -877,7 +890,7 @@ exports.isAuthenticated = (req, res, next) => {
                       }else{
                         userData.domain = req.user.domain;
                         // console.log('inside relogin after update user is ' + JSON.stringify(userData));
-                        var pages = userrole.setupPagePermissions(userData, req);
+                        var pages = userrole.setupPagePermissions(userData, req.user);
                         // console.log("userData========================= ");
                         userData.pages = pages;
                         // console.log(userData+' '+userData.pages.length);
