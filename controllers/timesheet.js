@@ -603,40 +603,65 @@ exports.updateDayTimesheetHours = (req, res) => {
             if(timesheetData.rowCount > 0) {
               console.log('req.body.isRunning '+req.body.isRunning);
               if(req.body.isRunning == false){
-                console.log('inside if')
-                let differenceOfTime ;
-                if(moment.tz(timesheetData.rows[0].currentTimestamp,companyDefaultTimezone).format('YYYY-MM-DD') == moment.tz(timesheetData.rows[0].lastruntime,companyDefaultTimezone).format('YYYY-MM-DD')){
-                  differenceOfTime = hoursToMinutes(moment.tz(timesheetData.rows[0].currentTimestamp,companyDefaultTimezone).format('hh:mm')) - hoursToMinutes(moment.tz(timesheetData.rows[0].lastruntime,companyDefaultTimezone).format('hh:mm'))
+                if(timesheetData.rows[0].isrunning == false){
+                  done();
+                  handleResponse.sendSuccess(res,'update timesheet data successfully',{updatedHours:minuteToHours(timesheetData.rows[0].total_work_hours)});
                 }else{
-                  console.log('inside different dates diffrence');
-                  differenceOfTime = hoursToMinutes('19:00') - hoursToMinutes(moment.tz(timesheetData.rows[0].lastruntime,companyDefaultTimezone).format('hh:mm'))
+                  console.log('inside if')
+                  let differenceOfTime ;
+                  if(moment.tz(timesheetData.rows[0].currentTimestamp,companyDefaultTimezone).format('YYYY-MM-DD') == moment.tz(timesheetData.rows[0].lastruntime,companyDefaultTimezone).format('YYYY-MM-DD')){
+                    differenceOfTime = hoursToMinutes(moment.tz(timesheetData.rows[0].currentTimestamp,companyDefaultTimezone).format('hh:mm')) - hoursToMinutes(moment.tz(timesheetData.rows[0].lastruntime,companyDefaultTimezone).format('hh:mm'))
+                  }else{
+                    console.log('inside different dates diffrence');
+                    differenceOfTime = hoursToMinutes('19:00') - hoursToMinutes(moment.tz(timesheetData.rows[0].lastruntime,companyDefaultTimezone).format('hh:mm'))
+                  }
+                  // let differenceOfTime = hoursToMinutes(moment.tz(timesheetData.rows[0].currentTimestamp,companyDefaultTimezone).format('hh:mm')) - hoursToMinutes(moment.tz(timesheetData.rows[0].lastruntime,companyDefaultTimezone).format('hh:mm'))
+                  console.log('differenceOfTime after element stopped '+minuteToHours(differenceOfTime));
+                  console.log(moment.tz(timesheetData.rows[0].currentTimestamp,companyDefaultTimezone).format('hh:mm'));
+                  console.log(moment.tz(timesheetData.rows[0].lastruntime,companyDefaultTimezone).format('hh:mm'));
+                  differenceOfTime += timesheetData.rows[0].total_work_hours;
+                  client.query('UPDATE timesheet_line_item SET total_work_hours=$1,isRunning=$2 WHERE id=$3',[differenceOfTime, req.body.isRunning ,req.body.line_item_id], function(err, updatedTimesheetLiRec) {
+                    if (err) {
+                      handleResponse.shouldAbort(err, client, done);
+                      handleResponse.handleError(res, err, ' Error in updating timesheet detail data');
+                    } else {
+                      done();
+                      handleResponse.sendSuccess(res,'update timesheet data successfully',{updatedHours:minuteToHours(differenceOfTime)});
+                      /*res.status(200).json({"success": true,"message":"success"});*/
+                    }
+                  });
                 }
-                // let differenceOfTime = hoursToMinutes(moment.tz(timesheetData.rows[0].currentTimestamp,companyDefaultTimezone).format('hh:mm')) - hoursToMinutes(moment.tz(timesheetData.rows[0].lastruntime,companyDefaultTimezone).format('hh:mm'))
-                console.log('differenceOfTime after element stopped '+minuteToHours(differenceOfTime));
-                console.log(moment.tz(timesheetData.rows[0].currentTimestamp,companyDefaultTimezone).format('hh:mm'));
-                console.log(moment.tz(timesheetData.rows[0].lastruntime,companyDefaultTimezone).format('hh:mm'));
-                differenceOfTime += timesheetData.rows[0].total_work_hours;
-                client.query('UPDATE timesheet_line_item SET total_work_hours=$1,isRunning=$2 WHERE id=$3',[differenceOfTime, req.body.isRunning ,req.body.line_item_id], function(err, updatedTimesheetLiRec) {
-                  if (err) {
-                    handleResponse.shouldAbort(err, client, done);
-                    handleResponse.handleError(res, err, ' Error in updating timesheet detail data');
-                  } else {
-                    done();
-                    handleResponse.sendSuccess(res,'update timesheet data successfully',{});
-                    /*res.status(200).json({"success": true,"message":"success"});*/
-                  }
-                });
               }else{
-                client.query('UPDATE timesheet_line_item SET lastRunTime=$1,isRunning=$2 WHERE id=$3',['now()', req.body.isRunning ,req.body.line_item_id], function(err, updatedTimesheetLiRec) {
-                  if (err) {
+                client.query('SELECT tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\'  as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category ,EXTRACT(DOW FROM tl.created_date at time zone \''+companyDefaultTimezone+'\') as week_day,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime at time zone \''+companyDefaultTimezone+'\'  as lastruntime ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id FROM TIMESHEET_LINE_ITEM tl WHERE company_id=$1 AND isRunning=$2 AND resource_id=$3',[req.user.company_id, true,req.user.id], function(err, timesheetDataRunning) {
+                  if(err) {
+                    console.error(err);
                     handleResponse.shouldAbort(err, client, done);
-                    handleResponse.handleError(res, err, ' Error in updating timesheet detail data');
+                    handleResponse.handleError(res, err, ' Error in finding timesheet which is running');
                   } else {
-                    done();
-                    handleResponse.sendSuccess(res,'update timesheet data successfully',{});
-                    /*res.status(200).json({"success": true,"message":"success"});*/
-                  }
-                });
+                    if(timesheetDataRunning.rowCount>0){
+                      done();
+                      handleResponse.handleError(res, 'Timer for some timesheet is already running .Please reload it. ', 'Timer for some timesheet is already running .Please reload it.');
+                    }else{
+
+                        let lastruntime = 'now()';
+                        if(timesheetData.rows[0].isrunning ==true){
+                          lastruntime = timesheetData.rows[0].lastRunTime;
+                        }
+                        client.query('UPDATE timesheet_line_item SET lastRunTime=$1,isRunning=$2 WHERE id=$3',[lastruntime, req.body.isRunning ,req.body.line_item_id], function(err, updatedTimesheetLiRec) {
+                          if (err) {
+                            handleResponse.shouldAbort(err, client, done);
+                            handleResponse.handleError(res, err, ' Error in updating timesheet detail data');
+                          } else {
+                            done();
+                            handleResponse.sendSuccess(res,'update timesheet data successfully',{});
+                            /*res.status(200).json({"success": true,"message":"success"});*/
+                          }
+                        });
+                      }
+
+                    }
+                  });
+
               }
             } else {
               done();

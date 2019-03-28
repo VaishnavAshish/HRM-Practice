@@ -23,7 +23,7 @@
                 <div class="slds-grid slds-grid_vertical-align-center">
                     <div class="slds-p-right_medium sm-hide">
                         <% if(user.permissions.includes("timesheetEntry")){ %>
-                          <div title="Start Timer" name="globalStart" start-timer class="cursor-pointer hide"  onclick="startKwTimerGlobally(this,'[name=kwTimer]');" timerDiv>
+                          <!-- <div title="Start Timer" name="globalStart" start-timer class="cursor-pointer hide"  onclick="startKwTimerGlobally(this,'[name=kwTimer]');" timerDiv>
                               <div class="bg-dull vpd-5 hpd-15 radius-500 " name="" >
                                 <div class="slds-grid">
                                   <div class="cursor-pointer">
@@ -48,12 +48,12 @@
                                         <i class="fa fa-stop text-red"></i>
                                     </div>
                                     <div class="slds-no-flex slds-p-horizontal_x-small" name="kwTimer">
-                                        <!-- <time name="kwTimer">0:00:01</time> -->
+                                        <time name="kwTimer">0:00:01</time>
 
                                     </div>
                                     <div class="lpd-5 line-semi-black-left slds-col--bump-left">
-                                        <!-- <i class="far fa-clock"></i> -->
-                                        <!-- <i class="fa fa-circle-notch fa-spin"></i> -->
+                                        <i class="far fa-clock"></i>
+
                                         <svg aria-hidden="true" focusable="false"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" width="23px" height="23px"  class="view-inline">
                                             <circle  cx="50%" cy="50%" fill="transparent" r="15.909091" stroke="#ddd" stroke-width="6"></circle>
                                             <circle cx="50%" cy="50%" fill="transparent" r="15.909091" stroke="#00cc33" stroke-width="6" stroke-dashoffset="25" stroke-dasharray=[0 100]>
@@ -64,7 +64,40 @@
                                             </circle>
                                         </svg>
 
-                                        <!-- <img alt="Person name" src="/img/clock.webp" title="User avatar" height="25" width="25" /> -->
+
+                                    </div>
+                                </div>
+                            </div>
+                          </div> -->
+                          <div title="Start Timer" name="globalStart" start-timer class="cursor-pointer"  onclick="startKwTimerGlobally(this,'[name=kwTimer]');" timerDiv>
+                              <div class="bg-dull vpd-5 hpd-15 radius-500 " name="" >
+                                <div class="slds-grid">
+                                  <div class="cursor-pointer">
+                                        <i class="fa fa-play text-blue fa-fw"></i>
+                                  </div>
+                                    <div class="slds-no-flex slds-p-horizontal_x-small">
+                                        <time name="kwTimer">
+                                            Start
+                                        </time>
+                                    </div>
+                                    <div class="lpd-5 line-semi-black-left slds-col--bump-left">
+                                        <i class="far fa-clock"></i>
+                                    </div>
+                                </div>
+                            </div>
+                          </div>
+
+                          <div title="Stop Timer" name="globalStop" stop-timer class="cursor-pointer hide" onclick="stopKwTimerGlobally(this, '[name=kwTimer]', '#syncTimer', '#modalAddNewTsheetQuick');" timerDiv>
+                              <div class="bg-dull vpd-5 hpd-15 radius-500 " name="" >
+                                <div class="slds-grid">
+                                  <div class="cursor-pointer">
+                                        <i class="fa fa-stop text-red"></i>
+                                    </div>
+                                    <div class="slds-no-flex slds-p-horizontal_x-small">
+                                        <time name="kwTimer">0:00:01</time>
+                                    </div>
+                                    <div class="lpd-5 line-semi-black-left slds-col--bump-left">
+                                        <i class="far fa-clock"></i>
                                     </div>
                                 </div>
                             </div>
@@ -181,70 +214,70 @@
                                   let timesheetCreatedDate=response.timesheetData[0].created_date.toString().split(' ')[0].split('T')[0];
                                   if(timesheetCreatedDate==response.currentDate){
 
-                                    $("[name=kwTimer]").attr("taskId",response.timesheetData[0].id);
-                                    $("[name=kwTimer]").attr("lineItemTaskId",response.timesheetData[0].task_id);
-                                    let eleToStart=$("#day-tabs").find("[line_item_id='"+response.timesheetData[0].id+"']").not('.hide');
-                                    if(eleToStart.length>0){
-                                      startTimer(eleToStart);
-                                    }else{
-                                      $("[name=globalStart]").addClass('hide');
-                                      $("[name=globalStop]").removeClass('hide');
-                                    }
+                                    // $("[name=kwTimer]").attr("taskId",response.timesheetData[0].id);
+                                    // $("[name=kwTimer]").attr("lineItemTaskId",response.timesheetData[0].task_id);
+                                    // let eleToStart=$("#day-tabs").find("[line_item_id='"+response.timesheetData[0].id+"']").not('.hide');
+                                    // if(eleToStart.length>0){
+                                    //   startTimer(eleToStart);
+                                    // }else{
+                                    //   $("[name=globalStart]").addClass('hide');
+                                    //   $("[name=globalStop]").removeClass('hide');
+                                    // }
+                                    let lastruntime = moment.tz(response.timesheetData[0].lastruntime , companyDefaultTimezone).format('hh:mm:ss');
+                                    hmsToSecondsOnly(lastruntime,(playStartTime)=>{
+                                      hmsToSecondsOnly(response.currentTime,(currentTime)=>{
+                                      //let currentTime=hoursToMinutes((new Date()).toTimeString().split(' ')[0]);
 
-                                    // hmsToSecondsOnly(response.timesheetData[0].lastruntime,(playStartTime)=>{
-                                    //   //let currentTime=hoursToMinutes((new Date()).toTimeString().split(' ')[0]);
-                                    //   hmsToSecondsOnly(response.currentTime,(currentTime)=>{
-                                    //
-                                    //       let difference=currentTime-playStartTime;
-                                    //       let previousTotalHours=(response.timesheetData[0].total_work_hours*60);
-                                    //       secondsToHms(previousTotalHours+difference,(currentPlayingTime)=>{
-                                    //             $("[name=kwTimer]").text(currentPlayingTime);
-                                    //             $("[name=kwTimer]").attr("taskId",response.timesheetData[0].id);
-                                    //             $("[name=kwTimer]").attr("lineItemTaskId",response.timesheetData[0].task_id);
-                                    //
-                                    //           let eleToStart=$("#day-tabs").find("[line_item_id='"+response.timesheetData[0].id+"']").not('.hide');
-                                    //           // $("[timerDiv]").show();
-                                    //           if(eleToStart.length>0){
-                                    //             $(eleToStart).closest('.slds-grid').find('time').text(currentPlayingTime);
-                                    //             startTimer(eleToStart);
-                                    //           }else{
-                                    //             $("[name=globalStart]").addClass('hide');
-                                    //             // $("[name=globalStart]").css('display','none');
-                                    //             $("[name=globalStart]").next('[stop-timer]').removeClass('hide');
-                                    //             kwCounter = $("[name=kwTimer]");
-                                    //             intervalID = NaN;
-                                    //             if (isNaN(intervalID)){
-                                    //               intervalID = setInterval(incrementTime, 1000);
-                                    //             }
-                                    //           }
-                                    //           console.log(difference);
-                                    //       });
-                                    //
-                                    //   });
-                                    //
-                                    // });
+                                          let difference=currentTime-playStartTime;
+                                          let previousTotalHours=(response.timesheetData[0].total_work_hours*60);
+                                          secondsToHms(previousTotalHours+difference,(currentPlayingTime)=>{
+                                                $("[name=kwTimer]").text(currentPlayingTime);
+                                                $("[name=kwTimer]").attr("taskId",response.timesheetData[0].id);
+                                                $("[name=kwTimer]").attr("lineItemTaskId",response.timesheetData[0].task_id);
+
+                                              let eleToStart=$("#day-tabs").find("[line_item_id='"+response.timesheetData[0].id+"']").not('.hide');
+                                              // $("[timerDiv]").show();
+                                              if(eleToStart.length>0){
+                                                $(eleToStart).closest('.slds-grid').find('time').text(currentPlayingTime);
+                                                startTimer(eleToStart);
+                                              }else{
+                                                $("[name=globalStart]").addClass('hide');
+                                                // $("[name=globalStart]").css('display','none');
+                                                $("[name=globalStart]").next('[stop-timer]').removeClass('hide');
+                                                kwCounter = $("[name=kwTimer]");
+                                                intervalID = NaN;
+                                                if (isNaN(intervalID)){
+                                                  intervalID = setInterval(incrementTime, 1000);
+                                                }
+                                              }
+                                              console.log(difference);
+                                          });
+
+                                      });
+
+                                    });
                                   }else{
-                                    $("[name=kwTimer]").attr("taskId",response.timesheetData[0].id);
-                                    $("[name=kwTimer]").attr("lineItemTaskId",response.timesheetData[0].task_id);
-                                    $("[name=kwTimer]").attr("lineItemDate",response.timesheetData[0].created_date.toString().split('T')[0].split(' ')[0]);
-                                    stopKwTimerGlobally(this, '[name=kwTimer]', '#syncTimer', '#modalAddNewTsheetQuick');
-                                    // hmsToSecondsOnly(response.timesheetData[0].lastruntime,(playStartTime)=>{
-                                    //
-                                    //     hmsToSecondsOnly('19:00:00',(timesheetDateTime)=>{
-                                    //
-                                    //         let difference=timesheetDateTime-playStartTime;
-                                    //         let previousTotalHours=(response.timesheetData[0].total_work_hours*60);
-                                    //         secondsToHms(previousTotalHours+difference,(currentPlayingTime)=>{
-                                    //
-                                    //             console.log(currentPlayingTime);
-                                    //             $("[name=kwTimer]").text(currentPlayingTime);
-                                    //             $("[name=kwTimer]").attr("taskId",response.timesheetData[0].id);
-                                    //             $("[name=kwTimer]").attr("lineItemTaskId",response.timesheetData[0].task_id);
-                                    //             $("[name=kwTimer]").attr("lineItemDate",response.timesheetData[0].created_date.toString().split('T')[0]);
-                                    //             stopKwTimerGlobally(this, '[name=kwTimer]', '#syncTimer', '#modalAddNewTsheetQuick');
-                                    //         });
-                                    //     });
-                                    // });
+                                    // $("[name=kwTimer]").attr("taskId",response.timesheetData[0].id);
+                                    // $("[name=kwTimer]").attr("lineItemTaskId",response.timesheetData[0].task_id);
+                                    // $("[name=kwTimer]").attr("lineItemDate",response.timesheetData[0].created_date.toString().split('T')[0].split(' ')[0]);
+                                    // stopKwTimerGlobally(this, '[name=kwTimer]', '#syncTimer', '#modalAddNewTsheetQuick');
+                                    hmsToSecondsOnly(response.timesheetData[0].lastruntime,(playStartTime)=>{
+
+                                        hmsToSecondsOnly('19:00:00',(timesheetDateTime)=>{
+
+                                            let difference=timesheetDateTime-playStartTime;
+                                            let previousTotalHours=(response.timesheetData[0].total_work_hours*60);
+                                            secondsToHms(previousTotalHours+difference,(currentPlayingTime)=>{
+
+                                                console.log(currentPlayingTime);
+                                                $("[name=kwTimer]").text(currentPlayingTime);
+                                                $("[name=kwTimer]").attr("taskId",response.timesheetData[0].id);
+                                                $("[name=kwTimer]").attr("lineItemTaskId",response.timesheetData[0].task_id);
+                                                $("[name=kwTimer]").attr("lineItemDate",response.timesheetData[0].created_date.toString().split('T')[0]);
+                                                stopKwTimerGlobally(this, '[name=kwTimer]', '#syncTimer', '#modalAddNewTsheetQuick');
+                                            });
+                                        });
+                                    });
 
 
                                   }

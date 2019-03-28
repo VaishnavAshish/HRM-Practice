@@ -463,16 +463,16 @@ function startKwTimerGlobally(ele,id) {
                                             $("[name=globalStart]").addClass('hide');
                                             // $("[name=globalStart]").css('display','none');
                                             $('[name=globalStop]').removeClass('hide');
-                                            // $($(id)[0]).text('0:00:00');
-                                            // kwCounter = $(id);
-                                            // intervalID = NaN;
+                                            $($(id)[0]).text('0:00:00');
+                                            kwCounter = $(id);
+                                            intervalID = NaN;
                                             // $("[timerDiv]").on('click',function(){stopKwTimerGlobally(this, '[name=kwTimer]', '#syncTimer', '#modalAddNewTsheetQuick')});
                                             $("[name=kwTimer]").attr("taskId",response.line_item.id);
                                             $("[name=kwTimer]").attr("lineItemTaskId",response.line_item.task_id);
                                             /*$("[name=kwTimer]").attr("taskId",response.line_item.id);*/
-                                            // if (isNaN(intervalID)){
-                                            //     intervalID = setInterval(()=>{incrementTime();}, 1000);
-                                            // }
+                                            if (isNaN(intervalID)){
+                                                intervalID = setInterval(()=>{incrementTime();}, 1000);
+                                            }
                                             /*showGlobalToast('#globalToast', 'success', response.message, 4000);
                                             location.reload();*/
                                         } else {
@@ -863,10 +863,10 @@ function stopKwTimerWithLogEntry(lineItemId,ele, id, inputId, modalId,currentDat
           console.log(response);
           if (response.success == true) {
               hideLoader('#globalLoader');
-              // if(typeof intervalID!="undefined"){
-              //   clearInterval(intervalID);
-              // }
-              // intervalID = NaN;
+              if(typeof intervalID!="undefined"){
+                clearInterval(intervalID);
+              }
+              intervalID = NaN;
               let logSubmittedDate=$("[name=kwTimer]").attr("lineItemDate");
               if(typeof logSubmittedDate=="undefined"){
                 logSubmittedDate=dateFormat(moment.tz(currentDate, companyDefaultTimezone).format());
