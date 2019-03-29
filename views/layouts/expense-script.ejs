@@ -104,6 +104,10 @@ $(document).ready(function(){
     if(isUserId) {
         reqUserId = url.pathname.substring(((url.pathname).lastIndexOf('/')+1), url.pathname.length);
     }
+    if(reqUserId != '<%= user.id%>') {
+      console.log("New User");
+      $('div[remove-on-other-user]').remove();
+    }
     let permissionsOfUser=<%- JSON.stringify(user.permissions) %>;
     if( permissionsOfUser.includes('expenseApprover')) {
         var usersList = <%- JSON.stringify(usersList) %>;

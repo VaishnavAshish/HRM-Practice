@@ -418,8 +418,8 @@ exports.getTimesheet = (req, res) => {
                           /*handleResponse.handleError(res, err, ' Error in finding timesheet detail data');*/
                         } else {
                           let taskListsDayArr = getTimesheetForDay(timesheetListByDate,currentTimestamp.rows[0].currentdate);
-                          console.log("timesheetListByDate");
-                          console.log(JSON.stringify(taskListsDayArr));
+                          // console.log("timesheetListByDate");
+                          // console.log(JSON.stringify(taskListsDayArr));
                           // console.log(week_start_date +" *************** "+ week_end_date);
 
                             // let queryToExec= `SELECT DISTINCT T1.task_id, T1.resource_id, T1.project_id, T1.company_id, T1.project_name, T1.task_name, T2.twh, T2.week_day, T2.user_role
@@ -457,8 +457,8 @@ exports.getTimesheet = (req, res) => {
                                       getAllCompanyUsers(req, client, err, done, res, function (users) {
                                       timeheet_users = users;
                                       let taskListsWeekArr = getTimesheetForWeek(timesheetListByProject.rows, dateFormat(week_start_date));
-                                      console.log("Weekly timesheet rows")
-                                      console.log(JSON.stringify(taskListsWeekArr));
+                                      // console.log("Weekly timesheet rows")
+                                      // console.log(JSON.stringify(taskListsWeekArr));
                                       var daysEnum = {"0":"Sunday","1":"Monday", "2":"Tuesday", "3":"Wednesday","4":"Thursday","5":"Friday","6":"Saturday"};
                                       done();
                                       handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : daysEnum, timesheetList : taskListsDayArr,timesheetWeekData : taskListsWeekArr , user:req.session.passport.user, projectList:projectList.rows, userRoles : userRoles, timeheet_users : timeheet_users, companyDefaultTimezone:companyDefaultTimezone,companyWeekStartDay:companyWeekStartDay , currentTimestamp:currentTimestamp.rows[0].currentdate },"success","Successfully rendered");
