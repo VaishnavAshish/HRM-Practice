@@ -96,15 +96,23 @@
                                     </div>
                                 </div>
                             </div>
+                            <% let url = new URL(window.location.href);
+                            var isUserId = url.pathname.substring(((url.pathname).lastIndexOf('/')+1), (url.pathname).lastIndexOf('#')).length > 0;
+                            if(isUserId) {
+                                reqUserId = url.pathname.substring(((url.pathname).lastIndexOf('/')+1), url.pathname.length);
+                            }
+                            if(reqUserId == '<%= user.id%>') { %>
+                              console.log("New User");
+                              <div class="slds-col--bump-left slds-p-left_medium" remove-on-other-user>
+                                  <div class="">
+                                      <button class="slds-button slds-button_brand slds-align-top" onclick="openModal('#modalAddNewExpense', true)">
+                                          <i class="fa fa-plus"></i>
+                                          <span class="sm-hide">Add New</span>
+                                      </button>
+                                  </div>
+                              </div>
+                            <% }%>
 
-                            <div class="slds-col--bump-left slds-p-left_medium" remove-on-other-user>
-                                <div class="">
-                                    <button class="slds-button slds-button_brand slds-align-top" onclick="openModal('#modalAddNewExpense', true)">
-                                        <i class="fa fa-plus"></i>
-                                        <span class="sm-hide">Add New</span>
-                                    </button>
-                                </div>
-                            </div>
                         </div>
                         <div class=" slds-p-top_x-small line-top">
                             <div class="slds-grid slds-wrap slds-grid_pull-padded">
