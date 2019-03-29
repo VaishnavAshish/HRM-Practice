@@ -1564,7 +1564,7 @@
                                             </div>`;
                                 } else {
                                     let twhInput = `<input type="text" class="slds-input time-hhmm" onpaste="setModified(this);" onkeyup="setModified(this);" onchange="setModified(this);" placeholder="" value="`+minuteToHours(row.total_work_hours)+`">`;
-                                    let clockShowing = ``;
+                                    // let clockShowing = ``;
                                     if(row.isrunning){
                                         twhInput = `<input type="text" class="slds-input" disabled placeholder="" value="`+minuteToHours(row.total_work_hours)+`">`;
                                         // clockShowing = `<svg aria-hidden="true" focusable="false"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" width="80%" height="80%"  class="view-inline slds-align_absolute-center">
@@ -1710,6 +1710,9 @@
                                         //                          <animate attributeName="opacity"   from="0" to="1" dur="60s" repeatCount="indefinite"/>
                                         //                     </circle>
                                         //                 </svg>`;
+                                        // <div class="slds-size_1-of-1 slds-medium-size_1-of-12">
+                                        //     ${clockShowing}
+                                        // </div>
                                     }
                                     rowhtm += `<div class="line-top slds-p-around_small" row-div row-id=`+row.id+` saved>
                                                     <div class="text-size-16 text-thick">
@@ -1745,9 +1748,7 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="slds-size_1-of-1 slds-medium-size_1-of-12">
-                                                            ${clockShowing}
-                                                        </div>
+
                                                         <div class="slds-size_1-of-1 slds-medium-size_4-of-12">
                                                             <div class="slds-grid">
                                                                 <div class="slds-p-horizontal_small slds-has-flexi-truncate">

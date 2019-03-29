@@ -760,12 +760,12 @@ function addTimeLogEntry(modalId,formId){
                                                       if(success==true){
                                                           $(selectedEle).addClass('hide');
                                                           $(selectedEle).next('[stop]').removeClass('hide');
-                                                          $(selectedEle).closest('.slds-grid').find('svg').removeClass('slds-hide');
+                                                          // $(selectedEle).closest('.slds-grid').find('svg').removeClass('slds-hide');
+                                                          $("[name=globalStop]").removeClass('hide');
+                                                          if (isNaN(intervalID)){
+                                                              intervalID = setInterval(function(){incrementTimeOfCount()}, 1000);
+                                                          }
                                                           startKwTimerGlobal($("[name=globalStart]"));
-                                                          // $("[name=globalStop]").removeClass('hide');
-                                                          // if (isNaN(intervalID)){
-                                                          //     intervalID = setInterval(function(){incrementTimeOfCount()}, 1000);
-                                                          // }
                                                       }else if(nores==true){
                                                           $('#addTimesheetLoader').addClass('hide');
                                                           showGlobalToast('#globalToast', 'error', response.message, 4000);
@@ -779,7 +779,7 @@ function addTimeLogEntry(modalId,formId){
                                           }else{
                                               if(selectedEle!=null&&selectedEle!=undefined){
 
-                                                  // intervalID = NaN;
+                                                  intervalID = NaN;
                                                   let timesheetRowData={};
                                                   let ele=selectedEle;
                                                   timesheetRowDataid=$(ele).attr('line_item_id');
@@ -1057,6 +1057,7 @@ function formateHHMM(e) {
 }
 function closeGlobalTimesheet(modalId){
   $('[name=globalStop]').addClass('hide');
+  // $('[name=globalStart] time').text('Start');
   $('[name=globalStart]').removeClass('hide');
   closeModal(modalId);
 }
