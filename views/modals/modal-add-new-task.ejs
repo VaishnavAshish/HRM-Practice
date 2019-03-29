@@ -1,6 +1,6 @@
 
 
-<!-- modal add new task start-->        
+<!-- modal add new task start-->
             <div id="modalAddNewTask" modal-div>
                 <section role="dialog" tabindex="-1" class="slds-modal">
                     <div class="slds-modal__container">
@@ -23,7 +23,7 @@
                                         <div class="slds-form-element__control">
                                             <input type="text" name="task_name" id="task_name" getFormData='' class="slds-input" placeholder="" required="" reset='value'/>
                                             <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset='errmsg'>
-                                                       
+
                                             </div>
                                         </div>
                                     </div>
@@ -34,7 +34,7 @@
                                         <div class="slds-form-element__control">
                                             <textarea id="task_desc" name="task_desc" getFormData='' class="slds-textarea" placeholder="" reset='value'></textarea>
                                             <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
-                                                        
+
                                             </div>
                                         </div>
                                     </div>
@@ -93,7 +93,7 @@
                                             </div>
                                         </div>
                                     </div> -->
-    
+
                                     <div class="slds-grid slds-wrap slds-gutters">
                                             <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
                                                 <div class="slds-form-element slds-m-bottom_medium">
@@ -121,18 +121,18 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            
+
                                     </div>
-                                    
-                                    
-    
-                                    <div class="slds-form-element slds-m-bottom_medium">
+
+
+
+                                    <!-- <div class="slds-form-element slds-m-bottom_medium">
                                         <label class="slds-form-element__label">
                                             Assigned To
                                         </label>
                                         <div class="slds-form-element__control">
                                             <div class="slds-select_container">
-                                                <select class="slds-select" name="assigned_user" getFormData id="assigned_user" onchange="updateAssignRole(this);setBillCostRate(this, 'task')" reset='value'> 
+                                                <select class="slds-select" name="assigned_user" getFormData id="assigned_user" onchange="updateAssignRole(this);setBillCostRate(this, 'task')" reset='value'>
                                                     <option value="" billRate="0.00" costRate="0.00"></option>
                                                      <% if(userList.length > 0) { %>
                                                         <% userList.forEach(function(resource) { %>
@@ -143,11 +143,11 @@
                                                         <% resUsers.forEach(function(resource) { %>
                                                            <option value="<%= resource.id %>" role="<%= resource.role %>" billrate="<%= resource.bill_rate %>" costrate="<%= resource.cost_rate %>"> <%= resource.email %> (<%= resource.role %>)</option>
                                                         <% }); %>
-                                                    <% } %>    
+                                                    <% } %>
                                                 </select>
                                             </div>
                                             <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
-                                                       
+
                                             </div>
                                         </div>
                                     </div>
@@ -163,12 +163,12 @@
                                                         <% if(userRoleList.length>0) { %>
                                                             <% userRoleList.forEach(function(userRole) { %>
                                                                 <option value="<%= userRole %>"><%= userRole %></option>
-                                                            <% }); %>  
+                                                            <% }); %>
                                                         <% } %>
                                                 </select>
                                             </div>
                                             <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
-        
+
                                             </div>
                                         </div>
                                     </div>
@@ -179,11 +179,11 @@
                                                 <div class="slds-form-element__control slds-input-has-fixed-addon">
                                                     <span class="slds-form-element__addon lmr-0" id="">USD</span>
                                                     <input type="text" bill-rate id="res_bill_rate" getformdata="" name="res_bill_rate" class="slds-input" placeholder="0.00" reset='value'>
-        
+
                                                     <span class="slds-form-element__addon slds-no-flex" id="">/hr</span>
                                                 </div>
                                                 <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
-                                                    
+
                                                 </div>
                                             </div>
                                         </div>
@@ -193,15 +193,15 @@
                                                 <div class="slds-form-element__control slds-input-has-fixed-addon">
                                                     <span class="slds-form-element__addon lmr-0" id="">USD</span>
                                                     <input type="text" cost-rate id="res_cost_rate" getformdata="" name="res_cost_rate" class="slds-input" placeholder="0.00" reset='value'>
-        
+
                                                     <span class="slds-form-element__addon slds-no-flex" id="">/hr</span>
                                                 </div>
                                                 <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
-                                                    
+
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
                                     <div class="slds-form-element slds-m-bottom_medium">
                                         <label class="slds-form-element__label">
                                             Estimated Hours
@@ -213,11 +213,11 @@
                                             <input type="text" name="estimate_hours" getFormData='' class="slds-input" reset='value'>
                                         </div>
                                         <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
-                                                       
+
                                         </div>
                                     </div>
-                                    
-                                      
+
+
                                 </div>
                             </form>
                         </div>
@@ -230,4 +230,4 @@
                 </section>
                 <div class="slds-backdrop"></div>
             </div>
-          <!-- modal add new task start-->   
+          <!-- modal add new task start-->

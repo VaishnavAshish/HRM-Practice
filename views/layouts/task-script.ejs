@@ -3,13 +3,13 @@
     function addNewTask(modalId, formId, accountId) {
         var taskData = createJSONForFormData(formId);
         console.log(projectName);
-        let taskUserEmail=$("#assigned_user option:selected").text();
+        // let taskUserEmail=$("#assigned_user option:selected").text();
         let userData={ userEmail:'',billRate:'0.00',costRate:'0.00'}
-        if(taskUserEmail!=''&&taskUserEmail!=undefined&&taskUserEmail!=null){
-            userData.userEmail= taskUserEmail;
-            userData.billRate=$("#assigned_user option:selected").attr('billRate');
-            userData.costRate=$("#assigned_user option:selected").attr('costRate');
-        }
+        // if(taskUserEmail!=''&&taskUserEmail!=undefined&&taskUserEmail!=null){
+        //     userData.userEmail= taskUserEmail;
+        //     userData.billRate=$("#assigned_user option:selected").attr('billRate');
+        //     userData.costRate=$("#assigned_user option:selected").attr('costRate');
+        // }
         taskData.billable=projectBillable;
         clearError("#task_name");
         if(taskData.task_name) {
