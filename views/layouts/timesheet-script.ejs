@@ -2143,4 +2143,31 @@ function addTabListToUl(weekStartDate){
   }
 
 }
+function submitWeeklyTimesheet(submitBtn){
+  console.log('inside submitWeeklyTimesheet');
+  console.log($(submitBtn));
+  console.log(weekStartDate+' '+weekEndDate);
+  showLoader('#globalLoader');
+  $.ajax({
+     type: 'POST',
+     url: '/submitWeeklyTimesheet',
+     contentType: 'application/json',
+     dataType: 'json',
+     data: JSON.stringify({weekStartDate:weekStartDate,weekEndDate:weekEndDate}),
+     success: function (response) {
+         hideLoader('#globalLoader');
+         if(response.success == true) {
+             location.reload();
+         }else{
+           showGlobalToast('#globalToast', 'error', response.message, 4000);
+         }
+     },
+     error: function (response) {
+         console.log(response);
+         hideLoader('#globalLoader');
+         showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+     }
+  });
+
+}
 </script>

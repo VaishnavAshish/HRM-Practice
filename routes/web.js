@@ -165,6 +165,7 @@ module.exports = function(app) {
     app.post('/getTimesheetDataWithTaskId', passportConfig.isAuthenticated, timesheetController.getDayTimesheetWithTaskId);
     app.post('/getTimesheetWithPlay', passportConfig.isAuthenticated, timesheetController.getTimesheetWithPlay);
     app.post('/submitWeeklyTimesheetByProjectTaskId', passportConfig.isAuthenticated, timesheetController.submitWeeklyTimesheetByProjectTaskId);
+    app.post('/submitWeeklyTimesheet', passportConfig.isAuthenticated, timesheetController.submitWeeklyTimesheet);
 // /submitWeeklyTimesheetByProjectId
 
     // submitDayTimesheet

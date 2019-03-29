@@ -289,7 +289,6 @@ exports.getExpense = (req, res) => {
 };
 
 exports.getExpenseDetail = (req, res) => {
-  let user_id = req.params.userId;
   setting.getCompanySetting(req, res ,(err,result)=>{
     if(err==true){
       // console.log('error in setting');
@@ -350,8 +349,10 @@ exports.getExpenseDetail = (req, res) => {
                             } else {
                                 // console.log("----------account.rows-------------");
                                 // console.log(account.rows);
-                                client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$3 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)', [req.session.passport.user.company_id, false, false,req.params.userId], function(err, project) {
+                                client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$3 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)', [req.session.passport.user.company_id, false, false,expense.rows[0].user_id], function(err, project) {
                                     if (err) {
+                                        console.log('expense user id is');
+                                        console.log(expense.rows[0].user_id);
                                         handleResponse.shouldAbort(err, client, done);
                                         handleResponse.responseToPage(res, 'pages/expense-details', {
                                             expense: {},
