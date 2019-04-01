@@ -1015,7 +1015,7 @@ exports.getInvoiceDetails = (req, res) => {
                                                             if(previousCurrency.length>0){
                                                               previousCurrency=parseFloat(previousCurrency[0].value);
                                                             }else{
-                                                              previousCurrency='USD';
+                                                              previousCurrency=1;
                                                             }
                                                             let line_total_amount=(currentCurrency/previousCurrency*parseFloat(lineItem.total_amount));
                                                             // console.log('total_amount '+line_total_amount);
