@@ -56,20 +56,20 @@
             taskDetailsData.project_id = projectId;
             taskDetailsData.taskId = taskId;
             taskDetailsData.assignment_id = null;
-            taskDetailsData.user_role = $('#assigned_user option:selected').attr('user_role');
-            if($('#assigned_user option:selected').attr('pr_as_id')) {
-                taskDetailsData.assignment_id = $('#assigned_user option:selected').attr('pr_as_id');
-            }
+            // taskDetailsData.user_role = $('#assigned_user option:selected').attr('user_role');
+            // if($('#assigned_user option:selected').attr('pr_as_id')) {
+            //     taskDetailsData.assignment_id = $('#assigned_user option:selected').attr('pr_as_id');
+            // }
             console.log("task details update method called");
             console.log(taskDetailsData);
-            let taskUserEmail=($("#assigned_user option:selected").text()).trim();
+            // let taskUserEmail=($("#assigned_user option:selected").text()).trim();
             let userData={ userEmail:'',billRate:'0.00',costRate:'0.00'}
-            if(taskUserEmail!=''&&taskUserEmail!=undefined&&taskUserEmail!=null){
-               userData.userEmail= taskUserEmail;
-               userData.billRate=$("#assigned_user option:selected").attr('billRate');
-               userData.costRate=$("#assigned_user option:selected").attr('costRate');
-
-            }
+            // if(taskUserEmail!=''&&taskUserEmail!=undefined&&taskUserEmail!=null){
+            //    userData.userEmail= taskUserEmail;
+            //    userData.billRate=$("#assigned_user option:selected").attr('billRate');
+            //    userData.costRate=$("#assigned_user option:selected").attr('costRate');
+            //
+            // }
             if(!$(formId).hasClass('has-error')) {
                 showLoader('#globalLoader');
                 $.ajax({
@@ -302,16 +302,7 @@ function findTaskByName(){
 
                     <div class="slds-size_1-of-1 slds-medium-size_3-of-12 slds-p-horizontal_small sm-tpd-15">
                         <div class="slds-grid">
-                            <div class="slds-has-flexi-truncate">
-                                <div class="slds-truncate text-dull slds-p-bottom_xx-small text-size-11 text-uppercase">
-                                    Assign To
-                                </div>
-                                <div>
-                                    <span class="slds-avatar slds-avatar_small slds-avatar_circle cursor-pointer">
-                                        <img alt="Person name" src="img/avatar1.jpg" title="`+ task.user_email +`">
-                                    </span>
-                                </div>
-                            </div>
+
                             <div class="slds-col--bump-left slds-p-left_x-small">
                                 <a href="/task-details?taskId=`+ task.id +`" class="slds-button slds-button_icon" title="Edit">
                                     <i class="fa fa-edit text-blue fs-lg text-size-18"></i>
@@ -322,7 +313,17 @@ function findTaskByName(){
                 </div>
             </div>
         </div>
-    </div>`
+    </div>`;
+    // <div class="slds-has-flexi-truncate">
+    //     <div class="slds-truncate text-dull slds-p-bottom_xx-small text-size-11 text-uppercase">
+    //         Assign To
+    //     </div>
+    //     <div>
+    //         <span class="slds-avatar slds-avatar_small slds-avatar_circle cursor-pointer">
+    //             <img alt="Person name" src="img/avatar1.jpg" title="`+ task.user_email +`">
+    //         </span>
+    //     </div>
+    // </div>
         $("#taskCardView").append(taskTr);
     }
 </script>

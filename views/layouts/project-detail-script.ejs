@@ -48,13 +48,14 @@
         }else{
             $(ele).closest('div[modal-div]').find('select[name="user_role"]').val(defaultRole);
         }
+        checkProjectAssignment($("#project_user_role"));
     }
     function checkProjectAssignment(ele){
         var userRole=$("option:selected", ele).val();
         var userId=$("#project_user option:selected").val();
         var projectAssginmentUser =  <%- JSON.stringify(resUsers) %>
         var assginedUserWithRole=projectAssginmentUser.filter(assignedUser=>{
-            return ((assignedUser.id==userId)&&(assignedUser.role==userRole));
+            return ((assignedUser.id==userId)&&(assignedUser.role.trim()==userRole.trim()));
         });
         console.log(assginedUserWithRole);
         if(assginedUserWithRole.length>0){

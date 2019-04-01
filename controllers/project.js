@@ -393,8 +393,8 @@ exports.getGlobalProject = (req, res) => {
                                 // let currentTime=moment.tz(task.rows[0].currentdate, companyDefaultTimezone).format('HH:mm:ss');
                                 // let currentDate=moment.tz(task.rows[0].currentdate, companyDefaultTimezone).format();
                                 let currentDate=moment.tz(currentTimestamp.rows[0].currentdate, companyDefaultTimezone).format('YYYY-MM-DD');
-                                let currentTime=moment.tz(currentTimestamp.rows[0].currentdate, companyDefaultTimezone).format('hh:mm:ss');
-                                currentTimestamp.rows[0].currentdate = moment.tz(currentTimestamp.rows[0].currentdate, companyDefaultTimezone).format('YYYY-MM-DD hh:mm:ssZ');
+                                let currentTime=moment.tz(currentTimestamp.rows[0].currentdate, companyDefaultTimezone).format('HH:mm:ss');
+                                currentTimestamp.rows[0].currentdate = moment.tz(currentTimestamp.rows[0].currentdate, companyDefaultTimezone).format('YYYY-MM-DD HH:mm:ssZ');
                                 console.log('getGlobalProject currentDate and time: '+currentDate+' '+currentTime);
                                 console.log(currentTimestamp.rows[0].currentdate);
                                 // let currentDate=currentTimestamp.rows[0].currentdate.split(' ')[0];

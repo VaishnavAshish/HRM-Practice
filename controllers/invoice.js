@@ -225,7 +225,7 @@ function getUserBRandCR(req, res, client, err, done, userId, projectId, userRole
     // console.log(userId);
     console.log('get data for task assignment');
     console.log(userId+' '+userRole+' '+projectId+' '+taskId);
-    client.query('SELECT bill_rate, cost_rate FROM task_assignment where user_id=$1 AND user_role=$2 AND project_id=$3 AND task_id=$4', [userId, userRole, projectId, taskId], function (err, userData) {
+    client.query('SELECT bill_rate, cost_rate FROM project_assignment where user_id=$1 AND user_role=$2 AND project_id=$3', [userId, userRole, projectId], function (err, userData) {
     if(err) {
         handleResponse.shouldAbort(err, client, done);
         handleResponse.handleError(res, err, ' Error in finding br and cr for timesheet data with task_id');
@@ -363,7 +363,7 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
                         // console.log("Step 2");
                         pool.connect((err, client, done) => {
                             // select resource_id, project_id, task_id, user_role, SUM(total_work_hours) as TWH from timesheet_line_item where project_id=7 AND invoiced=false AND created_date>= '2018-09-01' AND created_date<='2018-09-20' AND submitted=true GROUP BY resource_id, project_id, task_id, user_role
-                            client.query('select tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category ,tl.week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime  ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id from timesheet_line_item tl where submitted=$1 and invoiced=$2 and billable=$3 and project_id=$4 AND created_date>= $5 AND created_date<=$6 order by task_id, resource_id, user_role', [true, false, true, req.body.projectId, moment.tz(req.body.start_date.split('T')[0], companyDefaultTimezone).format(),moment.tz(req.body.end_date.split('T')[0], companyDefaultTimezone).format()], function (err, lineItems) {
+                            client.query('select tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category ,tl.week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime  ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id from timesheet_line_item tl where submitted=$1 and invoiced=$2 and billable=$3 and project_id=$4 AND created_date>= $5 AND created_date<=$6 order by project_id, resource_id, user_role', [true, false, true, req.body.projectId, moment.tz(req.body.start_date.split('T')[0], companyDefaultTimezone).format(),moment.tz(req.body.end_date.split('T')[0], companyDefaultTimezone).format()], function (err, lineItems) {
                                 if (err) {
                                     console.error(err);
                                     handleResponse.shouldAbort(err, client, done);
@@ -399,7 +399,7 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
                                               });
                                           });
                                       });*/
-                                      createGroupedObjWithTask(lineItems.rows, function (concatData) {
+                                      createGroupedObjWithProject(lineItems.rows, function (concatData) {
                                           // console.log("response get");
                                           // console.log(concatData);
                                           client.query('SELECT pa.id ,pa.company_id ,pa.account_id ,pa.user_id ,pa.project_id ,pa.created_by ,pa.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,pa.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,pa.bill_rate ,pa.cost_rate ,pa.user_role ,pa.record_id FROM PROJECT_ASSIGNMENT pa WHERE project_id=$1 AND company_id=$2', [req.body.projectId, req.user.company_id], function (err, projectAssignments) {
@@ -408,10 +408,10 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
                                                   handleResponse.handleError(res, err, ' Error in finding project assginment for timesheet data');
                                               } else {
                                                   calculateBR_CR_andGrouped(req, res, client, err, done, concatData, projectAssignments.rows, function(projectRows) {
-                                                      // console.log("Grouped and calculate data");
-                                                      // console.log(JSON.stringify(projectRows));
+                                                      console.log("Grouped and calculate data");
+                                                      console.log(JSON.stringify(projectRows));
                                                       projectRows.forEach(function (projectRow, index) {
-                                                          client.query('INSERT INTO INVOICE_LINE_ITEM (type,item_date,project_id,account_id,invoice_id,company_id,created_date, updated_date, amount, total_amount, quantity, currency, timesheet_row_id, user_id, user_role, unit_price) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING id', ['Timesheet', 'now()', req.body.projectId, req.body.accountId, req.body.invoiceId, req.user.company_id, 'now()', 'now()', projectRow.totalProjectCost, projectRow.totalProjectCost, parseInt(projectRow.totalHours), companyDefaultCurrency, projectRow.lineItemIds, projectRow.resource_id, projectRow.user_role, parseInt(projectRow.unit_price)], function (err, invoiceLineItem) {
+                                                          client.query('INSERT INTO INVOICE_LINE_ITEM (type,item_date,project_id,account_id,invoice_id,company_id,created_date, updated_date, amount, total_amount, quantity, currency, timesheet_row_id, user_id, user_role, unit_price,timesheet_id) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) RETURNING id', ['Timesheet', 'now()', req.body.projectId, req.body.accountId, req.body.invoiceId, req.user.company_id, 'now()', 'now()', projectRow.totalProjectCost, projectRow.totalProjectCost, parseInt(projectRow.totalHours), companyDefaultCurrency, projectRow.lineItemIds, projectRow.resource_id, projectRow.user_role, parseInt(projectRow.unit_price), projectRow.timesheet_id], function (err, invoiceLineItem) {
                                                               if (err) {
                                                                   console.error(err);
                                                                   handleResponse.shouldAbort(err, client, done);
@@ -451,7 +451,7 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
                          });
                     }else{
                         pool.connect((err, client, done) => {
-                            client.query('select tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category ,tl.week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime  ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id from timesheet_line_item tl where submitted=$1 and invoiced=$2 and billable=$3 and project_id=$4 order by task_id, resource_id, user_role', [true, false, true, req.body.projectId], function (err, lineItems) {
+                            client.query('select tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category ,tl.week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime  ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id from timesheet_line_item tl where submitted=$1 and invoiced=$2 and billable=$3 and project_id=$4 order by project_id, resource_id, user_role', [true, false, true, req.body.projectId], function (err, lineItems) {
                                 if (err) {
                                     console.error(err);
                                     handleResponse.shouldAbort(err, client, done);
@@ -460,7 +460,7 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
                                     if(lineItems.rows.length>0) {
                                         console.log('lineitem data is')
                                         console.log(JSON.stringify(lineItems.rows));
-                                        createGroupedObjWithTask(lineItems.rows, function (concatData) {
+                                        createGroupedObjWithProject(lineItems.rows, function (concatData) {
                                             console.log("response get");
                                             console.log("concatdata"+JSON.stringify(concatData));
                                             client.query('SELECT pa.id ,pa.company_id ,pa.account_id ,pa.user_id ,pa.project_id ,pa.created_by ,pa.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,pa.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,pa.bill_rate ,pa.cost_rate ,pa.user_role ,pa.record_id FROM PROJECT_ASSIGNMENT pa WHERE project_id=$1 AND company_id=$2', [req.body.projectId, req.user.company_id], function (err, projectAssignments) {
@@ -469,10 +469,10 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
                                                     handleResponse.handleError(res, err, ' Error in finding project assginment for timesheet data');
                                                 } else {
                                                     calculateBR_CR_andGrouped(req, res, client, err, done, concatData, projectAssignments.rows, function(projectRows) {
-                                                        // console.log("Grouped and calculate data");
-                                                        // console.log(JSON.stringify(projectRows));
+                                                        console.log("Grouped and calculate data");
+                                                        console.log(JSON.stringify(projectRows));
                                                         projectRows.forEach(function (projectRow, index) {
-                                                            client.query('INSERT INTO INVOICE_LINE_ITEM (type,item_date,project_id,account_id,invoice_id,company_id,created_date, updated_date, amount, total_amount, quantity, currency, timesheet_row_id, user_id, user_role, unit_price) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING id', ['Timesheet', 'now()', req.body.projectId, req.body.accountId, req.body.invoiceId, req.user.company_id, 'now()', 'now()', projectRow.totalProjectCost, projectRow.totalProjectCost, parseInt(projectRow.totalHours), companyDefaultCurrency, projectRow.lineItemIds, projectRow.resource_id, projectRow.user_role, parseInt(projectRow.unit_price)], function (err, invoiceLineItem) {
+                                                            client.query('INSERT INTO INVOICE_LINE_ITEM (type,item_date,project_id,account_id,invoice_id,company_id,created_date, updated_date, amount, total_amount, quantity, currency, timesheet_row_id, user_id, user_role, unit_price,timesheet_id) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) RETURNING id', ['Timesheet', 'now()', req.body.projectId, req.body.accountId, req.body.invoiceId, req.user.company_id, 'now()', 'now()', projectRow.totalProjectCost, projectRow.totalProjectCost, parseInt(projectRow.totalHours), companyDefaultCurrency, projectRow.lineItemIds, projectRow.resource_id, projectRow.user_role, parseInt(projectRow.unit_price),projectRow.timesheet_id], function (err, invoiceLineItem) {
                                                                 if (err) {
                                                                     console.error(err);
                                                                     handleResponse.shouldAbort(err, client, done);
@@ -518,7 +518,7 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
 
 };
 
-function createGroupedObjWithTask(lineItems, callback) {
+function createGroupedObjWithProject(lineItems, callback) {
     // console.log("method called");
     let groupedArr = [];
     let totalHours = 0;
@@ -531,7 +531,7 @@ function createGroupedObjWithTask(lineItems, callback) {
             line.lineIds = idArr;
             groupedArr.push(line);
         } else {
-            if(line.task_id != groupedArr[arrLength-1].task_id) {
+            if(line.project_id != groupedArr[arrLength-1].project_id) {
                 line.totalHours = parseInt(totalHours) + parseInt(line.total_work_hours);
                 idArr = [];
                 idArr.push(line.id);
@@ -565,17 +565,64 @@ function createGroupedObjWithTask(lineItems, callback) {
     });
 }
 
+// function createGroupedObjWithTask(lineItems, callback) {
+//     // console.log("method called");
+//     let groupedArr = [];
+//     let totalHours = 0;
+//     lineItems.forEach(function (line, index) {
+//         let arrLength = groupedArr.length;
+//         if(index == 0) {
+//             line.totalHours = parseInt(totalHours) + parseInt(line.total_work_hours);
+//             idArr = [];
+//             idArr.push(line.id);
+//             line.lineIds = idArr;
+//             groupedArr.push(line);
+//         } else {
+//             if(line.task_id != groupedArr[arrLength-1].task_id) {
+//                 line.totalHours = parseInt(totalHours) + parseInt(line.total_work_hours);
+//                 idArr = [];
+//                 idArr.push(line.id);
+//                 line.lineIds = idArr;
+//                 groupedArr.push(line);
+//             } else {
+//                 if(line.resource_id != groupedArr[arrLength-1].resource_id) {
+//                     line.totalHours = parseInt(totalHours) + parseInt(line.total_work_hours);
+//                     idArr = [];
+//                     idArr.push(line.id);
+//                     line.lineIds = idArr;
+//                     groupedArr.push(line);
+//                 } else {
+//                     if(line.user_role != groupedArr[arrLength-1].user_role) {
+//                         line.totalHours = parseInt(totalHours) + parseInt(line.total_work_hours);
+//                         idArr = [];
+//                         idArr.push(line.id);
+//                         line.lineIds = idArr;
+//                         groupedArr.push(line);
+//                     } else {
+//                         groupedArr[arrLength-1].totalHours += parseInt(line.total_work_hours);
+//                         groupedArr[arrLength-1].lineIds.push(line.id);
+//                     }
+//                 }
+//             }
+//
+//         }
+//         if(lineItems.length == (index+1)) {
+//             return callback(groupedArr);
+//         }
+//     });
+// }
+
 function calculateBR_CR_andGrouped(req, res, client, err, done, concatData, projectAssignments, callback) {
     console.log('inside calculate br and cr and group');
     console.log(JSON.stringify(concatData));
-    console.log(JSON.stringify(projectAssignments));
+    // console.log(JSON.stringify(projectAssignments));
     let projectArr = [];
     concatData.forEach(function (mergedRow, index) {
-        console.log('concatenated data is')
-        console.log(JSON.stringify(mergedRow));
+        // console.log('concatenated data is')
+        // console.log(JSON.stringify(mergedRow));
         getUserBRandCR(req, res, client, err, done, mergedRow.resource_id, mergedRow.project_id, mergedRow.user_role, mergedRow.task_id, function(response) {
-            console.log('user bill rate and cost rates are');
-            console.log(JSON.stringify(response));
+            // console.log('user bill rate and cost rates are');
+            // console.log(JSON.stringify(response));
             let projectObj = {};
             let arrLength = projectArr.length;
             var perMinuteCost = parseInt(response.bill_rate)/60;
@@ -604,6 +651,7 @@ function calculateBR_CR_andGrouped(req, res, client, err, done, concatData, proj
 
             if(index == 0) {
                 projectObj.project_id = mergedRow.project_id;
+                projectObj.timesheet_id = mergedRow.timesheet_id;
                 projectObj.totalHours = parseInt(mergedRow.totalHours);
                 projectObj.company_id = mergedRow.company_id;
                 projectObj.resource_id = mergedRow.resource_id;
@@ -615,6 +663,7 @@ function calculateBR_CR_andGrouped(req, res, client, err, done, concatData, proj
             } else {
                 if (mergedRow.resource_id != projectArr[arrLength-1].resource_id) {
                     projectObj.project_id = mergedRow.project_id;
+                    projectObj.timesheet_id = mergedRow.timesheet_id;
                     projectObj.totalHours = parseInt(mergedRow.totalHours);
                     projectObj.company_id = mergedRow.company_id;
                     projectObj.resource_id = mergedRow.resource_id;
@@ -626,6 +675,7 @@ function calculateBR_CR_andGrouped(req, res, client, err, done, concatData, proj
                 } else {
                     if(mergedRow.user_role != projectArr[arrLength-1].user_role) {
                         projectObj.project_id = mergedRow.project_id;
+                        projectObj.timesheet_id = mergedRow.timesheet_id;
                         projectObj.totalHours = parseInt(mergedRow.totalHours);
                         projectObj.company_id = mergedRow.company_id;
                         projectObj.resource_id = mergedRow.resource_id;
@@ -957,8 +1007,12 @@ exports.getInvoiceDetails = (req, res) => {
                                                             let previousCurrency=currencyWithSymbolArray.filter(function(currency){
                                                               return currency.name == lineItem.currency;
                                                             })
-                                                            console.log('previousCurrency '+previousCurrency);
-                                                            previousCurrency=parseFloat(previousCurrency[0].value)
+                                                            console.log('previousCurrency '+JSON.stringify(previousCurrency));
+                                                            if(previousCurrency.length>0){
+                                                              previousCurrency=parseFloat(previousCurrency[0].value);
+                                                            }else{
+                                                              previousCurrency='USD';
+                                                            }
                                                             let line_total_amount=(currentCurrency/previousCurrency*parseFloat(lineItem.total_amount));
                                                             // console.log('total_amount '+line_total_amount);
                                                             invoice_total_amount+=parseFloat(line_total_amount);

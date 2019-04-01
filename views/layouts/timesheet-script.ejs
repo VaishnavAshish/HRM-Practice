@@ -1372,6 +1372,8 @@
         weekTimesheetData.project_name = $('#week_project option:selected').val();
         weekTimesheetData.task_id = $('#week_task option:selected').attr('task_id');
         weekTimesheetData.task_name = $('#week_task option:selected').val();
+        // weekTimesheetData.bill_rate = $('#week_project_user_role option:selected').attr('bill_rate');
+        // weekTimesheetData.cost_rate = $('#week_project_user_role option:selected').attr('cost_rate');
         if(!$('#week-timesheet-form').hasClass('has-error')) {
             /* if(weekTimesheetData.timesheet_category) {
                 weekTimesheetData.timesheet_category = "Billable";
@@ -1379,48 +1381,49 @@
                 weekTimesheetData.timesheet_category = "Non Billable";
             } */
             console.log(weekTimesheetData);
-            createProjectAssignmentForUser(weekTimesheetData, function (response) {
-                if(response) {
-                    addRowToUL(modalId, weekTimesheetData);
-                }
-            });
+            addRowToUL(modalId, weekTimesheetData);
+            // createProjectAssignmentForUser(weekTimesheetData, function (response) {
+            //     if(response) {
+            //         addRowToUL(modalId, weekTimesheetData);
+            //     }
+            // });
         }
     }
 
-    function createProjectAssignmentForUser(weekTimesheetData, callback) {
-        showLoader('#globalLoader');
-            $.ajax({
-            type: 'POST',
-            url: '/checkAndCreateProjectAssignment',
-            contentType: 'application/json',
-            dataType: 'json',
-            data: JSON.stringify(weekTimesheetData),
-            success: function (response) {
-                if (response.success == true) {
-                    hideLoader('#globalLoader');
-                    showGlobalToast('#globalToast', 'success', response.message, 2000);
-                    return callback(true);
-                } else {
-                    showGlobalToast('#globalToast', 'error', "Error in adding row. Please try after some time", 2000);
-                    setTimeout(() => {
-                        location.reload();
-                    }, 2000);
-                }
-            },
-            error: function (response) {
-                console.log(response);
-                hideLoader('#globalLoader');
-                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
-            }
-        });
-    }
+    // function createProjectAssignmentForUser(weekTimesheetData, callback) {
+    //     showLoader('#globalLoader');
+    //         $.ajax({
+    //         type: 'POST',
+    //         url: '/checkAndCreateProjectAssignment',
+    //         contentType: 'application/json',
+    //         dataType: 'json',
+    //         data: JSON.stringify(weekTimesheetData),
+    //         success: function (response) {
+    //             if (response.success == true) {
+    //                 hideLoader('#globalLoader');
+    //                 showGlobalToast('#globalToast', 'success', response.message, 2000);
+    //                 return callback(true);
+    //             } else {
+    //                 showGlobalToast('#globalToast', 'error', "Error in adding row. Please try after some time", 2000);
+    //                 setTimeout(() => {
+    //                     location.reload();
+    //                 }, 2000);
+    //             }
+    //         },
+    //         error: function (response) {
+    //             console.log(response);
+    //             hideLoader('#globalLoader');
+    //             showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+    //         }
+    //     });
+    // }
 
     function addRowToUL(modalId, formData) {
         var inpt = '';
         for (let i = 0; i < 7; i++) {
             inpt += `<div class="slds-col hpd-2">
                         <div class="slds-form-element__control text-center">
-                            <input type="text" class="slds-input hpd-2 text-center" placeholder="0:00" onchange="isDataModified(this);" onblur="formateTime(this);"  week_start_date=`+dateFormat(moment.tz(weekStartDate, companyDefaultTimezone).format())+` pr_id=`+formData.project_id+` task_id=`+formData.task_id+` index=`+i+` pr_name='`+formData.project_name+`' task_name='`+formData.task_name+`' user_role='`+formData.user_role+`'
+                            <input type="text" class="slds-input hpd-2 text-center" placeholder="0:00" onchange="isDataModified(this);" onblur="formateTime(this);" week_start_date=`+dateFormat(moment.tz(weekStartDate, companyDefaultTimezone).format())+` pr_id=`+formData.project_id+` task_id=`+formData.task_id+` index=`+i+` pr_name='`+formData.project_name+`' task_name='`+formData.task_name+`' user_role='`+formData.user_role+`'
                             billable='`+formData.timesheet_category+`' added>
                         </div>
                     </div>`;
@@ -1476,7 +1479,7 @@
     //    var billable = $(ele).attr('billable');
        var created_date = dateFormat(adjustDays(week_start_date, "ADD", parseInt(index)));
        console.log(week_start_date+' '+created_date);
-        if(project_id != '' && task_id != '' && week_start_date != '') {
+        if(project_id != '' && week_start_date != '') {
             showLoader('#globalLoader');
             $.ajax({
                 type: 'POST',
@@ -1902,6 +1905,8 @@
                 weekDataObj.billable = $(ele).attr('billable');
                 weekDataObj.week_day = $(ele).attr('index');
                 weekDataObj.user_role = $(ele).attr('user_role');
+                // weekDataObj.bill_rate = $(ele).attr('bill_rate');
+                // weekDataObj.cost_rate = $(ele).attr('cost_rate');
                 weekDataObj.created_date = dateFormat(adjustDays(moment.tz($(ele).attr('week_start_date'), companyDefaultTimezone).format(), "ADD", weekDataObj.week_day));
                 weekDataObj.total_hours =  $(ele).val();
                 weekDataArr.push(weekDataObj);
@@ -1960,6 +1965,8 @@
    function addTimeSheetForDay(modalId, formId) {
         var dayTimeSheetData = createJSONForFormData(formId);
         var task_id = $('#day_task option:selected').attr('task_id');
+        // var bill_rate = $('#project_user_role option:selected').attr('bill_rate');
+        // var cost_rate = $('#project_user_role option:selected').attr('cost_rate');
         var project_id = $('#day_project option:selected').attr('pr_id');
         console.log('dayTimeSheetData.day_time');
         console.log(dayTimeSheetData.day_time);
@@ -1968,10 +1975,10 @@
         if ($('#day_project option:selected').val() == '' || $('#day_project option:selected').val() == null || $('#day_project option:selected').val() == undefined) {
             addError('#day_project', "Please select any project");
         } else {
-            if ($('#day_task option:selected').val() == '' || $('#day_task option:selected').val() == null || $('#day_task option:selected').val() == undefined) {
-                clearError('#day_project');
-                addError('#day_task', "Please select any task");
-            } else {
+            // if ($('#day_task option:selected').val() == '' || $('#day_task option:selected').val() == null || $('#day_task option:selected').val() == undefined) {
+            //     clearError('#day_project');
+            //     addError('#day_task', "Please select any task");
+            // } else {
                 if (dayTimeSheetData.day_time == '' || dayTimeSheetData.day_time == null || dayTimeSheetData.day_time == undefined || (parseInt(dayTimeSheetData.day_time.split(':')[0]) <= 0 && parseInt(dayTimeSheetData.day_time.split(':')[1]) <= 0)) {
                     clearError('#day_task');
                     addError('#day_time', "Enter valid hours");
@@ -1987,12 +1994,14 @@
                         } else {
                             if(dayTimeSheetData.user_role == ''|| dayTimeSheetData.user_role == null || dayTimeSheetData.user_role == undefined) {
                                 clearError('#day_time');
-                                addError('#project_user_role', "Total Time is not more than 24 hours.");
+                                addError('#project_user_role', "Please select user role.");
                             } else {
                                 clearError('#project_user_role');
                                 $('#addTimesheetLoader').removeClass('hide');
                                 dayTimeSheetData.task_id = task_id;
                                 dayTimeSheetData.project_id = project_id;
+                                // dayTimeSheetData.bill_rate = bill_rate;
+                                // dayTimeSheetData.cost_rate = cost_rate;
                                 var timesheet_date = $('#day-tab-ul').find('.slds-is-active').attr('date');
                                 dayTimeSheetData.timesheet_date = timesheet_date;
                                 console.log(dayTimeSheetData);
@@ -2002,7 +2011,7 @@
                         console.log(day_total_hours);
                     }
                 }
-            }
+            // }
         }
     }
 

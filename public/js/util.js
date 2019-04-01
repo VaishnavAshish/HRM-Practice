@@ -509,6 +509,20 @@ function startKwTimerGlobally(ele,id) {
     });
 
 }
+function renderRole(projectAssignmentList, id) {
+    let option = '';
+    if (projectAssignmentList.length > 0) {
+        option += '<option value=""> </option>';
+        projectAssignmentList.forEach(function (projAssign) {
+            option += `<option value="${projAssign.user_role}">${projAssign.user_role}</option>`;
+        });
+    } else {
+        option = '<option value="">No task found</option>'
+    }
+    console.log(option);
+    console.log("id", id);
+    $(id).html(option);
+}
 function renderTask(taskList, id) {
     let option = '';
     if (taskList.length > 0) {
@@ -533,7 +547,7 @@ function getTaskBillValue(obj,id){
     }
 }
 
-function getProjectTask(val, id) {
+function getProjectTask(val, id, roleInputId) {
     console.log("Iddd:", id);
     if ($('option:selected', val).val() != '' && $('option:selected', val).val() != undefined && $('option:selected', val).val() != null) {
         $('#addTimesheetLoader').removeClass('hide');
@@ -541,13 +555,14 @@ function getProjectTask(val, id) {
         var projectId = $('option:selected', val).attr('pr_id');
         $.ajax({
             type: 'POST',
-            url: '/getTaskList',
+            url: '/getTaskAndAssignmentList',
             contentType: 'application/json',
             dataType: 'json',
             data: JSON.stringify({ "projectId": projectId }),
             success: function (response) {
                 if (response.success == true) {
                     renderTask(response.tasks, id);
+                    renderRole(response.projectAssignment,roleInputId);
                     $('#addTimesheetLoader').addClass('hide');
                 } else {
                     $('#addTimesheetLoader').addClass('hide');
@@ -713,14 +728,16 @@ function addTimeLogEntry(modalId,formId){
         if ($('#globalProjectForTimesheet option:selected').val() == '' || $('#globalProjectForTimesheet option:selected').val() == null || $('#globalProjectForTimesheet option:selected').val() == undefined) {
             addError('#globalProjectForTimesheet', "Please select any project");
         } else {
-            if ($('#globalTaskForTimesheet option:selected').val() == '' || $('#globalTaskForTimesheet option:selected').val() == null || $('#globalTaskForTimesheet option:selected').val() == undefined) {
+            if ($('#globalUserRole option:selected').val() == '' || $('#globalUserRole option:selected').val() == null || $('#globalUserRole option:selected').val() == undefined) {
                 clearError('#globalProjectForTimesheet');
-                addError('#globalTaskForTimesheet', "Please select any task");
+                addError('#globalUserRole', "Please select any task");
             } else {
                 showLoader('#globalLoader');
                 lineItemData.task_id = $('#globalTaskForTimesheet option:selected').attr('task_id');
                 lineItemData.project_id = $('#globalProjectForTimesheet option:selected').attr('pr_id');
                 lineItemData.user_role = $('#globalUserRole option:selected').val();
+                // lineItemData.bill_rate = $('#globalUserRole option:selected').attr('bill_rate');
+                // lineItemData.cost_rate = $('#globalUserRole option:selected').val('cost_rate');
                 lineItemData.day_category = $('#globalTaskBill').is(':checked');
                 // let line_item_date = dateFormat(moment.tz(new Date(), companyDefaultTimezone).format());
                 let line_item_date=$("#logSubmittedDate").text();

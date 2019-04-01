@@ -223,7 +223,7 @@
                                     //   $("[name=globalStart]").addClass('hide');
                                     //   $("[name=globalStop]").removeClass('hide');
                                     // }
-                                    let lastruntime = moment.tz(response.timesheetData[0].lastruntime , companyDefaultTimezone).format('hh:mm:ss');
+                                    let lastruntime = moment.tz(response.timesheetData[0].lastruntime , companyDefaultTimezone).format('HH:mm:ss');
                                     hmsToSecondsOnly(lastruntime,(playStartTime)=>{
                                       hmsToSecondsOnly(response.currentTime,(currentTime)=>{
                                       //let currentTime=hoursToMinutes((new Date()).toTimeString().split(' ')[0]);

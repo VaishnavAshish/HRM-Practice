@@ -1016,12 +1016,12 @@ exports.getCurrentTimestamp = (req, res) => {
             handleResponse.handleError(res, err, ' Error in finding current date and time');
           } else {
             // currentTimestamp.rows[0].currentdate = JSON.stringify(currentTimestamp.rows[0].currentdate);
-            // let currentTime=moment.tz(new Date(), companyDefaultTimezone).format('hh:mm:ss');
+            // let currentTime=moment.tz(new Date(), companyDefaultTimezone).format('HH:mm:ss');
             // let currentDate=dateFormat(moment.tz(new Date(), companyDefaultTimezone).format());
             // let currentDate = currentTimestamp.rows[0].currentdate.split(' ')[0];
             // let currentTime = currentTimestamp.rows[0].currentdate.split(' ')[1].substring(0, currentTimestamp.rows[0].currentdate.split(' ')[1].lastIndexOf('.'));
             let currentDate=moment.tz(currentTimestamp.rows[0].currentdate, companyDefaultTimezone).format('YYYY-MM-DD');
-            let currentTime=moment.tz(currentTimestamp.rows[0].currentdate, companyDefaultTimezone).format('hh:mm:ss');
+            let currentTime=moment.tz(currentTimestamp.rows[0].currentdate, companyDefaultTimezone).format('HH:mm:ss');
             handleResponse.sendSuccess(res,'current timestamp fetched successfully',{"currentTime":currentTime,"currentDate":currentDate,"currentTimestamp":currentTimestamp.rows[0].currentdate});
           }
         });

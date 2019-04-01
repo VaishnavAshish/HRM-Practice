@@ -297,7 +297,7 @@ module.exports = function(app) {
         taskController.getTaskDetails(req, res);
     });
 
-    app.post('/getTaskList', passportConfig.isAuthenticated, taskController.getTaskList);
+    app.post('/getTaskAndAssignmentList', passportConfig.isAuthenticated, taskController.getTaskAndAssignmentList);
     app.post('/getProjectList', passportConfig.isAuthenticated, projectController.getProjectList);
     app.get('/getProjectListForCompany', passportConfig.isAuthenticated, projectController.getProjectListForCompany);
 
