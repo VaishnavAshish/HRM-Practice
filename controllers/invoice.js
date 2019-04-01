@@ -232,7 +232,8 @@ function getUserBRandCR(req, res, client, err, done, userId, projectId, userRole
     } else {
         console.log('-----userData.rows--');
         console.log(userData.rows);
-        if(userData.rows.length > 0 || userRole == undefined) {
+        if(userData.rowsCount > 0 || userRole == undefined) {
+            console.log('inside userData length greater than 0')
             return result(userData.rows[0]);
         } else {
             client.query('SELECT bill_rate, cost_rate FROM users where id=$1', [userId], function (err, userBrCr) {
