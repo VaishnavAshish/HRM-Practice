@@ -236,6 +236,7 @@ function getUserBRandCR(req, res, client, err, done, userId, projectId, userRole
             console.log('inside userData length greater than 0')
             return result(userData.rows[0]);
         } else {
+          console.log('inside userData length less than equal to 0')
             client.query('SELECT bill_rate, cost_rate FROM users where id=$1', [userId], function (err, userBrCr) {
                 if(err) {
                     handleResponse.shouldAbort(err, client, done);
