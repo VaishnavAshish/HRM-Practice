@@ -13,36 +13,36 @@
             <div class="slds-modal__content slds-p-around_medium">
                 <form id="addNewLineItemForm">
                     <div>
-                        <div class="slds-form-element slds-m-bottom_medium">
+                        <div class="slds-form-element slds-m-bottom_medium" reset='errorclass'>
                             <label class="slds-form-element__label">
                                 Select Project
                                 <abbr class="slds-required" title="required">*</abbr>
                             </label>
                             <div class="slds-form-element__control">
                                 <div class="slds-select_container">
-                                    <select class="slds-select" required="" id="globalProjectForTimesheet" name="day_project" getFormData onchange="getProjectTask(this,'#globalTaskForTimesheet','#globalUserRole')">
+                                    <select class="slds-select" required="" id="globalProjectForTimesheet" name="day_project" getFormData onchange="getProjectTask(this,'#globalTaskForTimesheet','#globalUserRole')" reset='value'>
                                         <option value=""> </option>
                                     </select>
                                 </div>
-                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset='errmsg'>
 
                                 </div>
                             </div>
                         </div>
                         <div class="slds-grid slds-wrap slds-grid_vertical-align-end slds-grid_pull-padded">
                             <div class=" slds-size_1-of-1 slds-medium-size_6-of-12 slds-p-horizontal_small">
-                                <div class="slds-form-element slds-m-bottom_medium">
+                                <div class="slds-form-element slds-m-bottom_medium" reset='errorclass'>
                                     <label class="slds-form-element__label">
                                         Task
                                         <!-- <abbr class="slds-required" title="required">*</abbr> -->
                                     </label>
                                     <div class="slds-form-element__control">
                                         <div class="slds-select_container">
-                                            <select class="slds-select" required="" id="globalTaskForTimesheet" name="day_task" getFormData onchange="getTaskBillValue(this,'#globalTaskBill')">
+                                            <select class="slds-select" required="" id="globalTaskForTimesheet" name="day_task" getFormData onchange="getTaskBillValue(this,'#globalTaskBill')" reset='value'>
                                                 <option value=""> </option>
                                             </select>
                                         </div>
-                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset='errmsg'>
 
                                         </div>
                                     </div>
@@ -72,7 +72,7 @@
                                     <div class="slds-col--bump-left slds-p-right_medium">
                                         <div class="slds-form-element ">
                                           <label class="slds-checkbox_toggle slds-grid">
-                                              <input type="checkbox" checked="" id="globalTaskBill" name="day_category" getFormData>
+                                              <input type="checkbox" checked="" id="globalTaskBill" name="day_category" getFormData reset-checked='true'>
                                               <span id="checkbox-toggle-3" class="slds-checkbox_faux_container">
                                                   <span class="slds-checkbox_faux"></span>
                                               </span>
@@ -86,12 +86,12 @@
                             </div>
                             <div class=" slds-size_1-of-1 slds-medium-size_3-of-12 slds-p-horizontal_small">
                                 <div class="slds-form-element slds-m-bottom_medium">
-                                    <label class="slds-form-element__label">
+                                    <label class="slds-form-element__label" reset='errorclass'>
                                         Time
                                     </label>
                                     <div class="slds-form-element__control">
                                           <input type="text" class="slds-input time-hhmm" placeholder="HH:MM" id="syncTimer" name="day_time" getFormData>
-                                          <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                          <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset='errmsg'>
                                           </div>
                                     </div>
                                 </div>
@@ -124,18 +124,18 @@
                                 <span>Billable</span>
                             </div>
                         </div> -->
-                        <div class="slds-form-element slds-m-bottom_medium">
+                        <div class="slds-form-element slds-m-bottom_medium" reset='errorclass'>
                             <label class="slds-form-element__label">
                                 Select Role
                                 <abbr class="slds-required" title="required">*</abbr>
                             </label>
                             <div class="slds-form-element__control">
                                 <div class="slds-select_container">
-                                    <select class="slds-select" required="" getFormData name="user_role" id="globalUserRole">
+                                    <select class="slds-select" required="" getFormData name="user_role" id="globalUserRole" reset='value'>
 
                                     </select>
                                 </div>
-                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset='errmsg'>
 
                                 </div>
                             </div>
@@ -143,7 +143,7 @@
                         <div class="slds-form-element slds-m-bottom_medium">
                             <label class="slds-form-element__label">Note</label>
                             <div class="slds-form-element__control">
-                                <textarea class="slds-textarea" placeholder="Placeholder Text" id="note" name="day_note" getFormData></textarea>
+                                <textarea class="slds-textarea" placeholder="Placeholder Text" id="note" name="day_note" getFormData reset='value'></textarea>
                             </div>
                         </div>
 

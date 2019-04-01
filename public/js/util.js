@@ -895,7 +895,7 @@ function stopKwTimerWithLogEntry(lineItemId,ele, id, inputId, modalId,currentDat
               // $("[name=globalStop]").css('display','none');
               $('[name=globalStart]').removeClass('hide');
               // $(id).text('Start');
-              openModal(modalId);
+              openModal(modalId,true);
           } else {
               hideLoader('#globalLoader');
               showGlobalToast('#globalToast', 'error', response.message, 4000);
