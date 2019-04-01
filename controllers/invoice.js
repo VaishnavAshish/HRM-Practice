@@ -645,12 +645,12 @@ function calculateBR_CR_andGrouped(req, res, client, err, done, concatData, proj
             //// console.log(totalAmount);
 
             /* totalAmount += parseFloat(invoicedAmount); */
-            let unit_price = projectAssignments.filter(function (projectAssign) {
-                if(projectAssign.user_id == mergedRow.resource_id && projectAssign.user_role == mergedRow.user_role) {
-                    return projectAssign.bill_rate;
-                }
-            });
-            console.log('unit_price'+unit_price);
+            // let unit_price = projectAssignments.filter(function (projectAssign) {
+            //     if(projectAssign.user_id == mergedRow.resource_id && projectAssign.user_role == mergedRow.user_role) {
+            //         return projectAssign.bill_rate;
+            //     }
+            // });
+            // console.log('unit_price'+unit_price);
             console.log(projectArr[arrLength-1]+' '+mergedRow.resource_id+' '+index);
 
             if(index == 0) {
@@ -661,7 +661,7 @@ function calculateBR_CR_andGrouped(req, res, client, err, done, concatData, proj
                 projectObj.resource_id = mergedRow.resource_id;
                 projectObj.user_role = mergedRow.user_role;
                 projectObj.totalProjectCost = totalAmount;
-                projectObj.unit_price = unit_price[0].bill_rate;
+                projectObj.unit_price = response.bill_rate;
                 projectObj.lineItemIds = mergedRow.lineIds;
                 projectArr.push(projectObj);
             } else {
@@ -673,7 +673,7 @@ function calculateBR_CR_andGrouped(req, res, client, err, done, concatData, proj
                     projectObj.resource_id = mergedRow.resource_id;
                     projectObj.user_role = mergedRow.user_role;
                     projectObj.totalProjectCost = totalAmount;
-                    projectObj.unit_price = unit_price[0].bill_rate;
+                    projectObj.unit_price = response.bill_rate;
                     projectObj.lineItemIds = mergedRow.lineIds;
                     projectArr.push(projectObj);
                 } else {
@@ -685,7 +685,7 @@ function calculateBR_CR_andGrouped(req, res, client, err, done, concatData, proj
                         projectObj.resource_id = mergedRow.resource_id;
                         projectObj.user_role = mergedRow.user_role;
                         projectObj.totalProjectCost = totalAmount;
-                        projectObj.unit_price = unit_price[0].bill_rate;
+                        projectObj.unit_price = response.bill_rate;
                         projectObj.lineItemIds = mergedRow.lineIds;
                         projectArr.push(projectObj);
                     } else {
