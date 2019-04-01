@@ -223,17 +223,17 @@ exports.postAddInvoiceItem = (req, res) => {
 function getUserBRandCR(req, res, client, err, done, userId, projectId, userRole, taskId, result) {
     // console.log('userId in getUserBRandCR');
     // console.log(userId);
-    console.log('get data for task assignment');
-    console.log(userId+' '+userRole+' '+projectId+' '+taskId);
+    // console.log('get data for task assignment');
+    // console.log(userId+' '+userRole+' '+projectId+' '+taskId);
     client.query('SELECT bill_rate, cost_rate FROM project_assignment where user_id=$1 AND user_role=$2 AND project_id=$3', [userId, userRole, projectId], function (err, userData) {
     if(err) {
         handleResponse.shouldAbort(err, client, done);
         handleResponse.handleError(res, err, ' Error in finding br and cr for timesheet data with task_id');
     } else {
-        console.log('-----userData.rows--');
-        console.log(userData.rows);
+        // console.log('-----userData.rows--');
+        // console.log(userData.rows);
         if(userData.rowsCount > 0 || userRole == undefined) {
-            console.log('inside userData length greater than 0')
+            // console.log('inside userData length greater than 0')
             return result(userData.rows[0]);
         } else {
           console.log('inside userData length less than equal to 0'+userId);
@@ -242,8 +242,8 @@ function getUserBRandCR(req, res, client, err, done, userId, projectId, userRole
                     handleResponse.shouldAbort(err, client, done);
                     handleResponse.handleError(res, err, ' Error in finding br and cr for timesheet data with user_id');
                 } else {
-                    console.log('-----userData.rows--');
-                    console.log(userBrCr.rows);
+                    // console.log('-----userData.rows--');
+                    // console.log(userBrCr.rows);
                     return result(userBrCr.rows[0]);
                 }
             });
@@ -299,6 +299,7 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
        handleResponse.handleError(res, err, ' Error in finding company setting data');
      }else{
        companyDefaultTimezone=result.timezone;
+       companyDefaultCurrency =result.currency;
         // console.log("Inside timesheet add");
         req.assert('accountId', 'Account cannot be blank').notEmpty();
         req.assert('projectId', 'Project cannot be blank').notEmpty();
@@ -1012,11 +1013,7 @@ exports.getInvoiceDetails = (req, res) => {
                                                               return currency.name == lineItem.currency;
                                                             })
                                                             console.log('previousCurrency '+JSON.stringify(previousCurrency));
-                                                            if(previousCurrency.length>0){
-                                                              previousCurrency=parseFloat(previousCurrency[0].value);
-                                                            }else{
-                                                              previousCurrency=1;
-                                                            }
+                                                            previousCurrency=parseFloat(previousCurrency[0].value);
                                                             let line_total_amount=(currentCurrency/previousCurrency*parseFloat(lineItem.total_amount));
                                                             // console.log('total_amount '+line_total_amount);
                                                             invoice_total_amount+=parseFloat(line_total_amount);
