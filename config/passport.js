@@ -319,7 +319,7 @@ passport.use(new RememberMeStrategy(
     consumeRememberMeToken(token, function(err, uid) {
       if (err) { return done(err); }
       if (!uid) { return done(null, false); }
-
+      console.log('uid '+uid);
       findById(uid, function(err, user) {
         if (err) { return done(err); }
         if (!user) { return done(null, false); }
