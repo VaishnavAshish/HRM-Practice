@@ -333,7 +333,7 @@ exports.getProject = (req, res) => {
                         projectAtRisk=projectArr.filter(pro => pro.status=="At Risk");
                         projectCompleted=projectArr.filter(pro => pro.status=="Completed");*/
                         done();
-                        handleResponse.responseToPage(res,'pages/projects-listing',{projects: projectArr.length>process.env.PAGE_RECORD_NO?projectArr.slice(0, process.env.PAGE_RECORD_NO-1):projectArr, totalCount: allProjectCount,notStartedCount:notStartedCount, inProgressCount :inProgressCount, atRiskCount :atRiskCount, completedCount:completedCount,user:req.session.passport.user, error:err, accounts:accountList.rows},"success","Successfully rendered");
+                        handleResponse.responseToPage(res,'pages/projects-listing',{projects: projectArr.length>process.env.PAGE_RECORD_NO?projectArr.slice(0, process.env.PAGE_RECORD_NO-1):projectArr, totalCount: allProjectCount,notStartedCount:notStartedCount, inProgressCount :inProgressCount, atRiskCount :atRiskCount, completedCount:completedCount,user:req.session.passport.user, error:err, accounts:accountList.rows,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD'),companyDefaultTimezone:companyDefaultTimezone},"success","Successfully rendered");
                   }
                 });
                 /*res.render('pages/projects-listing', { projects: project.rows, user: req.session.passport.user, error: err });*/
@@ -614,7 +614,7 @@ exports.getProjectDetail = (req, res) => {
                                         // // console.log('----------resUsers.rows-----------');
                                         // // console.log(resUsers.rows);
                                         done();
-                                        handleResponse.responseToPage(res,'pages/project-details',{ project: project.rows[0], userRoleList:userRole ,tasks: taskList.rows, accounts: accountList.rows, userList: userList.rows, user: req.session.passport.user, resUsers: resUsers.rows ,taskTotalCount:taskTotalCount},"success","Successfully rendered");
+                                        handleResponse.responseToPage(res,'pages/project-details',{ project: project.rows[0], userRoleList:userRole ,tasks: taskList.rows, accounts: accountList.rows, userList: userList.rows, user: req.session.passport.user, resUsers: resUsers.rows ,taskTotalCount:taskTotalCount,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD')},"success","Successfully rendered");
                                         /*res.render('pages/project-details', { project: project.rows[0], tasks: taskList.rows, accounts: accountList.rows, userList: userList.rows, user: req.session.passport.user, error: err, resUsers: resUsers.rows });*/
                                        }
                                     });

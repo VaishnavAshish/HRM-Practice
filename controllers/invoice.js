@@ -122,7 +122,7 @@ exports.getInvoice = (req, res) => {
                                 done();
                                 /*draftInvoice=invoiceListArr.filter(inv => inv.status=="DRAFT");
                                 paidInvoice=invoiceListArr.filter(inv => inv.status=="PAID");*/
-                                handleResponse.responseToPage(res,'pages/invoices-listing',{accounts: accountList.rows, invoiceList: invoiceListArr,totalCount:totalCount, draftCount:draftCount, paidCount:paidCount, user: req.session.passport.user },"success","Successfully rendered");
+                                handleResponse.responseToPage(res,'pages/invoices-listing',{accounts: accountList.rows, invoiceList: invoiceListArr,totalCount:totalCount, draftCount:draftCount, paidCount:paidCount, user: req.session.passport.user ,companyDefaultTimezone:companyDefaultTimezone,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD')},"success","Successfully rendered");
                                 /*res.render('pages/invoices-listing', { accounts: accountList.rows, invoiceList: invoiceList.rows, user: req.session.passport.user });*/
                             }
                         });
@@ -910,7 +910,7 @@ function addInvoiceLineItem(req, res, client, err, done, data, result) {
 }
 
 function updateExpenseRecord(req, res, client, err, done, expense, result) {
-    let newDate=moment.tz(new Date(), companyDefaultTimezone).format();
+    // let newD=moment.tz(new Date(), companyDefaultTimezone).format();
     client.query('UPDATE expense SET invoiced=$1,invoice_id=$2,modified_date=$3 WHERE id=$4', [true,req.body.invoiceId,'now()',expense.id], function (err, expenseUpdatedItem) {
         if (err) {
             console.error(err);
@@ -1048,7 +1048,7 @@ exports.getInvoiceDetails = (req, res) => {
                                                                 // // console.log(projects.rows);
                                                                 // console.log('invoice_total_amount '+invoice_total_amount);
                                                                 done();
-                                                                handleResponse.responseToPage(res,'pages/invoice-details',{projects:projects.rows, invoiceDetails: invoiceDetails.rows[0], invoiceItems: invoiceItems.rows, user: req.session.passport.user, userList:response  },"success","Successfully rendered");
+                                                                handleResponse.responseToPage(res,'pages/invoice-details',{projects:projects.rows, invoiceDetails: invoiceDetails.rows[0], invoiceItems: invoiceItems.rows, user: req.session.passport.user, userList:response ,companyDefaultTimezone:companyDefaultTimezone,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD') },"success","Successfully rendered");
                                                             })
 
                                                         }

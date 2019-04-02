@@ -1,4 +1,5 @@
 <script>
+let currentdate;
 function addProject(modalId) {
     let projectData = {};
     projectData.title = $("#new-project-title").val();
@@ -10,15 +11,15 @@ function addProject(modalId) {
         projectData.project_cost = $.trim($("#project-cost").val()).length > 0 ? parseFloat($("#project-cost").val()) : 0;
     }
     projectData.isBillable = $("#new-project-isBillable").prop('checked');
-    projectData.startDate = new Date($('#new-project-start-date').val());
-    projectData.endDate = new Date($('#new-project-end-date').val());
+    projectData.startDate = $('#new-project-start-date').val()?moment.tz($('#new-project-start-date').val(), companyDefaultTimezone).format('YYYY-MM-DD'):'';
+    projectData.endDate = $('#new-project-end-date').val()?moment.tz($('#new-project-end-date').val(), companyDefaultTimezone).format('YYYY-MM-DD'):'';
     console.log(projectData);
     if(!projectData.title) {
         addError("#new-project-title", "Please enter project title");
     } else {
         if(projectData.accountId == "" || projectData.accountId == null || projectData.accountId == undefined) {
             clearError('#new-project-title');
-            addError("#new-project-account", "Select any account"); 
+            addError("#new-project-account", "Select any account");
         } else {
             clearError('#new-project-account');
             showLoader('#globalLoader');
@@ -88,7 +89,8 @@ $(document).ready(function(){
     $("#offset").text(parseInt($("#pageRecordNo").text()));
     let noOfRecord=parseInt($("#offset").text());
     let searchFilter=$("#selectedFilter").text();
-
+    companyDefaultTimezone = "<%= companyDefaultTimezone %>";
+    currentdate = "<%= currentdate %>"
     if(searchFilter.trim()=="All"){
         if((<%= totalCount %>) >parseInt($("#offset").text())){
             $("#totalRecordCount").text(<%= totalCount %>);

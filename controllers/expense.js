@@ -249,7 +249,9 @@ exports.getExpense = (req, res) => {
                                                             accounts: account.rows,
                                                             projects: project.rows,
                                                             user: req.session.passport.user,
-                                                            usersList:usersList
+                                                            usersList:usersList,
+                                                            companyDefaultTimezone:companyDefaultTimezone,
+                                                            currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD')
                                                         }, "success", "Successfully rendered");
                                                     });
                                                 } else {
@@ -264,7 +266,9 @@ exports.getExpense = (req, res) => {
                                                         accounts: account.rows,
                                                         projects: project.rows,
                                                         user: req.session.passport.user,
-                                                        usersList:[]
+                                                        usersList:[],
+                                                        companyDefaultTimezone:companyDefaultTimezone,
+                                                        currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD')
                                                     }, "success", "Successfully rendered");
                                                 }
                                             }
@@ -406,7 +410,9 @@ exports.getExpenseDetail = (req, res) => {
                                                     accounts: account.rows,
                                                     projects: project.rows,
                                                     expCatList:expCat,
-                                                    user: req.session.passport.user
+                                                    user: req.session.passport.user,
+                                                    companyDefaultTimezone:companyDefaultTimezone,
+                                                    currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD')
                                                 }, "success", "Successfully rendered");
                                              }
                                         });

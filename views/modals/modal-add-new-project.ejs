@@ -1,4 +1,4 @@
-<!-- modal add new organization start-->        
+<!-- modal add new organization start-->
             <div id="modalAddNewProject">
                 <section role="dialog" tabindex="-1" class="slds-modal">
                     <div class="slds-modal__container">
@@ -20,7 +20,7 @@
                                     <div class="slds-form-element__control">
                                         <input type="text" id="new-project-title" name="new-project-title" class="slds-input" placeholder="" required="" reset='value'/>
                                         <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset='errmsg'>
-                                                   
+
                                         </div>
                                     </div>
                                 </div>
@@ -39,7 +39,7 @@
                                                             <% }); %>
                                                         <% } else { %>
                                                             <option value=""> </option>
-                                                        <% } %> 
+                                                        <% } %>
                                                 </select>
                                             </div>
                                             <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" id="err-msg-account" reset='errmsg'>
@@ -52,7 +52,7 @@
                                     <div class="slds-form-element__control">
                                         <textarea id="new-project-desc" class="slds-textarea" placeholder="" reset='value'></textarea>
                                         <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
-                                                   
+
                                         </div>
                                     </div>
                                 </div>
@@ -71,7 +71,7 @@
                                                     </select>
                                                 </div>
                                                 <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
-                                                            
+
                                                 </div>
                                             </div>
                                         </div>
@@ -115,7 +115,7 @@
                                                 <span class="slds-input__icon slds-input__icon_right">
                                                     <i class="fa fa-calendar"></i>
                                                 </span>
-                                                <input type="date"  class="slds-input open-date-pik" id="new-project-start-date" reset='value'/>
+                                                <input type="date"  class="slds-input open-date-pik" id="new-project-start-date" value="<%= currentdate %>" reset='value'/>
                                             </div>
                                             <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
@@ -131,7 +131,7 @@
                                                 <span class="slds-input__icon slds-input__icon_right">
                                                     <i class="fa fa-calendar"></i>
                                                 </span>
-                                                <input type="date"  class="slds-input open-date-pik" id="new-project-end-date" reset='value'/>
+                                                <input type="date"  class="slds-input open-date-pik" id="new-project-end-date" reset='value' value="<%= currentdate %>"/>
                                             </div>
                                             <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
@@ -150,4 +150,4 @@
                 </section>
                 <div class="slds-backdrop"></div>
             </div>
-          <!-- modal add new organization start-->   
+          <!-- modal add new organization start-->

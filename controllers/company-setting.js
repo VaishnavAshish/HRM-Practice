@@ -7,7 +7,7 @@ exports.getCompanySetting=(req,res,cb)=>{
 	moment.tz.link("Asia/Calcutta|Asia/Kolkata");
   /*// console.log(moment.tz.names());*/
 	pool.connect((err, client, done) => {
-        client.query('SELECT * FROM SETTING WHERE company_id=$1',[req.user.company_id], function(err, companySetting) {
+        client.query('SELECT *, Now() as currentdate  FROM SETTING WHERE company_id=$1',[req.user.company_id], function(err, companySetting) {
           if (err) {
           	console.error('err in getting settings');
             console.error(err);

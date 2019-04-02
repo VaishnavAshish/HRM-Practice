@@ -2,7 +2,10 @@
 
     var invoice_account_id=null,project_list={};
     var invoice_item_id=null;
+    let currentdate;
     $(document).ready(function(){
+        companyDefaultTimezone = "<%= companyDefaultTimezone %>";
+        currentdate = "<%= currentdate %>"
         var invoiceDetails=<%- JSON.stringify(invoiceDetails) %>;
         invoice_account_id=<%= invoiceDetails.account_id ;%>;
         invoice_item_id=<%= invoiceDetails.id ;%>;
@@ -103,7 +106,7 @@
                     invoiceItemData.account_id = invoice_account_id;
                     invoiceItemData.type = $(li).find("#type option:selected").val();
                     invoiceItemData.invoice_id = invoice_item_id;
-                    invoiceItemData.item_date =($(li).find("#item_date").val()=="")?new Date():new Date($(li).find("#item_date").val());
+                    invoiceItemData.item_date =($(li).find("#item_date").val()=="")?moment.tz(currentdate, companyDefaultTimezone).format('YYYY-MM-DD'):moment.tz($(li).find("#item_date").val(), companyDefaultTimezone).format('YYYY-MM-DD');
                     invoiceItemData.total_amount = ($(li).find('#amount').val()=="")?0:$(li).find('#amount').val();
                     invoiceItemData.note=$(li).find('#note').val();
                     console.log(invoiceItemData);

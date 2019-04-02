@@ -57,12 +57,12 @@
                                   `+formData.task_name+`
                               </div>
                               <div class=" text-size-11 text-dull">
-                                    
+
                               </div>
                           </div>
                       </div>
                       <div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-p-horizontal_small sm-vpd-15" id="time-hours">
-                            <div class="slds-col hpd-2"></div>  
+                            <div class="slds-col hpd-2"></div>
                             <div class="slds-grid">
                                 `+inpt+`
                           </div>
@@ -132,7 +132,7 @@
                                                         <div class="slds-col--bump-left slds-p-horizontal_medium">
                                                             <div class="slds-form-element">
                                                                 <label class="slds-checkbox_toggle slds-grid">
-                                                                    
+
                                                                     <input type="checkbox" `+checkedval+` onchange="setModified(this);">
                                                                     <span id="checkbox-toggle-3" class="slds-checkbox_faux_container">
                                                                         <span class="slds-checkbox_faux"></span>
@@ -183,7 +183,7 @@
                         openModal(modalId);
                         hideLoader('#globalLoader');
                     } else {
-                        
+
                     }
                 },
                 error: function (response) {
@@ -206,7 +206,7 @@
                 if(valArr[1].length < 2) {
                     $(ele).val(valArr[0]+":"+valArr[1]+"0");
                 } else if(valArr[1].length > 2) {
-                    $(ele).val(valArr[0]+":"+valArr[1].substring(0,2)); 
+                    $(ele).val(valArr[0]+":"+valArr[1].substring(0,2));
                 } else {
                     $(ele).val(valArr[0]+":"+valArr[1]);
                 }
@@ -273,7 +273,7 @@
                 if (response.success == true) {
                     // $('#addTimesheetLoader').addClass('hide');
                     // closeModal(modalId);
-                    
+
                     showGlobalToast('#globalToast', 'success', "Added Successfully", 2000);
                     setTimeout(() => {
                         location.reload();
@@ -347,7 +347,7 @@
                 if (response.success == true) {
                     $('#addTimesheetLoader').addClass('hide');
                     closeModal(modalId);
-                    
+
                     showGlobalToast('#globalToast', 'success', response.message, 4000);
                     location.reload();
                 } else {
@@ -396,7 +396,7 @@
                         closeModal(modalId);
                         showGlobalToast('#globalToast', 'success', response.message, 4000);
                         setTimeout(() => {
-                            location.reload();                            
+                            location.reload();
                         }, 2500);
                     } else {
                         $('#updateWeeklyTimesheetLoader').addClass('hide');

@@ -364,11 +364,6 @@ exports.postEditAccount = (req, res) => {
     }
 
 };
-function adjustDays (days) {
- var dat = new Date();
- dat.setTime(dat.getTime() -  (days * 24 * 60 * 60 * 1000));
- return dat;
-}
 
 exports.postAddAccount = (req, res) => {
   // console.log("Inside add account post method");

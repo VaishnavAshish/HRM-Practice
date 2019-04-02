@@ -1,5 +1,5 @@
 <script>
-
+let currentdate;
 function deleteExpense(expenseId){
         showLoader('#globalLoader');
         /*console.log('expense id is '+userId);*/
@@ -48,7 +48,7 @@ function addExpense(modalId) {
                 let expenseData = {};
                 expenseData.tax = $("#tax option:selected").val();
                 expenseData.tax_no = ($("#tax_no").val()=="")?0:$("#tax_no").val();
-                expenseData.expense_date =($("#expense_date").val()==""?new Date():new Date($("#expense_date").val()));
+                expenseData.expense_date =($("#expense_date").val()==""?moment.tz(currentdate, companyDefaultTimezone).format('YYYY-MM-DD'):moment.tz($("#expense_date").val(), companyDefaultTimezone).format('YYYY-MM-DD'));
                 expenseData.category = $('#category option:selected').val();
                 expenseData.currency = $('#currency option:selected').val();
                 expenseData.amount = ($('#amount').val()=="")?0:$('#amount').val();
@@ -99,6 +99,8 @@ function clearError(id, errMsgId) {
             $(errMsgId).html('');
     }
 $(document).ready(function(){
+    companyDefaultTimezone = '<%= companyDefaultTimezone %>';
+    currentdate = '<%= currentdate %>';
     let url = new URL(window.location.href);
     var isUserId = url.pathname.substring(((url.pathname).lastIndexOf('/')+1), (url.pathname).lastIndexOf('#')).length > 0;
     if(isUserId) {
