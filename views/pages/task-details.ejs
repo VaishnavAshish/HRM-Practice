@@ -91,7 +91,7 @@
                         <div class="slds-tabs_default__content" target-tab="task-details" data-modified>
                             <div id="update-task-details-form">
                                 <div class=" slds-card slds-p-around_large sm-pd-10">
-                                    <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                    <div class="slds-grid slds-wrap slds-grid_pull-padded" id="editTaskForm">
                                         <div class="slds-size_1-of-1 slds-medium-size_8-of-12 slds-p-horizontal_small">
                                             <div class="slds-p-bottom_x-small line-bottom">
                                                 <div class="text-uppercase ">
@@ -106,7 +106,7 @@
                                                             <abbr class="slds-required" title="required">*</abbr>
                                                         </label>
                                                         <div class="slds-form-element__control">
-                                                            <input type="text" id="task-title" name="title" getFormData='' value="<%= taskDetails.name %>" class="slds-input" placeholder="" required="">
+                                                            <input type="text" id="task-title" name="title" getFormData='' value="<%= taskDetails.name %>" class="slds-input" placeholder="" required="" disabled>
                                                             <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
                                                             </div>
@@ -166,7 +166,7 @@
                                                                     <span class="slds-input__icon slds-input__icon_right">
                                                                         <i class="far fa-clock"></i>
                                                                     </span>
-                                                                    <input type="text" name="estimated_hours" getFormData='' value="<%= taskDetails.estimated_hours %>" class="slds-input">
+                                                                    <input type="text" name="estimated_hours" getFormData='' value="<%= taskDetails.estimated_hours %>" class="slds-input" time>
                                                                 </div>
                                                                 <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 

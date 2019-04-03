@@ -87,7 +87,7 @@
 
 
                     <div class="slds-tabs_default__content" target-tab="org-details">
-                        <div class=" slds-card slds-p-around_large sm-pd-10" data-modified>
+                        <div class=" slds-card slds-p-around_large sm-pd-10" data-modified id="editCompanyForm">
 
                             <div class="slds-grid slds-wrap slds-grid_pull-padded">
                                 <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_6-of-12 slds-p-horizontal_small">
@@ -158,7 +158,7 @@
                                                 <div class="slds-form-element slds-m-bottom_medium">
                                                     <label class="slds-form-element__label">City</label>
                                                     <div class="slds-form-element__control">
-                                                        <input type="text" id="city" class="slds-input" placeholder="" value="<%=company.city%>">
+                                                        <input type="text" id="city" class="slds-input" placeholder="" value="<%=company.city%>" alphabet>
                                                         <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
                                                         </div>
@@ -169,7 +169,7 @@
                                                 <div class="slds-form-element slds-m-bottom_medium">
                                                     <label class="slds-form-element__label">State</label>
                                                     <div class="slds-form-element__control">
-                                                        <input type="text" id="state" class="slds-input" placeholder value="<%=company.state%>"
+                                                        <input type="text" id="state" class="slds-input" placeholder value="<%=company.state%>" alphabet>
                                                         <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
                                                         </div>
@@ -182,7 +182,7 @@
                                                 <div class="slds-form-element slds-m-bottom_medium">
                                                     <label class="slds-form-element__label">Country</label>
                                                     <div class="slds-form-element__control">
-                                                        <input type="text" id="country" class="slds-input" placeholder="" value="<%=company.country%>">
+                                                        <input type="text" id="country" class="slds-input" placeholder="" value="<%=company.country%>" alphabet>
                                                         <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
                                                         </div>
@@ -201,16 +201,18 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="text-right sm-tpd-15">
+                                          <button class="slds-button slds-button_brand slds-align-top" onclick="updateCompany(<%=company.id;%>)" disabled save-btn>
+                                            Save Changes
+                                          </button>
+                                        </div>
+
                                     </div>
-                                </div>
-                                <div class="text-right sm-tpd-15">
-                                  <button class="slds-button slds-button_brand slds-align-top" onclick="updateCompany(<%=company.id;%>)" disabled save-btn>
-                                      Save Changes
-                                  </button>
                                 </div>
                             </div>
                         </div>
-                        <div class="slds-tabs_default__content hide" target-tab="org-users">
+                    </div>
+                    <div class="slds-tabs_default__content hide" target-tab="org-users">
                             <div class=" slds-card ">
                                 <div class="slds-p-around_small">
                                         <div class="slds-grid slds-wrap slds-grid_pull-padded">
@@ -415,7 +417,7 @@
                             </div>
                         </div>
 
-                    </div>
+
 
                 </div>
             </div>

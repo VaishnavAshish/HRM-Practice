@@ -1,10 +1,10 @@
 <script>
     function isProjectFixedFee(ele) {
-        $('input[type=text][project-cost]').attr('disabled', 'disabled');
-        $('input[type=text][project-cost]').val(0);
+        $('input[type=number][project-cost]').attr('disabled', 'disabled');
+        $('input[type=number][project-cost]').val(0);
         if($('option:selected', ele).val() == "fixed_fee") {
-            $('input[type=text][project-cost]').removeAttr('disabled');
-            $('input[type=text][project-cost]').val('');
+            $('input[type=number][project-cost]').removeAttr('disabled');
+            $('input[type=number][project-cost]').val('');
         }
     }
 
@@ -22,14 +22,14 @@
 	            dataType: 'json',
                 data : JSON.stringify({"projectId":projectId}),
                 success : function(response){
-                    console.log(response); 
+                    console.log(response);
                     if(response.success == true) {
                         hideLoader('#globalLoader');
                         window.location.href = '/projects-listing';
                     } else {
                         hideLoader('#globalLoader');
                         showGlobalToast('#globalToast', 'error', response.message, 4000);
-                    }  
+                    }
                 },
                 error: function(response){
                         console.log(response);

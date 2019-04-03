@@ -55,20 +55,21 @@
         $('#user-signup-form .slds-form-element').removeClass('slds-has-error');
         $('#user-signup-form .slds-text-color_error').html('');
         //
-        $.each($('#user-signup-form input[required]'), function (index, input) {
-           if($(input).val().trim().length < 1) {
-               addError('#'+$(input).attr('id'), "Enter valid input");
-               $("#user-signup-form").addClass('has-error');
-               return false;
-           }
-        });
+        // $.each($('#user-signup-form input[required]'), function (index, input) {
+        //    if($(input).val().trim().length < 1) {
+        //        addError('#'+$(input).attr('id'), "Enter valid input");
+        //        $("#user-signup-form").addClass('has-error');
+        //        return false;
+        //    }
+        // });
+        checkFormValidation("#user-signup-form");
         if(!$('#user-signup-form').hasClass('has-error')) {
-            validateEmail(orgData.adminEmail, function (isEmailValid) {
-                if(!isEmailValid) {
-                    addError("#email", "Invalid email address. Please enter valid email address");
-                    $("#user-signup-form").addClass('has-error');
-                }
-            });
+            // validateEmail(orgData.adminEmail, function (isEmailValid) {
+            //     if(!isEmailValid) {
+            //         addError("#email", "Invalid email address. Please enter valid email address");
+            //         $("#user-signup-form").addClass('has-error');
+            //     }
+            // });
             if(orgData.adminPass.trim().length < 6) {
                 addError('#password', 'Password must be greater than 6 characters');
                 $("#user-signup-form").addClass('has-error');
@@ -77,6 +78,7 @@
             if(orgData.adminPass != orgData.con_password) {
                 addError('#con-password', "Password does not match");
                 $("#user-signup-form").addClass('has-error');
+                return false;
             }
             showLoader('#globalLoader');
             orgData.isSignup = true;
@@ -107,13 +109,13 @@
         }
     }
 
-    function validateEmail(sEmail, callback) {
-        var filter = /^[A-Z0-9._%+-]+@([A-Z0-9-]+\.)+[A-Z]{2,4}$/i;
-        if (filter.test(sEmail)) {
-            return callback(true);
-        }
-        else {
-            return callback(false);
-        }
-    }
+    // function validateEmail(sEmail, callback) {
+    //     var filter = /^[A-Z0-9._%+-]+@([A-Z0-9-]+\.)+[A-Z]{2,4}$/i;
+    //     if (filter.test(sEmail)) {
+    //         return callback(true);
+    //     }
+    //     else {
+    //         return callback(false);
+    //     }
+    // }
 </script>

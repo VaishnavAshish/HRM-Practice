@@ -371,23 +371,23 @@
     }
 
     function addInvoiceLineItem(modalId){
-      clearError("select[id=invoice-type]");
-      clearError("input[id=invoice-quantity]");
-      clearError("input[id=invoice-unit-price]");
+      clearError($("select[id=invoice-type]"));
+      clearError($("input[id=invoice-quantity]"));
+      clearError($("input[id=invoice-unit-price]"));
       let invoice_line_type=$("select[id=invoice-type]").val();
       let invoice_quantity = $("input[id=invoice-quantity]").val();
       let invoice_unit_price = $("input[id=invoice-unit-price]").val();
       let description = $("textarea[id=invoice-description]").val();
       if(invoice_line_type==""||invoice_line_type==null||invoice_line_type==undefined){
-          addError("select[id=invoice-type]","Please select any invoice line item type ");
+          addError($("select[id=invoice-type]"),"Please select any invoice line item type ");
       }else if(invoice_quantity==""||invoice_quantity==null||invoice_quantity==undefined){
-          addError("input[id=invoice-quantity]","Please enter the quantity ");
+          addError($("input[id=invoice-quantity]"),"Please enter the quantity ");
       }else if(invoice_unit_price==""||invoice_unit_price==null||invoice_unit_price==undefined){
-          addError("input[id=invoice-unit-price]","Please enter the unit price ");
+          addError($("input[id=invoice-unit-price]"),"Please enter the unit price ");
       }else{
-        clearError("select[id=invoice-type]");
-        clearError("input[id=invoice-quantity]");
-        clearError("input[id=invoice-unit-price]");
+        clearError($("select[id=invoice-type]"));
+        clearError($("input[id=invoice-quantity]"));
+        clearError($("input[id=invoice-unit-price]"));
         showLoader('#globalLoader');
         $.ajax({
             type: 'POST',

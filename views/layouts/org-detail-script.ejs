@@ -89,7 +89,6 @@ function deleteCompany(companyId){
     });
 }
 function updateCompany(companyId){
-		showLoader('#globalLoader');
 		console.log('company id is '+companyId);
 		let companyData={};
 		companyData.id=companyId;
@@ -100,29 +99,32 @@ function updateCompany(companyId){
 		companyData.state=$("#state").val();
 		companyData.country=$("#country").val();
 		companyData.zip_code=$("#zipcode").val();
+		checkFormValidation("#editCompanyForm");
+		if(!$("#editCompanyForm").hasClass('has-error')) {
+				showLoader('#globalLoader');
+				$.ajax({
+			      type: 'POST',
+			      url : '/updateCompany',
+			      contentType: 'application/json',
+			      dataType: 'json',
+			      data:JSON.stringify(companyData),
+			       success : function(response){
+			       		console.log(response);
+			       		hideLoader('#globalLoader');
+			       		window.location.href="/org-listing";
+			       		/*location.reload();*/
+			       		//showGlobalToast('#globalToast', 'success', 'company added successfully', 4000);
 
-		$.ajax({
-	      type: 'POST',
-	      url : '/updateCompany',
-	      contentType: 'application/json',
-	      dataType: 'json',
-	      data:JSON.stringify(companyData),
-	       success : function(response){
-	       		console.log(response);
-	       		hideLoader('#globalLoader');
-	       		window.location.href="/org-listing";
-	       		/*location.reload();*/
-	       		//showGlobalToast('#globalToast', 'success', 'company added successfully', 4000);
+			        },
+			       error: function(response){
 
-	        },
-	       error: function(response){
-
-	            console.log('error is : '+response);
-                hideLoader('#globalLoader');
-                showGlobalToast('#globalToast', 'error', 'company not updated', 4000);
-	            //showGlobalToast('#globalToast', 'error', 'error in validating domain', 4000);
-	        }
-	    });
+			            console.log('error is : '+response);
+		                hideLoader('#globalLoader');
+		                showGlobalToast('#globalToast', 'error', 'company not updated', 4000);
+			            //showGlobalToast('#globalToast', 'error', 'error in validating domain', 4000);
+			        }
+			    });
+			}
 	}
 
 </script>

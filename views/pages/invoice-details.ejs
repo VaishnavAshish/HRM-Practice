@@ -100,7 +100,7 @@
                         <!-- <div class="slds-p-bottom_small">
                             <div class="slds-badge slds-badge_inverse text-size-13 slds-p-around_x-small max-w-250 text-center">Status: Draft</div>
                         </div> -->
-                        <div class=" slds-card slds-p-around_large sm-pd-10 slds-m-bottom_large">
+                        <div class=" slds-card slds-p-around_large sm-pd-10 slds-m-bottom_large" >
                             <div id="invoice-details-form" data-modified>
                                 <div class="slds-grid slds-wrap slds-gutters">
                                     <div class="slds-col slds-size_1-of-1 slds-medium-size_8-of-12">
@@ -210,7 +210,7 @@
                                                             Tax %
                                                         </label>
                                                         <div class="slds-form-element__control">
-                                                            <input type="number" max="100" min="0" class="slds-input" placeholder="" id="inv-tax-per" onchange="calculateTax(this)" onkeyup="calculateTax(this)" value="<%= invoiceDetails.tax %>">
+                                                            <input type="number" max="100" min="0" class="slds-input" placeholder="" id="inv-tax-per" onchange="calculateTax(this)" onkeyup="calculateTax(this)" value="<%= invoiceDetails.tax %>" decimal>
                                                             <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
                                                             </div>

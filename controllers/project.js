@@ -674,7 +674,7 @@ exports.postEditProject = (req, res) => {
           // console.log('getProject>>>>>>>>>>>>>');
           // console.log(project.rows[0]);
           var projectStatus = req.body.projectData.project_status;
-          var projectPer = req.body.projectData.project_complete_per;
+          var projectPer = req.body.projectData.project_complete_per?req.body.projectData.project_complete_per:0;
           if('Completed' === projectStatus){
             projectPer = 100;
           } else if(projectPer >= 100) {

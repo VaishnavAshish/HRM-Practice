@@ -12,7 +12,7 @@
                         </header>
                         <div class="slds-modal__content">
                             <div>
-                                <div class="slds-grid slds-wrap slds-gutters slds-grid_vertical-stretch">
+                                <div class="slds-grid slds-wrap slds-gutters slds-grid_vertical-stretch" id="addResourceForm">
                                     <div class="slds-col slds-size_1-of-1 slds-medium-size_8-of-12">
                                         <div class="slds-p-around_large">
 
@@ -23,7 +23,7 @@
                                                 <abbr class="slds-required" title="required">*</abbr>
                                             </label>
                                             <div class="slds-form-element__control">
-                                                <input type="email" id="email" class="slds-input" placeholder="" required="" reset='value'/>
+                                                <input type="email" id="email" class="slds-input" placeholder="" required="" reset='value' email/>
                                                 <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset='errmsg'>
 
                                                 </div>
@@ -36,7 +36,7 @@
                                             </label>
                                             <div class="slds-form-element__control">
                                                 <div class="slds-select_container">
-                                                    <select class="slds-select" required="" getFormData name="user_role" id="project_user_role" onchange="setBillCostRate(this, 'resource')" reset='value'>
+                                                    <select class="slds-select" required="" getFormData name="user_role" id="project_user_role" reset='value'>
                                                         <option value=""></option>
                                                         <% if(userRoleList.length>0) { %>
                                                             <% userRoleList.forEach(function(userRole) { %>
@@ -89,7 +89,7 @@
                                                         First Name
                                                     </label>
                                                     <div class="slds-form-element__control">
-                                                        <input type="text" id="first_name" class="slds-input" placeholder="" required="" reset='value'>
+                                                        <input type="text" id="first_name" class="slds-input" placeholder="" reset='value' alphabet>
                                                         <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
                                                         </div>
                                                     </div>
@@ -102,7 +102,7 @@
                                                         Last Name
                                                     </label>
                                                     <div class="slds-form-element__control">
-                                                        <input type="text" id="last_name" class="slds-input" placeholder="" required="" reset='value'>
+                                                        <input type="text" id="last_name" class="slds-input" placeholder="" reset='value' alphabet>
                                                         <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
                                                         </div>
                                                     </div>
@@ -118,7 +118,7 @@
                                                         Phone
                                                     </label>
                                                     <div class="slds-form-element__control">
-                                                        <input type="text" id="phone" class="slds-input" placeholder="" required="" reset='value'>
+                                                        <input type="text" id="phone" class="slds-input" placeholder="" reset='value' phone>
                                                         <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
                                                         </div>
                                                     </div>
@@ -131,7 +131,7 @@
                                                         Mobile
                                                     </label>
                                                     <div class="slds-form-element__control">
-                                                        <input type="text" id="mobile" class="slds-input" placeholder="" required="" reset='value'>
+                                                        <input type="text" id="mobile" class="slds-input" placeholder="" reset='value' mobile>
                                                         <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
                                                         </div>
                                                     </div>
@@ -145,7 +145,7 @@
                                                     <label class="slds-form-element__label" for="" id="">Default Billable Rate</label>
                                                     <div class="slds-form-element__control slds-input-has-fixed-addon">
                                                         <!-- <span class="slds-form-element__addon" id="">$</span> -->
-                                                        <input type="text"  id="billRate" class="slds-input" placeholder="0.00" reset='value' />
+                                                        <input type="number"  id="billRate" class="slds-input" placeholder="0.00" reset='value' decimal/>
 
                                                         <span class="slds-form-element__addon slds-no-flex" id="">per hour</span>
                                                     </div>
@@ -159,7 +159,7 @@
                                                     <label class="slds-form-element__label" for="" id="">Default Cost Rate</label>
                                                     <div class="slds-form-element__control slds-input-has-fixed-addon">
                                                         <!-- <span class="slds-form-element__addon" id="">$</span> -->
-                                                        <input type="text"  id="costRate" class="slds-input" placeholder="0.00" reset='value' />
+                                                        <input type="number"  id="costRate" class="slds-input" placeholder="0.00" reset='value' decimal/>
 
                                                         <span class="slds-form-element__addon slds-no-flex" id="">per hour</span>
                                                     </div>

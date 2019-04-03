@@ -20,55 +20,62 @@ function addResource(modalId){
 			clearError('#email');
 			addError('#project_user_role', "Please select user role");
 		} else {
+
 			clearError('#project_user_role');
 			showLoader('#globalLoader');
-			let userData={};
-			userData.email=$("#email").val();
-			userData.first_name=$("#first_name").val();
-			userData.last_name=$("#last_name").val();
-			userData.phone=$("#phone").val();
-			userData.mobile=$("#mobile").val();
-			userData.team=$("#team").val();
-			userData.company=$("#companyId").val();
-			userData.permissions=[];
-			if(companyId!=null){
-				userData.user_role='Manager';
-				userData.bill_rate="0.00";
-				userData.cost_rate="0.00";
-			}else{
 
-				userData.user_role=$("#project_user_role").val();
-				userData.bill_rate=($("#billRate").val()=='')?"0.00":$("#billRate").val();
-				userData.cost_rate=($("#costRate").val()=='')?"0.00":$("#costRate").val();
-				$("input[name=permissions]:checked").each( function () {
-				   userData.permissions.push($(this).val());
-				   });
-			}
-			console.log(userData);
-			$.ajax({
-			  type: 'POST',
-			  url : '/addResource',
-			  contentType: 'application/json',
-			  dataType: 'json',
-			  data:JSON.stringify(userData),
-			   success : function(response){
-				   if(response.success){
-						hideLoader('#globalLoader');
-						closeModal(modalId);
-						showGlobalToast('#globalToast', 'success', response.message, 4000);
-						   location.reload();
-				   }
+			checkFormValidation("#addResourceForm");
+			if(!$("#addResourceForm").hasClass('has-error')) {
+					let userData={};
+					userData.email=$("#email").val();
+					userData.first_name=$("#first_name").val();
+					userData.last_name=$("#last_name").val();
+					userData.phone=$("#phone").val();
+					userData.mobile=$("#mobile").val();
+					userData.team=$("#team").val();
+					userData.company=$("#companyId").val();
+					userData.permissions=[];
+					if(companyId!=null){
+						userData.user_role='Manager';
+						userData.bill_rate="0.00";
+						userData.cost_rate="0.00";
+					}else{
 
-				},
-			   error: function(response){
-					console.log('error is : '+response);
-					console.log(response);
-					// response
+						userData.user_role=$("#project_user_role").val();
+						userData.bill_rate=($("#billRate").val()=='')?"0.00":$("#billRate").val();
+						userData.cost_rate=($("#costRate").val()=='')?"0.00":$("#costRate").val();
+						$("input[name=permissions]:checked").each( function () {
+						   userData.permissions.push($(this).val());
+						   });
+					}
+					console.log(userData);
+					$.ajax({
+					  type: 'POST',
+					  url : '/addResource',
+					  contentType: 'application/json',
+					  dataType: 'json',
+					  data:JSON.stringify(userData),
+					   success : function(response){
+						   if(response.success){
+								hideLoader('#globalLoader');
+								closeModal(modalId);
+								showGlobalToast('#globalToast', 'success', response.message, 4000);
+								   location.reload();
+						   }
+
+						},
+					   error: function(response){
+							console.log('error is : '+response);
+							console.log(response);
+							// response
+							hideLoader('#globalLoader');
+							closeModal(modalId);
+							showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+						}
+					});
+				} else {
 					hideLoader('#globalLoader');
-					closeModal(modalId);
-					showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
 				}
-			});
 		}
 	}
 }
@@ -130,39 +137,44 @@ function updateUser(userId){
 			addError("#email","Please enter email id");
 		}else{
 			showLoader('#globalLoader');
-			$.ajax({
-		      type: 'POST',
-		      url : '/updateResource',
-		      contentType: 'application/json',
-		      dataType: 'json',
-		      data:JSON.stringify(userData),
-		       success : function(response){
-		       		console.log(response);
-							$('[save-btn]').attr("disabled", true);
-		       		if($('[permission-modified]').length < 1) {
-							   setTimeout(() => {
-									hideLoader('#globalLoader');
-									showGlobalToast('#globalToast', 'success', "User details updated successfully", 4000);
-							   }, 2000);
-							} else {
-								showGlobalToast('#globalToast', 'success', "User details updated successfully", 4000);
-								setTimeout(() => {
-									location.reload();
-								}, 2000);
-							}
+			checkFormValidation("#editResourceForm");
+			if(!$("#editResourceForm").hasClass('has-error')) {
+					$.ajax({
+				      type: 'POST',
+				      url : '/updateResource',
+				      contentType: 'application/json',
+				      dataType: 'json',
+				      data:JSON.stringify(userData),
+				       success : function(response){
+				       		console.log(response);
+									$('[save-btn]').attr("disabled", true);
+				       		if($('[permission-modified]').length < 1) {
+									   setTimeout(() => {
+											hideLoader('#globalLoader');
+											showGlobalToast('#globalToast', 'success', "User details updated successfully", 4000);
+									   }, 2000);
+									} else {
+										showGlobalToast('#globalToast', 'success', "User details updated successfully", 4000);
+										setTimeout(() => {
+											location.reload();
+										}, 2000);
+									}
 
-		       		/*showGlobalToast('#globalToast', 'success', response.message, 4000);*/
+				       		/*showGlobalToast('#globalToast', 'success', response.message, 4000);*/
 
-		        },
-		       error: function(response){
+				        },
+				       error: function(response){
 
-		            console.log('error is : '+response);
-	                hideLoader('#globalLoader');
+				            console.log('error is : '+response);
+			                hideLoader('#globalLoader');
 
-	                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
-		            //showGlobalToast('#globalToast', 'error', 'error in validating domain', 4000);
-		        }
-		    });
+			                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+				            //showGlobalToast('#globalToast', 'error', 'error in validating domain', 4000);
+				        }
+				    });
+				} else{
+            hideLoader('#globalLoader');
+				}
 		}
 	}
 

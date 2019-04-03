@@ -103,9 +103,9 @@
 
                     <!-- expense details start -->
 
-                    <div class=" slds-card slds-p-around_large sm-pd-10" data-modified expenseSubmit= "<%= (user.permissions.indexOf('expenseApprover')==-1) ? expense.submitted :expense.invoiced %>"" >
+                    <div class=" slds-card slds-p-around_large sm-pd-10" data-modified expenseSubmit= "<%= (user.permissions.indexOf('expenseApprover')==-1) ? expense.submitted :expense.invoiced %>" >
                       <% console.log('user data '+ (user.permissions.indexOf('expenseApprover')==-1) ? "expense.submitted"+expense.submitted :"expense.invoiced"+expense.invoiced ); %>
-                        <div class="slds-grid slds-wrap slds-gutters">
+                        <div class="slds-grid slds-wrap slds-gutters" id="editExpenseForm">
                             <div class="slds-col slds-size_1-of-1 slds-medium-size_8-of-12">
                                 <div class="">
                                     <div class="slds-grid slds-wrap slds-gutters">
@@ -134,7 +134,7 @@
                                                 <div class="slds-form-element__control">
                                                     <div class="slds-select_container">
 
-                                                        <select class="slds-select" required="" id="category" value="<%= expense.category%>">
+                                                        <select class="slds-select" id="category" value="<%= expense.category%>">
                                                             <option value=""></option>
                                                             <% if(expCatList.length>0) { %>
                                                                 <% expCatList.forEach(function(expCat) { %>
@@ -179,7 +179,7 @@
 
                                                 </label>
                                                 <div class="slds-form-element__control">
-                                                    <input type="text" id="amount" class="slds-input" placeholder="" required="" value="<%= expense.amount%>">
+                                                    <input type="number" id="amount" class="slds-input" placeholder="" value="<%= expense.amount%>" decimal>
                                                     <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
                                                     </div>
@@ -214,7 +214,7 @@
                                                     Tax Amount
                                                 </label>
                                                 <div class="slds-form-element__control">
-                                                    <input type="text" id="tax_no" class="slds-input" value="<%= expense.tax_amount%>">
+                                                    <input type="number" id="tax_no" class="slds-input" value="<%= expense.tax_amount%>" decimal>
                                                     <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
                                                     </div>

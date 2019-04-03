@@ -103,34 +103,37 @@ function updateInvoiceDetails(invoiceId, formId) {
         invoiceData.total_amount = parseInt($("#invoice_total_amount").text());
         invoiceData.tax_per = parseFloat($("#inv-tax-per").val());
         console.log(invoiceData);
-        showLoader('#globalLoader');
-        $.ajax({
-            type: 'POST',
-            url : '/editInvoice',
-            contentType: 'application/json',
-            dataType: 'json',
-            data : JSON.stringify(invoiceData),
-            success : function(response){
-                console.log(response);
-                if(response.success == true) {
-                  $('[save-btn]').attr('disabled',true);
-                  showGlobalToast('#globalToast', 'success', 'Successfully updated invoice data.', 4000);
-                    setTimeout( function() {
-                        hideLoader('#globalLoader');
-                        location.reload();
-                    }, 2000);
-                } else {
-                    hideLoader('#globalLoader');
-                    showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
-                    closeModal(modalId);
-                }
-            },
-            error: function(response){
+        checkFormValidation("#invoice-details-form");
+        if(!$("#invoice-details-form").hasClass('has-error')) {
+            showLoader('#globalLoader');
+            $.ajax({
+                type: 'POST',
+                url : '/editInvoice',
+                contentType: 'application/json',
+                dataType: 'json',
+                data : JSON.stringify(invoiceData),
+                success : function(response){
                     console.log(response);
-                    hideLoader('#globalLoader');
-                    showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
-            }
-        });
+                    if(response.success == true) {
+                      $('[save-btn]').attr('disabled',true);
+                      showGlobalToast('#globalToast', 'success', 'Successfully updated invoice data.', 4000);
+                        setTimeout( function() {
+                            hideLoader('#globalLoader');
+                            location.reload();
+                        }, 2000);
+                    } else {
+                        hideLoader('#globalLoader');
+                        showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+                        closeModal(modalId);
+                    }
+                },
+                error: function(response){
+                        console.log(response);
+                        hideLoader('#globalLoader');
+                        showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+                }
+            });
+          }
         /*}
 
     });*/

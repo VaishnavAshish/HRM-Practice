@@ -23,6 +23,9 @@ function addAccount(modalId){
 		}else{
 			clearError("#name");
 			clearError("#email");
+			checkFormValidation("#addAccountForm");
+			if(!$("#addAccountForm").hasClass('has-error')) {
+
 		    $.ajax({
 		      type: 'POST',
 		      url : '/addAccount',
@@ -44,6 +47,9 @@ function addAccount(modalId){
 	                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
 		        }
 		    });
+			}else{
+				hideLoader('#globalLoader');
+			}
 
 		}
 	}
@@ -104,27 +110,32 @@ function updateAccount(accountId){
 			hideLoader('#globalLoader');
 			addError("#email","Please enter correct email id");
 		}else{
-			$.ajax({
-		      type: 'POST',
-		      url : '/editAccount',
-		      contentType: 'application/json',
-		      dataType: 'json',
-		      data:JSON.stringify(accountData),
-		       success : function(response){
-		       		console.log(response);
-							$('[save-btn]').attr("disabled", true);
-							setTimeout(() => {
-								hideLoader('#globalLoader');
-								showGlobalToast('#globalToast', 'success', response.message, 4000);
-							}, 2000);
+			checkFormValidation("#editAccountForm");
+			if(!$("#editAccountForm").hasClass('has-error')) {
+					$.ajax({
+				      type: 'POST',
+				      url : '/editAccount',
+				      contentType: 'application/json',
+				      dataType: 'json',
+				      data:JSON.stringify(accountData),
+				       success : function(response){
+				       		console.log(response);
+									$('[save-btn]').attr("disabled", true);
+									setTimeout(() => {
+										hideLoader('#globalLoader');
+										showGlobalToast('#globalToast', 'success', response.message, 4000);
+									}, 2000);
 
-		        },
-		       error: function(response){
-		            console.log('error is : '+JSON.stringify(response));
-	                hideLoader('#globalLoader');
-	                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
-		        }
-		    });
+				        },
+				       error: function(response){
+				            console.log('error is : '+JSON.stringify(response));
+			                hideLoader('#globalLoader');
+			                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+				        }
+				    });
+					}else{
+						hideLoader('#globalLoader');
+					}
 		 }
 	}
 function setDataToInvoiceTable(invoice){

@@ -95,7 +95,7 @@
                         <!-- header end -->
 
                         <div class="slds-tabs_default__content" target-tab="account-details">
-                            <div class=" slds-card slds-p-around_large sm-pd-10" data-modified>
+                            <div class=" slds-card slds-p-around_large sm-pd-10" data-modified id="editAccountForm">
                                 <div class="slds-grid slds-wrap slds-grid_pull-padded">
                                     <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_6-of-12 slds-p-horizontal_small">
                                         <div class="slds-p-bottom_x-small line-bottom">
@@ -304,7 +304,7 @@
                                                                 Contact First Name
                                                             </label>
                                                             <div class="slds-form-element__control">
-                                                                <input type="text" id="first_name" class="slds-input" placeholder="" required="" value="<%= account.first_name %>">
+                                                                <input type="text" id="first_name" class="slds-input" placeholder="" value="<%= account.first_name %>" alphabet>
                                                                 <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
                                                                 </div>
                                                             </div>
@@ -317,7 +317,7 @@
                                                                 Contact Last Name
                                                             </label>
                                                             <div class="slds-form-element__control">
-                                                                <input type="text" id="last_name" class="slds-input" placeholder="" required="" value="<%= account.last_name %>">
+                                                                <input type="text" id="last_name" class="slds-input" placeholder="" value="<%= account.last_name %>" alphabet>
                                                                 <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
                                                                 </div>
                                                             </div>
@@ -332,7 +332,7 @@
                                                                 <abbr class="slds-required" title="required">*</abbr>
                                                             </label>
                                                             <div class="slds-form-element__control">
-                                                                <input type="email" id="email" class="slds-input" placeholder="" required="" value="<%= account.email%>">
+                                                                <input type="email" id="email" class="slds-input" placeholder="" required="" value="<%= account.email%>" email>
                                                                 <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
                                                                 </div>
                                                             </div>
@@ -406,7 +406,7 @@
                                                     <div class="slds-form-element slds-m-bottom_medium">
                                                         <label class="slds-form-element__label">City</label>
                                                         <div class="slds-form-element__control">
-                                                            <input type="text" id="city" class="slds-input" placeholder="" value="<%= account.city %>">
+                                                            <input type="text" id="city" class="slds-input" placeholder="" value="<%= account.city %>" alphabet>
                                                             <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
                                                             </div>
@@ -417,7 +417,7 @@
                                                     <div class="slds-form-element slds-m-bottom_medium">
                                                         <label class="slds-form-element__label">State</label>
                                                         <div class="slds-form-element__control">
-                                                            <input type="text" id="state" class="slds-input" placeholder="" value="<%= account.state %>">
+                                                            <input type="text" id="state" class="slds-input" placeholder="" value="<%= account.state %>" alphabet>
                                                             <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
                                                             </div>
@@ -430,7 +430,7 @@
                                                     <div class="slds-form-element slds-m-bottom_medium">
                                                         <label class="slds-form-element__label">Country</label>
                                                         <div class="slds-form-element__control">
-                                                            <input type="text" id="country" class="slds-input" placeholder="" value="<%= account.country%>">
+                                                            <input type="text" id="country" class="slds-input" placeholder="" value="<%= account.country%>" alphabet>
                                                             <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
                                                             </div>
@@ -441,7 +441,7 @@
                                                     <div class="slds-form-element slds-m-bottom_medium">
                                                         <label class="slds-form-element__label">ZIP</label>
                                                         <div class="slds-form-element__control">
-                                                            <input type="text" id="zip_code" class="slds-input" placeholder="" value="<%= account.zip_code%>">
+                                                            <input type="number" id="zip_code" class="slds-input" placeholder="" value="<%= account.zip_code%>">
                                                             <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
                                                             </div>

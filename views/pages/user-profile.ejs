@@ -44,7 +44,7 @@
                         <div class="slds-size_1-of-1 slds-medium-size_12-of-12 slds-p-horizontal_small">
                             <div class="slds-card slds-p-around_large sm-pd-10 slds-m-bottom_large">
                                 <div class="">
-                                    <div class="">
+                                    <div class="" id="userProfileForm">
                                         <div class="slds-grid slds-wrap slds-gutters">
                                             <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
                                                 <div class="slds-grid slds-m-bottom_medium">
@@ -100,7 +100,7 @@
                                                         <abbr class="slds-required" title="required">*</abbr>
                                                     </label>
                                                     <div class="slds-form-element__control">
-                                                        <input type="text" id="first_name" class="slds-input" placeholder=""  required="" value="<%= userObj.first_name %>" />
+                                                        <input type="text" id="first_name" class="slds-input" placeholder=""  required="" value="<%= userObj.first_name %>" alphabet />
                                                         <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
                                                            <!-- Error Msg Here -->
                                                         </div>
@@ -115,7 +115,7 @@
                                                         <abbr class="slds-required" title="required">*</abbr>
                                                     </label>
                                                     <div class="slds-form-element__control">
-                                                        <input type="text" id="last_name" class="slds-input" placeholder="" required="" value="<%= userObj.last_name %>" />
+                                                        <input type="text" id="last_name" class="slds-input" placeholder="" required="" value="<%= userObj.last_name %>" alphabet />
                                                         <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
                                                         </div>
@@ -128,7 +128,7 @@
                                                 <div class="slds-form-element slds-m-bottom_medium">
                                                     <label class="slds-form-element__label">Phone</label>
                                                     <div class="slds-form-element__control">
-                                                        <input type="text" id="phone" class="slds-input" placeholder="" maxlength="14" value="<%= userObj.phone %>"/>
+                                                        <input type="text" id="phone" class="slds-input" placeholder="" maxlength="14" value="<%= userObj.phone %>" phone/>
                                                         <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
                                                         </div>
@@ -139,7 +139,7 @@
                                                 <div class="slds-form-element slds-m-bottom_medium">
                                                     <label class="slds-form-element__label">Mobile</label>
                                                     <div class="slds-form-element__control">
-                                                        <input type="text" id="mobile" class="slds-input" placeholder="" maxlength="14" value="<%= userObj.mobile %>" />
+                                                        <input type="text" id="mobile" class="slds-input" placeholder="" maxlength="14" value="<%= userObj.mobile %>" mobile/>
                                                         <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
                                                         </div>
@@ -153,7 +153,7 @@
                                                 <abbr class="slds-required" title="required">*</abbr>
                                             </label>
                                             <div class="slds-form-element__control">
-                                                <input type="text" class="slds-input" id="userRole" placeholder="" required="" disabled="" value="<%= userObj.role %>"/>
+                                                <input type="text" class="slds-input" id="userRole" placeholder="" required="" disabled="" value="<%= userObj.role %>" alphabet/>
                                                 <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
                                                 </div>

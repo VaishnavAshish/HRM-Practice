@@ -10,7 +10,7 @@
                             </button>
                             <h2  class="slds-text-heading_medium slds-hyphenate">Add New Clients/Accounts</h2>
                         </header>
-                        <div class="slds-modal__content slds-p-around_medium">
+                        <div class="slds-modal__content slds-p-around_medium" id="addAccountForm">
                             <div>
                                 <div class="slds-form-element slds-m-bottom_medium" reset='errorclass'>
                                     <label class="slds-form-element__label">
@@ -229,7 +229,7 @@
                                                         Contact First Name
                                                     </label>
                                                     <div class="slds-form-element__control">
-                                                        <input type="text" class="slds-input" placeholder="" required="" id="first_name" reset='value'>
+                                                        <input type="text" class="slds-input" placeholder=""  id="first_name" reset='value' alphabet>
                                                         <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset='errmsg'>
                                                         </div>
                                                     </div>
@@ -242,7 +242,7 @@
                                                         Contact Last Name
                                                     </label>
                                                     <div class="slds-form-element__control">
-                                                        <input type="text" id="last_name" class="slds-input" placeholder="" required="" reset='value'>
+                                                        <input type="text" id="last_name" class="slds-input" placeholder=""  reset='value' alphabet>
                                                         <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset='errmsg'>
                                                         </div>
                                                     </div>
@@ -257,7 +257,7 @@
                                                         <abbr class="slds-required" title="required">*</abbr>
                                                     </label>
                                                     <div class="slds-form-element__control">
-                                                        <input type="email" class="slds-input" placeholder="" required="" id="email" reset='value'>
+                                                        <input type="email" class="slds-input" placeholder="" required="" id="email" reset='value' email>
                                                         <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset='errmsg'>
                                                         </div>
                                                     </div>

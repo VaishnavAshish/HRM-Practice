@@ -13,6 +13,8 @@
         taskData.billable=projectBillable;
         clearError("#task_name");
         if(taskData.task_name) {
+          checkFormValidation("#addTaskForm");
+          if(!$("#addTaskForm").hasClass('has-error')) {
             showLoader('#globalLoader');
             $.ajax({
                 type: 'POST',
@@ -40,6 +42,7 @@
                         showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
                 }
             });
+          }
         } else {
             addError("#task_name", 'Please enter task title');
         }

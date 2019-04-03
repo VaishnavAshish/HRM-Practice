@@ -1,4 +1,4 @@
-<!-- modal add new organization start-->        
+<!-- modal add new organization start-->
 <div id="modalAddNewOrg">
     <section role="dialog" tabindex="-1" class="slds-modal">
         <div class="slds-modal__container">
@@ -11,7 +11,7 @@
                 <h2  class="slds-text-heading_medium slds-hyphenate">Add New Organization</h2>
             </header>
 
-            <div class="slds-modal__content slds-p-around_medium">
+            <div class="slds-modal__content slds-p-around_medium" id="addCompanyForm">
                 <div>
                     <div class="slds-form-element slds-m-bottom_medium">
                         <label class="slds-form-element__label">
@@ -21,7 +21,7 @@
                         <div class="slds-form-element__control">
                             <input type="text" class="slds-input" placeholder="" required="" name="orgName" id="orgName"/>
                             <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
-                                       
+
                             </div>
                         </div>
                     </div>
@@ -33,7 +33,7 @@
                         <div class="slds-form-element__control">
                             <input type="text" class="slds-input" placeholder="" required="" name="domain" id="domain"/>
                             <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
-                                       
+
                             </div>
                         </div>
                     </div> -->
@@ -41,13 +41,14 @@
                             <label class="slds-form-element__label" for="">
                                 <span>
                                     Domain Name
+                                    <abbr class="slds-required" title="required">*</abbr>
                                  </span>
                                  <!-- <small>
                                      (letters, number and dashes only )
                                  </small> -->
                             </label>
                             <div class="slds-form-element__control slds-input-has-fixed-addon">
-                                <input type="text" class="slds-input" id="domain" name="domain" placeholder="">
+                                <input type="text" class="slds-input" id="domain" name="domain" placeholder="" required="">
                                 <span class="slds-form-element__addon slds-no-flex">
                                     <strong class="text-size-16">
                                         .krow.com
@@ -55,7 +56,7 @@
                                 </span>
                             </div>
                             <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
-                         
+
                             </div>
                          </div>
                     <div class="slds-grid slds-wrap slds-gutters">
@@ -79,7 +80,7 @@
                                     <abbr class="slds-required" title="required">*</abbr>
                                 </label>
                                 <div class="slds-form-element__control">
-                                    <input type="email" class="slds-input" placeholder="" required="" name="adminEmail" id="adminEmail">
+                                    <input type="email" class="slds-input" placeholder="" required="" name="adminEmail" id="adminEmail" email>
                                     <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
                                     </div>
                                 </div>
@@ -99,7 +100,7 @@
                             </div>
                         </div> -->
                     </div>
-                    
+
                 </div>
             </div>
             <footer class="slds-modal__footer">
@@ -110,4 +111,4 @@
     </section>
     <div class="slds-backdrop"></div>
 </div>
-<!-- modal add new organization start-->   
+<!-- modal add new organization start-->

@@ -88,13 +88,12 @@ function updateExpense(expenseId){
                   addError($('#amount'),'Please enter correct amount');
               }else{
 
-                  showLoader('#globalLoader');
                   clearError('#project', '#err-msg-project')
                     let expenseData={};
                     expenseData.expenseId=expenseId;
                     expenseData.tax = $("#tax option:selected").val();
                     expenseData.tax_no = ($("#tax_no").val()=="")?0:$("#tax_no").val();
-                    expenseData.expense_date = moment.tz(($("#expense_date").val(), companyDefaultTimezone).format('YYYY-MM-DD');
+                    expenseData.expense_date = moment.tz($("#expense_date").val(), companyDefaultTimezone).format('YYYY-MM-DD');
                     expenseData.category = $('#category option:selected').val();
                     expenseData.currency = $('#currency option:selected').val();
                     expenseData.amount = ($('#amount').val()=="")?0:$('#amount').val();
@@ -104,27 +103,31 @@ function updateExpense(expenseId){
                     expenseData.project_id = $('#project option:selected').val();
                     expenseData.account_id = $('#project option:selected').attr('accountId');
                     console.log(expenseData);
-                    $.ajax({
-                      type: 'POST',
-                      url : '/editExpense',
-                      contentType: 'application/json',
-                      dataType: 'json',
-                      data:JSON.stringify(expenseData),
-                       success : function(response){
-                          console.log(response);
-                          $('[save-btn]').attr('disabled',true);
-                          setTimeout(function () {
-                              showGlobalToast('#globalToast', 'success',response.message, 4000);
-                              hideLoader('#globalLoader');
-                          }, 2000);
+                    checkFormValidation("#editExpenseForm");
+                    if(!$("#editExpenseForm").hasClass('has-error')) {
+                        showLoader('#globalLoader');
+                        $.ajax({
+                          type: 'POST',
+                          url : '/editExpense',
+                          contentType: 'application/json',
+                          dataType: 'json',
+                          data:JSON.stringify(expenseData),
+                           success : function(response){
+                              console.log(response);
+                              $('[save-btn]').attr('disabled',true);
+                              setTimeout(function () {
+                                  showGlobalToast('#globalToast', 'success',response.message, 4000);
+                                  hideLoader('#globalLoader');
+                              }, 2000);
 
-                        },
-                       error: function(response){
-                            hideLoader('#globalLoader');
-                            console.log(response.responseJSON.error);
-                            showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
-                        }
-                    });
+                            },
+                           error: function(response){
+                                hideLoader('#globalLoader');
+                                console.log(response.responseJSON.error);
+                                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+                            }
+                        });
+                      }
                 }
           } else {
             $('#project').closest('.slds-form-element').addClass('slds-has-error');

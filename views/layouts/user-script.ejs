@@ -1,6 +1,6 @@
 <script>
 function updateUser(userId){
-		clearError("#email");
+		// clearError("#email");
 		console.log('user id is '+userId);
 		let userData={};
 		userData.id=userId;
@@ -16,31 +16,34 @@ function updateUser(userId){
 		if(userData.email==""||userData.email==null||userData.email==undefined){
 			addError("#email","Please enter user email id");
 		}else{
-			clearError("#email");
-			showLoader('#globalLoader');
-			$.ajax({
-		      type: 'POST',
-		      url : '/updateResource',
-		      contentType: 'application/json',
-		      dataType: 'json',
-		      data:JSON.stringify(userData),
-		       success : function(response){
-					   console.log(response);
-						 $('[save-btn]').attr("disabled", true);
-					   setTimeout(() => {
-						   hideLoader('#globalLoader');
-						   showGlobalToast('#globalToast', 'success', 'Profile updated successfully', 4000);
-					   }, 2000);
+			checkFormValidation("#userProfileForm");
+			if(!$("#userProfileForm").hasClass('has-error')) {
+					// clearError("#email");
+					showLoader('#globalLoader');
+					$.ajax({
+				      type: 'POST',
+				      url : '/updateResource',
+				      contentType: 'application/json',
+				      dataType: 'json',
+				      data:JSON.stringify(userData),
+				       success : function(response){
+							   console.log(response);
+								 $('[save-btn]').attr("disabled", true);
+							   setTimeout(() => {
+								   hideLoader('#globalLoader');
+								   showGlobalToast('#globalToast', 'success', 'Profile updated successfully', 4000);
+							   }, 2000);
 
-		        },
-		       error: function(response){
+				        },
+				       error: function(response){
 
-		            console.log('error is : '+response);
-	                hideLoader('#globalLoader');
-	                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
-		            //showGlobalToast('#globalToast', 'error', 'error in validating domain', 4000);
-		        }
-		    });
+				            console.log('error is : '+response);
+			                hideLoader('#globalLoader');
+			                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+				            //showGlobalToast('#globalToast', 'error', 'error in validating domain', 4000);
+				        }
+				    });
+				}
 
 		}
 	}

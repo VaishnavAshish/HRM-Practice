@@ -44,26 +44,31 @@ function resetPassword(){
 		hideLoader('#globalLoader');
 		addError('#email', "Please enter user email");
 	}else{
-		$.ajax({
-		      type: 'POST',
-		      url : '/postResetPassword',
-		      contentType: 'application/json',
-		      dataType: 'json',
-		      data:JSON.stringify({"domain":domain,"email":email}),
-		       success : function(response){
-		       		console.log(response);
-		       		hideLoader('#globalLoader');
-		       		showGlobalToast('#globalToast', 'success', 'email send', 4000);
-		       		window.location.href="/login?domain="+domain;
+		checkFormValidation("#resetPasswordForm");
+		if(!$("#resetPasswordForm").hasClass('has-error')) {
+				$.ajax({
+				      type: 'POST',
+				      url : '/postResetPassword',
+				      contentType: 'application/json',
+				      dataType: 'json',
+				      data:JSON.stringify({"domain":domain,"email":email}),
+				       success : function(response){
+				       		console.log(response);
+				       		hideLoader('#globalLoader');
+				       		showGlobalToast('#globalToast', 'success', 'email send', 4000);
+				       		window.location.href="/login?domain="+domain;
 
-		        },
-		       error: function(response){
-		            hideLoader('#globalLoader');
-		            console.log('error is : '+response);
-	                showGlobalToast('#globalToast', 'error',response.responseJSON.message, 4000);
-		            //showGlobalToast('#globalToast', 'error', 'error in validating domain', 4000);
-		        }
-		    });
+				        },
+				       error: function(response){
+				            hideLoader('#globalLoader');
+				            console.log('error is : '+response);
+			                showGlobalToast('#globalToast', 'error',response.responseJSON.message, 4000);
+				            //showGlobalToast('#globalToast', 'error', 'error in validating domain', 4000);
+				        }
+				    });
+			} else {
+          hideLoader('#globalLoader');
+			}
 	}
 }
 function login(){
@@ -79,46 +84,51 @@ function login(){
 		hideLoader('#globalLoader');
 		addError('#password', "Please enter user password");
 	}else{
-		console.log(email);
-		let loginData={};
-		loginData.email=email;
-		loginData.password=password;
-		loginData.domain=$("#domain").val();
-		loginData.remember_me = $("#RememberLogin").is(":checked");
-		console.log('loginData '+JSON.stringify(loginData));
-	    $.ajax({
-	      type: 'POST',
-	      url : '/login',
-	      contentType: 'application/json',
-	      dataType: 'json',
-	      data:JSON.stringify(loginData),
-	       success : function(response){
-			   if(response.success==true){
-					hideLoader('#globalLoader');
-					console.log('userData');
-					console.log(response.userData);
-					let userData=response.userData;
-					if (userData.user_role.includes('SUPER_ADMIN')) {
-	                    console.log('SUPER_ADMIN');
-	                    window.location.href='/org-listing';
-	                  } else if (userData.user_role.includes('ADMIN')) {
-	                    console.log('ADMIN');
-	                    window.location.href='/timesheet/'+response.userData.id+'#default';
-	                  } else {
-	                    console.log('user');
-	                    window.location.href='/timesheet/'+response.userData.id+'#default';
-	                  }
-					/*window.location.href="/login?domain=" +domain;*/
-			   }
+		checkFormValidation("#loginForm");
+		if(!$("#loginForm").hasClass('has-error')) {
+				console.log(email);
+				let loginData={};
+				loginData.email=email;
+				loginData.password=password;
+				loginData.domain=$("#domain").val();
+				loginData.remember_me = $("#RememberLogin").is(":checked");
+				console.log('loginData '+JSON.stringify(loginData));
+			    $.ajax({
+			      type: 'POST',
+			      url : '/login',
+			      contentType: 'application/json',
+			      dataType: 'json',
+			      data:JSON.stringify(loginData),
+			       success : function(response){
+					   if(response.success==true){
+							hideLoader('#globalLoader');
+							console.log('userData');
+							console.log(response.userData);
+							let userData=response.userData;
+							if (userData.user_role.includes('SUPER_ADMIN')) {
+			                    console.log('SUPER_ADMIN');
+			                    window.location.href='/org-listing';
+			                  } else if (userData.user_role.includes('ADMIN')) {
+			                    console.log('ADMIN');
+			                    window.location.href='/timesheet/'+response.userData.id+'#default';
+			                  } else {
+			                    console.log('user');
+			                    window.location.href='/timesheet/'+response.userData.id+'#default';
+			                  }
+							/*window.location.href="/login?domain=" +domain;*/
+					   }
 
-	        },
-	       error: function(response){
-                console.log('error is : '+response);
-                hideLoader('#globalLoader');
-                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+			        },
+			       error: function(response){
+		                console.log('error is : '+response);
+		                hideLoader('#globalLoader');
+		                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
 
-	        }
-	    });
+			        }
+			    });
+				} else {
+					hideLoader("#globalLoader");
+				}
 	  }
 }
 /*function addError(id, msg) {
