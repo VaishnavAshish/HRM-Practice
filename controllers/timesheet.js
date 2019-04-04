@@ -153,6 +153,7 @@ function getTimesheetForWeek(timesheetListArray, week_start_date) {
     currentTaskId=timesheetList.task_id;
     currentProjectId=timesheetList.project_id;
     if(currentProjectId==previousProjectId){
+
       if(currentTaskId==previousTaskId){
         // console.log('matching task id '+currentTaskId+' '+previousTaskId);
         if(timesheetList.user_role.trim()==timesheetObj.user_role.trim()){
@@ -712,6 +713,9 @@ exports.updateDayTimesheetData = (req, res) => {
             handleResponse.handleError(res, err, ' Error in finding timesheet detail data');
           } else {
             if(timesheetData.rowCount > 0) {
+              if(!req.body.task_id){
+                req.body.task_id = null;
+              }
               client.query('UPDATE timesheet_line_item SET project_id=$1, task_id=$2, total_work_hours=$3, project_name=$4, task_name=$5, description=$6 WHERE id=$7',[req.body.project_id, req.body.task_id, hoursToMinutes(req.body.total_work_hours_formatted), req.body.project_name, req.body.task_name, req.body.description, req.body.timesheet_lineitem_id], function(err, updatedTimesheetLiRec) {
                 if (err) {
                   handleResponse.shouldAbort(err, client, done);
@@ -1642,6 +1646,9 @@ function createTimesheetLineItem(req, res, client, err, done, extraParam, isRunn
   console.log(req.params)
   let userId = req.params.userId ? req.params.userId:req.user.id;
   console.log('user id while inserting timesheet is '+userId);
+  if(!req.body.task_id){
+    req.body.task_id=null;
+  }
   let queryToExec = 'INSERT INTO TIMESHEET_LINE_ITEM (resource_id, project_id, task_id, created_date, total_work_hours, company_id, project_name, task_name, description, billable, user_role) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *';
   let data = [userId, req.body.project_id, req.body.task_id, moment.tz(extraParam.timesheet_date.split('T')[0], companyDefaultTimezone).format(), extraParam.day_time, req.user.company_id, req.body.day_project, req.body.day_task, req.body.day_note,req.body.day_category, req.body.user_role];
   if(isRunning) {

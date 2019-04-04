@@ -885,3 +885,158 @@ INSERT INTO public.role(name, permissions) VALUES ('USER', '{"PROJECT","TASK","T
 INSERT INTO public.company(id, name, domain, add_status,created_date,modified_date) VALUES (999999999999999, 'Krow Softwares', 'krowsoftware.krow.com', 'Approved',current_timestamp,current_timestamp);
 INSERT INTO public.users(id, email, password, username, company_id, user_role,add_status, role,created_date,modified_date) VALUES (9999999999999990, 'admin@krowsoftware.com', 'admin', 'admin@krowsoftware.com', 999999999999999 , '{"SUPER_ADMIN"}', 'Approved', 'SUPER_ADMIN',current_timestamp,current_timestamp);
 Insert into public.setting (expense_category,user_role,company_address,invoice_note,currency,timezone,company_id) values(array['Food'],array['Manager','Developer'],'','','USD','America/Los_Angeles',999999999999999)
+
+
+--created-date 03-04-2019
+CREATE OR REPLACE FUNCTION calculate_total_timesheet_hours()
+  RETURNS trigger LANGUAGE plpgsql AS
+$BODY$
+DECLARE
+  total_hours_cal INTEGER;
+BEGIN
+
+ IF TG_OP = 'DELETE' THEN
+	SELECT INTO total_hours_cal SUM(total_work_hours) FROM timesheet_line_item WHERE project_id = OLD.project_id;
+	RAISE NOTICE 'total_hours(%)', total_hours_cal;
+	UPDATE PROJECT SET total_hours = total_hours_cal WHERE id = OLD.project_id;
+ ELSE
+	SELECT INTO total_hours_cal SUM(total_work_hours) FROM timesheet_line_item WHERE project_id = NEW.project_id;
+	RAISE NOTICE 'total_hours(%)', total_hours_cal;
+	UPDATE PROJECT SET total_hours = total_hours_cal WHERE id = NEW.project_id;
+ END IF;
+
+ RETURN NEW;
+END;
+$BODY$
+
+CREATE TRIGGER update_project_total_hours
+    AFTER INSERT OR UPDATE OR DELETE
+    ON timesheet_line_item
+    FOR EACH ROW
+    EXECUTE PROCEDURE calculate_total_timesheet_hours();
+
+--created-date 04-04-2019
+
+CREATE OR REPLACE FUNCTION calculate_total_expense_amount()
+  RETURNS trigger LANGUAGE plpgsql AS
+$BODY$
+DECLARE
+  total_expense_cal INTEGER;
+BEGIN
+
+ IF TG_OP = 'DELETE' THEN
+	SELECT INTO total_expense_cal SUM(amount) FROM expense WHERE project_id = OLD.project_id AND archived = false;
+	RAISE NOTICE 'total_expense_amount(%)', total_expense_cal;
+	UPDATE PROJECT SET total_expense_amount = total_expense_cal WHERE id = OLD.project_id;
+ ELSE
+	SELECT INTO total_expense_cal SUM(amount) FROM expense WHERE project_id = NEW.project_id AND archived = false;
+	RAISE NOTICE 'total_expense_amount(%)', total_expense_cal;
+	UPDATE PROJECT SET total_expense_amount = total_expense_cal WHERE id = NEW.project_id;
+ END IF;
+
+ RETURN NEW;
+END;
+$BODY$
+
+CREATE TRIGGER update_project_total_expense
+AFTER INSERT OR UPDATE OR DELETE
+ON expense
+FOR EACH ROW
+EXECUTE PROCEDURE calculate_total_expense_amount();
+
+CREATE OR REPLACE FUNCTION calculate_total_invoice_amount()
+  RETURNS trigger LANGUAGE plpgsql AS
+$BODY$
+DECLARE
+  total_amount_cal INTEGER;
+BEGIN
+
+ IF TG_OP = 'DELETE' THEN
+ 	IF OLD.project_id IS NOT NULL THEN
+		SELECT INTO total_amount_cal SUM(total_amount) FROM invoice_line_item WHERE project_id = OLD.project_id;
+		RAISE NOTICE 'total_amount_cal(%)', total_amount_cal;
+		IF total_amount_cal IS NULL THEN
+			UPDATE PROJECT SET total_invoice_amount = 0 WHERE id = OLD.project_id;
+		ELSE
+			UPDATE PROJECT SET total_invoice_amount = total_amount_cal WHERE id = OLD.project_id;
+		END IF;
+	END IF;
+ ELSE
+ 	IF NEW.project_id IS NOT NULL THEN
+		SELECT INTO total_amount_cal SUM(total_amount) FROM invoice_line_item WHERE project_id = NEW.project_id;
+		RAISE NOTICE 'total_amount_cal(%)', total_amount_cal;
+		IF total_amount_cal IS NULL THEN
+			UPDATE PROJECT SET total_invoice_amount = 0 WHERE id = NEW.project_id;
+		ELSE
+			UPDATE PROJECT SET total_invoice_amount = total_amount_cal WHERE id = NEW.project_id;
+		END IF;
+	END IF;
+ END IF;
+
+ RETURN NEW;
+END;
+$BODY$
+
+
+CREATE TRIGGER update_project_total_invoice_amount
+AFTER INSERT OR DELETE
+ON invoice_line_item
+FOR EACH ROW
+EXECUTE PROCEDURE calculate_total_invoice_amount();
+
+CREATE OR REPLACE FUNCTION calculate_total_invoice_data()
+  RETURNS trigger LANGUAGE plpgsql AS
+$BODY$
+DECLARE
+  total_hours_cal INTEGER;
+  total_expense_invoice INTEGER;
+BEGIN
+
+ IF TG_OP = 'DELETE' THEN
+ 	IF OLD.project_id IS NOT NULL AND OLD.timesheet_id IS NOT NULL THEN
+		SELECT INTO total_hours_cal SUM(quantity) FROM invoice_line_item WHERE project_id = OLD.project_id AND timesheet_id IS NOT NULL;
+		RAISE NOTICE 'total_hours_cal(%)', total_hours_cal;
+		IF total_hours_cal IS NULL THEN
+			UPDATE PROJECT SET total_invoice_time = 0 WHERE id = OLD.project_id;
+		ELSE
+			UPDATE PROJECT SET total_invoice_time = total_hours_cal WHERE id = OLD.project_id;
+		END IF;
+	ELSEIF OLD.project_id IS NOT NULL AND OLD.expense_id IS NOT NULL THEN
+		SELECT INTO total_expense_invoice SUM(unit_price) FROM invoice_line_item WHERE project_id = OLD.project_id AND expense_id IS NOT NULL;
+		RAISE NOTICE 'total_expense_invoice(%)', total_expense_invoice;
+		IF total_expense_invoice IS NULL THEN
+			UPDATE PROJECT SET total_invoice_expense = 0 WHERE id = OLD.project_id;
+		ELSE
+			UPDATE PROJECT SET total_invoice_expense = total_expense_invoice WHERE id = OLD.project_id;
+		END IF;
+	END IF;
+ ELSE
+ 	IF NEW.project_id IS NOT NULL AND NEW.timesheet_id IS NOT NULL THEN
+		SELECT INTO total_hours_cal SUM(quantity) FROM invoice_line_item WHERE project_id = NEW.project_id AND timesheet_id IS NOT NULL;
+		RAISE NOTICE 'total_hours_cal(%)', total_hours_cal;
+		IF total_hours_cal IS NULL THEN
+			UPDATE PROJECT SET total_invoice_time = 0 WHERE id = NEW.project_id;
+		ELSE
+			UPDATE PROJECT SET total_invoice_time = total_hours_cal WHERE id = NEW.project_id;
+		END IF;
+	ELSEIF NEW.project_id IS NOT NULL AND NEW.expense_id IS NOT NULL THEN
+		SELECT INTO total_expense_invoice SUM(unit_price) FROM invoice_line_item WHERE project_id = NEW.project_id AND expense_id IS NOT NULL;
+		RAISE NOTICE 'total_expense_invoice(%)', total_expense_invoice;
+		IF total_expense_invoice IS NULL THEN
+			UPDATE PROJECT SET total_invoice_expense = 0 WHERE id = NEW.project_id;
+		ELSE
+			UPDATE PROJECT SET total_invoice_expense = total_expense_invoice WHERE id = NEW.project_id;
+		END IF;
+	END IF;
+ END IF;
+
+ RETURN NEW;
+END;
+$BODY$
+
+
+CREATE TRIGGER update_project_total_invoice_data
+    AFTER INSERT OR DELETE
+    ON invoice_line_item
+    FOR EACH ROW
+    EXECUTE PROCEDURE calculate_total_invoice_data();

@@ -1586,7 +1586,7 @@ function invoiceHtmlData (req,res,invoiceHtml){
                                                                                 /*// console.log('-------latest------');
                                                                                 // console.log(latest);*/
                                                                                 lines.inv_qauntity = lines.quantity;
-                                                                                if(lines.type == "Timesheet") {
+                                                                                if(lines.type == "Timesheet"&&lines.timesheet_id !=null) {
                                                                                     lines.inv_qauntity = minuteToHours(lines.quantity);
                                                                                 }
                                                                                 lines['totalHoursFormatted'] = minuteToHours(lines.quantity);
@@ -1713,15 +1713,19 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
                 if(invLineDetails.note != null) {
                     note = invLineDetails.note;
                 }
-
+                let notes = `Note:  ${note} `;
+                if(projectObj.length>0){
+                    notes = `Project:  ${projectObj[0].name}
+                              <br />
+                             Note:  ${note} `;
+                }
+                // console.log('invLineDetails.inv_qauntity '+invLineDetails.inv_qauntity);
                 let rowHtml='<tr>'+
                         '<td align="left">'+
                             invLineDetails.type+
                         '</td>'+
                         '<td align="left">'+
-                            'Project: '+ projectObj[0].name +
-                        '<br />'+
-                            'Note: ' + note +
+                          notes+
                         '</td>'+
                         '<td align="left">'+
                             invLineDetails.inv_qauntity+
@@ -1862,7 +1866,7 @@ let account_address = `<strong>${accountDetails.name}</strong><BR />
                                                 <div>
                                                     <div class="">
                                                         <h1 class="">
-                                                            <strong class="ext-uppercase">
+                                                            <strong class="text-uppercase text-center">
                                                                 Invoice
                                                             </strong>
                                                         </h1>
@@ -2039,10 +2043,9 @@ let account_address = `<strong>${accountDetails.name}</strong><BR />
     //   res.setHeader('content-type', 'application/pdf');
     //   res.send(body);
     // });
-    var options = { format: 'Letter',height: "14.5in",width: "11in"
-    };
-    console.log('hmtl is:');
-    console.log(pdfHTML);
+    var options = { format: 'A4',height: "14.5in",width: "11in"};
+    // console.log('hmtl is:');
+    // console.log(pdfHTML);
     pdf.create(pdfHTML, options).toStream(function (err, stream) {
         if (err) {
             handleResponse.handleError(res, err, ' Error in generating pdf data');

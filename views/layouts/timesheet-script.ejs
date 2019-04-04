@@ -404,7 +404,11 @@
                     } */
 
                     $('#project_name').html('<option pr_id="'+response.data.timesheetData["project_id"]+'" value="'+response.data.timesheetData["project_name"]+'">'+response.data.timesheetData["project_name"]+'</option>')
-                    $('#task_name').html('<option pr_id="'+response.data.timesheetData["project_id"]+'" task_id="'+response.data.timesheetData["task_id"]+'" value="'+response.data.timesheetData["task_name"]+'">'+response.data.timesheetData["task_name"]+'</option>')
+                    if(response.data.timesheetData["task_id"]){
+                      $('#task_name').html('<option pr_id="'+response.data.timesheetData["project_id"]+'" task_id="'+response.data.timesheetData["task_id"]+'" value="'+response.data.timesheetData["task_name"]+'">'+response.data.timesheetData["task_name"]+'</option>')
+                    }else{
+                      $('#task_name').html('<option task_id="" value=""> </option>');
+                    }
                     var isBillable = "Non Billable";
                     if(response.data.timesheetData["billable"] === true) {
                         isBillable = "Billable"
@@ -465,12 +469,13 @@
         if (dayTimeSheetData.project_name == '' || dayTimeSheetData.project_name == null || dayTimeSheetData.project_name == undefined) {
             addError('#project_name', "Please select any project");
         } else {
-            if (dayTimeSheetData.task_name == '' || dayTimeSheetData.task_name == null || dayTimeSheetData.task_name == undefined) {
-                clearError('#project_name');
-                addError('#task_name', "Please select any task");
-            } else {
+            // if (dayTimeSheetData.task_name == '' || dayTimeSheetData.task_name == null || dayTimeSheetData.task_name == undefined) {
+            //     clearError('#project_name');
+            //     addError('#task_name', "Please select any task");
+            // } else {
                 if (dayTimeSheetData.total_work_hours_formatted == '' || dayTimeSheetData.total_work_hours_formatted == null || dayTimeSheetData.total_work_hours_formatted == undefined || parseInt(dayTimeSheetData.total_work_hours_formatted) < 0) {
-                    clearError('#task_name');
+                    // clearError('#task_name');
+                    clearError('#project_name');
                     addError('#total_work_hours_formatted', "Enter hours");
                 } else {
                     var currTab = $('#day-tab-ul li.slds-is-active').attr('day');
@@ -521,7 +526,7 @@
                     /* } */
 
                 }
-            }
+            // }
         }
     }
 

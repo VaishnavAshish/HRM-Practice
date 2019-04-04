@@ -494,6 +494,16 @@ exports.getProjectList = (req, res) => {
     })
   }
 };
+
+function minuteToHours(min) {
+  var num = min;
+  var hours = (num / 60);
+  var rhours = Math.floor(hours);
+  var minutes = (hours - rhours) * 60;
+  var rminutes = Math.round(minutes);
+  rminutes = rminutes < 10 ? '0'+rminutes : rminutes;
+  return rhours + ":" + rminutes;
+  }
 exports.getProjectDetail = (req, res) => {
   setting.getCompanySetting(req, res ,(err,result)=>{
      if(err==true){
@@ -509,7 +519,7 @@ exports.getProjectDetail = (req, res) => {
             /*handleResponse.handleError(res, "incorrect project id", " Project id is not correct");*/
           } else {
             pool.connect((err, client, done) => {
-              client.query('SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id FROM PROJECT p where id=$1 AND company_id=$2', [req.query.projectId, req.user.company_id], function (err, project) {
+              client.query('SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id,p.total_hours,p.total_invoice_amount,p.total_expense_amount,p.total_invoice_time,p.total_invoice_expense FROM PROJECT p where id=$1 AND company_id=$2', [req.query.projectId, req.user.company_id], function (err, project) {
                 if (err) {
                   console.error(err);
                   handleResponse.shouldAbort(err, client, done);
@@ -541,6 +551,10 @@ exports.getProjectDetail = (req, res) => {
                         }
                         project.rows[0]["startDateFormatted"] = startDateFormatted;
                         project.rows[0]["endDateFormatted"] = endDateFormatted;
+
+                        project.rows[0]["total_hours"] = minuteToHours(project.rows[0]["total_hours"]);
+                        project.rows[0]["total_invoice_time"] = minuteToHours(project.rows[0]["total_invoice_time"]);
+
                         let taskTotalCount=0;
                         if(taskList.rows.length>0){
                             taskList.rows.forEach(function (data) {
