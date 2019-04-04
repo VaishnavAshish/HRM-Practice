@@ -1291,7 +1291,7 @@ exports.deleteInvoice = (req, res) => {
 }
 
 exports.findInvoiceByCriteria = (req, res) => {
-  // console.log("findInvoiceByCriteria----------------------------------"+req.body.searchField);
+  console.log("findInvoiceByCriteria----------------------------------"+JSON.stringify(req.body.searchField));
   setting.getCompanySetting(req, res ,(err,result)=>{
      if(err==true){
        handleResponse.handleError(res, err, ' error in finding company setting');
@@ -1318,6 +1318,7 @@ exports.findInvoiceByCriteria = (req, res) => {
                   searchCriteriaVal.push(req.body.accountArchived);
                 }else{
                   searchCriteriaVal.push(false);
+                  req.body.accountArchived = false;
                 }
                 let queryToExec='SELECT i.id ,i.status ,i.account_id ,i.company_id ,i.created_by ,i.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,i.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,i.archived ,i.account_name ,i.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,i.due_date at time zone \''+companyDefaultTimezone+'\' as due_date ,i.description ,i.project_id ,i.project_name ,i.total_amount ,i.record_id ,i.currency ,i.tax ,(SELECT count(*) FROM INVOICE '+whereClause+') as searchCount FROM INVOICE i '+whereClause+' ORDER BY start_date DESC,record_id OFFSET '+offset+' LIMIT ' + process.env.PAGE_RECORD_NO;
                 console.log('queryToExec '+queryToExec+' '+searchCriteriaVal);
@@ -1346,8 +1347,10 @@ exports.findInvoiceByCriteria = (req, res) => {
                           let searchCount = 0;
                           console.log('------------invoiceList.rows--------------');
                           console.log(invoiceList.rows);
+                          console.log(accountIdArr);
                           if(invoiceList.rows.length>0){
                               invoiceList.rows.forEach(function (invoice) {
+                                  console.log(invoice.account_id);
                                   if(accountIdArr.includes(invoice.account_id)) {
                                       // invoice['startDateFormatted'] = invoice.start_date == null ? null : dateFormat(moment.tz(invoice.start_date, companyDefaultTimezone).format());
                                       // invoice['dueDateFormatted'] = invoice.due_date == null ? '' : dateFormat(moment.tz(invoice.due_date, companyDefaultTimezone).format());
