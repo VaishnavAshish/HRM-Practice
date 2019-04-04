@@ -516,12 +516,16 @@ function renderRole(projectAssignmentList, id) {
         projectAssignmentList.forEach(function (projAssign) {
             option += `<option value="${projAssign.user_role}">${projAssign.user_role}</option>`;
         });
+
     } else {
-        option = '<option value="">No task found</option>'
+        option = '<option value="">No roles found</option>'
     }
     console.log(option);
     console.log("id", id);
     $(id).html(option);
+    if(projectAssignmentList.length ==1 ){
+        $(id).val(projectAssignmentList[0].user_role);
+    }
 }
 function renderTask(taskList, id) {
     let option = '';
