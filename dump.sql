@@ -898,11 +898,19 @@ BEGIN
  IF TG_OP = 'DELETE' THEN
 	SELECT INTO total_hours_cal SUM(total_work_hours) FROM timesheet_line_item WHERE project_id = OLD.project_id;
 	RAISE NOTICE 'total_hours(%)', total_hours_cal;
-	UPDATE PROJECT SET total_hours = total_hours_cal WHERE id = OLD.project_id;
+  IF total_hours_cal IS NULL THEN
+	 UPDATE PROJECT SET total_hours = 0 WHERE id = OLD.project_id;
+  ELSE
+   UPDATE PROJECT SET total_hours = total_hours_cal WHERE id = OLD.project_id;
+  END IF;
  ELSE
 	SELECT INTO total_hours_cal SUM(total_work_hours) FROM timesheet_line_item WHERE project_id = NEW.project_id;
 	RAISE NOTICE 'total_hours(%)', total_hours_cal;
-	UPDATE PROJECT SET total_hours = total_hours_cal WHERE id = NEW.project_id;
+  IF total_hours_cal IS NULL THEN
+	 UPDATE PROJECT SET total_hours = 0 WHERE id = NEW.project_id;
+  ELSE
+   UPDATE PROJECT SET total_hours = total_hours_cal WHERE id = NEW.project_id;
+  END IF;
  END IF;
 
  RETURN NEW;
@@ -927,11 +935,19 @@ BEGIN
  IF TG_OP = 'DELETE' THEN
 	SELECT INTO total_expense_cal SUM(amount) FROM expense WHERE project_id = OLD.project_id AND archived = false;
 	RAISE NOTICE 'total_expense_amount(%)', total_expense_cal;
-	UPDATE PROJECT SET total_expense_amount = total_expense_cal WHERE id = OLD.project_id;
+  IF total_expense_cal IS NULL THEN
+    UPDATE PROJECT SET total_expense_amount = 0 WHERE id = OLD.project_id;
+  ELSE
+    UPDATE PROJECT SET total_expense_amount = total_expense_cal WHERE id = OLD.project_id;
+  END IF;
  ELSE
 	SELECT INTO total_expense_cal SUM(amount) FROM expense WHERE project_id = NEW.project_id AND archived = false;
 	RAISE NOTICE 'total_expense_amount(%)', total_expense_cal;
-	UPDATE PROJECT SET total_expense_amount = total_expense_cal WHERE id = NEW.project_id;
+  IF total_expense_cal IS NULL THEN
+    UPDATE PROJECT SET total_expense_amount = 0 WHERE id = NEW.project_id;
+  ELSE
+    UPDATE PROJECT SET total_expense_amount = total_expense_cal WHERE id = NEW.project_id;
+  END IF;	
  END IF;
 
  RETURN NEW;
