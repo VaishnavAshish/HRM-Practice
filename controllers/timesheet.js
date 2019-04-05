@@ -1,9 +1,10 @@
 const pg = require("pg");
-var pool = require('./../config/dbconfig');
+const pool = require('./../config/dbconfig');
 const commonController = require('./common-functions');
 const handleResponse = require('./page-error-handle');
 const moment = require('moment-timezone');
-var setting = require('./company-setting');
+const setting = require('./company-setting');
+const jsonexport = require('jsonexport');
 let companyDefaultTimezone,companyWeekStartDay;
 /*handleError=(res, reason, message, code) =>{
   // console.log("ERROR: " + reason);
@@ -41,6 +42,52 @@ function dateFormat(gDate) {
 //   let formatedDate = moment.tz(gDate, companyDefaultTimezone).format('YYYY-MM-DD');
 //   return formatedDate;
 // }
+
+exports.generateTimesheetCsv = (req, res) => {
+  console.log('req.params.weekstartdate '+req.params.weekstartdate);
+  setting.getCompanySetting(req, res ,(err,result)=>{
+     if(err==true){
+          handleResponse.handleError(res, err, ' error in finding company setting');
+     }else{
+         companyDefaultTimezone=result.timezone;
+
+         pool.connect((err, client, done) => {
+             let week_start_date = moment.tz(req.params.weekstartdate,companyDefaultTimezone).format();
+             let week_end_date = calculateWeekEndDate(week_start_date);
+
+             client.query('SELECT tl.id ,tl.created_date at time zone \''+companyDefaultTimezone+'\'  as created_date ,tl.total_work_hours ,tl.project_name ,tl.task_name ,tl.description ,tl.category , EXTRACT(DOW FROM created_date at time zone \''+companyDefaultTimezone+'\') as week_day ,tl.billable ,tl.lastruntime at time zone \''+companyDefaultTimezone+'\'  as lastruntime ,tl.user_role ,tl.invoiced ,tl.record_id  FROM TIMESHEET_LINE_ITEM tl WHERE company_id=$1 AND resource_id=$2 AND created_date at time zone \''+companyDefaultTimezone+'\'  BETWEEN $3 AND $4 AND project_id is not null ORDER BY created_date, task_id, user_role',[req.user.company_id, req.user.id, week_start_date, week_end_date], function(err, timesheet) {
+             if (err) {
+               handleResponse.shouldAbort(err, client, done);
+               handleResponse.handleError(res, err, ' Error in finding timesheet data');
+             } else {
+              //  console.log('---------timesheet.rows---------');
+              //  console.log(timesheet.rows);
+               done();
+               if(timesheet.rowCount>0){
+                   jsonexport(timesheet.rows,function(err, csv){
+                       if(err) {
+                         console.log('err');
+                         console.log(err);
+                         handleResponse.handleError(res, err, "Server Error: Error in creating csv file");
+                       }
+                      //  console.log(csv);
+                       res.setHeader('Content-Disposition', 'attachment; filename=\"' + 'timesheet-' + Date.now() + '.csv\"');
+                       res.writeHead(200, {
+                         'Content-Type': 'text/csv'
+                       });
+                       res.end(csv);
+                   });
+               }else{
+                  handleResponse.handleError(res, err, ' No timesheet Found');
+               }
+
+             }
+           });
+         })
+       }
+     });
+
+}
 
 function calculateWeekEndDate(start_date) {
   //console.log('calculateWeekEndDate called');

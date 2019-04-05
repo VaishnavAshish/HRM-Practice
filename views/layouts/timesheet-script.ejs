@@ -2157,6 +2157,13 @@ function addTabListToUl(weekStartDate){
   }
 
 }
+
+function exportTimesheetCsv(){
+  console.log(`generateTimesheetCsv/'${weekStartDate}'`);
+  window.location.href=`generateTimesheetCsv/${weekStartDate}`;
+}
+
+
 function submitWeeklyTimesheet(submitBtn){
   console.log('inside submitWeeklyTimesheet');
   console.log($(submitBtn));

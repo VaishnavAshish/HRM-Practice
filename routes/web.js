@@ -127,6 +127,7 @@ module.exports = function(app) {
     app.post('/deleteExpense', passportConfig.isAuthenticated, expenseController.deleteExpense);
     app.post('/editExpense', passportConfig.isAuthenticated, expenseController.postEditExpense);
     app.post('/submitExpense', passportConfig.isAuthenticated, expenseController.submitExpense);
+    app.get('/generateExpenseCsv', passportConfig.isAuthenticated, expenseController.generateExpenseCsv);
 
 
     //app.get('/project', passportConfig.isAuthenticated, projectController.getProject);
@@ -137,6 +138,8 @@ module.exports = function(app) {
     app.post('/editProject', passportConfig.isAuthenticated, projectController.postEditProject);
     app.post('/getGlobalProject', passportConfig.isAuthenticated, projectController.getGlobalProject);
     app.post('/checkAndCreateProjectAssignment', passportConfig.isAuthenticated, projectController.checkAndCreateProjectAssignment);
+    app.get('/generateProjectCsv', passportConfig.isAuthenticated, projectController.generateProjectCsv);
+
 
     app.post('/addProjectResource', passportConfig.isAuthenticated, projectResourceController.postAddProjectRes);
     app.post('/deleteProjectResource', passportConfig.isAuthenticated, projectResourceController.deleteProjectRes);
@@ -151,6 +154,8 @@ module.exports = function(app) {
     app.post('/addTask', passportConfig.isAuthenticated, taskController.postAddTask);
     // app.get('/editTask/:taskId', passportConfig.isAuthenticated, taskController.getEditTask);
     app.post('/editTask', passportConfig.isAuthenticated, taskController.postEditTask);
+    app.get('/generateTaskCsv/:projectId', passportConfig.isAuthenticated, taskController.generateTaskCsv);
+
 
     app.get('/timesheet/:userId',passportConfig.isAuthenticated, roleConfig.permit,roleConfig.nocache, timesheetController.getTimesheet);
     app.post('/addTimesheet', passportConfig.isAuthenticated, timesheetController.addTimesheet);
@@ -166,6 +171,9 @@ module.exports = function(app) {
     app.post('/getTimesheetWithPlay', passportConfig.isAuthenticated, timesheetController.getTimesheetWithPlay);
     app.post('/submitWeeklyTimesheetByProjectTaskId', passportConfig.isAuthenticated, timesheetController.submitWeeklyTimesheetByProjectTaskId);
     app.post('/submitWeeklyTimesheet', passportConfig.isAuthenticated, timesheetController.submitWeeklyTimesheet);
+    app.get('/timesheet/generateTimesheetCsv/:weekstartdate', passportConfig.isAuthenticated, timesheetController.generateTimesheetCsv);
+
+
 // /submitWeeklyTimesheetByProjectId
 
     // submitDayTimesheet
@@ -289,7 +297,7 @@ module.exports = function(app) {
     app.post('/insertExpenseInvoiceItem', passportConfig.isAuthenticated, invoiceController.insertExpenseInvoiceItem);
     app.post('/insertTimesheetInvoiceItem', passportConfig.isAuthenticated, invoiceController.insertTimesheetInvoiceItem);
     app.post('/insertNewInvoiceItem', passportConfig.isAuthenticated, invoiceController.insertNewInvoiceItem);
-
+    app.get('/generateInvoiceCsv', passportConfig.isAuthenticated, invoiceController.generateInvoiceCsv);
 
 
     app.get('/task-details', passportConfig.isAuthenticated, roleConfig.permit,roleConfig.nocache, function(req, res) {

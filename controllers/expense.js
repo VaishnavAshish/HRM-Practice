@@ -1,9 +1,10 @@
 const pg = require("pg");
-var pool = require('./../config/dbconfig');
-var handleResponse = require('./page-error-handle');
+const pool = require('./../config/dbconfig');
+const handleResponse = require('./page-error-handle');
 const moment = require('moment-timezone');
-var setting = require('./company-setting');
+const setting = require('./company-setting');
 const timesheetController = require('./timesheet');
+const jsonexport = require('jsonexport');
 let companyDefaultTimezone;
 /*handleError = (res, reason, message, code) => {
   // console.log("ERROR: " + reason);
@@ -53,6 +54,50 @@ function dateFormat(gDate) {
 //     return formatedDate;
 // }
 
+exports.generateExpenseCsv = (req, res) => {
+
+  setting.getCompanySetting(req, res ,(err,result)=>{
+     if(err==true){
+          handleResponse.handleError(res, err, ' error in finding company setting');
+     }else{
+         companyDefaultTimezone=result.timezone;
+
+         pool.connect((err, client, done) => {
+             whereClause='WHERE company_id=$1 AND archived=$2 AND project_id IN (SELECT id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$3) AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2)';
+             client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.total_amount ,e.record_id,e.submitted FROM EXPENSE e '+whereClause+' ORDER BY expense_date DESC,record_id ', [req.user.company_id, false,false], function(err, expense) {
+             if (err) {
+               handleResponse.shouldAbort(err, client, done);
+               handleResponse.handleError(res, err, ' Error in finding expense data');
+             } else {
+              //  console.log('---------expense.rows---------');
+              //  console.log(expense.rows);
+               done();
+               if(expense.rowCount>0){
+                   jsonexport(expense.rows,function(err, csv){
+                       if(err) {
+                         console.log('err');
+                         console.log(err);
+                         handleResponse.handleError(res, err, "Server Error: Error in creating csv file");
+                       }
+                      //  console.log(csv);
+                       res.setHeader('Content-Disposition', 'attachment; filename=\"' + 'expense-' + Date.now() + '.csv\"');
+                       res.writeHead(200, {
+                         'Content-Type': 'text/csv'
+                       });
+                       res.end(csv);
+                   });
+               }else{
+                  handleResponse.handleError(res, err, ' No Expense Found');
+               }
+
+             }
+           });
+         })
+       }
+     });
+
+}
+
 
 exports.getExpense = (req, res) => {
     let user_id = req.params.userId;
@@ -76,7 +121,7 @@ exports.getExpense = (req, res) => {
         // console.log('companyDefaultTimezone');
         // console.log(companyDefaultTimezone);
         pool.connect((err, client, done) => {
-            whereClause='WHERE company_id=$1 AND archived=$2 AND project_id IN (SELECT id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$5) AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2 AND user_id=$6)';
+            whereClause='WHERE company_id=$1 AND archived=$2 AND project_id IN (SELECT id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$5) AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND user_id=$6';
             // console.log('queryToExec '+'SELECT e.*,(select count(*) from EXPENSE '+whereClause+') as totalCount,(select count(*) from EXPENSE '+whereClause+' AND status ilike $3) as draftCount,(select count(*) from EXPENSE '+whereClause+' AND status ilike $4) as approvedCount FROM EXPENSE e '+whereClause+' ORDER BY expense_date,record_id OFFSET 0 LIMIT ' + process.env.PAGE_RECORD_NO+' searchCrieteriaValue'+req.user.company_id, false, 'Draft', 'Approved',false, user_id);
             client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id,e.submitted ,(select count(*) from EXPENSE '+whereClause+') as totalCount,(select count(*) from EXPENSE '+whereClause+' AND status ilike $3) as draftCount,(select count(*) from EXPENSE '+whereClause+' AND status ilike $4) as approvedCount FROM EXPENSE e '+whereClause+' ORDER BY expense_date DESC,record_id OFFSET 0 LIMIT ' + process.env.PAGE_RECORD_NO, [req.user.company_id, false, 'Draft', 'Approved',false, user_id], function(err, expense) {
                 if (err) {

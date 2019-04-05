@@ -9,6 +9,7 @@ const fixer = new Fixer('bb5ebdb737191fd21bb0866be1706d33')
 const moment = require('moment-timezone');
 const setting = require('./company-setting');
 const companySettingFile = require('./setting');
+const jsonexport = require('jsonexport');
 let companyDefaultTimezone;
 let companyDefaultCurrency;
 
@@ -61,6 +62,50 @@ function dateFormat(gDate) {
 //   // console.log(formatedDate);
 //   return formatedDate;
 // }
+
+exports.generateInvoiceCsv = (req, res) => {
+
+  setting.getCompanySetting(req, res ,(err,result)=>{
+     if(err==true){
+          handleResponse.handleError(res, err, ' error in finding company setting');
+     }else{
+         companyDefaultTimezone=result.timezone;
+
+         pool.connect((err, client, done) => {
+           whereClause='WHERE company_id=$1 AND archived=$2 AND account_id IN(SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) '
+           client.query('SELECT i.id ,i.status ,i.created_by ,i.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,i.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,i.account_name ,i.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,i.due_date at time zone \''+companyDefaultTimezone+'\' as due_date ,i.description ,i.project_name ,i.total_amount ,i.record_id ,i.currency ,i.tax FROM INVOICE i '+whereClause+' ORDER BY start_date DESC,record_id ', [req.user.company_id, false], function (err, invoice) {
+             if (err) {
+               handleResponse.shouldAbort(err, client, done);
+               handleResponse.handleError(res, err, ' Error in finding invoice data');
+             } else {
+              //  console.log('---------invoice.rows---------');
+              //  console.log(invoice.rows);
+               done();
+               if(invoice.rowCount>0){
+                   jsonexport(invoice.rows,function(err, csv){
+                       if(err) {
+                         console.log('err');
+                         console.log(err);
+                         handleResponse.handleError(res, err, "Server Error: Error in creating csv file");
+                       }
+                      //  console.log(csv);
+                       res.setHeader('Content-Disposition', 'attachment; filename=\"' + 'invoice-' + Date.now() + '.csv\"');
+                       res.writeHead(200, {
+                         'Content-Type': 'text/csv'
+                       });
+                       res.end(csv);
+                   });
+               }else{
+                  handleResponse.handleError(res, err, ' No Invoice Found');
+               }
+
+             }
+           });
+         })
+       }
+     });
+
+}
 
 
 exports.getInvoice = (req, res) => {

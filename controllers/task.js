@@ -1,10 +1,11 @@
 const pg = require("pg");
-var pool = require('./../config/dbconfig');
+const pool = require('./../config/dbconfig');
 const handleResponse = require('./page-error-handle');
 const moment = require('moment-timezone');
-var setting = require('./company-setting');
+const setting = require('./company-setting');
+const commonController = require('./common-functions');
+const jsonexport = require('jsonexport');
 let companyDefaultTimezone;
-var commonController = require('./common-functions');
 // common-functions.js
 /*handleError = (res, reason, message, code) => {
   // console.log("ERROR: " + reason);
@@ -45,6 +46,49 @@ function dateFormat(gDate) {
 //   // console.log('Date format returned');
 //   return formatedDate;
 // }
+
+exports.generateTaskCsv = (req, res) => {
+
+  setting.getCompanySetting(req, res ,(err,result)=>{
+     if(err==true){
+          handleResponse.handleError(res, err, ' error in finding company setting');
+     }else{
+         companyDefaultTimezone=result.timezone;
+
+         pool.connect((err, client, done) => {
+           client.query('SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.billable_hours ,t.milestone ,t.priority ,t.created_date at time zone \''+companyDefaultTimezone+'\' as created_date,t.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date,t.project_name ,t.record_id FROM TASK t where project_id=$1 AND company_id=$2 AND archived=$3', [req.params.projectId, req.user.company_id,false], function (err, tasks) {
+             if (err) {
+               handleResponse.shouldAbort(err, client, done);
+               handleResponse.handleError(res, err, ' Error in finding task data');
+             } else {
+              //  console.log('---------task.rows---------');
+              //  console.log(tasks.rows);
+               done();
+               if(tasks.rowCount>0){
+                   jsonexport(tasks.rows,function(err, csv){
+                       if(err) {
+                         console.log('err');
+                         console.log(err);
+                         handleResponse.handleError(res, err, "Server Error: Error in creating csv file");
+                       }
+                      //  console.log(csv);
+                       res.setHeader('Content-Disposition', 'attachment; filename=\"' + 'task-' + Date.now() + '.csv\"');
+                       res.writeHead(200, {
+                         'Content-Type': 'text/csv'
+                       });
+                       res.end(csv);
+                   });
+               }else{
+                  handleResponse.handleError(res, err, ' No Task Found');
+               }
+
+             }
+           });
+         })
+       }
+     });
+
+}
 
 exports.findTaskByName = (req, res) => {
   // console.log("findAccountByName----------------------------------"+req.body.searchText);
@@ -278,7 +322,7 @@ exports.getTaskDetails = (req, res) => {
         // console.log(companyDefaultTimezone);
           if (req.query.taskId != '' && req.query.taskId != undefined && req.query.taskId != null) {
             pool.connect((err, client, done) => {
-              client.query('SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date ,t.updated_date ,t.archived ,t.project_name ,t.record_id FROM TASK t where id=$1 AND company_id=$2', [req.query.taskId, req.user.company_id], function (err, taskDetail) {
+              client.query('SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,t.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,t.archived ,t.project_name ,t.record_id FROM TASK t where id=$1 AND company_id=$2', [req.query.taskId, req.user.company_id], function (err, taskDetail) {
                 if (err) {
                   console.error(err);
                   handleResponse.shouldAbort(err, client, done);
@@ -368,7 +412,7 @@ exports.postEditTask = (req, res) => {
         companyDefaultTimezone=result.timezone;
           if (req.body.taskDetails.taskId != '' && req.body.taskDetails.taskId != undefined && req.body.taskDetails.taskId != null) {
             pool.connect((err, client, done) => {
-              client.query('SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date ,t.updated_date ,t.archived ,t.project_name ,t.record_id FROM TASK t where id=$1 AND company_id=$2', [req.body.taskDetails.taskId, req.user.company_id], function (err, taskDetail) {
+              client.query('SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date at time zone \''+companyDefaultTimezone+'\' as created_date,t.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,t.archived ,t.project_name ,t.record_id FROM TASK t where id=$1 AND company_id=$2', [req.body.taskDetails.taskId, req.user.company_id], function (err, taskDetail) {
                 if (err) {
                   console.error(err);
                   handleResponse.shouldAbort(err, client, done);
@@ -512,7 +556,7 @@ exports.getTaskAndAssignmentList = (req, res, callback) => {
       }else{
         companyDefaultTimezone=result.timezone;
         pool.connect((err, client, done) => {
-          client.query('SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date ,t.updated_date ,t.archived ,t.project_name ,t.record_id FROM TASK t where project_id=$1 AND company_id=$2', [req.body.projectId, req.user.company_id], function (err, tasks) {
+          client.query('SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date at time zone \''+companyDefaultTimezone+'\' as created_date,t.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,t.archived ,t.project_name ,t.record_id FROM TASK t where project_id=$1 AND company_id=$2', [req.body.projectId, req.user.company_id], function (err, tasks) {
             if (err) {
               console.error(err);
               handleResponse.shouldAbort(err, client, done);

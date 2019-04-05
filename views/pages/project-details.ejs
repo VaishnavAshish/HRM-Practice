@@ -195,6 +195,9 @@
                                             </div>
                                             <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_7-of-12 slds-p-horizontal_small">
                                                 <div class="text-right sm-tpd-15">
+                                                    <button class="slds-button slds-button_neutral slds-align-top" onclick="exportToCsv('generateTaskCsv/<%= project.id %>')">
+                                                        <span class="">Export Task</span>
+                                                    </button>
                                                     <button class="slds-button slds-button_brand slds-align-top" onclick="openModal('#modalAddNewTask', true)">
                                                         <i class="fa fa-plus"></i>
                                                         <span class="">Add Task</span>

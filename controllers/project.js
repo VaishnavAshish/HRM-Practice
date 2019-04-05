@@ -1,9 +1,10 @@
 const pg = require("pg");
-var pool = require('./../config/dbconfig');
+const pool = require('./../config/dbconfig');
 const handleResponse = require('./page-error-handle');
 const moment = require('moment-timezone');
-var setting = require('./company-setting');
+const setting = require('./company-setting');
 const commonController = require('./common-functions');
+const jsonexport = require('jsonexport');
 let companyDefaultTimezone;
 /*handleError = (res, reason, message, code) => {
   // console.log("ERROR: " + reason);
@@ -41,7 +42,49 @@ function dateFormat(gDate) {
 //   formatedDate = yyyy + '-' + mm + '-' + dd;
 //   return formatedDate;
 // }
+exports.generateProjectCsv = (req, res) => {
+  console.log('inside generate project csv');
+  setting.getCompanySetting(req, res ,(err,result)=>{
+     if(err==true){
+          handleResponse.handleError(res, err, ' error in finding company setting');
+     }else{
+         companyDefaultTimezone=result.timezone;
+         console.log('companyDefaultTimezone '+companyDefaultTimezone);
+         pool.connect((err, client, done) => {
+           whereClause='WHERE company_id=$1 AND archived=$2 AND account_id In (SELECT id from ACCOUNT WHERE company_id=$1 AND archived=$2)';
+           client.query('SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.completed ,p.archived ,p.project_cost ,p.record_id FROM PROJECT p '+whereClause+' AND isGlobal=$3 ORDER BY start_date DESC,name ', [req.user.company_id, false,false], function (err, project) {
+             if (err) {
+               handleResponse.shouldAbort(err, client, done);
+               handleResponse.handleError(res, err, ' Error in finding project data');
+             } else {
+              //  console.log('---------project.rows---------');
+              //  console.log(project.rows);
+               done();
+               if(project.rowCount>0){
+                   jsonexport(project.rows,function(err, csv){
+                       if(err) {
+                         console.log('err');
+                         console.log(err);
+                         handleResponse.handleError(res, err, "Server Error: Error in creating csv file");
+                       }
+                      //  console.log(csv);
+                       res.setHeader('Content-Disposition', 'attachment; filename=\"' + 'project-' + Date.now() + '.csv\"');
+                       res.writeHead(200, {
+                         'Content-Type': 'text/csv'
+                       });
+                       res.end(csv);
+                   });
+               }else{
+                  handleResponse.handleError(res, err, ' No Project Found');
+               }
 
+             }
+           });
+         })
+       }
+     });
+
+}
 
 exports.findProjectByCriteria = (req, res) => {
   // console.log("findProjectByCriteria----------------------------------"+req.body.searchField);
