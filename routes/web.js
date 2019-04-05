@@ -299,6 +299,7 @@ module.exports = function(app) {
     app.post('/insertTimesheetInvoiceItem', passportConfig.isAuthenticated, invoiceController.insertTimesheetInvoiceItem);
     app.post('/insertNewInvoiceItem', passportConfig.isAuthenticated, invoiceController.insertNewInvoiceItem);
     app.get('/generateInvoiceCsv', passportConfig.isAuthenticated, invoiceController.generateInvoiceCsv);
+    app.get('/generateInvoiceDetailCsv/:invoiceId', passportConfig.isAuthenticated, invoiceController.generateInvoiceDetailCsv);
 
 
     app.get('/task-details', passportConfig.isAuthenticated, roleConfig.permit,roleConfig.nocache, function(req, res) {

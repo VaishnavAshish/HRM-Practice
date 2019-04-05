@@ -62,6 +62,69 @@ function dateFormat(gDate) {
 //   // console.log(formatedDate);
 //   return formatedDate;
 // }
+exports.generateInvoiceDetailCsv = (req, res) => {
+
+  setting.getCompanySetting(req, res ,(err,result)=>{
+     if(err==true){
+          handleResponse.handleError(res, err, ' error in finding company setting');
+     }else{
+         companyDefaultTimezone=result.timezone;
+
+         pool.connect((err, client, done) => {
+           whereClause='WHERE company_id=$1 AND id=$2 '
+           client.query('SELECT i.status ,i.created_by ,i.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,i.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,i.account_name ,i.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,i.due_date at time zone \''+companyDefaultTimezone+'\' as due_date ,i.description ,i.project_name ,i.total_amount ,i.record_id ,i.currency ,i.tax FROM INVOICE i '+whereClause+' ORDER BY start_date DESC,record_id ', [req.user.company_id, req.params.invoiceId], function (err, invoice) {
+             if (err) {
+               handleResponse.shouldAbort(err, client, done);
+               handleResponse.handleError(res, err, ' Error in finding invoice data');
+             } else {
+               client.query('SELECT il.type ,il.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,il.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,il.item_date at time zone \''+companyDefaultTimezone+'\' as item_date ,il.hours ,il.unit_price ,il.cost_rate ,il.note ,il.amount ,il.tax ,il.total_amount ,il.user_role ,il.quantity ,il.record_id ,il.currency FROM INVOICE_LINE_ITEM il WHERE company_id=$1 AND invoice_id=$2', [req.user.company_id, req.params.invoiceId], function (err, invoiceItems) {
+               if (err) {
+                   console.error(err);
+                   handleResponse.shouldAbort(err, client, done);
+                   handleResponse.handleError(res, err, ' Error in finding invoice line item data');
+                 } else {
+                    //  console.log('---------invoice.rows---------');
+                    //  console.log(invoice.rows);
+                     done();
+                     if(invoice.rowCount>0){
+                       let invoiceCsv = 'Invoice Details: \n\n';
+                         jsonexport([invoice.rows[0]],function(err, csv){
+                             if(err) {
+                               console.log('err');
+                               console.log(err);
+                               handleResponse.handleError(res, err, "Server Error: Error in creating csv file");
+                             }
+                            //  console.log(csv);
+                            invoiceCsv += csv+'\n\n\n\n';
+                            invoiceCsv += 'Invoice Item Details : \n\n';
+                            jsonexport(invoiceItems.rows,function(err, invoiceItemCsv){
+                                if(err) {
+                                  console.log('err');
+                                  console.log(err);
+                                  handleResponse.handleError(res, err, "Server Error: Error in creating csv file");
+                                }
+                               //  console.log(csv);
+                              invoiceCsv += invoiceItemCsv+'\n\n\n\n';
+                               res.setHeader('Content-Disposition', 'attachment; filename=\"' + 'invoice-' + Date.now() + '.csv\"');
+                               res.writeHead(200, {
+                                 'Content-Type': 'text/csv'
+                               });
+                               res.end(invoiceCsv);
+                             });
+                         });
+                     }else{
+                        handleResponse.handleError(res, err, ' No Invoice Found');
+                     }
+                   }
+                 });
+
+             }
+           });
+         })
+       }
+     });
+
+}
 
 exports.generateInvoiceCsv = (req, res) => {
 

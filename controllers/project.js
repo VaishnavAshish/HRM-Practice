@@ -79,7 +79,7 @@ exports.generateProjectDetailCsv = (req, res) => {
                                done();
                                if(project.rowCount>0){
 
-                                    let projectCsv = 'Project Details: \n\n';
+                                   let projectCsv = 'Project Details: \n\n';
                                    jsonexport([project.rows[0]],function(err, csv){
                                        if(err) {
                                          console.log('err');
@@ -94,7 +94,7 @@ exports.generateProjectDetailCsv = (req, res) => {
                                              console.log(err);
                                              handleResponse.handleError(res, err, "Server Error: Error in creating csv file");
                                            }
-                                           projectCsv +=taskcsv+'\n\n\n\n';
+                                           projectCsv += taskcsv+'\n\n\n\n';
                                            projectCsv += 'Expense Details : \n\n';
                                            jsonexport(expense.rows,function(err, expensecsv){
                                                if(err) {
