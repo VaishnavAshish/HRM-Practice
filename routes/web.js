@@ -139,6 +139,7 @@ module.exports = function(app) {
     app.post('/getGlobalProject', passportConfig.isAuthenticated, projectController.getGlobalProject);
     app.post('/checkAndCreateProjectAssignment', passportConfig.isAuthenticated, projectController.checkAndCreateProjectAssignment);
     app.get('/generateProjectCsv', passportConfig.isAuthenticated, projectController.generateProjectCsv);
+    app.get('/generateProjectDetailCsv/:projectId', passportConfig.isAuthenticated, projectController.generateProjectDetailCsv);
 
 
     app.post('/addProjectResource', passportConfig.isAuthenticated, projectResourceController.postAddProjectRes);

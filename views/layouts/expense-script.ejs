@@ -14,12 +14,13 @@ function deleteExpense(expenseId){
                 console.log(response);
                 hideLoader('#globalLoader');
                 showGlobalToast('#globalToast', 'success', response.message, 4000);
+                setTimeout(location.reload(),5000);
                 /*if(userId!=undefined){
                     location.reload();
                 }else{
                     window.location.href='/expenses-listing/'+userId+'#default';
                 }*/
-                 window.location.href = document.referrer;
+                //  window.location.href = document.referrer;
 
             },
            error: function(response){

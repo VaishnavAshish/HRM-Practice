@@ -85,6 +85,10 @@
                                                 <i class=" fa fa-file-export text-blue" aria-hidden="true"></i>
                                             </span>
                                         </button> -->
+
+                                       <button class="slds-button slds-button_neutral slds-align-top" onclick="exportToCsv('generateProjectDetailCsv/<%= project.id%>')">
+                                         <span class="sm-hide">Export Projects</span>
+                                       </button>
                                         <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteProject(\'<%= project.id %>\')');">
                                                 <!-- updateProjectDetails('<%= project.id %>', '#edit-project') -->
                                             Delete
@@ -195,9 +199,15 @@
                                             </div>
                                             <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_7-of-12 slds-p-horizontal_small">
                                                 <div class="text-right sm-tpd-15">
+                                                  <% if(taskTotalCount>0){ %>
                                                     <button class="slds-button slds-button_neutral slds-align-top" onclick="exportToCsv('generateTaskCsv/<%= project.id %>')">
                                                         <span class="">Export Task</span>
                                                     </button>
+                                                  <% } else { %>
+                                                    <button class="slds-button slds-button_neutral slds-align-top" onclick="exportToCsv('generateTaskCsv/<%= project.id %>')" disabled>
+                                                        <span class="">Export Task</span>
+                                                    </button>
+                                                  <% } %>
                                                     <button class="slds-button slds-button_brand slds-align-top" onclick="openModal('#modalAddNewTask', true)">
                                                         <i class="fa fa-plus"></i>
                                                         <span class="">Add Task</span>

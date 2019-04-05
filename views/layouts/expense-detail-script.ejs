@@ -27,6 +27,8 @@ function disableInput(ele){
 }
 function deleteExpense(expenseId){
         showLoader('#globalLoader');
+        let url= window.location.href;
+        let userId = url.substring(url.lastIndexOf('/'));
         console.log('expense id is '+expenseId);
         $.ajax({
           type: 'POST',
@@ -39,7 +41,7 @@ function deleteExpense(expenseId){
                 hideLoader('#globalLoader');
                  /*window.history.back();*/
                 showGlobalToast('#globalToast', 'success', response.message, 4000);
-                window.location.href="/expenses-listing";
+                window.location.href="/expenses-listing/"+userId;
                  /*window.location.href = document.referrer;*/
 
             },

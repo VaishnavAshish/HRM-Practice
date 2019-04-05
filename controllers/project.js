@@ -42,6 +42,105 @@ function dateFormat(gDate) {
 //   formatedDate = yyyy + '-' + mm + '-' + dd;
 //   return formatedDate;
 // }
+
+exports.generateProjectDetailCsv = (req, res) => {
+  console.log('inside generate project csv');
+  setting.getCompanySetting(req, res ,(err,result)=>{
+     if(err==true){
+          handleResponse.handleError(res, err, ' error in finding company setting');
+     }else{
+         companyDefaultTimezone=result.timezone;
+         console.log('companyDefaultTimezone '+companyDefaultTimezone);
+         pool.connect((err, client, done) => {
+           whereClause='WHERE company_id=$1 AND archived=$2 AND account_id In (SELECT id from ACCOUNT WHERE company_id=$1 AND archived=$2)';
+           client.query('SELECT p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.completed ,p.archived ,p.project_cost ,p.total_hours,p.total_expense_amount,p.total_invoice_amount,p.total_invoice_time,p.total_invoice_expense,p.record_id FROM PROJECT p  '+whereClause+' AND isGlobal=$3 AND id=$4', [req.user.company_id, false,false,req.params.projectId], function (err, project) {
+             if (err) {
+               handleResponse.shouldAbort(err, client, done);
+               handleResponse.handleError(res, err, ' Error in finding project data');
+             } else {
+               client.query('SELECT t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.billable_hours ,t.milestone ,t.priority ,t.created_date at time zone \''+companyDefaultTimezone+'\' as created_date,t.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date,t.project_name ,t.record_id FROM TASK t where project_id=$1 AND company_id=$2 AND archived=$3', [req.params.projectId, req.user.company_id,false], function (err, tasks) {
+                 if (err) {
+                   handleResponse.shouldAbort(err, client, done);
+                   handleResponse.handleError(res, err, ' Error in finding task data');
+                 } else {
+                     whereClause='WHERE project_id=$1';
+                     client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.total_amount ,e.record_id,e.submitted FROM EXPENSE e '+whereClause+' ORDER BY expense_date DESC,record_id ', [req.params.projectId], function(err, expense) {
+                       if (err) {
+                         handleResponse.shouldAbort(err, client, done);
+                         handleResponse.handleError(res, err, ' Error in finding expense data');
+                       } else {
+                         client.query('SELECT tl.created_date at time zone \''+companyDefaultTimezone+'\'  as created_date ,tl.total_work_hours ,tl.project_name ,tl.task_name ,tl.description ,tl.category , EXTRACT(DOW FROM created_date at time zone \''+companyDefaultTimezone+'\') as week_day ,tl.billable ,tl.lastruntime at time zone \''+companyDefaultTimezone+'\'  as lastruntime ,tl.user_role ,tl.invoiced ,tl.record_id  FROM TIMESHEET_LINE_ITEM tl WHERE company_id=$1 AND project_id=$2 ORDER BY created_date, task_id, user_role',[req.user.company_id, req.params.projectId], function(err, timesheet) {
+                           if (err) {
+                             handleResponse.shouldAbort(err, client, done);
+                             handleResponse.handleError(res, err, ' Error in finding timesheet data');
+                           } else {
+                            //  console.log('---------project.rows---------');
+                            //  console.log(project.rows);
+                               done();
+                               if(project.rowCount>0){
+
+                                    let projectCsv = 'Project Details: \n\n';
+                                   jsonexport([project.rows[0]],function(err, csv){
+                                       if(err) {
+                                         console.log('err');
+                                         console.log(err);
+                                         handleResponse.handleError(res, err, "Server Error: Error in creating csv file");
+                                       }
+                                       projectCsv += csv+'\n\n\n\n';
+                                       projectCsv += 'Task Details : \n\n';
+                                       jsonexport(tasks.rows,function(err, taskcsv){
+                                           if(err) {
+                                             console.log('err');
+                                             console.log(err);
+                                             handleResponse.handleError(res, err, "Server Error: Error in creating csv file");
+                                           }
+                                           projectCsv +=taskcsv+'\n\n\n\n';
+                                           projectCsv += 'Expense Details : \n\n';
+                                           jsonexport(expense.rows,function(err, expensecsv){
+                                               if(err) {
+                                                 console.log('err');
+                                                 console.log(err);
+                                                 handleResponse.handleError(res, err, "Server Error: Error in creating csv file");
+                                               }
+                                               projectCsv +=expensecsv+'\n\n\n\n';
+                                               projectCsv += 'Timesheet Details : \n\n';
+                                               jsonexport(timesheet.rows,function(err, timesheetcsv){
+                                                   if(err) {
+                                                     console.log('err');
+                                                     console.log(err);
+                                                     handleResponse.handleError(res, err, "Server Error: Error in creating csv file");
+                                                   }
+                                                   projectCsv +=timesheetcsv;
+                                                    //  console.log(csv);
+                                                     res.setHeader('Content-Disposition', 'attachment; filename=\"' + 'projectDetail-' + Date.now() + '.csv\"');
+                                                     res.writeHead(200, {
+                                                       'Content-Type': 'text/csv'
+                                                     });
+                                                     res.end(projectCsv);
+                                              });
+                                          });
+                                       });
+                                   });
+                               }else{
+                                  handleResponse.handleError(res, err, ' No Project detail Found');
+                               }
+                             }
+                           });
+
+                         }
+                       });
+
+                     }
+                   });
+
+             }
+           });
+         })
+       }
+     });
+
+}
+
 exports.generateProjectCsv = (req, res) => {
   console.log('inside generate project csv');
   setting.getCompanySetting(req, res ,(err,result)=>{
@@ -52,7 +151,7 @@ exports.generateProjectCsv = (req, res) => {
          console.log('companyDefaultTimezone '+companyDefaultTimezone);
          pool.connect((err, client, done) => {
            whereClause='WHERE company_id=$1 AND archived=$2 AND account_id In (SELECT id from ACCOUNT WHERE company_id=$1 AND archived=$2)';
-           client.query('SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.completed ,p.archived ,p.project_cost ,p.record_id FROM PROJECT p '+whereClause+' AND isGlobal=$3 ORDER BY start_date DESC,name ', [req.user.company_id, false,false], function (err, project) {
+           client.query('SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.completed ,p.archived ,p.project_cost,p.total_hours,p.total_expense_amount,p.total_invoice_amount,p.total_invoice_time ,p.record_id FROM PROJECT p '+whereClause+' AND isGlobal=$3 ORDER BY start_date DESC,name ', [req.user.company_id, false,false], function (err, project) {
              if (err) {
                handleResponse.shouldAbort(err, client, done);
                handleResponse.handleError(res, err, ' Error in finding project data');
