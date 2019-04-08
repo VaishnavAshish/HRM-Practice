@@ -518,7 +518,7 @@ function startKwTimerGlobally(ele,id) {
 function renderRole(projectAssignmentList, id) {
     let option = '';
     if (projectAssignmentList.length > 0) {
-        option += '<option value=""> </option>';
+        // option += '<option value=""> </option>';
         projectAssignmentList.forEach(function (projAssign) {
             option += `<option value="${projAssign.user_role}">${projAssign.user_role}</option>`;
         });
@@ -529,9 +529,9 @@ function renderRole(projectAssignmentList, id) {
     console.log(option);
     console.log("id", id);
     $(id).html(option);
-    if(projectAssignmentList.length ==1 ){
-        $(id).val(projectAssignmentList[0].user_role);
-    }
+    // if(projectAssignmentList.length ==1 ){
+    //     $(id).val(projectAssignmentList[0].user_role);
+    // }
 }
 function renderTask(taskList, id) {
     let option = '';

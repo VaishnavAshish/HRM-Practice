@@ -620,7 +620,7 @@ sendEmail = (req, res, next) => {
     '<tr>' +
     '<td valign="top" align="center" style="padding-top: 20px; padding-bottom: 10px;">' +
     '<a href="/" target="_blank">' +
-    '<img src="/img/krow-logo.png" alt="">' +
+    '<img src="/img/klient.png" alt=""  width="120">' +
     '</a>' +
     '</td>' +
     '</tr>' +

@@ -290,7 +290,7 @@ sendInvitationEmail = (req, res, next) => {
                         '<tbody>'+
                             '<tr>'+
                                 '<td valign="top" align="center" style="padding-top: 20px; padding-bottom: 10px;">'+
-                                        '<img src="http://multitenant-example-1.herokuapp.com/img/krow-logo.png" alt="">'+
+                                        '<img src="http://multitenant-example-1.herokuapp.com/img/klient.png" alt=""  width="120">'+
                            '</td>'+
                             '</tr>'+
                             '<tr>'+
@@ -392,7 +392,7 @@ sendResetEmail = (req,res)=>{
                   '<tr>'+
                       '<td valign="top" align="center" style="padding-top: 20px; padding-bottom: 10px;">'+
                           '<a href="/" target="_blank">'+
-                              '<img src="http://multitenant-example-1.herokuapp.com/img/krow-logo.png" alt="">'+
+                              '<img src="http://multitenant-example-1.herokuapp.com/img/klient.png" alt="">'+
                           '</a>'+
                       '</td>'+
                   '</tr>'+
