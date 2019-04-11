@@ -180,8 +180,10 @@ exports.initiateStripe = (req, res) => {
     //     );
 
 }
+
 exports.invoicePaymentDeclined = (req, res) => {
   console.log(JSON.parse(req.body));
+  res.send(200);
   // console.log('req')
   // console.log(req)
   // console.log('res')
