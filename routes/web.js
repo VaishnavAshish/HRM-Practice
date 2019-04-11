@@ -320,8 +320,8 @@ module.exports = function(app) {
     app.post('/getProjectList', passportConfig.isAuthenticated, projectController.getProjectList);
     app.get('/getProjectListForCompany', passportConfig.isAuthenticated, projectController.getProjectListForCompany);
 
-    // app.get('*',function(req, res) {
-    //     res.redirect('/domain');
-    // });
+    app.get('*',function(req, res) {
+        res.redirect('/domain');
+    });
 
 };
