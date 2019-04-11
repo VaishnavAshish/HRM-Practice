@@ -56,4 +56,43 @@ function saveCompanyGeneralSetting(){
 	    });
 
 }
+
+function checkPaymentAndAdd(){
+	$.ajax({
+				type: 'POST',
+				url : '/initiateStripe',
+				contentType: 'application/json',
+				success : function(response){
+						console.log('response is : '+JSON.stringify(response));
+				},
+				error: function(response){
+					console.log('error is : '+JSON.stringify(response));
+
+				}
+	    });
+}
+
+function enableIntegration(){
+	var stripe = Stripe('pk_test_p3cM0dAiczDAJ1qf6lTe5WEs00pOzjH2HU');
+	var elements = stripe.elements();
+	var card = elements.create('card', {
+	  hidePostalCode: true,
+	  style: {
+	    base: {
+	      iconColor: '#F99A52',
+	      color: '#32315E',
+	      lineHeight: '48px',
+	      fontWeight: 400,
+	      fontFamily: '"Open Sans", "Helvetica Neue", "Helvetica", sans-serif',
+	      fontSize: '15px',
+
+	      '::placeholder': {
+	        color: '#CFD7DF',
+	      }
+	    },
+	  }
+	});
+	card.mount('#card-element');
+	$("#paymentDetail").show();
+}
 </script>

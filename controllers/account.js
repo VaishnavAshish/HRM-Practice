@@ -1,8 +1,8 @@
 const pg = require("pg");
-var pool = require('./../config/dbconfig');
-var handleResponse = require('./page-error-handle');
+const pool = require('./../config/dbconfig');
+const handleResponse = require('./page-error-handle');
 const moment = require('moment-timezone');
-var setting = require('./company-setting');
+const setting = require('./company-setting');
 let companyDefaultTimezone;
 /*handleError=(res, reason, message, code) =>{
   // console.log("ERROR: " + reason);

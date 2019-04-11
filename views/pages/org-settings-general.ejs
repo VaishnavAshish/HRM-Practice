@@ -2,8 +2,36 @@
 <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="en">
 
 <% include ../layouts/head %>
-
 <body class="kw">
+  <style>
+    .StripeElement {
+      box-sizing: border-box;
+
+      height: 40px;
+
+      padding: 10px 12px;
+
+      border: 1px solid transparent;
+      border-radius: 4px;
+      background-color: white;
+
+      box-shadow: 0 1px 3px 0 #e6ebf1;
+      -webkit-transition: box-shadow 150ms ease;
+      transition: box-shadow 150ms ease;
+    }
+
+    .StripeElement--focus {
+      box-shadow: 0 1px 3px 0 #cfd7df;
+    }
+
+    .StripeElement--invalid {
+      border-color: #fa755a;
+    }
+
+    .StripeElement--webkit-autofill {
+      background-color: #fefde5 !important;
+    }
+  </style>
 
     <% include ../layouts/nav %>
     <% include ../layouts/sideNav %>
@@ -39,7 +67,15 @@
                                     </div>
                                     </div>
                                 </div>
+                                <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
 
+                                    <div class="text-right tpd-15">
+                                        <button class="slds-button slds-button_neutral slds-align-top" type="button" onclick="enableIntegration()" >
+                                            Enable Integration
+                                        </button>
+                                    </div>
+
+                                </div>
 
                             </div>
                             <div class="">
@@ -426,6 +462,23 @@
                                     </div>
                             </div>
                            </form>
+                           <form id="paymentDetail" class="hide">
+
+                             <div class="form-row" >
+                               <label for="card-element">
+                                 Credit or debit card
+                               </label>
+                               <div id="card-element">
+                                 <!-- a Stripe Element will be inserted here. -->
+                               </div>
+
+                               <!-- Used to display form errors -->
+                               <div id="card-errors" role="alert"></div>
+                             </div>
+                             <input type="button" value="Submit Payment" onclick="checkPaymentAndAdd()">
+                           </form>
+
+
 
                         <!-- body end -->
                 </div>
@@ -436,6 +489,8 @@
     </main>
 
     <% include ../layouts/scripts %>
+    <script src="https://js.stripe.com/v3/"></script>
+
     <% include ../layouts/setting-script %>
 </body>
 

@@ -19,6 +19,9 @@ const passport = require('passport');
 const roleConfig = require('./../config/user-role');
 const passportConfig = require('./../config/passport');
 
+const stripeController = require('./../controllers/stripe');
+const quickbookController = require('./../controllers/quickbook');
+
 module.exports = function(app) {
 
     /**
@@ -77,10 +80,16 @@ module.exports = function(app) {
         });
     });
 
+
     //searching url
     /*app.post('/findCompanyByName', passportConfig.isAuthenticated,adminController.findCompanyByName);*/
     /*app.post('/findUserByEmail', passportConfig.isAuthenticated,resourceController.findUserByEmail);*/
     /*app.post('/findAccountByName', passportConfig.isAuthenticated,accountController.findAccountByName);*/
+
+
+    app.post('/initiateStripe', passportConfig.isAuthenticated,stripeController.initiateStripe);
+    app.post('/invoicePaymentDeclined', passportConfig.isAuthenticated,stripeController.invoicePaymentDeclined);
+
 
     app.post('/activate', passportConfig.isAuthenticated,adminController.postActivate);
 
