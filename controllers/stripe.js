@@ -182,9 +182,9 @@ exports.initiateStripe = (req, res) => {
 }
 
 exports.invoicePaymentDeclined = (req, res) => {
-  console.log(JSON.stringify(req.body));
+  // console.log(JSON.stringify(req.body));
+  console.log('req');
   handleResponse.sendSuccess(res,'invoices found successfully',{});
-  // console.log('req')
   // console.log(req)
   // console.log('res')
   // console.log(res)
