@@ -182,8 +182,8 @@ exports.initiateStripe = (req, res) => {
 }
 
 exports.invoicePaymentDeclined = (req, res) => {
-  // console.log(JSON.stringify(req.body));
   console.log('req')
+  console.log(JSON.stringify(req.body));
   handleResponse.sendSuccess(res,'webhook found successfully',{});
   // console.log(req)
   // console.log('res')
