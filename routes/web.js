@@ -88,7 +88,7 @@ module.exports = function(app) {
 
 
     app.post('/initiateStripe', passportConfig.isAuthenticated,stripeController.initiateStripe);
-    app.get('/invoicePaymentDeclined', passportConfig.isAuthenticated,stripeController.invoicePaymentDeclined);
+    app.post('/invoicePaymentDeclined', passportConfig.isAuthenticated,stripeController.invoicePaymentDeclined);
 
 
     app.post('/activate', passportConfig.isAuthenticated,adminController.postActivate);

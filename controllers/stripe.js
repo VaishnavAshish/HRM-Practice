@@ -181,8 +181,9 @@ exports.initiateStripe = (req, res) => {
 
 }
 exports.invoicePaymentDeclined = (req, res) => {
-  console.log('req')
-  console.log(req)
-  console.log('res`')
-  console.log(res)
+  console.log(JSON.parse(req.body));
+  // console.log('req')
+  // console.log(req)
+  // console.log('res')
+  // console.log(res)
 }
