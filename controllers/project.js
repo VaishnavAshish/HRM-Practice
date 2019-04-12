@@ -159,7 +159,7 @@ exports.generateProjectCsv = (req, res) => {
               //  console.log('---------project.rows---------');
               //  console.log(project.rows);
                done();
-               if(project.rowCount>0){
+                    let projectCSV = 'Project Details : \n\n';
                    jsonexport(project.rows,function(err, csv){
                        if(err) {
                          console.log('err');
@@ -167,15 +167,14 @@ exports.generateProjectCsv = (req, res) => {
                          handleResponse.handleError(res, err, "Server Error: Error in creating csv file");
                        }
                       //  console.log(csv);
+                      projectCSV += csv+'\n\n\n\n';
                        res.setHeader('Content-Disposition', 'attachment; filename=\"' + 'project-' + Date.now() + '.csv\"');
                        res.writeHead(200, {
                          'Content-Type': 'text/csv'
                        });
-                       res.end(csv);
+                       res.end(projectCSV);
                    });
-               }else{
-                  handleResponse.handleError(res, err, ' No Project Found');
-               }
+
 
              }
            });

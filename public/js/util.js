@@ -28,11 +28,7 @@ window.onhashchange = function() {
     handleHashLinks();
 }
 
-function exportToCsv(csvEndPoint){
-  console.log(`/${csvEndPoint}`);
-  window.location.href=`/${csvEndPoint}`;
 
-}
 
 function removeHrefFromLink(targetContainer){
   $("a",targetContainer).removeAttr('href');

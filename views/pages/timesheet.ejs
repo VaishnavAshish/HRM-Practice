@@ -1,7 +1,15 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="en">
     <% include ../layouts/head %>
+
     <body class="kw">
+      <style>
+      .current-date {
+        background: #cecece;
+        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        color: inherit;
+      }
+      </style>
         <%- include('../layouts/nav', {user:user}); %>
         <%- include('../layouts/sideNav',{user:user }); %>
         <main class="main-body-space tpd-60 bpd-100">
@@ -349,9 +357,9 @@
                                             <div class="slds-size_1-of-1">
                                                 <div class="text-right sm-tpd-10" remove-on-other-user>
 
-                                                    <button class="slds-button slds-button_neutral" onclick="exportTimesheetCsv()">
+                                                    <!-- <button class="slds-button slds-button_neutral" onclick="exportTimesheetCsv()">
                                                       Export Timesheet
-                                                    </button>
+                                                    </button> -->
                                                     <button class="slds-button slds-button_brand" onclick="submitWeeklyTimesheet(this);">Submit</button>
                                                 </div>
                                             </div>

@@ -247,7 +247,7 @@ exports.getSetting = (req, res) => {
 	            handleResponse.responseToPage(res,'pages/org-settings-general',{setting:{},user:req.user,timezones:timezones,stripeCustomerId:null},"success","Successfully rendered");
         	}else{
 		        done();
-		        handleResponse.responseToPage(res,'pages/org-settings-general',{setting:{},setting:companySetting.rows[0],user:req.user,timezones:timezones,stripeCustomerId:companySetting.rows[0].stripe_customer_id},"success","Successfully rendered");
+		        handleResponse.responseToPage(res,'pages/org-settings-general',{setting:companySetting.rows[0],user:req.user,timezones:timezones,stripeCustomerId:companySetting.rows[0].stripe_customer_id},"success","Successfully rendered");
         	}
       }
 
@@ -255,9 +255,33 @@ exports.getSetting = (req, res) => {
     });
   })
 };
+
+exports.getSettingExport = (req, res) => {
+  console.log(moment.tz.names());
+  // let timezones=moment.tz.names();
+  pool.connect((err, client, done) => {
+    client.query('SELECT * FROM SETTING WHERE company_id=$1', [req.user.company_id], function (err, companySetting) {
+      if (err) {
+        handleResponse.shouldAbort(err, client, done);
+        handleResponse.responseToPage(res,'pages/org-settings-export',{setting:{},user:req.user, error:err},"error","  Error in finding setting data");
+      } else {
+        	if(companySetting.rows.length<0){
+			  	    done();
+	            handleResponse.responseToPage(res,'pages/org-settings-export',{setting:{},user:req.user,stripeCustomerId:null},"success","Successfully rendered");
+        	}else{
+		        done();
+		        handleResponse.responseToPage(res,'pages/org-settings-export',{setting:companySetting.rows[0],user:req.user,stripeCustomerId:companySetting.rows[0].stripe_customer_id},"success","Successfully rendered");
+        	}
+      }
+
+
+    });
+  })
+};
+
 exports.getSettingUserRole = (req, res) => {
   pool.connect((err, client, done) => {
-    client.query('SELECT user_role FROM SETTING WHERE company_id=$1', [req.user.company_id], function (err, companySetting) {
+    client.query('SELECT user_role,stripe_customer_id FROM SETTING WHERE company_id=$1', [req.user.company_id], function (err, companySetting) {
       if (err) {
         handleResponse.shouldAbort(err, client, done);
         handleResponse.responseToPage(res,'pages/org-settings-userrole',{setting:{},user:req.user, error:err},"error","  Error in finding setting data");
@@ -277,7 +301,7 @@ exports.getSettingUserRole = (req, res) => {
 };
 exports.getSettingInvoice = (req, res) => {
   pool.connect((err, client, done) => {
-    client.query("SELECT invoice_note, company_logo FROM SETTING WHERE company_id=$1", [req.user.company_id], function (err, companySetting) {
+    client.query("SELECT invoice_note, company_logo,stripe_customer_id FROM SETTING WHERE company_id=$1", [req.user.company_id], function (err, companySetting) {
       if (err) {
         handleResponse.shouldAbort(err, client, done);
         handleResponse.responseToPage(res,'pages/org-settings-invoice',{setting:{},user:req.user, error:err},"error","  Error in finding setting data");
@@ -368,7 +392,7 @@ exports.getCompanyLogo = (req,res) =>{
 
 exports.getSettingExpense = (req, res) => {
   pool.connect((err, client, done) => {
-    client.query('SELECT expense_category FROM SETTING WHERE company_id=$1', [req.user.company_id], function (err, companySetting) {
+    client.query('SELECT expense_category,stripe_customer_id FROM SETTING WHERE company_id=$1', [req.user.company_id], function (err, companySetting) {
       if (err) {
         handleResponse.shouldAbort(err, client, done);
         handleResponse.responseToPage(res,'pages/org-settings-expense',{setting:{},user:req.user, error:err},"error","  Error in finding setting data");

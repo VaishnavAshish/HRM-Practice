@@ -8,11 +8,104 @@
     <% include ../layouts/nav %>
     <% include ../layouts/sideNav %>
     <main class="main-body-space tpd-60 bpd-100">
-        
+        <div>
+            <div class=" slds-p-around_small">
+                <!-- Integrations header start end -->
+                <div class="slds-card slds-p-around_small slds-m-bottom_medium">
+                    <div class="slds-grid slds-wrap">
+                        <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                            <div class="slds-grid">
+                                <div class="slds-no-flex slds-p-right_x-small">
+                                    <span class="slds-icon_container slds-icon-standard-process">
+                                        <i class="fa fa-puzzle-piece text-size-21 text-white slds-icon"></i>
+                                    </span>
+                                </div>
+                                <div class="slds-has-flexi-truncate">
+                                    <div class="slds-text-body_small text-height-normal">
+                                        Integrations
+                                    </div>
+                                    <h1 class="slds-page-header__title slds-p-right_x-small text-height-normal">
+                                        <div class="slds-dropdown-trigger slds-dropdown-trigger_click cursor-pointer" aria-haspopup="true" title="" onclick="openDropdown(this, event, true);">
+                                            <div class="slds-grid slds-has-flexi-truncate slds-grid_vertical-align-center">
+                                                <span class="slds-truncate" title="">All</span>
+                                                <i class="fa fa-caret-down lpd-5"></i>
+                                            </div>
+                                            <div class="slds-dropdown slds-dropdown_left text-normal">
+                                                <ul class="slds-dropdown__list" >
+                                                    <li class="slds-dropdown__item">
+                                                        <a href="javascript:void(0);" tabindex="0" class="slds-grid_vertical-align-center">
+
+                                                            <div class="slds-has-flexi-truncate slds-p-horizontal_small">
+                                                                 <div class="slds-truncate">
+                                                                     All
+                                                                 </div>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <!-- <li class="slds-dropdown__item">
+                                                        <a href="javascript:void(0);" tabindex="0" class="slds-grid_vertical-align-center">
+                                                            <div class="slds-has-flexi-truncate slds-p-horizontal_small">
+                                                                 <div class="slds-truncate">
+                                                                     Active
+                                                                 </div>
+                                                            </div>
+                                                            <div class="slds-no-flex">
+                                                                <span class="slds-badge slds-align-middle"> 1 </span>
+                                                            </div>
+                                                        </a>
+                                                    </li> -->
+
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                            <div class="slds-text-align_right sm-tpd-10 sm-text-left">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Integrations header end -->
+
+                <!-- list start -->
+                <div class="slds-card slds-p-around_small" style="min-height: 70vh">
+                    <ul class="slds-grid slds-grid_pull-padded slds-wrap">
+                        <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <a href="/org-settings-general" class="slds-app-launcher__tile slds-text-link_reset slds-m-vertical_medium ">
+                                <div class="slds-no-flex slds-p-around_small">
+                                    <img src="https://d1yjjnpx0p53s8.cloudfront.net/styles/logo-thumbnail/s3/062017/untitled-2_26.png?itok=jfNd1c1F" alt="" width="64">
+                                </div>
+                                <div class="slds-has-flexi-truncate slds-app-launcher__tile-body">
+                                    <div class="">
+                                        <div>
+                                            <strong class="text-size-18">
+                                                quickbooks
+                                            </strong>
+                                        </div>
+                                        <div class="slds-truncate text-dull">Online Invoicing Software for small businesses </div>
+                                        <div>
+                                            <span class="slds-badge slds-theme_success">Active</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+                <!-- list end -->
+
+            </div>
+        </div>
         <% include ../layouts/footer %>
     </main>
 
     <% include ../layouts/scripts %>
+
 
 
 </body>

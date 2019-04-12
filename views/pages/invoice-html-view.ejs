@@ -184,11 +184,11 @@
                                 <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked-horizontal slds-no-row-hover">
                                     <thead class="tbl-head-blue">
                                         <tr class="slds-text-title_caps">
-                                            <th scope="col" class="">
+                                            <!-- <th scope="col" class="">
                                                 <div class="slds-p-vertical_x-small slds-truncate" title="Type">
                                                     Type
                                                 </div>
-                                            </th>
+                                            </th> -->
                                             <th scope="col" class="">
                                                 <div class="slds-p-vertical_x-small slds-truncate" title="Description">
                                                     Description
@@ -221,18 +221,18 @@
                                             <% sumOfTotalAmount += parseFloat(invLineDetails.total_amount); %>
 
                                             <tr>
-                                                <td data-label="Type">
+                                                <!-- <td data-label="Type">
                                                     <div>
                                                         <%= invLineDetails.type %>
                                                     </div>
-                                                </td>
+                                                </td> -->
                                                 <td data-label="Description" class="slds-cell-wrap">
                                                   <div>
                                                       <% if(projectObj.length<=0) { %>
-                                                            Note: <%= invLineDetails.note %>
+                                                             <%= invLineDetails.note %>
                                                       <% } else { %>
                                                             Project: <%= projectObj[0].name %>
-                                                            <br> Note: <%= invLineDetails.note %>
+                                                            <br>  <%= invLineDetails.note %>
                                                       <% } %>
                                                     </div>
                                                 </td>

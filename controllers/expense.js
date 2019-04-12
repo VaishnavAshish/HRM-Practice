@@ -72,7 +72,7 @@ exports.generateExpenseCsv = (req, res) => {
               //  console.log('---------expense.rows---------');
               //  console.log(expense.rows);
                done();
-               if(expense.rowCount>0){
+                  let expenseCSV = 'Expense Details : \n\n';
                    jsonexport(expense.rows,function(err, csv){
                        if(err) {
                          console.log('err');
@@ -80,15 +80,14 @@ exports.generateExpenseCsv = (req, res) => {
                          handleResponse.handleError(res, err, "Server Error: Error in creating csv file");
                        }
                       //  console.log(csv);
+                       expenseCSV += csv+'\n\n\n\n';
                        res.setHeader('Content-Disposition', 'attachment; filename=\"' + 'expense-' + Date.now() + '.csv\"');
                        res.writeHead(200, {
                          'Content-Type': 'text/csv'
                        });
-                       res.end(csv);
+                       res.end(expenseCSV);
                    });
-               }else{
-                  handleResponse.handleError(res, err, ' No Expense Found');
-               }
+
 
              }
            });

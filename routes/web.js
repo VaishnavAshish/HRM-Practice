@@ -76,7 +76,8 @@ module.exports = function(app) {
         console.log(req.user);
         res.render('pages/home', {user:req.user,
             messageType:'success',
-            message :'Page rendered successfuly'
+            message :'Page rendered successfuly',
+            stripeCustomerId :''
         });
     });
 
@@ -88,6 +89,8 @@ module.exports = function(app) {
 
 
     app.post('/initiateStripe', passportConfig.isAuthenticated,stripeController.initiateStripe);
+    app.post('/disableStripe', passportConfig.isAuthenticated, stripeController.disableStripe);
+
     app.post('/invoicePaymentDeclined',stripeController.invoicePaymentDeclined);
 
 
@@ -181,7 +184,8 @@ module.exports = function(app) {
     app.post('/getTimesheetWithPlay', passportConfig.isAuthenticated, timesheetController.getTimesheetWithPlay);
     app.post('/submitWeeklyTimesheetByProjectTaskId', passportConfig.isAuthenticated, timesheetController.submitWeeklyTimesheetByProjectTaskId);
     app.post('/submitWeeklyTimesheet', passportConfig.isAuthenticated, timesheetController.submitWeeklyTimesheet);
-    app.get('/timesheet/generateTimesheetCsv/:weekstartdate', passportConfig.isAuthenticated, timesheetController.generateTimesheetCsv);
+    // app.get('/timesheet/generateTimesheetCsv/:weekstartdate', passportConfig.isAuthenticated, timesheetController.generateTimesheetCsv);
+    app.get('/generateTimesheetCsv', passportConfig.isAuthenticated, timesheetController.generateTimesheetCsv);
 
 
 // /submitWeeklyTimesheetByProjectId
@@ -211,7 +215,8 @@ module.exports = function(app) {
     });
 
     app.get('/integration-dashboard', passportConfig.isAuthenticated,roleConfig.permit, roleConfig.nocache, function(req, res) {
-        res.render('pages/integration-dashboard');
+        // res.render('pages/integration-dashboard');
+        stripeController.getIntegrationDashboard(req, res);
     });
 
 
@@ -256,7 +261,9 @@ module.exports = function(app) {
     app.get('/org-settings', passportConfig.isAuthenticated,roleConfig.permit,roleConfig.nocache, function (req, res) {
         settingController.getSetting(req, res);
     });
-
+    app.get('/org-settings-export', passportConfig.isAuthenticated,roleConfig.permit,roleConfig.nocache, function (req, res) {
+        settingController.getSettingExport(req, res);
+    });
     app.get('/org-settings-userrole', passportConfig.isAuthenticated,roleConfig.permit,roleConfig.nocache, function (req, res) {
         settingController.getSettingUserRole(req, res);
     });

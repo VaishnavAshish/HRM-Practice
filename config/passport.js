@@ -237,7 +237,7 @@ passport.use('user', new LocalStrategy({ usernameField: 'email',passReqToCallbac
         // console.log('email-----------' + email);
          // console.log('comapny domain-----------' + company.rows[0].id);
          // console.log('SELECT * FROM users where email=$1 and company_id=$2'+email.toLowerCase()+company.rows[0].id);
-        client.query("SELECT * FROM users where email=$1 and company_id=$2 and add_status IN ('Joined','Approved')", [email.toLowerCase(),company.rows[0].id], function(err, user) {
+        client.query("SELECT * FROM users where email=$1 and company_id=$2 and archived=$3 and add_status IN ('Joined','Approved')", [email.toLowerCase(),company.rows[0].id,false], function(err, user) {
             if (err) {
               /*poolDone();*/
               shouldAbort(err, client, poolDone);
@@ -245,7 +245,7 @@ passport.use('user', new LocalStrategy({ usernameField: 'email',passReqToCallbac
             }else if (user.rows.length<=0) {
               // console.log(user);
               poolDone();
-              return done('Email is not correct or you are not yet connected to the company.Please contact to the administrator', null);
+              return done('Email is not correct or not connected to the company.Please contact to the administrator', null);
             }
             comparePassword(password, user.rows[0].password, (err, isMatch) => {
               if (err) {
@@ -846,7 +846,7 @@ passport.use(new TwitterStrategy({
  */
 exports.isAuthenticated = (req, res, next) => {
   if (!req.isAuthenticated()) {
-    res.redirect('/domain?hello');
+    res.redirect('/domain');
   }else{
 
     // console.log('------------inputUser------------');

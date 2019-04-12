@@ -144,7 +144,7 @@ exports.generateInvoiceCsv = (req, res) => {
               //  console.log('---------invoice.rows---------');
               //  console.log(invoice.rows);
                done();
-               if(invoice.rowCount>0){
+                   let invoiceCSV = 'Invoice Details : \n\n';
                    jsonexport(invoice.rows,function(err, csv){
                        if(err) {
                          console.log('err');
@@ -152,15 +152,14 @@ exports.generateInvoiceCsv = (req, res) => {
                          handleResponse.handleError(res, err, "Server Error: Error in creating csv file");
                        }
                       //  console.log(csv);
+                      invoiceCSV += csv+'\n\n\n\n';
                        res.setHeader('Content-Disposition', 'attachment; filename=\"' + 'invoice-' + Date.now() + '.csv\"');
                        res.writeHead(200, {
                          'Content-Type': 'text/csv'
                        });
-                       res.end(csv);
+                       res.end(invoiceCSV);
                    });
-               }else{
-                  handleResponse.handleError(res, err, ' No Invoice Found');
-               }
+
 
              }
            });
@@ -1824,17 +1823,21 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
                 if(invLineDetails.note != null) {
                     note = invLineDetails.note;
                 }
-                let notes = `Note:  ${note} `;
+                let notes = ` ${note} `;
                 if(projectObj.length>0){
                     notes = `Project:  ${projectObj[0].name}
                               <br />
-                             Note:  ${note} `;
+                               ${note} `;
                 }
+                // '<td align="left">'+
+                // invLineDetails.type+
+                // '</td>'+
+
+                // <th scope="col" align="left" width="15%">
+                //     Type
+                // </th>
                 // console.log('invLineDetails.inv_qauntity '+invLineDetails.inv_qauntity);
                 let rowHtml='<tr>'+
-                        '<td align="left">'+
-                            invLineDetails.type+
-                        '</td>'+
                         '<td align="left">'+
                           notes+
                         '</td>'+
@@ -2073,9 +2076,7 @@ let account_address = `<strong>${accountDetails.name}</strong><BR />
                                 <table class="tbl-border tbl-padded">
                                     <thead>
                                         <tr class="bg-blue text-white">
-                                            <th scope="col" align="left" width="15%">
-                                                Type
-                                            </th>
+
                                             <th scope="
                                                 col" align="left" width="40%">
                                                 Description

@@ -42,14 +42,14 @@ function addStripeToken(req,res,customer){
                   function(err, invoices) {
                     // asynchronously called
                     pool.connect((err, client, done) => {
-                  			client.query('UPDATE SETTING set stripe_customer_id=$1 where company_id=$2 RETURNING id',[customer.id, req.user.company_id], function(err, updatedSetting) {
+                  			client.query('UPDATE SETTING set stripe_customer_id=$1,stripe_subscription_id=$2 where company_id=$3 RETURNING id',[customer.id, subscription.id, req.user.company_id], function(err, updatedSetting) {
           			          if (err){
           			            handleResponse.shouldAbort(err, client, done);
           			            handleResponse.handleError(res, err, ' Error in updating settings');
           			          } else {
           			            done();
           			            // handleResponse.sendSuccess(res,'settings updated successfully',{});
-                            handleResponse.sendSuccess(res,'Stripes data updated successfully',{customer:customer});
+                            handleResponse.sendSuccess(res,'Stripes data updated successfully',{customer:customer,subscription:subscription});
 
           			          }
         		            });
@@ -73,29 +73,95 @@ exports.initiateStripe = (req, res) => {
       limit: 1,
       email: req.user.email,
     }, function(err, customers) {
-      console.log('customer data');
-      console.log(customers.data.length);
-      console.log(customers.data);
-      if(customers.data.length>0){
-          addStripeToken(req,res,customers.data[0]);
-      }else{
-        stripe.customers.create({
-          email: req.user.email,
-        }, function(err, customer) {
-            if(err) {
-              console.log('error in creating customer');
-              handleResponse.handleError(res, err, 'Error in creating customer');
-            }else{
-                console.log('customer');
-                console.log(customer);
-                addStripeToken(req,res,customer);
-            }
-        });
+          // console.log('customer data');
+          // console.log(customers.data.length);
+          // console.log(customers.data);
+          if(customers.data.length>0){
+              addStripeToken(req,res,customers.data[0]);
+          }else{
+            stripe.customers.create({
+              email: req.user.email,
+            }, function(err, customer) {
+                if(err) {
+                  // console.log('error in creating customer');
+                  handleResponse.handleError(res, err, 'Error in creating customer');
+                }else{
+                    // console.log('customer');
+                    // console.log(customer);
+                    addStripeToken(req,res,customer);
+                }
+            });
+          }
+        // asynchronously called
       }
-    // asynchronously called
+    );
   }
-);
 
+exports.disableStripe = (req, res) => {
+  pool.connect((err, client, done) => {
+      client.query('SELECT stripe_customer_id,stripe_subscription_id FROM SETTING WHERE company_id=$1',[req.user.company_id], function(err, stripeSetting) {
+        if (err){
+          handleResponse.shouldAbort(err, client, done);
+          handleResponse.handleError(res, err, ' Error in finding settings');
+        } else {
+          // done();
+          stripe.subscriptions.del(
+              stripeSetting.rows[0].stripe_subscription_id,
+              function(err, confirmation) {
+                if (err){
+                  handleResponse.shouldAbort(err, client, done);
+                  handleResponse.handleError(res, err, ' Error in finding settings');
+                } else {
+                  // asynchronously called
+                  client.query('UPDATE SETTING set stripe_customer_id=$1,stripe_subscription_id=$2 where company_id=$3',[null,null,req.user.company_id], function(err, stripeSetting) {
+                    if (err){
+                      handleResponse.shouldAbort(err, client, done);
+                      handleResponse.handleError(res, err, ' Error in updating settings');
+                    } else {
+                        done();
+                        handleResponse.sendSuccess(res,'Stripes subscription data deleted successfully',{});
+                    }
+                  });
+                }
+              });
+
+
+        }
+      });
+
+  });
+}
+
+exports.invoicePaymentDeclined = (req, res) => {
+  console.log('req')
+  console.log(JSON.stringify(req.body));
+  // handleResponse.sendSuccess(res,'webhook found successfully',{});
+  pool.connect((err, client, done) => {
+    client.query('UPDATE SETTING set stripe_customer_id=$1,stripe_subscription_id=$2 where company_id=$3',[null,null,req.user.company_id], function(err, stripeSetting) {
+        if (err){
+          handleResponse.shouldAbort(err, client, done);
+          handleResponse.handleError(res, err, ' Error in updating settings');
+        } else {
+            done();
+            handleResponse.sendSuccess(res,'Stripes subscription data deleted successfully',{});
+        }
+      });
+  });
+}
+
+exports.getIntegrationDashboard = (req, res) => {
+  pool.connect((err, client, done) => {
+      client.query('SELECT stripe_customer_id,stripe_subscription_id FROM SETTING WHERE company_id=$1',[req.user.company_id], function(err, stripeSetting) {
+        if (err){
+          handleResponse.shouldAbort(err, client, done);
+          handleResponse.responseToPage(res,'pages/integration-dashboard',{user:req.user,error:err,stripeCustomerId:''},"error"," error in finding company setting");
+        } else {
+          done();
+          handleResponse.responseToPage(res,'pages/integration-dashboard',{user:req.user,error:err,stripeCustomerId:stripeSetting.rows[0].stripe_customer_id},"success","Successfully rendered");
+        }
+      })
+    });
+}
 
     // stripe.tokens.create({
     //   card: {
@@ -201,14 +267,3 @@ exports.initiateStripe = (req, res) => {
     //         // asynchronously called
     //       }
     //     );
-
-}
-
-exports.invoicePaymentDeclined = (req, res) => {
-  console.log('req')
-  console.log(JSON.stringify(req.body));
-  handleResponse.sendSuccess(res,'webhook found successfully',{});
-  // console.log(req)
-  // console.log('res')
-  // console.log(res)
-}
