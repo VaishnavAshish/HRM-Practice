@@ -313,7 +313,7 @@ exports.getTaskDetails = (req, res) => {
       if(err==true){
         // console.log('error in setting');
         // console.log(err);
-        handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.session.passport.user, error:err},"error"," error in finding company setting");
+        handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.user, error:err},"error"," error in finding company setting");
         /*handleResponse.handleError(res, err, ' error in finding company setting');*/
       }else{
 
@@ -326,7 +326,7 @@ exports.getTaskDetails = (req, res) => {
                 if (err) {
                   console.error(err);
                   handleResponse.shouldAbort(err, client, done);
-                  handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.session.passport.user, error:err},"error"," Error in finding task data");
+                  handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.user, error:err},"error"," Error in finding task data");
                   /*handleResponse.handleError(res, err, ' Error in finding task data');*/
                 } else {
                   if(taskDetail.rows.length>0){
@@ -335,20 +335,20 @@ exports.getTaskDetails = (req, res) => {
                       if (err) {
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);
-                        handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.session.passport.user, error:err},"error"," Error in finding task data");
+                        handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.user, error:err},"error"," Error in finding task data");
                         /*handleResponse.handleError(res, err, ' Error in finding task data');*/
                       } else {
                           client.query('SELECT id,email,bill_rate,cost_rate, role as user_role FROM USERS WHERE id NOT IN (SELECT user_id FROM PROJECT_ASSIGNMENT WHERE project_id=$1) AND company_id=$2 AND archived=$3', [taskDetail.rows[0].project_id,req.user.company_id,false], function (err, userList) {
                             if (err) {
                               console.error(err);
                               handleResponse.shouldAbort(err, client, done);
-                              handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.session.passport.user, error:err},"error"," Error in finding users data");
+                              handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.user, error:err},"error"," Error in finding users data");
                             } else {
                               client.query('SELECT u.id, u.email, pa.bill_rate, pa.cost_rate, pa.user_role, pa.id as assignment_id from PROJECT_ASSIGNMENT pa INNER JOIN users u ON pa.user_id = u.id AND pa.company_id = u.company_id AND u.archived = $1 AND pa.project_id = $2', [false, taskDetail.rows[0].project_id], function (err, resList) {
                                 if (err) {
                                   console.error(err);
                                   handleResponse.shouldAbort(err, client, done);
-                                  handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.session.passport.user, error:err},"error"," Error in finding users data");
+                                  handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.user, error:err},"error"," Error in finding users data");
                                 } else {
                                     // console.log("taskDetail");
                                     // console.log(taskDetail);
@@ -380,8 +380,8 @@ exports.getTaskDetails = (req, res) => {
                                     /*taskDetail.rows[0]["project_name"] = req.query.project;*/
                                     // console.log('>>>>>>>>>>>>>>>>>> Task List <<<<<<<<<<<<<<<<<<');
                                     // console.log(userListCombined);
-                                    handleResponse.responseToPage(res,'pages/task-details', {user: req.session.passport.user, taskDetails: taskDetail.rows[0],userList:userListCombined },"success","Successfully rendered");
-                                /*res.render('pages/task-details', { user: req.session.passport.user, taskDetails: taskDetail.rows[0] });*/
+                                    handleResponse.responseToPage(res,'pages/task-details', {user: req.user, taskDetails: taskDetail.rows[0],userList:userListCombined,stripeCustomerId:result.stripe_customer_id },"success","Successfully rendered");
+                                /*res.render('pages/task-details', { user: req.user, taskDetails: taskDetail.rows[0] });*/
                                 }
                               });
                             }
@@ -389,13 +389,13 @@ exports.getTaskDetails = (req, res) => {
                       }
                     });
                   }else{
-                      handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.session.passport.user, error:err},"error"," Error in finding task data");
+                      handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.user, error:err},"error"," Error in finding task data");
                   }
                 }
               });
             });
           } else {
-            handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.session.passport.user, error:err},"error"," Error in finding task data");
+            handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.user, error:err},"error"," Error in finding task data");
           }
       }
     });

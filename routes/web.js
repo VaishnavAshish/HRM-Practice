@@ -73,8 +73,8 @@ module.exports = function(app) {
 
     app.get('/home', passportConfig.isAuthenticated, roleConfig.nocache, function(req, res) {
         console.log('--------req.user redirect------');
-        console.log(req.session.passport.user);
-        res.render('pages/home', {user:req.session.passport.user,
+        console.log(req.user);
+        res.render('pages/home', {user:req.user,
             messageType:'success',
             message :'Page rendered successfuly'
         });
@@ -210,12 +210,17 @@ module.exports = function(app) {
         expenseController.getExpense(req, res);
     });
 
+    app.get('/integration-dashboard', passportConfig.isAuthenticated,roleConfig.permit, roleConfig.nocache, function(req, res) {
+        res.render('pages/integration-dashboard');
+    });
+
+
     app.get('/expense-details', passportConfig.isAuthenticated,roleConfig.permit, roleConfig.nocache, function(req, res) {
         expenseController.getExpenseDetail(req, res);
     });
 
     app.get('/projects-listing', passportConfig.isAuthenticated,roleConfig.permit, roleConfig.nocache, function(req, res) {
-        //res.render('pages/projects-listing',{user:req.session.passport.user});
+        //res.render('pages/projects-listing',{user:req.user});
         projectController.getProject(req, res)
     });
     app.get('/org-listing', passportConfig.isAuthenticated,roleConfig.permit, roleConfig.nocache, function(req, res) {
@@ -237,11 +242,11 @@ module.exports = function(app) {
     });
 
     app.get('/reset-password', roleConfig.nocache,  function (req, res) {
-        /*res.render('pages/reset-password',{user:req.session.passport.user});*/
+        /*res.render('pages/reset-password',{user:req.user});*/
         authController.getResetPassword(req, res);
     });
     app.get('/admin-login', passportConfig.isAuthenticated, roleConfig.nocache, function (req, res) {
-        res.render('pages/admin-login',{user:req.session.passport.user});
+        res.render('pages/admin-login',{user:req.user});
     });
 
     app.get('/org-details', passportConfig.isAuthenticated,roleConfig.permit,roleConfig.nocache, function(req, res) {
@@ -265,13 +270,13 @@ module.exports = function(app) {
 
     app.get('/org-settings-timesheet', passportConfig.isAuthenticated,roleConfig.nocache,  function (req, res) {
 
-        res.render('pages/org-settings-timesheet',{user:req.session.passport.user,
+        res.render('pages/org-settings-timesheet',{user:req.user,
             messageType:'success',
             message :'Page rendered successfuly'
         });
     });
     app.get('/org-import-data', passportConfig.isAuthenticated,roleConfig.nocache,  function (req, res) {
-        res.render('pages/org-import-data',{user:req.session.passport.user,
+        res.render('pages/org-import-data',{user:req.user,
             messageType:'success',
             message :'Page rendered successfuly'
         });
@@ -282,12 +287,12 @@ module.exports = function(app) {
     });
 
     app.get('/accounts-listing', passportConfig.isAuthenticated,roleConfig.permit, roleConfig.nocache, function(req, res) {
-        /*res.render('pages/accounts-listing',{user:req.session.passport.user});*/
+        /*res.render('pages/accounts-listing',{user:req.user});*/
         accountController.getAccount(req, res)
     });
 
     app.get('/account-details', passportConfig.isAuthenticated, roleConfig.permit,roleConfig.nocache, function(req, res) {
-        /*res.render('pages/account-details',{user:req.session.passport.user});*/
+        /*res.render('pages/account-details',{user:req.user});*/
         accountController.getAccountDetail(req, res);
     });
 
@@ -312,7 +317,7 @@ module.exports = function(app) {
 
 
     app.get('/task-details', passportConfig.isAuthenticated, roleConfig.permit,roleConfig.nocache, function(req, res) {
-        // res.render('pages/task-details',{user:req.session.passport.user});
+        // res.render('pages/task-details',{user:req.user});
         taskController.getTaskDetails(req, res);
     });
 

@@ -1,6 +1,6 @@
 let role={
 	"super_admin":["org-listing","org-details","resource-details"],
-	"admin":["accounts-listing","account-details","resources-listing","resource-details","org-settings","org-settings-userrole","org-settings-invoice","org-settings-expense"],
+	"admin":["accounts-listing","account-details","resources-listing","resource-details","org-settings","org-settings-userrole","org-settings-invoice","org-settings-expense","integration-dashboard"],
 	"user":[]
 };
 let assignment={
@@ -25,6 +25,7 @@ exports.setupPagePermissions = (userData, user) => {
 	  pages.push({ label: 'Accounts', url: '/accounts-listing' });
 	  pages.push({ label: 'Team', url: '/resources-listing' });
 
+
 	  if(userData.permissions.includes('projectManager')){
 		pages.push({ label: 'Projects', url: '/projects-listing' });
 	  }
@@ -39,6 +40,7 @@ exports.setupPagePermissions = (userData, user) => {
 		pages.push({ label: 'Invoices', url: '/invoices-listing' });
 	  }
 	  pages.push({ label: 'Settings', url: '/org-settings'});
+		pages.push({ label: 'Integration Dashboard', url:'/integration-dashboard'});
 	} else {
 	  if(userData.permissions.includes('projectManager')){
 		  pages.push({ label: 'Projects', url: '/projects-listing' });

@@ -240,14 +240,14 @@ exports.getSetting = (req, res) => {
     client.query('SELECT * FROM SETTING WHERE company_id=$1', [req.user.company_id], function (err, companySetting) {
       if (err) {
         handleResponse.shouldAbort(err, client, done);
-        handleResponse.responseToPage(res,'pages/org-settings-general',{setting:{},user:req.session.passport.user, error:err,timezones:timezones},"error","  Error in finding setting data");
+        handleResponse.responseToPage(res,'pages/org-settings-general',{setting:{},user:req.user, error:err,timezones:timezones},"error","  Error in finding setting data");
       } else {
         	if(companySetting.rows.length<0){
 			  	    done();
-	            handleResponse.responseToPage(res,'pages/org-settings-general',{setting:{},user:req.session.passport.user,timezones:timezones},"success","Successfully rendered");
+	            handleResponse.responseToPage(res,'pages/org-settings-general',{setting:{},user:req.user,timezones:timezones,stripeCustomerId:null},"success","Successfully rendered");
         	}else{
 		        done();
-		        handleResponse.responseToPage(res,'pages/org-settings-general',{setting:{},setting:companySetting.rows[0],user:req.session.passport.user,timezones:timezones},"success","Successfully rendered");
+		        handleResponse.responseToPage(res,'pages/org-settings-general',{setting:{},setting:companySetting.rows[0],user:req.user,timezones:timezones,stripeCustomerId:companySetting.rows[0].stripe_customer_id},"success","Successfully rendered");
         	}
       }
 
@@ -260,14 +260,14 @@ exports.getSettingUserRole = (req, res) => {
     client.query('SELECT user_role FROM SETTING WHERE company_id=$1', [req.user.company_id], function (err, companySetting) {
       if (err) {
         handleResponse.shouldAbort(err, client, done);
-        handleResponse.responseToPage(res,'pages/org-settings-userrole',{setting:{},user:req.session.passport.user, error:err},"error","  Error in finding setting data");
+        handleResponse.responseToPage(res,'pages/org-settings-userrole',{setting:{},user:req.user, error:err},"error","  Error in finding setting data");
       } else {
         	if(companySetting.rows.length<0){
 			  	done();
-	            handleResponse.responseToPage(res,'pages/org-settings-userrole',{setting:{},user:req.session.passport.user},"success","Successfully rendered");
+	            handleResponse.responseToPage(res,'pages/org-settings-userrole',{setting:{},user:req.user,stripeCustomerId:null},"success","Successfully rendered");
         	}else{
 		        done();
-		        handleResponse.responseToPage(res,'pages/org-settings-userrole',{setting:companySetting.rows[0],user:req.session.passport.user},"success","Successfully rendered");
+		        handleResponse.responseToPage(res,'pages/org-settings-userrole',{setting:companySetting.rows[0],user:req.user,stripeCustomerId:companySetting.rows[0].stripe_customer_id},"success","Successfully rendered");
         	}
       }
 
@@ -280,19 +280,19 @@ exports.getSettingInvoice = (req, res) => {
     client.query("SELECT invoice_note, company_logo FROM SETTING WHERE company_id=$1", [req.user.company_id], function (err, companySetting) {
       if (err) {
         handleResponse.shouldAbort(err, client, done);
-        handleResponse.responseToPage(res,'pages/org-settings-invoice',{setting:{},user:req.session.passport.user, error:err},"error","  Error in finding setting data");
+        handleResponse.responseToPage(res,'pages/org-settings-invoice',{setting:{},user:req.user, error:err},"error","  Error in finding setting data");
       } else {
           if(companySetting.rows.length<0){
               done();
-              handleResponse.responseToPage(res,'pages/org-settings-invoice',{setting:{},user:req.session.passport.user},"success","Successfully rendered");
+              handleResponse.responseToPage(res,'pages/org-settings-invoice',{setting:{},user:req.user},"success","Successfully rendered");
           }else{
             /*companySetting.rows[0].company_logo=companySetting.rows[0].company_logo.toString('base64');*/
             /*// console.log('----------company setting--------')
             // console.log(companySetting.rows[0].company_logo);*/
             done();
             /*res.header('Content-Type','image/jpg' );
-            res.render('pages/org-settings-invoice',{setting:companySetting.rows[0],user:req.session.passport.user,messageType:"success",message:"Successfully rendered"});*/
-		        handleResponse.responseToPage(res,'pages/org-settings-invoice',{setting:companySetting.rows[0],user:req.session.passport.user},"success","Successfully rendered");
+            res.render('pages/org-settings-invoice',{setting:companySetting.rows[0],user:req.user,messageType:"success",message:"Successfully rendered"});*/
+		        handleResponse.responseToPage(res,'pages/org-settings-invoice',{setting:companySetting.rows[0],user:req.user,stripeCustomerId:companySetting.rows[0].stripe_customer_id},"success","Successfully rendered");
         	}
       }
 
@@ -306,7 +306,7 @@ exports.getCompanyLogo = (req,res) =>{
         client.query("SELECT company_logo,contenttype FROM SETTING WHERE company_id=$1", [req.user.company_id], function (err, companySetting) {
           if (err) {
             handleResponse.shouldAbort(err, client, done);
-            handleResponse.responseToPage(res,'pages/org-settings-invoice',{setting:{},user:req.session.passport.user, error:err},"error","  Error in finding setting data");
+            handleResponse.responseToPage(res,'pages/org-settings-invoice',{setting:{},user:req.user, error:err},"error","  Error in finding setting data");
           } else {
                 /*companySetting.rows[0].company_logo=companySetting.rows[0].company_logo.toString('base64');*/
                 // console.log('--------------------------------AJAY ----------');
@@ -371,14 +371,14 @@ exports.getSettingExpense = (req, res) => {
     client.query('SELECT expense_category FROM SETTING WHERE company_id=$1', [req.user.company_id], function (err, companySetting) {
       if (err) {
         handleResponse.shouldAbort(err, client, done);
-        handleResponse.responseToPage(res,'pages/org-settings-expense',{setting:{},user:req.session.passport.user, error:err},"error","  Error in finding setting data");
+        handleResponse.responseToPage(res,'pages/org-settings-expense',{setting:{},user:req.user, error:err},"error","  Error in finding setting data");
       } else {
         	if(companySetting.rows.length<0){
 			  	done();
-            	handleResponse.responseToPage(res,'pages/org-settings-expense',{setting:{},user:req.session.passport.user},"success","Successfully rendered");
+            	handleResponse.responseToPage(res,'pages/org-settings-expense',{setting:{},user:req.user,stripeCustomerId:null},"success","Successfully rendered");
         	}else{
 		        done();
-		        handleResponse.responseToPage(res,'pages/org-settings-expense',{setting:companySetting.rows[0],user:req.session.passport.user},"success","Successfully rendered");
+		        handleResponse.responseToPage(res,'pages/org-settings-expense',{setting:companySetting.rows[0],user:req.user,stripeCustomerId:companySetting.rows[0].stripe_customer_id},"success","Successfully rendered");
         	}
       }
 

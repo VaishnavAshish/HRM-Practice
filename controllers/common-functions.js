@@ -100,7 +100,7 @@ function createTaskAssignment(req, client, err, done, taskId, billRate, costRate
         console.error(err);
         handleResponse.shouldAbort(err, client, done);
         return callback(null);
-        // handleResponse.responseToPage(res,'pages/resources-listing',{resources: [], userRoleList:[] , totalCount:0,activeCount:0, archivedCount:0,user:req.session.passport.user, error:err},"error"," Error in finding user role for the company");
+        // handleResponse.responseToPage(res,'pages/resources-listing',{resources: [], userRoleList:[] , totalCount:0,activeCount:0, archivedCount:0,user:req.user, error:err},"error"," Error in finding user role for the company");
       } else {
         // console.log("userRoles");
         // console.log(userRoleList.rows[0].user_role);

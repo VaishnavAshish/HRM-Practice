@@ -442,7 +442,7 @@ exports.getTimesheet = (req, res) => {
       if(err==true){
         // console.log('error in setting');
         // console.log(err);
-        handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : [], timesheetList : [],timesheetWeekData : [] , projectList:[], userRoles : [], timeheet_users : [],companyDefaultTimezone:'',user:req.session.passport.user,error:err},"error","Error in finding company setting.Please Restart.");
+        handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : [], timesheetList : [],timesheetWeekData : [] , projectList:[], userRoles : [], timeheet_users : [],companyDefaultTimezone:'',user:req.user,error:err},"error","Error in finding company setting.Please Restart.");
 
       }else{
             let userId = req.params.userId;
@@ -462,7 +462,7 @@ exports.getTimesheet = (req, res) => {
                     if(err) {
                       console.error(err);
                       handleResponse.shouldAbort(err, client, done);
-                      handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : [], timesheetList : [],timesheetWeekData : [] , projectList:[], userRoles : [], timeheet_users : [],companyDefaultTimezone:'',user:req.session.passport.user,error:err},"error","Error in finding project data.Please Restart.");
+                      handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : [], timesheetList : [],timesheetWeekData : [] , projectList:[], userRoles : [], timeheet_users : [],companyDefaultTimezone:'',user:req.user,error:err},"error","Error in finding project data.Please Restart.");
                       /*handleResponse.handleError(res, err, ' Error in finding project data');*/
                     } else {
                       // console.log("week_start_date");
@@ -482,7 +482,7 @@ exports.getTimesheet = (req, res) => {
                         if(err) {
                           console.error(err);
                           handleResponse.shouldAbort(err, client, done);
-                          handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : [], timesheetList : [],timesheetWeekData : [] , projectList:[], userRoles : [], timeheet_users : [],companyDefaultTimezone:'',user:req.session.passport.user,error:err},"error","Error in finding timesheet detail data.Please Restart.");
+                          handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : [], timesheetList : [],timesheetWeekData : [] , projectList:[], userRoles : [], timeheet_users : [],companyDefaultTimezone:'',user:req.user,error:err},"error","Error in finding timesheet detail data.Please Restart.");
                           /*handleResponse.handleError(res, err, ' Error in finding timesheet detail data');*/
                         } else {
                           let taskListsDayArr = getTimesheetForDay(timesheetListByDate,currentTimestamp.rows[0].currentdate);
@@ -513,7 +513,7 @@ exports.getTimesheet = (req, res) => {
                              client.query(queryToExec,[req.user.company_id, userId, week_start_date, week_end_date], function(err, timesheetListByProject) {
                               if (err) {
                                 handleResponse.shouldAbort(err, client, done);
-                                handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : [], timesheetList : [],timesheetWeekData : [] , projectList:[], userRoles : [], timeheet_users : [],companyDefaultTimezone:'',user:req.session.passport.user,error:err},"error","Error in finding timesheet detail data for week.Please Restart.");
+                                handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : [], timesheetList : [],timesheetWeekData : [] , projectList:[], userRoles : [], timeheet_users : [],companyDefaultTimezone:'',user:req.user,error:err},"error","Error in finding timesheet detail data for week.Please Restart.");
                               } else {
 
                                 getCompanyAllRoles(req, client, err, done, res, function(userRoles) {
@@ -530,7 +530,7 @@ exports.getTimesheet = (req, res) => {
                                       // console.log(JSON.stringify(taskListsWeekArr));
                                       var daysEnum = {"0":"Sunday","1":"Monday", "2":"Tuesday", "3":"Wednesday","4":"Thursday","5":"Friday","6":"Saturday"};
                                       done();
-                                      handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : daysEnum, timesheetList : taskListsDayArr,timesheetWeekData : taskListsWeekArr , user:req.session.passport.user, projectList:projectList.rows, userRoles : userRoles, timeheet_users : timeheet_users, companyDefaultTimezone:companyDefaultTimezone,companyWeekStartDay:companyWeekStartDay , currentTimestamp:currentTimestamp.rows[0].currentdate },"success","Successfully rendered");
+                                      handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : daysEnum, timesheetList : taskListsDayArr,timesheetWeekData : taskListsWeekArr , user:req.user, projectList:projectList.rows, userRoles : userRoles, timeheet_users : timeheet_users, companyDefaultTimezone:companyDefaultTimezone,companyWeekStartDay:companyWeekStartDay , currentTimestamp:currentTimestamp.rows[0].currentdate,stripeCustomerId:result.stripe_customer_id },"success","Successfully rendered");
                                       });
                                   } else {
                                     done()
@@ -538,7 +538,7 @@ exports.getTimesheet = (req, res) => {
                                       // console.log("Weekly timesheet rows")
                                       // console.log(JSON.stringify(taskListsWeekArr));
                                       var daysEnum = {"0":"Sunday","1":"Monday", "2":"Tuesday", "3":"Wednesday","4":"Thursday","5":"Friday","6":"Saturday"};
-                                      handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : daysEnum, timesheetList : taskListsDayArr,timesheetWeekData : taskListsWeekArr , user:req.session.passport.user, projectList:projectList.rows, userRoles : userRoles, timeheet_users : [],companyDefaultTimezone:companyDefaultTimezone, companyWeekStartDay:companyWeekStartDay, currentTimestamp:currentTimestamp.rows[0].currentdate },"success","Successfully rendered");
+                                      handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : daysEnum, timesheetList : taskListsDayArr,timesheetWeekData : taskListsWeekArr , user:req.user, projectList:projectList.rows, userRoles : userRoles, timeheet_users : [],companyDefaultTimezone:companyDefaultTimezone, companyWeekStartDay:companyWeekStartDay, currentTimestamp:currentTimestamp.rows[0].currentdate,stripeCustomerId:result.stripe_customer_id },"success","Successfully rendered");
                                   }
                                 })
                               }
@@ -585,7 +585,7 @@ function getCompanyAllRoles(req, client, err, done, res, callback) {
       console.error(err);
       handleResponse.shouldAbort(err, client, done);
       return callback(null);
-      // handleResponse.responseToPage(res,'pages/resources-listing',{resources: [], userRoleList:[] , totalCount:0,activeCount:0, archivedCount:0,user:req.session.passport.user, error:err},"error"," Error in finding user role for the company");
+      // handleResponse.responseToPage(res,'pages/resources-listing',{resources: [], userRoleList:[] , totalCount:0,activeCount:0, archivedCount:0,user:req.user, error:err},"error"," Error in finding user role for the company");
 
     } else {
       // console.log("userRoles");

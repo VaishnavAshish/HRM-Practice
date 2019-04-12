@@ -276,7 +276,7 @@ exports.findProjectByName = (req, res) => {
      if(err==true){
        // console.log('error in setting');
        // console.log(err);
-      //  handleResponse.responseToPage(res,'pages/projects-listing',{projects: [], totalCount: 0,notStartedCount:0, inProgressCount :0, atRiskCount :0, completedCount:0,user:req.session.passport.user, error:err},"error","  Error in finding company setting");
+      //  handleResponse.responseToPage(res,'pages/projects-listing',{projects: [], totalCount: 0,notStartedCount:0, inProgressCount :0, atRiskCount :0, completedCount:0,user:req.user, error:err},"error","  Error in finding company setting");
        handleResponse.handleError(res, err, ' error in finding company setting');
      }else{
          companyDefaultTimezone=result.timezone;
@@ -384,7 +384,7 @@ exports.findProjectByName = (req, res) => {
                             handleResponse.sendSuccess(res,'Projects searched successfully',{projects: projectArr,count:searchCount});
                       }
                     });
-                    /*res.render('pages/projects-listing', { projects: project.rows, user: req.session.passport.user, error: err });*/
+                    /*res.render('pages/projects-listing', { projects: project.rows, user: req.user, error: err });*/
                   }
                 });
               }
@@ -398,7 +398,7 @@ exports.getProject = (req, res) => {
       if(err==true){
         // console.log('error in setting');
         // console.log(err);
-        handleResponse.responseToPage(res,'pages/projects-listing',{projects: [], totalCount: 0,notStartedCount:0, inProgressCount :0, atRiskCount :0, completedCount:0,user:req.session.passport.user, error:err},"error","  Error in finding company setting");
+        handleResponse.responseToPage(res,'pages/projects-listing',{projects: [], totalCount: 0,notStartedCount:0, inProgressCount :0, atRiskCount :0, completedCount:0,user:req.user, error:err},"error","  Error in finding company setting");
         /*handleResponse.handleError(res, err, ' error in finding company setting');*/
       }else{
           companyDefaultTimezone=result.timezone;
@@ -407,16 +407,16 @@ exports.getProject = (req, res) => {
           pool.connect((err, client, done) => {
             whereClause='WHERE company_id=$1 AND archived=$2 AND account_id In (SELECT id from ACCOUNT WHERE company_id=$1 AND archived=$2)';
             client.query('SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id,(SELECT count(*) FROM PROJECT '+whereClause+' AND isGlobal=$3) as totalCount,(SELECT count(*) FROM PROJECT '+whereClause+' AND isGlobal=$3 AND status ilike $4) as notStartedCount,(SELECT count(*) FROM PROJECT '+whereClause+' AND isGlobal=$3 AND status ilike $5) as inProgressCount,(SELECT count(*) FROM PROJECT '+whereClause+' AND isGlobal=$3 AND status ilike $6) as atRiskCount,(SELECT count(*) FROM PROJECT '+whereClause+
-            ' AND isGlobal=$3 AND status ilike $7) as completedCount FROM PROJECT p '+whereClause+' AND isGlobal=$3 ORDER BY start_date DESC,name ', [req.session.passport.user.company_id, false,false,'%Not Started%','%In Progress%','%At Risk%','%Completed%'], function (err, project) {
+            ' AND isGlobal=$3 AND status ilike $7) as completedCount FROM PROJECT p '+whereClause+' AND isGlobal=$3 ORDER BY start_date DESC,name ', [req.user.company_id, false,false,'%Not Started%','%In Progress%','%At Risk%','%Completed%'], function (err, project) {
               if (err) {
                 handleResponse.shouldAbort(err, client, done);
-                handleResponse.responseToPage(res,'pages/projects-listing',{projects: [], totalCount: 0,notStartedCount:0, inProgressCount :0, atRiskCount :0, completedCount:0,user:req.session.passport.user, error:err},"error","  Error in finding project data");
+                handleResponse.responseToPage(res,'pages/projects-listing',{projects: [], totalCount: 0,notStartedCount:0, inProgressCount :0, atRiskCount :0, completedCount:0,user:req.user, error:err},"error","  Error in finding project data");
                 /*handleResponse.handleError(res, err, ' Error in finding project data');*/
               } else {
                 client.query('SELECT * FROM ACCOUNT where company_id=$1 AND archived=$2', [req.user.company_id, false], function (err, accountList) {
                   if (err) {
                     handleResponse.shouldAbort(err, client, done);
-                    handleResponse.responseToPage(res,'pages/projects-listing',{projects: [], totalCount: 0,notStartedCount:0, inProgressCount :0, atRiskCount :0, completedCount:0,user:req.session.passport.user, error:err},"error","  Error in finding account data");
+                    handleResponse.responseToPage(res,'pages/projects-listing',{projects: [], totalCount: 0,notStartedCount:0, inProgressCount :0, atRiskCount :0, completedCount:0,user:req.user, error:err},"error","  Error in finding account data");
                   } else {
                     // console.log("----------project.rows-------------");
                         let accountIdArr=[];
@@ -475,10 +475,10 @@ exports.getProject = (req, res) => {
                         projectAtRisk=projectArr.filter(pro => pro.status=="At Risk");
                         projectCompleted=projectArr.filter(pro => pro.status=="Completed");*/
                         done();
-                        handleResponse.responseToPage(res,'pages/projects-listing',{projects: projectArr.length>process.env.PAGE_RECORD_NO?projectArr.slice(0, process.env.PAGE_RECORD_NO-1):projectArr, totalCount: allProjectCount,notStartedCount:notStartedCount, inProgressCount :inProgressCount, atRiskCount :atRiskCount, completedCount:completedCount,user:req.session.passport.user, error:err, accounts:accountList.rows,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD'),companyDefaultTimezone:companyDefaultTimezone},"success","Successfully rendered");
+                        handleResponse.responseToPage(res,'pages/projects-listing',{projects: projectArr.length>process.env.PAGE_RECORD_NO?projectArr.slice(0, process.env.PAGE_RECORD_NO-1):projectArr, totalCount: allProjectCount,notStartedCount:notStartedCount, inProgressCount :inProgressCount, atRiskCount :atRiskCount, completedCount:completedCount,user:req.user, error:err, accounts:accountList.rows,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD'),companyDefaultTimezone:companyDefaultTimezone,stripeCustomerId:result.stripe_customer_id},"success","Successfully rendered");
                   }
                 });
-                /*res.render('pages/projects-listing', { projects: project.rows, user: req.session.passport.user, error: err });*/
+                /*res.render('pages/projects-listing', { projects: project.rows, user: req.user, error: err });*/
               }
             });
           })
@@ -613,7 +613,7 @@ exports.getProjectList = (req, res) => {
     handleResponse.handleError(res, "incorrect account id", " Account id is not correct");
   } else {
     pool.connect((err, client, done) => {
-      client.query('SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id FROM PROJECT p WHERE company_id=$1 AND archived=$2 AND isGlobal=$3 AND account_id=$4', [req.session.passport.user.company_id, false, false, req.body.accountId], function (err, project) {
+      client.query('SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id FROM PROJECT p WHERE company_id=$1 AND archived=$2 AND isGlobal=$3 AND account_id=$4', [req.user.company_id, false, false, req.body.accountId], function (err, project) {
         if (err) {
           handleResponse.shouldAbort(err, client, done);
           handleResponse.handleError(res, err, ' Error in finding project data');
@@ -657,7 +657,7 @@ exports.getProjectDetail = (req, res) => {
           // console.log('getProjectDetail-------------' + req.query.projectId);
           let projectId = req.query.projectId;
           if (projectId == '' || projectId == null || projectId == undefined) {
-            handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [],user:req.session.passport.user, error:err},"error"," Project id is not correct");
+            handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [],user:req.user, error:err},"error"," Project id is not correct");
             /*handleResponse.handleError(res, "incorrect project id", " Project id is not correct");*/
           } else {
             pool.connect((err, client, done) => {
@@ -665,7 +665,7 @@ exports.getProjectDetail = (req, res) => {
                 if (err) {
                   console.error(err);
                   handleResponse.shouldAbort(err, client, done);
-                  handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [],user:req.session.passport.user, error:err},"error"," Error in finding project data");
+                  handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [],user:req.user, error:err},"error"," Error in finding project data");
                   /*handleResponse.handleError(res, err, ' Error in finding project data');*/
                 } else {
                   if(project.rowCount > 0) {
@@ -676,7 +676,7 @@ exports.getProjectDetail = (req, res) => {
                       if (err) {
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);
-                        handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [],user:req.session.passport.user, error:err},"error"," Error in finding task data");
+                        handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [],user:req.user, error:err},"error"," Error in finding task data");
                         /*handleResponse.handleError(res, err, ' Error in finding task data');*/
                       } else {
                         // // console.log("-------------taskList------------");
@@ -716,7 +716,7 @@ exports.getProjectDetail = (req, res) => {
                                 if (err) {
                                   console.error(err);
                                   handleResponse.shouldAbort(err, client, done);
-                                  handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [], user:req.session.passport.user, error:err},"error"," Error in finding task assignment data");
+                                  handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [], user:req.user, error:err},"error"," Error in finding task assignment data");
                                   return false;
                                 } else {
                                   if(taskAssignResourceId.rows.length>0){
@@ -734,14 +734,14 @@ exports.getProjectDetail = (req, res) => {
                           if (err) {
                             console.error(err);
                             handleResponse.shouldAbort(err, client, done);
-                            handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [], user:req.session.passport.user, error:err},"error"," Error in finding account data");
+                            handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [], user:req.user, error:err},"error"," Error in finding account data");
                             /*handleResponse.handleError(res, err, ' Error in finding account data');*/
                           } else {
                             client.query('SELECT id,email, role, user_role, first_name, last_name, bill_rate, cost_rate FROM USERS WHERE company_id=$1 AND archived=$2', [req.user.company_id, false], function (err, userList) {
                               if (err) {
                                 console.error(err);
                                 handleResponse.shouldAbort(err, client, done);
-                                handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [], user:req.session.passport.user, error:err},"error"," Error in finding user data");
+                                handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [], user:req.user, error:err},"error"," Error in finding user data");
                                 /*handleResponse.handleError(res, err, ' Error in finding user data');*/
                               } else {
                                 // // console.log("----userList--------");
@@ -749,14 +749,14 @@ exports.getProjectDetail = (req, res) => {
                                 client.query('SELECT u.id, u.first_name, u.last_name, u.email, pa.user_role as role, pa.bill_rate, pa.cost_rate, pa.id as assinment_id from PROJECT_ASSIGNMENT pa INNER JOIN users u ON pa.user_id = u.id AND pa.company_id = u.company_id AND u.archived = $1 AND pa.project_id = $2  ORDER BY u.email, pa.user_role', [false, req.query.projectId], function (err, resUsers) {
                                   if (err) {
                                     handleResponse.shouldAbort(err, client, done);
-                                    handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [], user:req.session.passport.user, error:err},"error"," Error in finding user data");
+                                    handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [], user:req.user, error:err},"error"," Error in finding user data");
                                     /*handleResponse.handleError(res, err, ' Error in finding user data');*/
                                   } else {
                                     client.query('SELECT user_role FROM SETTING WHERE company_id=$1', [req.user.company_id], function (err, userRoleData) {
                                     if (err) {
                                       console.error(err);
                                       handleResponse.shouldAbort(err, client, done);
-                                      handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [], user:req.session.passport.user, error:err},"error"," Error in finding user role for the company");
+                                      handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [], user:req.user, error:err},"error"," Error in finding user role for the company");
                                     }
                                     else {
                                         let userRole=['Manager'];
@@ -770,8 +770,8 @@ exports.getProjectDetail = (req, res) => {
                                         // // console.log('----------resUsers.rows-----------');
                                         // // console.log(resUsers.rows);
                                         done();
-                                        handleResponse.responseToPage(res,'pages/project-details',{ project: project.rows[0], userRoleList:userRole ,tasks: taskList.rows, accounts: accountList.rows, userList: userList.rows, user: req.session.passport.user, resUsers: resUsers.rows ,taskTotalCount:taskTotalCount,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD')},"success","Successfully rendered");
-                                        /*res.render('pages/project-details', { project: project.rows[0], tasks: taskList.rows, accounts: accountList.rows, userList: userList.rows, user: req.session.passport.user, error: err, resUsers: resUsers.rows });*/
+                                        handleResponse.responseToPage(res,'pages/project-details',{ project: project.rows[0], userRoleList:userRole ,tasks: taskList.rows, accounts: accountList.rows, userList: userList.rows, user: req.user, resUsers: resUsers.rows ,taskTotalCount:taskTotalCount,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD'),stripeCustomerId:result.stripe_customer_id},"success","Successfully rendered");
+                                        /*res.render('pages/project-details', { project: project.rows[0], tasks: taskList.rows, accounts: accountList.rows, userList: userList.rows, user: req.user, error: err, resUsers: resUsers.rows });*/
                                        }
                                     });
                                   }
@@ -925,7 +925,7 @@ exports.postAddProject = (req, res) => {
             handleResponse.shouldAbort(err, client, done);
             handleResponse.handleError(res, err, ' Error in connecting to the database');
           } else {
-            client.query('SELECT * FROM PROJECT where company_id = $1 AND name = $2', [req.session.passport.user.company_id, project_name], function (err, existingProject) {
+            client.query('SELECT * FROM PROJECT where company_id = $1 AND name = $2', [req.user.company_id, project_name], function (err, existingProject) {
               if (err) {
                 handleResponse.shouldAbort(err, client, done);
                 handleResponse.handleError(res, err, ' Error in finding project data');
@@ -937,7 +937,7 @@ exports.postAddProject = (req, res) => {
                   done();
                   handleResponse.handleError(res, 'Project adding error', ' Project with this name already exists.');
                 } else {
-                  client.query('Insert INTO PROJECT (name,description,type, start_date, end_date, total_hours, billable, completion_date, include_weekend, percent_completed, estimated_hours, global_project, completed, company_id, account_id, project_cost) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING id', [project_name, project_desc, project_type, start_date, end_date, total_hours, billable, completion_date, include_weekend, complete_per, estimate_hours, global_project, completed, req.session.passport.user.company_id, req.body.accountId, req.body.project_cost], function (err, insertedProject) {
+                  client.query('Insert INTO PROJECT (name,description,type, start_date, end_date, total_hours, billable, completion_date, include_weekend, percent_completed, estimated_hours, global_project, completed, company_id, account_id, project_cost) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING id', [project_name, project_desc, project_type, start_date, end_date, total_hours, billable, completion_date, include_weekend, complete_per, estimate_hours, global_project, completed, req.user.company_id, req.body.accountId, req.body.project_cost], function (err, insertedProject) {
                     if (err) {
                       handleResponse.shouldAbort(err, client, done);
                       handleResponse.handleError(res, err, ' Error in adding project data to the database');

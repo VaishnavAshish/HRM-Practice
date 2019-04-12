@@ -803,7 +803,7 @@ exports.getUserPicture = (req,res) =>{
         client.query("SELECT user_img,contenttype FROM USERS WHERE id=$1", [req.params.userid], function (err, userDetail) {
           if (err) {
             handleResponse.shouldAbort(err, client, done);
-            handleResponse.responseToPage(res,'pages/user-profile',{userObj: {},user:req.session.passport.user, error:err},"error"," Error in finding user data");
+            handleResponse.responseToPage(res,'pages/user-profile',{userObj: {},user:req.user, error:err},"error"," Error in finding user data");
           }
           else {
             done();

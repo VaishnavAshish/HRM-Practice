@@ -80,13 +80,13 @@ exports.getResourceDetail = (req, res) => {
         handleResponse.responseToPage(res, 'pages/resource-details', {
           resource: {},
           userRoleList: [],
-          isSuperAdmin: req.session.passport.user.user_role.contains('SUPER_ADMIN'),
+          isSuperAdmin: req.user.user_role.contains('SUPER_ADMIN'),
           company: req.query.comp_name,
-          user: req.session.passport.user,
+          user: req.user,
           error: err
         }, "error", "User id is not correct.");
       } else {
-        // console.log('getResourceDetail-------------' + req.query.userid + ' request user session is ' + req.session.passport.user.user_role.contains('SUPER_ADMIN'));
+        // console.log('getResourceDetail-------------' + req.query.userid + ' request user session is ' + req.user.user_role.contains('SUPER_ADMIN'));
         pool.connect((err, client, done) => {
           client.query('SELECT u.id ,u.email ,u.password ,u.username ,u.company_id ,u.user_role ,u.created_date at time zone \'' + companyDefaultTimezone + '\' as created_date ,u.modified_date at time zone \'' + companyDefaultTimezone + '\' as modified_date ,u.first_name ,u.last_name ,u.phone ,u.mobile ,u.designation ,u.archived ,u.password_reset_token ,u.add_status ,u.bill_rate ,u.cost_rate ,u.permissions ,u.role ,u.record_id FROM users u where u.id=$1', [req.query.userid], function(err, resource) {
             if (err) {
@@ -95,9 +95,9 @@ exports.getResourceDetail = (req, res) => {
               handleResponse.responseToPage(res, 'pages/resource-details', {
                 resource: {},
                 userRoleList: [],
-                isSuperAdmin: req.session.passport.user.user_role.contains('SUPER_ADMIN'),
+                isSuperAdmin: req.user.user_role.contains('SUPER_ADMIN'),
                 company: req.query.comp_name,
-                user: req.session.passport.user,
+                user: req.user,
                 error: err
               }, "error", " Error in finding user");
 
@@ -109,9 +109,9 @@ exports.getResourceDetail = (req, res) => {
                   handleResponse.responseToPage(res, 'pages/resources-details', {
                     resource: {},
                     userRoleList: [],
-                    isSuperAdmin: req.session.passport.user.user_role.contains('SUPER_ADMIN'),
+                    isSuperAdmin: req.user.user_role.contains('SUPER_ADMIN'),
                     company: req.query.comp_name,
-                    user: req.session.passport.user,
+                    user: req.user,
                     error: err
                   }, "error", " Error in finding user role for the company");
                 } else {
@@ -125,9 +125,10 @@ exports.getResourceDetail = (req, res) => {
                   handleResponse.responseToPage(res, 'pages/resource-details', {
                     resource: resource.rows[0],
                     userRoleList: userRole,
-                    isSuperAdmin: req.session.passport.user.user_role.contains('SUPER_ADMIN'),
+                    isSuperAdmin: req.user.user_role.contains('SUPER_ADMIN'),
                     company: req.query.comp_name,
-                    user: req.session.passport.user
+                    user: req.user,
+                    stripeCustomerId:result.stripe_customer_id
                   }, "success", "Successfully rendered");
                 }
               })
@@ -150,7 +151,7 @@ exports.getCompanyDetail = (req, res) => {
         totalCount: 0,
         activeCount: 0,
         archivedCount: 0,
-        user: req.session.passport.user,
+        user: req.user,
         error: err
       }, "error", "Error in finding company setting");
     } else {
@@ -164,7 +165,7 @@ exports.getCompanyDetail = (req, res) => {
             resources: [],
             count: 0,
             userRoleList: [],
-            user: req.session.passport.user,
+            user: req.user,
             error: err
           }, "error", " Company id is not correct");
           /*handleResponse.handleError(res, 'incorrect company id', 'company id is not correct ');*/
@@ -181,11 +182,11 @@ exports.getCompanyDetail = (req, res) => {
                   resources: [],
                   count: 0,
                   userRoleList: [],
-                  user: req.session.passport.user,
+                  user: req.user,
                   error: err
                 }, "error", " Error in finding company");
                 /*handleResponse.handleError(res, err, ' Error in finding company');*/
-                /*res.render('pages/org-details', { company: companies.rows[0], user: req.session.passport.user, error: err });*/
+                /*res.render('pages/org-details', { company: companies.rows[0], user: req.user, error: err });*/
               } else {
                 console.log('companyDefaultTimezone' + companyDefaultTimezone);
                 client.query('SELECT u.id ,u.email ,u.password ,u.username ,u.company_id ,u.user_role ,u.created_date at time zone \'' + companyDefaultTimezone + '\' as created_date,u.modified_date at time zone \'' + companyDefaultTimezone + '\' as modified_date,u.first_name ,u.last_name ,u.phone ,u.mobile ,u.designation ,u.archived ,u.password_reset_token ,u.add_status ,u.bill_rate ,u.cost_rate ,u.permissions ,u.role ,u.record_id ,(select count(*) from Users where company_id=$1 AND archived=$2) as total FROM Users u where company_id=$1 AND archived=$2 ORDER BY created_date DESC,email OFFSET 0 LIMIT ' + process.env.PAGE_RECORD_NO, [req.query.companyid, false], function(err, resourceList) {
@@ -198,7 +199,7 @@ exports.getCompanyDetail = (req, res) => {
                       resources: [],
                       count: 0,
                       userRoleList: [],
-                      user: req.session.passport.user,
+                      user: req.user,
                       error: err
                     }, "error", " Error in finding users for the company");
                     /*handleResponse.handleError(res, err, ' Error in finding users for the company');*/
@@ -213,7 +214,7 @@ exports.getCompanyDetail = (req, res) => {
                           resources: [],
                           count: 0,
                           userRoleList: [],
-                          user: req.session.passport.user,
+                          user: req.user,
                           error: err
                         }, "error", " Error in finding user role for the company");
                       } else {
@@ -257,11 +258,12 @@ exports.getCompanyDetail = (req, res) => {
                           admin: admin_user[0],
                           company: companies.rows[0],
                           resources: resourceList.rows,
-                          user: req.session.passport.user,
+                          user: req.user,
                           count: totalCount,
-                          userRoleList: userRole
+                          userRoleList: userRole,
+                          stripeCustomerId:result.stripe_customer_id
                         }, "success", "Successfully rendered");
-                        /*res.render('pages/org-details', { admin: admin_user[0], company: companies.rows[0], resources: resourceList.rows, user: req.session.passport.user, error: err });*/
+                        /*res.render('pages/org-details', { admin: admin_user[0], company: companies.rows[0], resources: resourceList.rows, user: req.user, error: err });*/
                       }
 
                     })
@@ -282,7 +284,8 @@ exports.getUserProfile = (req, res) => {
     if (err == true) {
       handleResponse.responseToPage(res, 'pages/user-profile', {
         userObj: users.rows[0],
-        user: req.session.passport.user
+        user: req.user,
+        stripeCustomerId:result.stripe_customer_id
       }, "error", "Error in finding company setting");
     } else {
 
@@ -298,7 +301,7 @@ exports.getUserProfile = (req, res) => {
             handleResponse.shouldAbort(err, client, done);
             handleResponse.responseToPage(res, 'pages/user-profile', {
               userObj: {},
-              user: req.session.passport.user,
+              user: req.user,
               error: err
             }, "error", " Error in finding user");
             /*handleResponse.handleError(res, err, ' Error in finding user');*/
@@ -316,9 +319,10 @@ exports.getUserProfile = (req, res) => {
           done();
           handleResponse.responseToPage(res, 'pages/user-profile', {
             userObj: users.rows[0],
-            user: req.session.passport.user
+            user: req.user,
+            stripeCustomerId:result.stripe_customer_id
           }, "success", "Successfully rendered");
-          /*res.render('pages/user-profile', { userObj: users.rows[0], user: req.session.passport.user, error: err });*/
+          /*res.render('pages/user-profile', { userObj: users.rows[0], user: req.user, error: err });*/
         })
       })
     }
@@ -326,43 +330,51 @@ exports.getUserProfile = (req, res) => {
 };
 
 exports.getCompanyProfile = (req, res) => {
-  if (req.user) {
+  setting.getCompanySetting(req, res, (err, result) => {
+    if (err == true) {
+      handleResponse.responseToPage(res, 'pages/user-profile', {
+        userObj: users.rows[0],
+        user: req.user,
+        stripeCustomerId:result.stripe_customer_id
+      }, "error", "Error in finding company setting");
+    } else {
+
+      companyDefaultTimezone = result.timezone;
     // console.log('getCompanyProfile-------------' + req.user.id)
-    pool.connect((err, client, done) => {
-      client.query('SELECT c.id ,c.name ,c.domain ,c.archived ,c.created_date at time zone \'' + companyDefaultTimezone + '\' as created_date ,c.modified_date at time zone \'' + companyDefaultTimezone + '\' as modified_date ,c.street ,c.city ,c.state ,c.country ,c.zip_code ,c.add_status ,c.token FROM Company c where c.id=$1', [req.user.company_id], function(err, companies) {
-        if (err) {
-          console.error(err);
-          handleResponse.shouldAbort(err, client, done);
-          handleResponse.responseToPage(res, 'pages/company_profile', {
-            company: {},
-            user: req.session.passport.user,
-            error: err
-          }, "error", " Error in finding company");
-          /*handleResponse.handleError(res, err, ' Error in finding company');*/
-        }
+        pool.connect((err, client, done) => {
+          client.query('SELECT c.id ,c.name ,c.domain ,c.archived ,c.created_date at time zone \'' + companyDefaultTimezone + '\' as created_date ,c.modified_date at time zone \'' + companyDefaultTimezone + '\' as modified_date ,c.street ,c.city ,c.state ,c.country ,c.zip_code ,c.add_status ,c.token FROM Company c where c.id=$1', [req.user.company_id], function(err, companies) {
+            if (err) {
+              console.error(err);
+              handleResponse.shouldAbort(err, client, done);
+              handleResponse.responseToPage(res, 'pages/company_profile', {
+                company: {},
+                user: req.user,
+                error: err
+              }, "error", " Error in finding company");
+              /*handleResponse.handleError(res, err, ' Error in finding company');*/
+            }
 
-        if (companies.rows.length > 0) {
-          // let created_date = dateFormat(moment.tz(companies.rows[0].created_date, companyDefaultTimezone).format());
-          // let modified_date = dateFormat(moment.tz(companies.rows[0].modified_date, companyDefaultTimezone).format());
-          let created_date = dateFormat(companies.rows[0].created_date);
-          let modified_date = dateFormat(companies.rows[0].modified_date);
-          companies.rows[0].created_date = created_date;
-          companies.rows[0].modified_date = modified_date;
+            if (companies.rows.length > 0) {
+              // let created_date = dateFormat(moment.tz(companies.rows[0].created_date, companyDefaultTimezone).format());
+              // let modified_date = dateFormat(moment.tz(companies.rows[0].modified_date, companyDefaultTimezone).format());
+              let created_date = dateFormat(companies.rows[0].created_date);
+              let modified_date = dateFormat(companies.rows[0].modified_date);
+              companies.rows[0].created_date = created_date;
+              companies.rows[0].modified_date = modified_date;
 
-        }
-        console.error('getCompanyProfile>>>>>>>>>>>>> ' + JSON.stringify(companies));
-        done();
-        handleResponse.responseToPage(res, 'pages/company_profile', {
-          company: companies.rows[0],
-          user: req.session.passport.user
-        }, "success", "Successfully rendered");
-        /*res.render('pages/company_profile', { company: companies.rows[0], user: req.session.passport.user, error: err });*/
-      })
-    })
-  } else {
-    done();
-    res.redirect('/domain');
-  }
+            }
+            console.error('getCompanyProfile>>>>>>>>>>>>> ' + JSON.stringify(companies));
+            done();
+            handleResponse.responseToPage(res, 'pages/company_profile', {
+              company: companies.rows[0],
+              user: req.user,
+              stripeCustomerId:result.stripe_customer_id
+            }, "success", "Successfully rendered");
+            /*res.render('pages/company_profile', { company: companies.rows[0], user: req.user, error: err });*/
+          })
+        })
+      }
+    });
 };
 
 exports.getAllCompanyResources = (req, res) => {
@@ -375,7 +387,7 @@ exports.getAllCompanyResources = (req, res) => {
         totalCount: 0,
         activeCount: 0,
         archivedCount: 0,
-        user: req.session.passport.user,
+        user: req.user,
         error: err
       }, "error", "Error in finding company setting");
     } else {
@@ -393,7 +405,7 @@ exports.getAllCompanyResources = (req, res) => {
               totalCount: 0,
               activeCount: 0,
               archivedCount: 0,
-              user: req.session.passport.user,
+              user: req.user,
               error: err
             }, "error", " Error in finding user for the company");
             /*handleResponse.handleError(res, err, ' Error in finding user for the company');*/
@@ -408,7 +420,7 @@ exports.getAllCompanyResources = (req, res) => {
                   totalCount: 0,
                   activeCount: 0,
                   archivedCount: 0,
-                  user: req.session.passport.user,
+                  user: req.user,
                   error: err
                 }, "error", " Error in finding user role for the company");
               } else {
@@ -449,7 +461,8 @@ exports.getAllCompanyResources = (req, res) => {
                   totalCount: totalCount,
                   activeCount: activeCount,
                   archivedCount: (totalCount - activeCount),
-                  user: req.session.passport.user
+                  user: req.user,
+                  stripeCustomerId:result.stripe_customer_id
                 }, "success", "Successfully rendered");
 
               }
@@ -829,7 +842,7 @@ exports.getCompany = (req, res) => {
         totalCount: 0,
         activeCount: 0,
         archivedCount: 0,
-        user: req.session.passport.user,
+        user: req.user,
         error: err
       }, "error", " Error in finding company setting");
       /*handleResponse.handleError(res, err, ' error in finding company setting');*/
@@ -849,7 +862,7 @@ exports.getCompany = (req, res) => {
               totalCount: 0,
               activeCount: 0,
               archivedCount: 0,
-              user: req.session.passport.user,
+              user: req.user,
               error: err
             }, "error", " Error in finding company data");
             /*handleResponse.handleError(res, err, ' Error in finding company data');*/
@@ -876,9 +889,10 @@ exports.getCompany = (req, res) => {
               totalCount: totalCount,
               activeCount: activeCount,
               archivedCount: (totalCount - activeCount),
-              user: req.session.passport.user
+              user: req.user,
+              stripeCustomerId:result.stripe_customer_id
             }, "success", "Successfully rendered");
-            /*res.render('pages/org-listing', { compnies: companies.rows, user: req.session.passport.user, error: err });*/
+            /*res.render('pages/org-listing', { compnies: companies.rows, user: req.user, error: err });*/
           }
         });
       })

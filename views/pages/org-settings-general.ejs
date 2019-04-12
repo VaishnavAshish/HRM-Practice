@@ -70,9 +70,21 @@
                                 <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
 
                                     <div class="text-right tpd-15">
-                                        <button class="slds-button slds-button_neutral slds-align-top" type="button" onclick="enableIntegration()" >
+                                      <% if(stripeCustomerId){ %>
+                                        <button class="slds-button slds-button_neutral slds-align-top hide" type="button" onclick="enableIntegration()" enableIntegration>
                                             Enable Integration
                                         </button>
+                                        <button class="slds-button slds-button_brand slds-align-top" type="button" onclick="disableIntegration()" disableIntegration>
+                                          Disable Integration
+                                        </button>
+                                      <% } else { %>
+                                        <button class="slds-button slds-button_neutral slds-align-top" type="button" onclick="enableIntegration()" enableIntegration>
+                                            Enable Integration
+                                        </button>
+                                        <button class="slds-button slds-button_brand slds-align-top hide" type="button" onclick="disableIntegration()" disableIntegration>
+                                          Disable Integration
+                                        </button>
+                                      <% } %>
                                     </div>
 
                                 </div>
@@ -462,34 +474,36 @@
                                     </div>
                             </div>
                            </form>
-                           <form id="paymentDetail" class="hide">
+                           <!-- <form id="paymentDetail" class="hide" action="/initiateStripe" method="post" >
 
                              <div class="form-row" >
                                <label for="card-element">
                                  Credit or debit card
                                </label>
                                <div id="card-element">
-                                 <!-- a Stripe Element will be inserted here. -->
+
                                </div>
 
-                               <!-- Used to display form errors -->
+
                                <div id="card-errors" role="alert"></div>
                              </div>
-                             <input type="button" value="Submit Payment" onclick="checkPaymentAndAdd()">
-                           </form>
+                             <button>Submit Payment</button>
 
+                           </form> -->
 
 
                         <!-- body end -->
+
                 </div>
             </div>
         </div>
-
+        <script src="https://js.stripe.com/v3/"></script>
+        <% include ../modals/modal-add-card-detail.ejs %>
         <% include ../layouts/footer %>
     </main>
 
     <% include ../layouts/scripts %>
-    <script src="https://js.stripe.com/v3/"></script>
+
 
     <% include ../layouts/setting-script %>
 </body>

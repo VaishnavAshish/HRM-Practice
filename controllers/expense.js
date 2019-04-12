@@ -113,7 +113,7 @@ exports.getExpense = (req, res) => {
             expCatList:[],
             accounts: [],
             projects: [],
-            user: req.session.passport.user,
+            user: req.user,
             error: err
         }, "error", " Error in finding company settings");
       }else{
@@ -134,12 +134,12 @@ exports.getExpense = (req, res) => {
                         expCatList:[],
                         accounts: [],
                         projects: [],
-                        user: req.session.passport.user,
+                        user: req.user,
                         error: err
                     }, "error", "Error in finding expense data");
                     /*handleResponse.handleError(res, err, ' Error in finding expense data');*/
                 } else {
-                    client.query('SELECT id,name,currency FROM ACCOUNT WHERE company_id=$1 AND archived=$2', [req.session.passport.user.company_id, false], function(err, account) {
+                    client.query('SELECT id,name,currency FROM ACCOUNT WHERE company_id=$1 AND archived=$2', [req.user.company_id, false], function(err, account) {
                         if (err) {
                             handleResponse.shouldAbort(err, client, done);
                             handleResponse.responseToPage(res, 'pages/expenses-listing', {
@@ -150,7 +150,7 @@ exports.getExpense = (req, res) => {
                                 expCatList:[],
                                 accounts: [],
                                 projects: [],
-                                user: req.session.passport.user,
+                                user: req.user,
                                 error: err
                             }, "error", " Error in finding account data");
                             /*handleResponse.handleError(res, err, ' Error in finding account data');*/
@@ -163,7 +163,7 @@ exports.getExpense = (req, res) => {
                                     return ele.id;
                                 });
                             }
-                            client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$3 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)', [req.session.passport.user.company_id, false, false,req.params.userId], function(err, project) {
+                            client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$3 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)', [req.user.company_id, false, false,req.params.userId], function(err, project) {
                                 if (err) {
                                     handleResponse.shouldAbort(err, client, done);
                                     handleResponse.responseToPage(res, 'pages/expenses-listing', {
@@ -174,7 +174,7 @@ exports.getExpense = (req, res) => {
                                         expCatList:[],
                                         accounts: [],
                                         projects: [],
-                                        user: req.session.passport.user,
+                                        user: req.user,
                                         error: err
                                     }, "error", " Error in finding project data");
                                     /*handleResponse.handleError(res, err, ' Error in finding project data');*/
@@ -191,7 +191,7 @@ exports.getExpense = (req, res) => {
                                                 expCatList:[],
                                                 accounts: [],
                                                 projects: [],
-                                                user: req.session.passport.user,
+                                                user: req.user,
                                                 error: err
                                             }, "error", "Error in finding user role for the company");
 
@@ -209,7 +209,7 @@ exports.getExpense = (req, res) => {
                                                 expCatList:[],
                                                 accounts: [],
                                                 projects: [],
-                                                user: req.session.passport.user,
+                                                user: req.user,
                                                 error: err
                                             }, "error", "Error in finding resources for the company");
 
@@ -293,10 +293,11 @@ exports.getExpense = (req, res) => {
                                                             expCatList:expCat,
                                                             accounts: account.rows,
                                                             projects: project.rows,
-                                                            user: req.session.passport.user,
+                                                            user: req.user,
                                                             usersList:usersList,
                                                             companyDefaultTimezone:companyDefaultTimezone,
-                                                            currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD')
+                                                            currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD'),
+                                                            stripeCustomerId:result.stripe_customer_id
                                                         }, "success", "Successfully rendered");
                                                     });
                                                 } else {
@@ -310,10 +311,11 @@ exports.getExpense = (req, res) => {
                                                         expCatList:expCat,
                                                         accounts: account.rows,
                                                         projects: project.rows,
-                                                        user: req.session.passport.user,
+                                                        user: req.user,
                                                         usersList:[],
                                                         companyDefaultTimezone:companyDefaultTimezone,
-                                                        currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD')
+                                                        currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD'),
+                                                        stripeCustomerId:result.stripe_customer_id
                                                     }, "success", "Successfully rendered");
                                                 }
                                             }
@@ -347,7 +349,7 @@ exports.getExpenseDetail = (req, res) => {
           accounts: [],
           projects: [],
           expCatList:[],
-          user: req.session.passport.user,
+          user: req.user,
           error: err
       }, "error", " Error in finding company settings");
 
@@ -361,7 +363,7 @@ exports.getExpenseDetail = (req, res) => {
                 accounts: [],
                 projects: [],
                 expCatList:[],
-                user: req.session.passport.user,
+                user: req.user,
                 error: err
             }, "error", "  Expense id is not correct");
             /*handleResponse.handleError(res, 'incorrect expense id', ' Expense id is not correct');*/
@@ -376,14 +378,14 @@ exports.getExpenseDetail = (req, res) => {
                             accounts: [],
                             projects: [],
                             expCatList:[],
-                            user: req.session.passport.user,
+                            user: req.user,
                             error: err
                         }, "error", " Error in finding expense data");
                         /*handleResponse.handleError(res, err, ' Error in finding expense data');*/
                     } else {
                         console.error('getExpense>>>>>>>>>>>>>');
                         // console.log(expense.rows[0]);
-                        client.query('SELECT id,name,currency FROM ACCOUNT WHERE company_id=$1 AND archived=$2', [req.session.passport.user.company_id, false], function(err, account) {
+                        client.query('SELECT id,name,currency FROM ACCOUNT WHERE company_id=$1 AND archived=$2', [req.user.company_id, false], function(err, account) {
                             if (err) {
                                 handleResponse.shouldAbort(err, client, done);
                                 handleResponse.responseToPage(res, 'pages/expense-details', {
@@ -391,14 +393,14 @@ exports.getExpenseDetail = (req, res) => {
                                     accounts: [],
                                     projects: [],
                                     expCatList:[],
-                                    user: req.session.passport.user,
+                                    user: req.user,
                                     error: err
                                 }, "error", " Error in finding account data");
                                 /*handleResponse.handleError(res, err, ' Error in finding account data');*/
                             } else {
                                 // console.log("----------account.rows-------------");
                                 // console.log(account.rows);
-                                client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$3 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)', [req.session.passport.user.company_id, false, false,expense.rows[0].user_id], function(err, project) {
+                                client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$3 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)', [req.user.company_id, false, false,expense.rows[0].user_id], function(err, project) {
                                     if (err) {
                                         console.log('expense user id is');
                                         console.log(expense.rows[0].user_id);
@@ -408,7 +410,7 @@ exports.getExpenseDetail = (req, res) => {
                                             accounts: [],
                                             projects: [],
                                             expCatList:[],
-                                            user: req.session.passport.user,
+                                            user: req.user,
                                             error: err
                                         }, "error", " Error in finding project data");
                                         /*handleResponse.handleError(res, err, ' Error in finding project data');*/
@@ -422,7 +424,7 @@ exports.getExpenseDetail = (req, res) => {
                                                     accounts: [],
                                                     projects: [],
                                                     expCatList:[],
-                                                    user: req.session.passport.user,
+                                                    user: req.user,
                                                     error: err
                                                 }, "error", "  Error in finding expense category for the company");
 
@@ -455,9 +457,10 @@ exports.getExpenseDetail = (req, res) => {
                                                     accounts: account.rows,
                                                     projects: project.rows,
                                                     expCatList:expCat,
-                                                    user: req.session.passport.user,
+                                                    user: req.user,
                                                     companyDefaultTimezone:companyDefaultTimezone,
-                                                    currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD')
+                                                    currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD'),
+                                                    stripeCustomerId:result.stripe_customer_id
                                                 }, "success", "Successfully rendered");
                                              }
                                         });
@@ -579,7 +582,7 @@ exports.postAddExpense = (req, res) => {
             // console.log('createdDate ' + createdDate);
             pool.connect((err, client, done) => {
                 let total_expense_amount = parseFloat(req.body.tax_no) + parseFloat(req.body.amount);
-                client.query('Insert INTO EXPENSE (tax,tax_amount,note,status,category,amount,billable,created_date,modified_date,expense_date,project_id,account_id,company_id,currency,user_id, total_amount) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING id', [ req.body.tax, req.body.tax_no, req.body.note, "Draft", req.body.category, req.body.amount, req.body.billable, 'now()', 'now()', moment.tz(req.body.expense_date.split('T')[0], companyDefaultTimezone).format(), req.body.project_id, req.body.account_id, req.session.passport.user.company_id, req.body.currency, req.user.id, total_expense_amount], function(err, insertedExpense) {
+                client.query('Insert INTO EXPENSE (tax,tax_amount,note,status,category,amount,billable,created_date,modified_date,expense_date,project_id,account_id,company_id,currency,user_id, total_amount) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING id', [ req.body.tax, req.body.tax_no, req.body.note, "Draft", req.body.category, req.body.amount, req.body.billable, 'now()', 'now()', moment.tz(req.body.expense_date.split('T')[0], companyDefaultTimezone).format(), req.body.project_id, req.body.account_id, req.user.company_id, req.body.currency, req.user.id, total_expense_amount], function(err, insertedExpense) {
                     if (err) {
                         handleResponse.shouldAbort(err, client, done);
                         handleResponse.handleError(res, err, ' Error in adding expense data to the database');
@@ -709,7 +712,7 @@ exports.findExpenseByCriteria = (req, res) => {
                                 if (err) {
                                     console.error(err);
                                     handleResponse.shouldAbort(err, client, done);
-                                    handleResponse.responseToPage(res,'pages/resources-listing',{user:req.session.passport.user, error:err},"error"," Error in finding user role for the company");
+                                    handleResponse.responseToPage(res,'pages/resources-listing',{user:req.user, error:err},"error"," Error in finding user role for the company");
                                 }
                                 else {
                                         let projectIdArr = [];
@@ -848,14 +851,14 @@ exports.findExpenseForAccount = (req, res) => {
                                     client.query(queryToExec, searchFieldVal, function(err, expenses) {
                                       if (err) {
                                         handleResponse.shouldAbort(err, client, done);
-                                        /*handleResponse.responseToPage(res,'pages/org-listing',{user:req.session.passport.user, error:err},"error"," Error in finding company data");*/
+                                        /*handleResponse.responseToPage(res,'pages/org-listing',{user:req.user, error:err},"error"," Error in finding company data");*/
                                         handleResponse.handleError(res, err, ' Error in finding expense for account');
                                       } else {
                                         client.query('SELECT email,id FROM USERS WHERE company_id=$1', [req.user.company_id], function (err, userEmailList) {
                                           if (err) {
                                             console.error(err);
                                             handleResponse.shouldAbort(err, client, done);
-                                            handleResponse.responseToPage(res,'pages/resources-listing',{user:req.session.passport.user, error:err},"error"," Error in finding user role for the company");
+                                            handleResponse.responseToPage(res,'pages/resources-listing',{user:req.user, error:err},"error"," Error in finding user role for the company");
                                           }
                                           else {
                                             // console.log('expenselist var before insertion')
@@ -941,7 +944,7 @@ exports.findExpenseForAccount = (req, res) => {
                     handleResponse.handleError(res, err, ' Error in finding expense data');
                     /*handleResponse.handleError(res, err, ' Error in finding expense data');*/
                 } else {
-                    client.query('SELECT id,name FROM ACCOUNT WHERE company_id=$1 AND archived=$2', [req.session.passport.user.company_id, false], function(err, account) {
+                    client.query('SELECT id,name FROM ACCOUNT WHERE company_id=$1 AND archived=$2', [req.user.company_id, false], function(err, account) {
                         if (err) {
                             handleResponse.shouldAbort(err, client, done);
                             handleResponse.handleError(res, err, ' Error in finding account data');
@@ -956,7 +959,7 @@ exports.findExpenseForAccount = (req, res) => {
                                     return ele.id;
                                 });
                             }
-                            client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$3 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)', [req.session.passport.user.company_id, false,false,req.body.user_id], function(err, project) {
+                            client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$3 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)', [req.user.company_id, false,false,req.body.user_id], function(err, project) {
                                 if (err) {
                                     handleResponse.shouldAbort(err, client, done);
                                     handleResponse.handleError(res, err, ' Error in finding project data');
@@ -965,7 +968,7 @@ exports.findExpenseForAccount = (req, res) => {
                                     if (err) {
                                         console.error(err);
                                         handleResponse.shouldAbort(err, client, done);
-                                        handleResponse.responseToPage(res,'pages/resources-listing',{user:req.session.passport.user, error:err},"error"," Error in finding user role for the company");
+                                        handleResponse.responseToPage(res,'pages/resources-listing',{user:req.user, error:err},"error"," Error in finding user role for the company");
                                     }
                                     else {
                                             // console.log("----------project.rows-------------");

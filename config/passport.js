@@ -898,7 +898,7 @@ exports.isAuthenticated = (req, res, next) => {
                         inputUser=inputUser.filter(inpUser=>{
                           return inpUser.userid!=req.user.id;
                         })
-                        req.session.passport.user=userData;
+                        req.user=userData;
                         // console.log('--------req.user----------');
                         // console.log(req.user);
                         return next();

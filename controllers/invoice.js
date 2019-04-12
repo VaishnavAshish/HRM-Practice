@@ -176,7 +176,7 @@ exports.getInvoice = (req, res) => {
       if(err==true){
         // console.log('error in setting');
         // console.log(err);
-        handleResponse.responseToPage(res,'pages/invoices-listing',{accounts: [], invoiceList: [],totalCount:0, draftCount:0, paidCount:0,user:req.session.passport.user, error:err},"error"," Error in finding account data");
+        handleResponse.responseToPage(res,'pages/invoices-listing',{accounts: [], invoiceList: [],totalCount:0, draftCount:0, paidCount:0,user:req.user, error:err},"error"," Error in finding account data");
         /*handleResponse.handleError(res, err, ' error in finding company setting');*/
       }else{
             companyDefaultTimezone = result.timezone;
@@ -190,7 +190,7 @@ exports.getInvoice = (req, res) => {
                     if (err) {
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);
-                        handleResponse.responseToPage(res,'pages/invoices-listing',{accounts: [], invoiceList: [],totalCount:0, draftCount:0, paidCount:0,user:req.session.passport.user, error:err},"error"," Error in finding account data");
+                        handleResponse.responseToPage(res,'pages/invoices-listing',{accounts: [], invoiceList: [],totalCount:0, draftCount:0, paidCount:0,user:req.user, error:err},"error"," Error in finding account data");
                         /*handleResponse.handleError(res, err, ' Error in finding account data');*/
                     } else {
 
@@ -204,7 +204,7 @@ exports.getInvoice = (req, res) => {
                             if (err) {
                                 console.error(err);
                                 handleResponse.shouldAbort(err, client, done);
-                                handleResponse.responseToPage(res,'pages/invoices-listing',{accounts: [], invoiceList: [],totalCount:0, draftCount:0, paidCount:0,user:req.session.passport.user, error:err},"error"," Error in finding invoice data");
+                                handleResponse.responseToPage(res,'pages/invoices-listing',{accounts: [], invoiceList: [],totalCount:0, draftCount:0, paidCount:0,user:req.user, error:err},"error"," Error in finding invoice data");
                                 /*handleResponse.handleError(res, err, ' Error in finding invoice data');*/
                             } else {
                                 let invoiceListArr = [];
@@ -230,8 +230,8 @@ exports.getInvoice = (req, res) => {
                                 done();
                                 /*draftInvoice=invoiceListArr.filter(inv => inv.status=="DRAFT");
                                 paidInvoice=invoiceListArr.filter(inv => inv.status=="PAID");*/
-                                handleResponse.responseToPage(res,'pages/invoices-listing',{accounts: accountList.rows, invoiceList: invoiceListArr,totalCount:totalCount, draftCount:draftCount, paidCount:paidCount, user: req.session.passport.user ,companyDefaultTimezone:companyDefaultTimezone,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD')},"success","Successfully rendered");
-                                /*res.render('pages/invoices-listing', { accounts: accountList.rows, invoiceList: invoiceList.rows, user: req.session.passport.user });*/
+                                handleResponse.responseToPage(res,'pages/invoices-listing',{accounts: accountList.rows, invoiceList: invoiceListArr,totalCount:totalCount, draftCount:draftCount, paidCount:paidCount, user: req.user ,companyDefaultTimezone:companyDefaultTimezone,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD'),stripeCustomerId:result.stripe_customer_id},"success","Successfully rendered");
+                                /*res.render('pages/invoices-listing', { accounts: accountList.rows, invoiceList: invoiceList.rows, user: req.user });*/
                             }
                         });
                     }
@@ -1058,7 +1058,7 @@ exports.getInvoiceDetails = (req, res) => {
       if(err==true){
         // console.log('error in setting');
         // console.log(err);
-        handleResponse.responseToPage(res,'pages/invoices-listing',{accounts: [], invoiceList: [],totalCount:0, draftCount:0, paidCount:0,user:req.session.passport.user, error:err},"error"," Error in finding account data");
+        handleResponse.responseToPage(res,'pages/invoices-listing',{accounts: [], invoiceList: [],totalCount:0, draftCount:0, paidCount:0,user:req.user, error:err},"error"," Error in finding account data");
         /*handleResponse.handleError(res, err, ' error in finding company setting');*/
       }else{
             companyDefaultTimezone = result.timezone;
@@ -1069,7 +1069,7 @@ exports.getInvoiceDetails = (req, res) => {
             // console.log(companyDefaultCurrency);
             let invoiceId=req.query.invoiceId;
             if(invoiceId==''||invoiceId==null||invoiceId==undefined){
-                handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.session.passport.user, userList:[], error:err},"error"," Invoice id is not correct");
+                handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.user, userList:[], error:err},"error"," Invoice id is not correct");
             }else{
 
                 pool.connect((err, client, done) => {
@@ -1077,7 +1077,7 @@ exports.getInvoiceDetails = (req, res) => {
                         if (err) {
                             console.error(err);
                             handleResponse.shouldAbort(err, client, done);
-                            handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.session.passport.user, userList:[], error:err},"error"," Error in finding invoice data");
+                            handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.user, userList:[], error:err},"error"," Error in finding invoice data");
                             /*handleResponse.handleError(res, err, ' Error in finding invoice data');*/
                         }  else {
                             if(invoiceDetails.rows.length>0){
@@ -1086,7 +1086,7 @@ exports.getInvoiceDetails = (req, res) => {
                                     if (err) {
                                         console.error(err);
                                             handleResponse.shouldAbort(err, client, done);
-                                            handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.session.passport.user, userList:[], error:err},"error"," Error in finding project data");
+                                            handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.user, userList:[], error:err},"error"," Error in finding project data");
                                             /*handleResponse.handleError(res, err, ' Error in finding project data');*/
                                         }  else {
                                                 // console.log('projects are '+JSON.stringify(projects));
@@ -1094,7 +1094,7 @@ exports.getInvoiceDetails = (req, res) => {
                                                 if (err) {
                                                     console.error(err);
                                                     handleResponse.shouldAbort(err, client, done);
-                                                    handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.session.passport.user, userList:[], error:err},"error"," Error in finding invoice line item data");
+                                                    handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.user, userList:[], error:err},"error"," Error in finding invoice line item data");
                                                     /*handleResponse.handleError(res, err, ' Error in finding invoice line item data');*/
                                                 } else {
                                                     let invoice_total_amount=0;
@@ -1146,7 +1146,7 @@ exports.getInvoiceDetails = (req, res) => {
                                                         if (err) {
                                                             console.error(err);
                                                             handleResponse.shouldAbort(err, client, done);
-                                                            handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.session.passport.user, userList:[], error:err},"error"," Error in updating invoice data");
+                                                            handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.user, userList:[], error:err},"error"," Error in updating invoice data");
                                                             /*handleResponse.handleError(res, err, ' Error in updating invoice data');*/
                                                         } else {
 
@@ -1156,7 +1156,7 @@ exports.getInvoiceDetails = (req, res) => {
                                                                 // // console.log(projects.rows);
                                                                 // console.log('invoice_total_amount '+invoice_total_amount);
                                                                 done();
-                                                                handleResponse.responseToPage(res,'pages/invoice-details',{projects:projects.rows, invoiceDetails: invoiceDetails.rows[0], invoiceItems: invoiceItems.rows, user: req.session.passport.user, userList:response ,companyDefaultTimezone:companyDefaultTimezone,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD') },"success","Successfully rendered");
+                                                                handleResponse.responseToPage(res,'pages/invoice-details',{projects:projects.rows, invoiceDetails: invoiceDetails.rows[0], invoiceItems: invoiceItems.rows, user: req.user, userList:response ,companyDefaultTimezone:companyDefaultTimezone,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD'),stripeCustomerId:result.stripe_customer_id },"success","Successfully rendered");
                                                             })
 
                                                         }
@@ -1520,7 +1520,7 @@ exports.findInvoiceForAccount = (req, res) => {
                       client.query(queryToExec,searchFieldVal, function (err, invoices) {
                         if (err) {
                           handleResponse.shouldAbort(err, client, done);
-                          /*handleResponse.responseToPage(res,'pages/org-listing',{user:req.session.passport.user, error:err},"error"," Error in finding company data");*/
+                          /*handleResponse.responseToPage(res,'pages/org-listing',{user:req.user, error:err},"error"," Error in finding company data");*/
                           handleResponse.handleError(res, err, ' Error in finding invoice for account');
                         }
                         else{
@@ -1611,7 +1611,7 @@ function invoiceHtmlData (req,res,invoiceHtml){
        if(err==true){
          // console.log('error in setting');
          // console.log(err);
-         handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.session.passport.user, error:err},"error"," Error in fetching company setting ");
+         handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.user, error:err},"error"," Error in fetching company setting ");
          /*handleResponse.handleError(res, err, ' error in finding company setting');*/
        }else{
              companyDefaultTimezone = result.timezone;
@@ -1620,54 +1620,54 @@ function invoiceHtmlData (req,res,invoiceHtml){
                     if (err) {
                         handleResponse.shouldAbort(err, client, done);
                         if(invoiceHtml==true){
-                            handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.session.passport.user, error:err},"error"," Error in fetching invoice details");
+                            handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.user, error:err},"error"," Error in fetching invoice details");
                         }else{
-                            handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.session.passport.user, error:err,pdfError:true},"error"," Error in fetching invoice details");
+                            handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.user, error:err,pdfError:true},"error"," Error in fetching invoice details");
                         }
                     } else {
                         client.query('SELECT * FROM account WHERE id=$1',[invoiceDetails.rows[0].account_id], function (err, accountDetails) {
                         if (err) {
                             handleResponse.shouldAbort(err, client, done);
                             if(invoiceHtml==true){
-                                handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.session.passport.user, error:err},"error"," Error in fetching invoice details");
+                                handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.user, error:err},"error"," Error in fetching invoice details");
                             }else{
-                                handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.session.passport.user, error:err,pdfError:true},"error"," Error in fetching invoice details");
+                                handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.user, error:err,pdfError:true},"error"," Error in fetching invoice details");
                             }
                         } else {
                             client.query('SELECT * FROM setting WHERE company_id=$1',[req.user.company_id], function (err, companySetting) {
                             if (err) {
                                 handleResponse.shouldAbort(err, client, done);
                                 if(invoiceHtml==true){
-                                    handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.session.passport.user, error:err},"error"," Error in fetching invoice details");
+                                    handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.user, error:err},"error"," Error in fetching invoice details");
                                 }else{
-                                    handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.session.passport.user, error:err,pdfError:true},"error"," Error in fetching invoice details");
+                                    handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.user, error:err,pdfError:true},"error"," Error in fetching invoice details");
                                 }
                             } else {
                                     client.query('SELECT il.id ,il.type ,il.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,il.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,il.item_date at time zone \''+companyDefaultTimezone+'\' as item_date ,il.archived ,il.hours ,il.unit_price ,il.cost_rate ,il.note ,il.amount ,il.tax ,il.total_amount ,il.timesheet_id ,il.expense_id ,il.project_id ,il.account_id ,il.invoice_id ,il.company_id ,il.user_id ,il.user_role ,il.quantity ,il.record_id ,il.currency ,il.timesheet_row_id FROM invoice_line_item il WHERE  invoice_id=$1',[invId], function (err, invoiceLineItems) {
                                         if (err) {
                                             handleResponse.shouldAbort(err, client, done);
                                             if(invoiceHtml==true){
-                                                handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.session.passport.user, error:err},"error"," Error in fetching invoice details");
+                                                handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.user, error:err},"error"," Error in fetching invoice details");
                                             }else{
-                                                handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.session.passport.user, error:err,pdfError:true},"error"," Error in fetching invoice details");
+                                                handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.user, error:err,pdfError:true},"error"," Error in fetching invoice details");
                                             }
                                         } else {
                                             client.query('SELECT * FROM project WHERE company_id=$1 AND account_id=$2',[req.user.company_id, invoiceDetails.rows[0].account_id], function (err, projects) {
                                                 if (err) {
                                                     handleResponse.shouldAbort(err, client, done);
                                                     if(invoiceHtml==true){
-                                                        handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.session.passport.user, error:err},"error"," Error in fetching invoice details");
+                                                        handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.user, error:err},"error"," Error in fetching invoice details");
                                                     }else{
-                                                        handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.session.passport.user, error:err,pdfError:true},"error"," Error in fetching invoice details");
+                                                        handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.user, error:err,pdfError:true},"error"," Error in fetching invoice details");
                                                     }
                                                 } else {
                                                     client.query('SELECT name FROM company WHERE id = $1',[req.user.company_id], function (err, companyName) {
                                                         if (err) {
                                                             handleResponse.shouldAbort(err, client, done);
                                                             if(invoiceHtml==true){
-                                                                handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.session.passport.user, error:err},"error"," Error in fetching invoice details");
+                                                                handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.user, error:err},"error"," Error in fetching invoice details");
                                                             }else{
-                                                                handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.session.passport.user, error:err,pdfError:true},"error"," Error in fetching invoice details");
+                                                                handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.user, error:err,pdfError:true},"error"," Error in fetching invoice details");
                                                             }
                                                         } else {
                                                                 // console.log('---length---');
@@ -1739,7 +1739,7 @@ function invoiceHtmlData (req,res,invoiceHtml){
                                                                                             /*// console.log('dates are');
                                                                                             // console.log(invoiceDetails.rows[0].startDateFormatted+' '+invoiceDetails.rows[0].created_date);
                                                                                             // console.log(invoiceDetails.rows[0].dueDateFormatted+' '+invoiceDetails.rows[0].due_date);*/
-                                                                                            handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.session.passport.user, error:err, invoiceDetails : invoiceDetails.rows[0], lineItems : invoiceLineList, accountDetails:accountDetails.rows[0],companySetting:companySetting.rows[0], projects:projects.rows,companyName:companyName.rows[0].name},"success","Successfully rendered");
+                                                                                            handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.user, error:err, invoiceDetails : invoiceDetails.rows[0], lineItems : invoiceLineList, accountDetails:accountDetails.rows[0],companySetting:companySetting.rows[0], projects:projects.rows,companyName:companyName.rows[0].name,stripeCustomerId:result.stripe_customer_id},"success","Successfully rendered");
                                                                                         }else{
 
                                                                                             generatePdf(req,res,invoiceDetails.rows[0],invoiceLineList,accountDetails.rows[0],companySetting.rows[0], projects.rows,companyName.rows[0].name);
@@ -1762,7 +1762,7 @@ function invoiceHtmlData (req,res,invoiceHtml){
                                                                         console.log('start and due dates arre'+startDateFormatted+' '+dueDateFormatted);
                                                                         invoiceDetails.rows[0]['startDateFormatted'] = startDateFormatted;
                                                                         invoiceDetails.rows[0]['dueDateFormatted'] = dueDateFormatted;
-                                                                        handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.session.passport.user, error:err, invoiceDetails : invoiceDetails.rows[0], lineItems : [], accountDetails:accountDetails.rows[0],companySetting:companySetting.rows[0], projects:projects.rows,companyName:companyName.rows[0].name},"success","Successfully rendered");
+                                                                        handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.user, error:err, invoiceDetails : invoiceDetails.rows[0], lineItems : [], accountDetails:accountDetails.rows[0],companySetting:companySetting.rows[0], projects:projects.rows,companyName:companyName.rows[0].name,stripeCustomerId:result.stripe_customer_id},"success","Successfully rendered");
                                                                     }
 
                                                           })

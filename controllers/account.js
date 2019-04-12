@@ -138,7 +138,7 @@ exports.getAccount = (req, res) => {
       if(err==true){
         // console.log('error in setting');
         // console.log(err);
-        handleResponse.responseToPage(res,'pages/accounts-listing',{accounts:[], totalCount:0,activeCount:0, archivedCount:0 ,user:req.session.passport.user,error:err},"error"," error in finding company setting");
+        handleResponse.responseToPage(res,'pages/accounts-listing',{accounts:[], totalCount:0,activeCount:0, archivedCount:0 ,user:req.user,error:err},"error"," error in finding company setting");
         /*handleResponse.handleError(res, err, ' error in finding company setting');*/
       }else{
 
@@ -149,7 +149,7 @@ exports.getAccount = (req, res) => {
             getAccountQuery(req,client,(err,account) => {
               if (err) {
                 handleResponse.shouldAbort(err, client, done);
-                handleResponse.responseToPage(res,'pages/accounts-listing',{accounts:[], totalCount:0,activeCount:0, archivedCount:0 ,user:req.session.passport.user,error:err},"error","Error in finding account.Please Restart.");
+                handleResponse.responseToPage(res,'pages/accounts-listing',{accounts:[], totalCount:0,activeCount:0, archivedCount:0 ,user:req.user,error:err},"error","Error in finding account.Please Restart.");
               } else {
 
                     /*// console.log('sub 8 days '+adjustDays(8));
@@ -181,7 +181,7 @@ exports.getAccount = (req, res) => {
                     }
                     // console.log(account.rows);
                     done();
-                    handleResponse.responseToPage(res,'pages/accounts-listing',{accounts:accList, totalCount:totalCount,activeCount:activeCount, archivedCount:(totalCount-activeCount) ,user:req.session.passport.user},"success","Successfully rendered");
+                    handleResponse.responseToPage(res,'pages/accounts-listing',{accounts:accList, totalCount:totalCount,activeCount:activeCount, archivedCount:(totalCount-activeCount) ,user:req.user,stripeCustomerId:result.stripe_customer_id},"success","Successfully rendered");
 
               }
             });
@@ -202,7 +202,7 @@ exports.getAccountDetail = (req, res) => {
         // console.log('getAccountDetail-------------' + req.query.accountId);
         let accountId=req.query.accountId;
         if(accountId==''||accountId==null||accountId==undefined){
-            handleResponse.responseToPage(res,'pages/account-details',{account:{}, projects:[], invoices:[], projectTotalCount:0,invoiceTotalCount:0,user:req.session.passport.user, error:err},"error","Error in finding account.Please Restart.");
+            handleResponse.responseToPage(res,'pages/account-details',{account:{}, projects:[], invoices:[], projectTotalCount:0,invoiceTotalCount:0,user:req.user, error:err},"error","Error in finding account.Please Restart.");
         }else{
             pool.connect((err, client, done) => {
               client.query('SELECT a.id ,a.name ,a.first_name ,a.last_name ,a.email ,a.archived ,a.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,a.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,a.company_id ,a.street ,a.city ,a.state ,a.country ,a.zip_code ,a.record_id ,a.currency FROM ACCOUNT a where a.id=$1 AND a.company_id=$2',[req.query.accountId, req.user.company_id], function(err, account) {
@@ -210,7 +210,7 @@ exports.getAccountDetail = (req, res) => {
                   // console.log('err in account')
                   console.error(err);
                   handleResponse.shouldAbort(err, client, done);
-                  handleResponse.responseToPage(res,'pages/account-details',{account:{}, projects:[], invoices:[], projectTotalCount:0,invoiceTotalCount:0,user:req.session.passport.user, error:err},"error","Error in finding account.Please Restart.");
+                  handleResponse.responseToPage(res,'pages/account-details',{account:{}, projects:[], invoices:[], projectTotalCount:0,invoiceTotalCount:0,user:req.user, error:err},"error","Error in finding account.Please Restart.");
                   /*handleResponse.handleError(res, err, ' Error in finding account');*/
                 } else {
                   console.error('getAccount>>>>>>>>>>>>>');
@@ -221,7 +221,7 @@ exports.getAccountDetail = (req, res) => {
                       // console.log('err in project')
                       console.error(err);
                       handleResponse.shouldAbort(err, client, done);
-                      handleResponse.responseToPage(res,'pages/account-details',{account:{}, projects:[], invoices:[], projectTotalCount:0,invoiceTotalCount:0,user:req.session.passport.user, error:err},"error","Error in finding projects.Please Restart.");
+                      handleResponse.responseToPage(res,'pages/account-details',{account:{}, projects:[], invoices:[], projectTotalCount:0,invoiceTotalCount:0,user:req.user, error:err},"error","Error in finding projects.Please Restart.");
                       /*handleResponse.handleError(res, err, ' Error in finding projects');*/
                     } else {
                         let projectIdArr=[];
@@ -235,7 +235,7 @@ exports.getAccountDetail = (req, res) => {
                           // console.log('err in invoice');
                           console.error(err);
                           handleResponse.shouldAbort(err, client, done);
-                          handleResponse.responseToPage(res,'pages/account-details',{account:{}, projects:[], invoices:[], projectTotalCount:0,invoiceTotalCount:0,user:req.session.passport.user, error:err},"error","Error in finding invoices.Please Restart.");
+                          handleResponse.responseToPage(res,'pages/account-details',{account:{}, projects:[], invoices:[], projectTotalCount:0,invoiceTotalCount:0,user:req.user, error:err},"error","Error in finding invoices.Please Restart.");
                         } else {
 
                             console.error('getAllProjects>>>>>>>>>>>>>');
@@ -294,7 +294,7 @@ exports.getAccountDetail = (req, res) => {
                             // console.log("**********<<<<<<<<<<< project filteration  >>>>>>>>>>>>>*********");
                             // console.log(invoiceList.rows);
                             done();
-                            handleResponse.responseToPage(res,'pages/account-details',{account:account.rows[0], projects:projectList.rows, invoices:invoiceListArr, projectTotalCount:projectTotalCount,invoiceTotalCount:invoiceTotalCount, user:req.session.passport.user},"success","Successfully rendered");
+                            handleResponse.responseToPage(res,'pages/account-details',{account:account.rows[0], projects:projectList.rows, invoices:invoiceListArr, projectTotalCount:projectTotalCount,invoiceTotalCount:invoiceTotalCount, user:req.user,stripeCustomerId:result.stripe_customer_id},"success","Successfully rendered");
 
                          }
                       })
@@ -410,7 +410,7 @@ exports.postAddAccount = (req, res) => {
                         handleResponse.shouldAbort(err, client, done);
                         handleResponse.handleError(res, err, ' error in connecting to database');
                       } else {
-                        client.query('SELECT a.id ,a.name ,a.first_name ,a.last_name ,a.email ,a.archived ,a.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,a.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,a.company_id ,a.street ,a.city ,a.state ,a.country ,a.zip_code ,a.record_id ,a.currency FROM ACCOUNT a where a.company_id = $1 AND a.name = $2',[req.session.passport.user.company_id, account_name], function(err, existingAccount) {
+                        client.query('SELECT a.id ,a.name ,a.first_name ,a.last_name ,a.email ,a.archived ,a.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,a.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,a.company_id ,a.street ,a.city ,a.state ,a.country ,a.zip_code ,a.record_id ,a.currency FROM ACCOUNT a where a.company_id = $1 AND a.name = $2',[req.user.company_id, account_name], function(err, existingAccount) {
                           if (err){
                             handleResponse.shouldAbort(err, client, done);
                             handleResponse.handleError(res, err, ' Error in finding accounts');
@@ -422,7 +422,7 @@ exports.postAddAccount = (req, res) => {
                               done();
                               handleResponse.handleError(res,'Account adding error', 'Account with this name already exists.');
                             }else{
-                              client.query('Insert INTO ACCOUNT (name,first_name,last_name, email,created_date,modified_date,currency,company_id) values ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id',[account_name,first_name,last_name,email,'now()','now()',req.body.currency, req.session.passport.user.company_id], function(err, insertedAccount) {
+                              client.query('Insert INTO ACCOUNT (name,first_name,last_name, email,created_date,modified_date,currency,company_id) values ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id',[account_name,first_name,last_name,email,'now()','now()',req.body.currency, req.user.company_id], function(err, insertedAccount) {
                                   if (err){
                                     handleResponse.shouldAbort(err, client, done);
                                     handleResponse.handleError(res, err, ' Error in adding account');

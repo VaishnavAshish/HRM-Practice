@@ -66,7 +66,7 @@ getCompany = (companyid,next) => {
             // console.log(err);
             handleResponse.shouldAbort(err, client, done);
             next(error,null);
-            /*res.render('pages/org-details', { company: companies.rows[0], user: req.session.passport.user, error: err });*/
+            /*res.render('pages/org-details', { company: companies.rows[0], user: req.user, error: err });*/
           } else {
             done();
             // console.log("comapny data is "+JSON.stringify(companies));
@@ -88,7 +88,7 @@ getCompanyId = (domain,next) => {
             // console.log(err);
             handleResponse.shouldAbort(err, client, done);
             next(error,null);
-            /*res.render('pages/org-details', { company: companies.rows[0], user: req.session.passport.user, error: err });*/
+            /*res.render('pages/org-details', { company: companies.rows[0], user: req.user, error: err });*/
           } else {
             done();
             // console.log("company data is "+JSON.stringify(companies));
@@ -176,7 +176,7 @@ exports.postAddResource = (req, res) => {
         companyDefaultTimezone=result.timezone;
         // console.log('companyDefaultTimezone');
         // console.log(companyDefaultTimezone);
-        let companyId = (req.body.company != undefined) ? req.body.company : req.session.passport.user.company_id;
+        let companyId = (req.body.company != undefined) ? req.body.company : req.user.company_id;
         // console.log('resource company id is ' + companyId);
             req.assert('email', 'Email cannot be blank').notEmpty();
             /*req.assert('password', 'Password cannot be blank').notEmpty();
@@ -749,7 +749,7 @@ exports.findUserByEmail = (req, res) => {
             client.query('SELECT name FROM company WHERE id=$1',[company_id], function (err, company) {
               if (err) {
                 handleResponse.shouldAbort(err, client, done);
-                /*handleResponse.responseToPage(res,'pages/org-listing',{user:req.session.passport.user, error:err},"error"," Error in finding company data");*/
+                /*handleResponse.responseToPage(res,'pages/org-listing',{user:req.user, error:err},"error"," Error in finding company data");*/
                 handleResponse.handleError(res, err, ' Error in finding company data');
               }else{
                 let offset=0;
@@ -761,7 +761,7 @@ exports.findUserByEmail = (req, res) => {
                 client.query(queryToExec,['%'+req.body.searchText+'%',company_id], function (err, users) {
                   if (err) {
                     handleResponse.shouldAbort(err, client, done);
-                    /*handleResponse.responseToPage(res,'pages/org-listing',{user:req.session.passport.user, error:err},"error"," Error in finding company data");*/
+                    /*handleResponse.responseToPage(res,'pages/org-listing',{user:req.user, error:err},"error"," Error in finding company data");*/
                     handleResponse.handleError(res, err, ' Error in finding company users');
                   }
                   else{
@@ -779,8 +779,8 @@ exports.findUserByEmail = (req, res) => {
                       // console.log(JSON.stringify(users.rows));
                       done();
                       handleResponse.sendSuccess(res,'Users searched successfully',{resources: users.rows,company:company.rows[0].name,count:searchCount});
-                      /*handleResponse.responseToPage(res,'pages/org-listing',{ compnies: companies.rows, user: req.session.passport.user },"success","Successfully rendered");*/
-                      /*res.render('pages/org-listing', { compnies: companies.rows, user: req.session.passport.user, error: err });*/
+                      /*handleResponse.responseToPage(res,'pages/org-listing',{ compnies: companies.rows, user: req.user },"success","Successfully rendered");*/
+                      /*res.render('pages/org-listing', { compnies: companies.rows, user: req.user, error: err });*/
 
                   }
                 });
