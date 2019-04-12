@@ -30,7 +30,7 @@
                         <!-- header start end -->
                         <div class="slds-card">
                             <div class="slds-grid slds-wrap slds-p-horizontal_small slds-p-top_small">
-                                <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                <div class="slds-size_1-of-1 slds-medium-size_1-of-4">
                                     <div class="slds-grid">
                                         <div class="slds-no-flex slds-p-right_x-small">
                                             <span class="slds-icon_container slds-icon-standard-template">
@@ -73,18 +73,47 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="slds-grid slds-size_1-of-1 slds-medium-size_2-of-4">
 
-                                <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                    <div class="slds-size_1-of-1 slds-medium-size_4-of-12 slds-align_absolute-center">
+                                      <div class="slds-form-element slds-m-bottom_medium">
+                                          <label class="slds-form-element__label">
+                                              Total Invoiced Time
+                                          </label>
+                                          <div class="slds-form-element__control">
+                                            <%= project.total_invoice_time %>
+                                          </div>
+
+                                      </div>
+                                    </div>
+                                    <div class="slds-size_1-of-1 slds-medium-size_4-of-12 slds-align_absolute-center">
+                                      <div class="slds-form-element slds-m-bottom_medium">
+                                          <label class="slds-form-element__label">
+                                              Total Invoiced Expense
+                                          </label>
+                                          <div class="slds-form-element__control">
+                                            <%= project.total_invoice_expense %>
+                                          </div>
+
+                                      </div>
+
+                                    </div>
+                                    <div class="slds-size_1-of-1 slds-medium-size_4-of-12 slds-align_absolute-center">
+                                        <div class="slds-form-element slds-m-bottom_medium">
+                                            <label class="slds-form-element__label">
+                                                Total Invoice Amount
+                                            </label>
+                                            <div class="slds-form-element__control">
+                                              <%= project.total_invoice_amount %>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="slds-size_1-of-1 slds-medium-size_1-of-4">
                                     <div class="text-right sm-tpd-15">
-                                        <!-- <button class="slds-button slds-button_brand slds-align-top" onclick="updateProjectDetails('<%= project.id %>', '#edit-project');">
-
-                                            Save Changes
-                                        </button> -->
-                                        <!-- <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top" title="Export CSV">
-                                            <span class="slds-button__icon">
-                                                <i class=" fa fa-file-export text-blue" aria-hidden="true"></i>
-                                            </span>
-                                        </button> -->
 
                                        <button class="slds-button slds-button_neutral slds-align-top" onclick="exportToCsv('generateProjectDetailCsv/<%= project.id%>')">
                                          <span class="sm-hide">Export Project Details</span>
@@ -576,7 +605,7 @@
 
                                                         </div>
 
-                                                        <div class="slds-grid slds-wrap slds-gutters">
+                                                        <!-- <div class="slds-grid slds-wrap slds-gutters">
 
                                                             <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
                                                               <div class="slds-form-element slds-m-bottom_medium">
@@ -613,7 +642,7 @@
                                                                 </div>
                                                             </div>
 
-                                                        </div>
+                                                        </div> -->
 
 
                                                     </div>
