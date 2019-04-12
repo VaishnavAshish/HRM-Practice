@@ -316,6 +316,7 @@ module.exports = function(app) {
     app.post('/deleteInvoiceItem', passportConfig.isAuthenticated, invoiceController.deleteInvoiceItem);
     app.post('/addInvoiceItem', passportConfig.isAuthenticated, invoiceController.postAddInvoiceItem);
     app.post('/editInvoiceItem', passportConfig.isAuthenticated, invoiceController.postInvoiceItemDetail);
+    app.post('/updateInvoiceItemData', passportConfig.isAuthenticated, invoiceController.updateInvoiceItemData);
     app.post('/insertExpenseInvoiceItem', passportConfig.isAuthenticated, invoiceController.insertExpenseInvoiceItem);
     app.post('/insertTimesheetInvoiceItem', passportConfig.isAuthenticated, invoiceController.insertTimesheetInvoiceItem);
     app.post('/insertNewInvoiceItem', passportConfig.isAuthenticated, invoiceController.insertNewInvoiceItem);

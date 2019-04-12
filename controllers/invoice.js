@@ -273,6 +273,21 @@ exports.postAddInvoice = (req, res) => {
       }
 
 };
+exports.updateInvoiceItemData = (req, res) => {
+  pool.connect((err, client, done) => {
+    client.query('UPDATE INVOICE_LINE_ITEM set note=$1 WHERE id=$2 RETURNING id', [req.body.description, req.body.invoiceItemId], function (err, invoiceLineItem) {
+        if (err) {
+            console.error(err);
+            handleResponse.shouldAbort(err, client, done);
+            handleResponse.handleError(res, err, ' Error in updating invoice line item data');
+        } else {
+            done();
+            handleResponse.sendSuccess(res,'Invoice line item updated successfully',{});
+            /*res.status(200).json({ "success": true, "id": id = invoiceLineItem.rows[0].id,"message":"success" });*/
+        }
+    });
+  });
+}
 exports.postAddInvoiceItem = (req, res) => {
   // console.log(req.body);
   /*req.assert('expense_id', 'Expense cannot be blank').notEmpty();*/
@@ -523,7 +538,7 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
                                                       console.log("Grouped and calculate data");
                                                       console.log(JSON.stringify(projectRows));
                                                       projectRows.forEach(function (projectRow, index) {
-                                                          client.query('INSERT INTO INVOICE_LINE_ITEM (type,item_date,project_id,account_id,invoice_id,company_id,created_date, updated_date, amount, total_amount, quantity, currency, timesheet_row_id, user_id, user_role, unit_price,timesheet_id) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) RETURNING id', ['Timesheet', 'now()', req.body.projectId, req.body.accountId, req.body.invoiceId, req.user.company_id, 'now()', 'now()', projectRow.totalProjectCost, projectRow.totalProjectCost, parseInt(projectRow.totalHours), companyDefaultCurrency, projectRow.lineItemIds, projectRow.resource_id, projectRow.user_role, parseInt(projectRow.unit_price), projectRow.timesheet_id], function (err, invoiceLineItem) {
+                                                          client.query('INSERT INTO INVOICE_LINE_ITEM (type,item_date,project_id,account_id,invoice_id,company_id,created_date, updated_date, amount, total_amount, quantity, currency, timesheet_row_id, user_id, user_role, unit_price,timesheet_id,note) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18) RETURNING id', ['Timesheet', 'now()', req.body.projectId, req.body.accountId, req.body.invoiceId, req.user.company_id, 'now()', 'now()', projectRow.totalProjectCost, projectRow.totalProjectCost, parseInt(projectRow.totalHours), companyDefaultCurrency, projectRow.lineItemIds, projectRow.resource_id, projectRow.user_role, parseInt(projectRow.unit_price), projectRow.timesheet_id,"Hours"], function (err, invoiceLineItem) {
                                                               if (err) {
                                                                   console.error(err);
                                                                   handleResponse.shouldAbort(err, client, done);
@@ -584,7 +599,7 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
                                                         console.log("Grouped and calculate data");
                                                         console.log(JSON.stringify(projectRows));
                                                         projectRows.forEach(function (projectRow, index) {
-                                                            client.query('INSERT INTO INVOICE_LINE_ITEM (type,item_date,project_id,account_id,invoice_id,company_id,created_date, updated_date, amount, total_amount, quantity, currency, timesheet_row_id, user_id, user_role, unit_price,timesheet_id) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) RETURNING id', ['Timesheet', 'now()', req.body.projectId, req.body.accountId, req.body.invoiceId, req.user.company_id, 'now()', 'now()', projectRow.totalProjectCost, projectRow.totalProjectCost, parseInt(projectRow.totalHours), companyDefaultCurrency, projectRow.lineItemIds, projectRow.resource_id, projectRow.user_role, parseInt(projectRow.unit_price),projectRow.timesheet_id], function (err, invoiceLineItem) {
+                                                            client.query('INSERT INTO INVOICE_LINE_ITEM (type,item_date,project_id,account_id,invoice_id,company_id,created_date, updated_date, amount, total_amount, quantity, currency, timesheet_row_id, user_id, user_role, unit_price,timesheet_id,note) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18) RETURNING id', ['Timesheet', 'now()', req.body.projectId, req.body.accountId, req.body.invoiceId, req.user.company_id, 'now()', 'now()', projectRow.totalProjectCost, projectRow.totalProjectCost, parseInt(projectRow.totalHours), companyDefaultCurrency, projectRow.lineItemIds, projectRow.resource_id, projectRow.user_role, parseInt(projectRow.unit_price),projectRow.timesheet_id,"Hours"], function (err, invoiceLineItem) {
                                                                 if (err) {
                                                                     console.error(err);
                                                                     handleResponse.shouldAbort(err, client, done);
@@ -985,15 +1000,21 @@ function addInvoiceLineItem(req, res, client, err, done, data, result) {
     // console.log(data);
     let timesheet_id=null;
     let expense_id = null;
+
     // let currency = companyDefaultCurrency;
     let type = data.type;
     let currency=data.currency;
-    if(type == "Expense") {
+    if(data.id){
+      if(type == "Expense") {
         expense_id = data.id;
         timesheet_id = null;
-    } else {
+        data.note = 'Expenses';
+
+      } else {
         timesheet_id = data.id;
         expense_id = null;
+        data.note = 'Hours';
+      }
     }
     if(!data.note) {
         data.note = ''
@@ -1089,7 +1110,7 @@ exports.getInvoiceDetails = (req, res) => {
                                             /*handleResponse.handleError(res, err, ' Error in finding project data');*/
                                         }  else {
                                                 // console.log('projects are '+JSON.stringify(projects));
-                                                client.query('SELECT il.id ,il.type ,il.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,il.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,il.item_date at time zone \''+companyDefaultTimezone+'\' as item_date ,il.archived ,il.hours ,il.unit_price ,il.cost_rate ,il.note ,il.amount ,il.tax ,il.total_amount ,il.timesheet_id ,il.expense_id ,il.project_id ,il.account_id ,il.invoice_id ,il.company_id ,il.user_id ,il.user_role ,il.quantity ,il.record_id ,il.currency ,il.timesheet_row_id FROM INVOICE_LINE_ITEM il WHERE company_id=$1 AND invoice_id=$2 AND archived=$3', [req.user.company_id, req.query.invoiceId, false], function (err, invoiceItems) {
+                                                client.query('SELECT il.id ,il.type ,il.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,il.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,il.item_date at time zone \''+companyDefaultTimezone+'\' as item_date ,il.archived ,il.hours ,il.unit_price ,il.cost_rate ,il.note ,il.amount ,il.tax ,il.total_amount ,il.timesheet_id ,il.expense_id ,il.project_id ,il.account_id ,il.invoice_id ,il.company_id ,il.user_id ,il.user_role ,il.quantity ,il.record_id ,il.currency ,il.timesheet_row_id FROM INVOICE_LINE_ITEM il WHERE company_id=$1 AND invoice_id=$2 AND archived=$3 ORDER BY project_id,timesheet_id,expense_id,created_date', [req.user.company_id, req.query.invoiceId, false], function (err, invoiceItems) {
                                                 if (err) {
                                                     console.error(err);
                                                     handleResponse.shouldAbort(err, client, done);

@@ -497,11 +497,16 @@
                                                         <div class=" slds-no-flex slds-p-horizontal_small invoice-col" style="width:45%">
                                                             <div class="slds-form-element slds-m-bottom_small">
                                                                 <div class="slds-form-element__control">
-                                                                  <% if(projectObj.length<=0) { %>
-                                                                    <textarea class="slds-textarea" disabled rows="1"> <%= item.note %></textarea>
-                                                                  <% } else { %>
+                                                                  <textarea class="slds-textarea"  rows="1" onchange="enableSaveButton(this)"><%= item.note %></textarea>
+                                                                  <!-- <% if(projectObj.length<=0) { %>
+                                                                    <textarea class="slds-textarea"  rows="1" onchange="enableSaveButton(this)"> <%= item.note %></textarea>
+                                                                  <% } else if(item.timesheet_id) { %>
                                                                     <textarea class="slds-textarea" disabled rows="1">Project: <%= projectObj[0].name %> &#13;&#10; Resource: <%= userObj[0].email %> <% if(item.user_role.length > 0) {%> (<%= item.user_role %>) <% } %> &#13;&#10; Note: <%= item.note %></textarea>
-                                                                  <% } %>
+                                                                    <textarea class="slds-textarea"  rows="1" onchange="enableSaveButton(this)">Hours</textarea>
+                                                                  <% } else if(item.expense_id) { %>
+                                                                      <textarea class="slds-textarea" disabled rows="1">Project: <%= projectObj[0].name %> &#13;&#10; Resource: <%= userObj[0].email %> <% if(item.user_role.length > 0) {%> (<%= item.user_role %>) <% } %> &#13;&#10; Note: <%= item.note %></textarea>
+                                                                      <textarea class="slds-textarea"  rows="1" onchange="enableSaveButton(this)">Expenses</textarea>
+                                                                  <% } %> -->
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -568,7 +573,14 @@
                                                                 <%= item.total_amount %>
                                                             </div>
                                                         </div>
-                                                        <div class="slds-no-flex slds-p-horizontal_small invoice-col">
+                                                        <div class="slds-no-flex slds-p-horizontal_small invoice-col" style="width:2%;">
+                                                            <div class="text-center tpd-5">
+                                                                <button class="slds-button slds-button_icon" title="Save" onclick="saveInvoiceItem('<%= item.id %>',this)" disabled save-line-item>
+                                                                    <i class="fa fa-save text-blue"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-no-flex slds-p-horizontal_small invoice-col" style="width:2%;">
                                                             <div class="text-center tpd-5">
                                                                 <button class="slds-button slds-button_icon" title="Remove" onclick="deleteBeforeConfirm('#globalAlert', 'deleteInvoiceItem(this,\'<%= item.id %>\', \'<%= item.timesheet_id %>\', \'<%= item.expense_id %>\', \'<%= item.type %>\')')">
                                                                     <i class="fa fa-times text-red"></i>

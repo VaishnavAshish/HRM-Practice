@@ -146,7 +146,38 @@
             next(null,true);
         }
 
+    }
 
+    function enableSaveButton(ele){
+      let description = $(ele).closest('li').find('button[save-line-item]').removeAttr('disabled');
+    }
+
+    function saveInvoiceItem(invoiceItemId,ele){
+        let description = $(ele).closest('li').find('textarea').val();
+        $.ajax({
+            type: 'POST',
+            url : '/updateInvoiceItemData',
+            contentType: 'application/json',
+            dataType: 'json',
+            data:JSON.stringify({invoiceItemId:invoiceItemId,description:description}),
+            success : function(response){
+                if(response.success == true) {
+                    console.log(response);
+                    location.reload();
+
+                } else {
+                    hideLoader('#globalLoader');
+                    showGlobalToast('#globalToast', 'error', "Error in saving invoice item.", 4000);
+                }
+
+            },
+            error: function(response){
+                console.log(response);
+                hideLoader('#globalLoader');
+                showGlobalToast('#globalToast', 'error', response.responseText, 4000);
+
+            }
+        });
     }
 
 /*    function saveInvoiceItem(obj,invoiceItemId){
