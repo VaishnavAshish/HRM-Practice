@@ -236,7 +236,7 @@ passport.use('user', new LocalStrategy({ usernameField: 'email',passReqToCallbac
           return done('Domain not found', null);
         }
         // console.log('email-----------' + email);
-         console.log('company domain-----------' + JSON.stringify(company.rows[0]));
+        //  console.log('company domain-----------' + JSON.stringify(company.rows[0]));
         //  console.log('SELECT * FROM users where email=$1 and company_id=$2'+email.toLowerCase()+company.rows[0].id);
 
         client.query("SELECT * FROM users where email=$1 and company_id=$2 and archived=$3 and add_status IN ('Joined','Approved')", [email.toLowerCase(),company.rows[0].id,false], function(err, user) {
@@ -916,9 +916,9 @@ exports.isAuthenticated = (req, res, next) => {
                             userData.domain = company.rows[0].domain;
                             // console.log('inside relogin after update user is ' + JSON.stringify(userData));
                             var pages = userrole.setupPagePermissions(userData, req.user);
-                            console.log("userData========================= ");
+                            // console.log("userData========================= ");
                             userData.pages = pages;
-                            console.log(userData);
+                            // console.log(userData);
                             done();
                             // inputUser=inputUser.filter(inpUser=>{
                             //   return inpUser.userid!=req.user.id;
