@@ -4,11 +4,12 @@ const handleResponse = require('./page-error-handle');
 const moment = require('moment-timezone');
 const setting = require('./company-setting');
 const OAuthClient = require('intuit-oauth');
+var oauthClient ;
 
 exports.initiateQuickbook = (req, res) => {
     console.log('req.query');
     console.log(req.query);
-    var oauthClient = new OAuthClient({
+    oauthClient = new OAuthClient({
         clientId: req.query.client_id,
         clientSecret: req.query.client_secret,
         environment: process.env.QUICKBOOK_ENV,
@@ -25,7 +26,7 @@ exports.initiateQuickbook = (req, res) => {
 exports.getAuthCode = (req,res) => {
   console.log('req');
   console.log(req);
-  OAuthClient.createToken(req.url)
+  oauthClient.createToken(req.url)
        .then(function(authResponse) {
              oauth2_token_json = JSON.stringify(authResponse.getJson(), null,2);
          })
