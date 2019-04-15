@@ -4,7 +4,7 @@ const handleResponse = require('./page-error-handle');
 const moment = require('moment-timezone');
 const setting = require('./company-setting');
 const OAuthClient = require('intuit-oauth');
-var oauthClient = null ;
+global.oauthClient = null ;
 
 exports.initiateQuickbook = (req, res) => {
     // console.log('req.query');
@@ -105,13 +105,13 @@ exports.disconnectQuickbook = (req,res) =>{
                 "access_token":quickbook_token.token.access_token
               }
               console.log(tokenJSON);
-              oauthClient = new OAuthClient({
-                  clientId: quickbook_token.clientId,
-                  clientSecret: quickbook_token.clientSecret,
-                  environment: quickbook_token.environment,
-                  redirectUri: quickbook_token.redirectUri,
-                  token:quickbook_token.token.refresh_token
-              });
+              // oauthClient = new OAuthClient({
+              //     clientId: quickbook_token.clientId,
+              //     clientSecret: quickbook_token.clientSecret,
+              //     environment: quickbook_token.environment,
+              //     redirectUri: quickbook_token.redirectUri,
+              //     token:quickbook_token.token.refresh_token
+              // });
 
               oauthClient.revoke(tokenJSON)
               .then(function(authResponse) {
