@@ -4,13 +4,13 @@ const handleResponse = require('./page-error-handle');
 const moment = require('moment-timezone');
 const setting = require('./company-setting');
 const OAuthClient = require('intuit-oauth');
-var oauthClient = null ;
+var oauth_Client = null ;
 
 exports.initiateQuickbook = (req, res) => {
     console.log('req.query');
     console.log(req.query);
 
-    oauthClient = new OAuthClient({
+    oauth_Client = new OAuthClient({
         clientId: req.query.client_id,
         clientSecret: req.query.client_secret,
         environment: process.env.QUICKBOOK_ENV,
@@ -18,7 +18,7 @@ exports.initiateQuickbook = (req, res) => {
     });
 
     // AuthorizationUri
-    var authUri = oauthClient.authorizeUri({scope:[OAuthClient.scopes.Accounting,OAuthClient.scopes.OpenId],state:'testState'});  // can be an array of multiple scopes ex : {scope:[OAuthClient.scopes.Accounting,OAuthClient.scopes.OpenId]}
+    var authUri = oauth_Client.authorizeUri({scope:[OAuthClient.scopes.Accounting,OAuthClient.scopes.OpenId],state:'testState'});  // can be an array of multiple scopes ex : {scope:[OAuthClient.scopes.Accounting,OAuthClient.scopes.OpenId]}
     console.log('authUri')
     console.log(authUri)
     res.redirect(authUri);
@@ -27,7 +27,7 @@ exports.initiateQuickbook = (req, res) => {
 exports.getAuthCode = (req,res) => {
   console.log('req');
   console.log(req);
-  oauthClient.createToken(req.url)
+  oauth_Client.createToken(req.url)
        .then(function(authResponse) {
              oauth2_token_json = JSON.stringify(authResponse.getJson(), null,2);
          })
