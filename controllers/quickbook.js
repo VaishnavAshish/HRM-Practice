@@ -39,8 +39,8 @@ exports.getAuthCode = (req,res) => {
         .catch(function(e) {
              console.error(e);
          });
-
-    res.redirect('/');
+     res.send(200);
+    // res.redirect('/');
 }
 
 exports.refreshAccessToken = (req,res) =>{
