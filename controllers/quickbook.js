@@ -110,7 +110,7 @@ exports.disconnectQuickbook = (req,res) =>{
               .catch(function(e) {
                 console.error("The error message is :"+e.originalMessage);
                 console.error(e.intuit_tid);
-                handleResponse.handleError(res, err, ' Error in revoking token');
+                handleResponse.handleError(res, e, ' Error in revoking token'+e);
               });
             }else{
               handleResponse.handleError(res, 'Error in fetching quickbook settings', 'Error in fetching quickbook settings');
