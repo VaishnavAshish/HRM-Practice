@@ -33,7 +33,7 @@ exports.getAuthCode = (req,res) => {
        .then(function(authResponse) {
              oauth2_token_json = JSON.stringify(authResponse.getJson(), null,2);
              pool.connect((err, client, done) => {
-                 client.query('UPDATE SETTING set quickbook_token=$1 where company_id=$2 RETURNING id',[oauthClient.token, req.user.company_id], function(err, updatedSetting) {
+                 client.query('UPDATE SETTING set quickbook_token=$1 where company_id=$2 RETURNING id',[oauthClient, req.user.company_id], function(err, updatedSetting) {
                    if (err){
                      handleResponse.shouldAbort(err, client, done);
                      res.redirect('/');
@@ -94,7 +94,7 @@ exports.disconnectQuickbook = (req,res) =>{
             console.log('companySetting');
             console.log(companySetting.rows[0]);
             if(companySetting.rows[0].quickbook_token!=null){
-              let quickbook_token = JSON.parse(companySetting.rows[0].quickbook_token);
+              let quickbook_token = JSON.parse(companySetting.rows[0].quickbook_token.token);
               console.log('quickbook_token');
               // console.log(quickbook_token);
               let tokenJSON = {
@@ -105,7 +105,7 @@ exports.disconnectQuickbook = (req,res) =>{
                 "access_token":quickbook_token.access_token
               }
               console.log(tokenJSON);
-              oauthClient.revoke(tokenJSON)
+              companySetting.rows[0].quickbook_token.revoke(tokenJSON)
               .then(function(authResponse) {
                 console.log('Tokens revoked : ' + JSON.stringify(authResponse.json()));
                 client.query('UPDATE SETTING set quickbook_token=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedSetting) {
