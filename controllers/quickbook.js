@@ -9,6 +9,7 @@ var oauthClient ;
 exports.initiateQuickbook = (req, res) => {
     console.log('req.query');
     console.log(req.query);
+
     oauthClient = new OAuthClient({
         clientId: req.query.client_id,
         clientSecret: req.query.client_secret,
