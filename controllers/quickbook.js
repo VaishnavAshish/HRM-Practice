@@ -4,7 +4,7 @@ const handleResponse = require('./page-error-handle');
 const moment = require('moment-timezone');
 const setting = require('./company-setting');
 const OAuthClient = require('intuit-oauth');
-var oauthClient ;
+var oauthClient = null ;
 
 exports.initiateQuickbook = (req, res) => {
     console.log('req.query');
