@@ -32,6 +32,7 @@ exports.getAuthCode = (req,res) => {
   oauthClient.createToken(req.url)
        .then(function(authResponse) {
              oauth2_token_json = JSON.stringify(authResponse.getJson(), null,2);
+             console.log(oauth2_token_json);
          })
         .catch(function(e) {
              console.error(e);
