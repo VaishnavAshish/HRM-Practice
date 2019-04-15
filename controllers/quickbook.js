@@ -93,7 +93,7 @@ exports.disconnectQuickbook = (req,res) =>{
         } else {
             console.log('companySetting');
             console.log(companySetting.rows[0]);
-            // if(companySetting.rows[0].quickbook_token!=null){
+            if(companySetting.rows[0].quickbook_token!=null){
               // let quickbook_token = JSON.parse(companySetting.rows[0].quickbook_token);
               // console.log('quickbook_token');
               // // console.log(quickbook_token);
