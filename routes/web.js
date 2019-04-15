@@ -93,6 +93,8 @@ module.exports = function(app) {
 
     app.get('/initiateQuickbook', passportConfig.isAuthenticated, quickbookController.initiateQuickbook);
     app.get('/getAuthCode', quickbookController.getAuthCode);
+    app.post('/disconnectQuickbook', passportConfig.isAuthenticated, quickbookController.disconnectQuickbook);
+
 
     app.post('/invoicePaymentDeclined',stripeController.invoicePaymentDeclined);
 

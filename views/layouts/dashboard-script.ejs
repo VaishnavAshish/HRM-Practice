@@ -1,23 +1,21 @@
 <script>
-function connectToQuickbook(formId,modalId){
-  let quickbookData = createJSONForFormData(formId);
+function disconnectFromQuickbook(modalId){
 	showLoader('#globalLoader');
 	$.ajax({
-				type: 'GET',
-				url : '/initiateQuickbook',
-        contentType:'application/json',
-        dataType:'json',
-        data:JSON.stringify(quickbookData),
+				type: 'POST',
+				url : '/disconnectQuickbook',
 				success : function(response){
+          console.log('response is : '+JSON.stringify(response));
 						hideLoader('#globalLoader');
-						// closeModal('#modalAddPaymentDetail');
+						closeModal(modalId);
+            location.reload();
 						// $("button[enableIntegration]").show();
 						// $("button[disableIntegration]").hide();
 						// $("#integration-dashboard").hide();
-						console.log('response is : '+JSON.stringify(response));
 				},
 				error: function(response){
 					hideLoader('#globalLoader');
+          closeModal(modalId);
 					showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
 					setTimeout(function(){
 						location.reload();
@@ -28,5 +26,7 @@ function connectToQuickbook(formId,modalId){
 			});
 
 }
+
+
 
 </script>

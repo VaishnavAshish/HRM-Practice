@@ -12,41 +12,46 @@
                   </header>
                   <div class="slds-modal__content" modal-body>
                       <!-- <div> -->
+                      <% if(!user.company_info.quickbook_token){ %>
+                          <form id="connect-to-quickbook" method="get" action="/initiateQuickbook">
+                              <div class="slds-theme_shade slds-p-around_small">
+                                <!-- <div class="slds-grid slds-wrap slds-gutters"> -->
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_12-of-12">
+                                        <div class="slds-form-element slds-m-bottom_medium">
+                                            <label class="slds-form-element__label" for="client_id" >Client Id</label>
+                                            <div class="slds-form-element__control slds-input-has-fixed-addon">
+                                                <input type="text" id="client_id" getFormData name="client_id" class="slds-input" reset='value'>
+                                            </div>
+                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
-                      <form id="connect-to-quickbook" method="get" action="/initiateQuickbook">
-                          <div class="slds-theme_shade slds-p-around_small">
-                            <!-- <div class="slds-grid slds-wrap slds-gutters"> -->
-                                <div class="slds-col slds-size_1-of-1 slds-medium-size_12-of-12">
-                                    <div class="slds-form-element slds-m-bottom_medium">
-                                        <label class="slds-form-element__label" for="client_id" >Client Id</label>
-                                        <div class="slds-form-element__control slds-input-has-fixed-addon">
-                                            <input type="text" id="client_id" getFormData name="client_id" class="slds-input" reset='value'>
-                                        </div>
-                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
-
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="slds-col slds-size_1-of-1 slds-medium-size_12-of-12">
-                                    <div class="slds-form-element slds-m-bottom_medium">
-                                        <label class="slds-form-element__label" for="client_secret">Client Secret Key</label>
-                                        <div class="slds-form-element__control slds-input-has-fixed-addon">
-                                            <input type="text" id="client_secret" getFormData name="client_secret" class="slds-input" reset='value'>
-                                        </div>
-                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_12-of-12">
+                                        <div class="slds-form-element slds-m-bottom_medium">
+                                            <label class="slds-form-element__label" for="client_secret">Client Secret Key</label>
+                                            <div class="slds-form-element__control slds-input-has-fixed-addon">
+                                                <input type="text" id="client_secret" getFormData name="client_secret" class="slds-input" reset='value'>
+                                            </div>
+                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            <!-- </div> -->
-                          </div>
-                        <footer class="slds-modal__footer">
-                            <button class="slds-button slds-button_neutral" onclick="closeModal('#modalQuickbookSetting');">Cancel</button>
-                            <button type="submit" class="slds-button">
-                              <img src="/img/connect_quickbook.png" alt=""  width="200">
-                            </button>
-                        </footer>
-                    </form>
+                                <!-- </div> -->
+                              </div>
+                            <footer class="slds-modal__footer">
+                                <button class="slds-button slds-button_neutral" onclick="closeModal('#modalQuickbookSetting');">Cancel</button>
+                                <button type="submit" class="slds-button">
+                                  <img src="/img/connect_quickbook.png" alt=""  width="200">
+                                </button>
+                            </footer>
+                        </form>
+                    <% } else { %>
+                      <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" onclick="disconnectFromQuickbook('#modalQuickbookSetting');">Disconnect To Quickbook</button>
+                      </footer/>
+                    <% } %>
                   </div>
               </div>
           </section>

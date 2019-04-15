@@ -87,9 +87,11 @@
                                             </strong>
                                         </div>
                                         <div class="slds-truncate text-dull">Online Invoicing Software for small businesses </div>
-                                        <div>
+                                        <% if(user.company_info.quickbook_token){ %>
+                                          <div>
                                             <span class="slds-badge slds-theme_success">Active</span>
-                                        </div>
+                                          </div>
+                                        <% } %>
                                     </div>
                                 </div>
                             </a>
