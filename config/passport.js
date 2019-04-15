@@ -851,8 +851,8 @@ passport.use(new TwitterStrategy({
  * Login Required middleware.
  */
 exports.isAuthenticated = (req, res, next) => {
-  console.log('in authentication request user id is ');
-  console.log(req.user);
+  // console.log('in authentication request user id is ');
+  // console.log(req.user);
   if (!req.isAuthenticated()) {
     res.redirect('/domain');
   }else{
