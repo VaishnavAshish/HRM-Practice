@@ -32,7 +32,9 @@ exports.getAuthCode = (req,res) => {
   oauthClient.createToken(req.url)
        .then(function(authResponse) {
              oauth2_token_json = JSON.stringify(authResponse.getJson(), null,2);
+             console.log('oauth2_token_json');
              console.log(oauth2_token_json);
+             console.log(oauthClient);
          })
         .catch(function(e) {
              console.error(e);
@@ -40,3 +42,42 @@ exports.getAuthCode = (req,res) => {
 
     res.redirect('/');
 }
+
+exports.refreshAccessToken = (req,res) =>{
+
+    oauthClient.refresh()
+        .then(function(authResponse){
+            console.log('The Refresh Token is  '+ JSON.stringify(authResponse.getJson()));
+            oauth2_token_json = JSON.stringify(authResponse.getJson(), null,2);
+            res.send(oauth2_token_json);
+        })
+        .catch(function(e) {
+            console.error(e);
+        });
+
+};
+
+exports.getCompanyInfo = (req,res) => {
+
+
+    var companyID = oauthClient.getToken().realmId;
+    var url = oauthClient.environment == 'sandbox' ? OAuthClient.environment.sandbox : OAuthClient.environment.production ;
+    oauthClient.makeApiCall({url: url + 'v3/company/' + companyID +'/companyinfo/' + companyID})
+        .then(function(authResponse){
+            console.log("The response for API call is :"+JSON.stringify(authResponse));
+            res.send(JSON.parse(authResponse.text()));
+        })
+        .catch(function(e) {
+            console.error(e);
+        });
+};
+exports.revokeAuthToken = (req,res) =>{
+  oauthClient.revoke(params)
+        .then(function(authResponse) {
+            console.log('Tokens revoked : ' + JSON.stringify(authResponse.json()));
+        })
+        .catch(function(e) {
+            console.error("The error message is :"+e.originalMessage);
+            console.error(e.intuit_tid);
+        });
+});
