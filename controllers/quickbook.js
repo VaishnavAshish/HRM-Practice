@@ -34,7 +34,7 @@ exports.getAuthCode = (req,res) => {
              oauth2_token_json = JSON.stringify(authResponse.getJson(), null,2);
              console.log('oauth2_token_json');
              console.log(oauth2_token_json);
-             console.log(oauthClient); 
+             console.log(oauthClient);
          })
         .catch(function(e) {
              console.error(e);
@@ -80,4 +80,4 @@ exports.revokeAuthToken = (req,res) =>{
             console.error("The error message is :"+e.originalMessage);
             console.error(e.intuit_tid);
         });
-});
+};
