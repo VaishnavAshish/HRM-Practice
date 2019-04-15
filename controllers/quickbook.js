@@ -16,6 +16,8 @@ exports.initiateQuickbook = (req, res) => {
         environment: process.env.QUICKBOOK_ENV,
         redirectUri: process.env.QUICKBOOK_REDIRECTURL
     });
+    console.log('oauthClient');
+    console.log(oauthClient);
 
     // AuthorizationUri
     var authUri = oauthClient.authorizeUri({scope:[OAuthClient.scopes.Accounting,OAuthClient.scopes.OpenId],state:'testState'});  // can be an array of multiple scopes ex : {scope:[OAuthClient.scopes.Accounting,OAuthClient.scopes.OpenId]}
@@ -27,7 +29,7 @@ exports.initiateQuickbook = (req, res) => {
 exports.getAuthCode = (req,res) => {
   console.log('req');
   console.log(oauthClient);
-  OAuthClient.createToken(req.url)
+  oauthClient.createToken(req.url)
        .then(function(authResponse) {
              oauth2_token_json = JSON.stringify(authResponse.getJson(), null,2);
          })
