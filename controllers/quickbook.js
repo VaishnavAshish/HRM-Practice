@@ -109,8 +109,7 @@ exports.disconnectQuickbook = (req,res) =>{
                   clientId: quickbook_token.clientId,
                   clientSecret: quickbook_token.clientSecret,
                   environment: quickbook_token.environment,
-                  redirectUri: quickbook_token.redirectUri,
-                  token: quickbook_token.redirectUri
+                  redirectUri: quickbook_token.redirectUri
               });
 
               oauthClient.revoke(tokenJSON)
