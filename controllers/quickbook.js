@@ -35,12 +35,13 @@ exports.getAuthCode = (req,res) => {
              console.log('oauth2_token_json');
              console.log(oauth2_token_json);
              console.log(oauthClient);
+             res.redirect('/');
          })
         .catch(function(e) {
              console.error(e);
          });
-     res.send(200);
-    // res.redirect('/');
+    //  res.send(200);
+
 }
 
 exports.refreshAccessToken = (req,res) =>{
