@@ -94,6 +94,13 @@ exports.disconnectQuickbook = (req,res) =>{
             console.log('companySetting');
             console.log(companySetting.rows[0]);
             if(companySetting.rows[0].quickbook_token!=null){
+              let tokenJSON = {
+                "token_type": companySetting.rows[0].quickbook_token.token_type,
+                "expires_in": companySetting.rows[0].quickbook_token.expires_in,
+                "refresh_token":companySetting.rows[0].quickbook_token.refresh_token,
+                "x_refresh_token_expires_in":companySetting.rows[0].quickbook_token.x_refresh_token_expires_in,
+                "access_token":companySetting.rows[0].quickbook_token.access_token
+              }
               oauthClient.revoke(companySetting.rows[0].quickbook_token)
               .then(function(authResponse) {
                 console.log('Tokens revoked : ' + JSON.stringify(authResponse.json()));
