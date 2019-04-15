@@ -91,6 +91,9 @@ module.exports = function(app) {
     app.post('/initiateStripe', passportConfig.isAuthenticated,stripeController.initiateStripe);
     app.post('/disableStripe', passportConfig.isAuthenticated, stripeController.disableStripe);
 
+    app.get('/initiateQuickbook', passportConfig.isAuthenticated, quickbookController.initiateQuickbook);
+    app.get('/getAuthCode', quickbookController.getAuthCode);
+
     app.post('/invoicePaymentDeclined',stripeController.invoicePaymentDeclined);
 
 
@@ -216,7 +219,11 @@ module.exports = function(app) {
 
     app.get('/integration-dashboard', passportConfig.isAuthenticated,roleConfig.permit, roleConfig.nocache, function(req, res) {
         // res.render('pages/integration-dashboard');
-        stripeController.getIntegrationDashboard(req, res);
+        if(req.user.company_info.stripe_customer_id){
+          stripeController.getIntegrationDashboard(req, res);
+        }else{
+          res.redirect('/');
+        }
     });
 
 

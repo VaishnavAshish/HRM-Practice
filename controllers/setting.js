@@ -240,14 +240,14 @@ exports.getSetting = (req, res) => {
     client.query('SELECT * FROM SETTING WHERE company_id=$1', [req.user.company_id], function (err, companySetting) {
       if (err) {
         handleResponse.shouldAbort(err, client, done);
-        handleResponse.responseToPage(res,'pages/org-settings-general',{setting:{},user:req.user, error:err,timezones:timezones},"error","  Error in finding setting data");
+        handleResponse.responseToPage(res,'pages/org-settings-general',{setting:{},user:req.user, error:err,timezones:timezones,STRIPE_PUBLISH_KEY : process.env.STRIPE_PUBLISH_KEY},"error","  Error in finding setting data");
       } else {
         	if(companySetting.rows.length<0){
 			  	    done();
-	            handleResponse.responseToPage(res,'pages/org-settings-general',{setting:{},user:req.user,timezones:timezones,stripeCustomerId:null},"success","Successfully rendered");
+	            handleResponse.responseToPage(res,'pages/org-settings-general',{setting:{},user:req.user,timezones:timezones,stripeCustomerId:null,STRIPE_PUBLISH_KEY : process.env.STRIPE_PUBLISH_KEY},"success","Successfully rendered");
         	}else{
 		        done();
-		        handleResponse.responseToPage(res,'pages/org-settings-general',{setting:companySetting.rows[0],user:req.user,timezones:timezones,stripeCustomerId:companySetting.rows[0].stripe_customer_id},"success","Successfully rendered");
+		        handleResponse.responseToPage(res,'pages/org-settings-general',{setting:companySetting.rows[0],user:req.user,timezones:timezones,stripeCustomerId:companySetting.rows[0].stripe_customer_id,STRIPE_PUBLISH_KEY : process.env.STRIPE_PUBLISH_KEY},"success","Successfully rendered");
         	}
       }
 

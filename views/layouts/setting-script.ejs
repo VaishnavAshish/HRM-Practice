@@ -1,5 +1,5 @@
 <script>
-var stripe = Stripe('pk_test_p3cM0dAiczDAJ1qf6lTe5WEs00pOzjH2HU');
+var stripe = Stripe('<%= STRIPE_PUBLISH_KEY %>');
 var card;
 $(document).ready(function(){
 	<% if (setting!=undefined) { %>
@@ -59,10 +59,12 @@ function saveCompanyGeneralSetting(){
 
 }
 function disableIntegration(){
+	showLoader('#globalLoader');
 	$.ajax({
 				type: 'POST',
 				url : '/disableStripe',
 				success : function(response){
+						hideLoader('#globalLoader');
 						closeModal('#modalAddPaymentDetail');
 						$("button[enableIntegration]").show();
 						$("button[disableIntegration]").hide();
@@ -70,6 +72,11 @@ function disableIntegration(){
 						console.log('response is : '+JSON.stringify(response));
 				},
 				error: function(response){
+					hideLoader('#globalLoader');
+					showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+					setTimeout(function(){
+						location.reload();
+					},5000)
 					console.log('error is : '+JSON.stringify(response));
 
 				}
@@ -77,6 +84,7 @@ function disableIntegration(){
 }
 
 function checkPaymentAndAdd(){
+	showLoader('#globalLoader');
 	stripe.createToken(card).then(function(result) {
     if (result.error) {
       // Inform the user if there was an error.
@@ -92,6 +100,7 @@ function checkPaymentAndAdd(){
 						dataType :'json',
 						data:JSON.stringify({stripeToken:result.token.id}),
 						success : function(response){
+								hideLoader('#globalLoader');
 								closeModal('#modalAddPaymentDetail');
 								$("button[enableIntegration]").hide();
 								$("button[disableIntegration]").show();
@@ -99,16 +108,18 @@ function checkPaymentAndAdd(){
 								console.log('response is : '+JSON.stringify(response));
 						},
 						error: function(response){
+							hideLoader('#globalLoader');
+							showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+							setTimeout(function(){
+								location.reload();
+							},5000)
 							console.log('error is : '+JSON.stringify(response));
 
 						}
 					});
     }
   });
-
-
-
-
+	
 }
 
 function enableIntegration(){

@@ -1,0 +1,32 @@
+<script>
+function connectToQuickbook(formId,modalId){
+  let quickbookData = createJSONForFormData(formId);
+	showLoader('#globalLoader');
+	$.ajax({
+				type: 'GET',
+				url : '/initiateQuickbook',
+        contentType:'application/json',
+        dataType:'json',
+        data:JSON.stringify(quickbookData),
+				success : function(response){
+						hideLoader('#globalLoader');
+						// closeModal('#modalAddPaymentDetail');
+						// $("button[enableIntegration]").show();
+						// $("button[disableIntegration]").hide();
+						// $("#integration-dashboard").hide();
+						console.log('response is : '+JSON.stringify(response));
+				},
+				error: function(response){
+					hideLoader('#globalLoader');
+					showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+					setTimeout(function(){
+						location.reload();
+					},5000)
+					console.log('error is : '+JSON.stringify(response));
+
+				}
+			});
+
+}
+
+</script>

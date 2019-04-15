@@ -75,7 +75,7 @@
                 <div class="slds-card slds-p-around_small" style="min-height: 70vh">
                     <ul class="slds-grid slds-grid_pull-padded slds-wrap">
                         <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
-                            <a href="/org-settings-general" class="slds-app-launcher__tile slds-text-link_reset slds-m-vertical_medium ">
+                            <a href="javascript:void(0);" class="slds-app-launcher__tile slds-text-link_reset slds-m-vertical_medium " onclick="openModal('#modalQuickbookSetting', true)">
                                 <div class="slds-no-flex slds-p-around_small">
                                     <img src="https://d1yjjnpx0p53s8.cloudfront.net/styles/logo-thumbnail/s3/062017/untitled-2_26.png?itok=jfNd1c1F" alt="" width="64">
                                 </div>
@@ -101,11 +101,12 @@
 
             </div>
         </div>
+        <% include ../modals/modal-quickbook-setting %>
         <% include ../layouts/footer %>
     </main>
 
     <% include ../layouts/scripts %>
-
+    <% include ../layouts/dashboard-script %>
 
 
 </body>

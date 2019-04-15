@@ -94,7 +94,7 @@
 			<ul>
 				<% for(var i=0; i<user.pages.length; i++) { %>
           <% if(user.pages[i].url == '/integration-dashboard'){ %>
-            <% if(stripeCustomerId){ %>
+            <% if(user.company_info.stripe_customer_id){ %>
               <li class="slds-nav-vertical__item" id="integration-dashboard">
             <% } else{ %>
   					       <li class="slds-nav-vertical__item hide" id="integration-dashboard">

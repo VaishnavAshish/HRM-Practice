@@ -169,7 +169,7 @@ passport.deserializeUser((user, done) => {
           done(err, null);
         } else {
           let userData=user;
-          // console.log('passport.deserializeUser');
+          // console.log('passport.deserializeUser'+JSON.stringify(user));
           poolDone();
           // console.log("After Pool done");
           done(null, userData);
@@ -220,7 +220,8 @@ passport.use('user', new LocalStrategy({ usernameField: 'email',passReqToCallbac
   let domain=req.body.domain;
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
   pool.connect((err, client, poolDone) => {
-    client.query("Select id, name from company where domain=$1 AND archived=$2", [domain,false], function(err, company) {
+    client.query("select * from company INNER JOIN (SELECT company_id,stripe_customer_id,stripe_subscription_id FROM setting) setting ON company.id = setting.company_id AND company.domain=$1 AND company.archived=$2", [domain,false], function(err, company) {
+    // client.query("select * from company where domain=$1 AND archived=$2", [domain,false], function(err, company) {
       if (err) {
         // console.log('err-----------' + JSON.stringify(err));
         /*poolDone();*/
@@ -235,36 +236,41 @@ passport.use('user', new LocalStrategy({ usernameField: 'email',passReqToCallbac
           return done('Domain not found', null);
         }
         // console.log('email-----------' + email);
-         // console.log('comapny domain-----------' + company.rows[0].id);
-         // console.log('SELECT * FROM users where email=$1 and company_id=$2'+email.toLowerCase()+company.rows[0].id);
+         console.log('company domain-----------' + JSON.stringify(company.rows[0]));
+        //  console.log('SELECT * FROM users where email=$1 and company_id=$2'+email.toLowerCase()+company.rows[0].id);
+
         client.query("SELECT * FROM users where email=$1 and company_id=$2 and archived=$3 and add_status IN ('Joined','Approved')", [email.toLowerCase(),company.rows[0].id,false], function(err, user) {
             if (err) {
               /*poolDone();*/
+              // console.log(err);
               shouldAbort(err, client, poolDone);
               return done('Failed to load user', null);
             }else if (user.rows.length<=0) {
-              // console.log(user);
+              // console.log(user.rows[0]);
               poolDone();
               return done('Email is not correct or not connected to the company.Please contact to the administrator', null);
+            }else{
+              // console.log(user.rows[0]);
+              comparePassword(password, user.rows[0].password, (err, isMatch) => {
+                if (err) {
+                  poolDone();
+                  return done('Error in password confirmation. Please enter password correctly.',null);
+                }else if (isMatch) {
+                  // console.log('is match '+isMatch);
+                  user.rows[0]['company'] = company.rows[0].name;
+                  user.rows[0]['company_id'] = company.rows[0].id;
+                  user.rows[0]['company_info'] = company.rows[0];
+                  // console.log("**********************user*********************");
+                  // console.log(user.rows[0]);
+                  // console.log("**********************user*********************");
+                  poolDone();
+                  return done(null, user.rows[0]);
+                }
+                // console.log('inside compare');
+                poolDone();
+                return done('Invalid credentials', null);
+              });
             }
-            comparePassword(password, user.rows[0].password, (err, isMatch) => {
-              if (err) {
-                poolDone();
-                return done('Error in password confirmation. Please enter password correctly.',null);
-              }else if (isMatch) {
-                // console.log('is match '+isMatch);
-                user.rows[0]['company'] = company.rows[0].name;
-                user.rows[0]['company_id'] = company.rows[0].id;
-                // console.log("**********************user*********************");
-                // console.log(user);
-                // console.log("**********************user*********************");
-                poolDone();
-                return done(null, user.rows[0]);
-              }
-              // console.log('inside compare');
-              poolDone();
-              return done('Invalid credentials', null);
-            });
         });
       }
 
@@ -845,71 +851,119 @@ passport.use(new TwitterStrategy({
  * Login Required middleware.
  */
 exports.isAuthenticated = (req, res, next) => {
+  console.log('in authentication request user id is ');
+  console.log(req.user);
   if (!req.isAuthenticated()) {
     res.redirect('/domain');
   }else{
 
     // console.log('------------inputUser------------');
     // console.log(inputUser);
-    let matchUser=inputUser.find(inpUser=>{
-      return inpUser.userid==req.user.id;
-    })
+
+    // let matchUser=inputUser.find(inpUser=>{
+    //   return inpUser.userid==req.user.id;
+    // })
+
     // console.log('matchUser');
     // console.log(matchUser);
-    if(matchUser!=undefined){
+    // if(matchUser!=undefined){
         pool.connect((err, client, done) => {
-              client.query('SELECT * FROM users where id = $1', [req.user.id], function (err, existingUser) {
-              if (err) {
-                handleResponse.shouldAbort(err, client, done);
-                handleResponse.handleError(res, err, ' Error in finding user data');
-              } else {
-                  // console.log('------existingUser.rows[0]--------');
-                  // console.log(existingUser.rows[0]);
-                  var userData=existingUser.rows[0];
-                  req.login(userData, function(err) {
-                      if (err) {
-                        try {
-                            res.clearCookie('remember_me');
-                            req.logout();
-                            req.session.destroy((error) => {
-                              if (error) {
-                                // console.log('Error : Failed to destroy the session during logout.', err);
-                                handleResponse.handleError(res, error, ' Failed to destroy the session during logout.');
-                              }else{
-                                req.user = null;
+          client.query("select * from company INNER JOIN (SELECT company_id,stripe_customer_id,stripe_subscription_id FROM setting) setting ON company.id = setting.company_id AND company.id=$1 AND company.archived=$2", [req.user.company_id,false], function(err, company) {
+            if (err) {
+              handleResponse.shouldAbort(err, client, done);
+              // handleResponse.handleError(res, err, ' Error in finding company data');
+              res.redirect('/domain');
+            }else{
+                  client.query("SELECT * FROM users where id=$1 and archived=$2 and add_status IN ('Joined','Approved')", [req.user.id,false], function (err, existingUser) {
+                  if (err) {
+                    handleResponse.shouldAbort(err, client, done);
+                    // handleResponse.handleError(res, err, ' Error in finding user data');
+                    res.redirect('/domain');
+                  } else {
+                      // console.log('------existingUser.rows[0]--------');
+                      // console.log(existingUser.rows[0]);
+                      if(existingUser.rowCount>0){
 
-                                handleResponse.handleError(res, err, ' Error in user logout before logging in another user.');
+                        var userData=existingUser.rows[0];
+                        userData.company = company.rows[0].name;
+                        userData.company_id = company.rows[0].id;
+                        userData.company_info=company.rows[0];
+                        req.login(userData, function(err) {
+                          if (err) {
+                            try {
+                              res.clearCookie('remember_me');
+                              req.logout();
+                              req.session.destroy((error) => {
+                                if (error) {
+                                  // console.log('Error : Failed to destroy the session during logout.', err);
+                                  // handleResponse.handleError(res, error, ' Failed to destroy the session during logout.');
+                                  res.redirect('/domain');
+                                }else{
+                                  req.user = null;
 
-                              }
-                            });
-                          } catch (err) {
-                            console.debug("--------3333-" + err);
+                                  // handleResponse.handleError(res, err, ' Error in user logout before logging in another user.');
+                                  res.redirect('/domain');
 
-                            handleResponse.handleError(res, err, ' Error in user logout');
+                                }
+                              });
+                            } catch (err) {
+                              console.debug("--------3333-" + err);
+
+                              // handleResponse.handleError(res, err, ' Error in user logout');
+                              res.redirect('/domain');
+                            }
+                          }else{
+                            userData.domain = company.rows[0].domain;
+                            // console.log('inside relogin after update user is ' + JSON.stringify(userData));
+                            var pages = userrole.setupPagePermissions(userData, req.user);
+                            console.log("userData========================= ");
+                            userData.pages = pages;
+                            console.log(userData);
+                            done();
+                            // inputUser=inputUser.filter(inpUser=>{
+                            //   return inpUser.userid!=req.user.id;
+                            // })
+                            // req.user=userData;
+
+                            // console.log('--------req.user----------');
+                            // console.log(req.user);
+                            return next();
                           }
-                      }else{
-                        userData.domain = req.user.domain;
-                        // console.log('inside relogin after update user is ' + JSON.stringify(userData));
-                        var pages = userrole.setupPagePermissions(userData, req.user);
-                        // console.log("userData========================= ");
-                        userData.pages = pages;
-                        // console.log(userData+' '+userData.pages.length);
-                        done();
-                        inputUser=inputUser.filter(inpUser=>{
-                          return inpUser.userid!=req.user.id;
                         })
-                        req.user=userData;
-                        // console.log('--------req.user----------');
-                        // console.log(req.user);
-                        return next();
+                      }else{
+                        done();
+                        // handleResponse.handleError(res, ' Error in finding user data', ' Error in finding user data');
+                        try {
+                          res.clearCookie('remember_me');
+                          req.logout();
+                          req.session.destroy((error) => {
+                            if (error) {
+                              // console.log('Error : Failed to destroy the session during logout.', err);
+                              // handleResponse.handleError(res, error, ' Failed to destroy the session during logout.');
+                              res.redirect('/domain');
+                            }else{
+                              req.user = null;
+
+                              // handleResponse.handleError(res, err, ' Error in user logout before logging in another user.');
+                              res.redirect('/domain');
+
+                            }
+                          });
+                        } catch (err) {
+                          console.debug("--------3333-" + err);
+
+                          // handleResponse.handleError(res, err, ' Error in user logout');
+                          res.redirect('/domain');
+                        }
                       }
-                  })
-              }
+                  }
+               })
+             }
            })
           })
-    }else{
-        return next();
-    }
+    // }else{
+    //     return next();
+    // }
 
   }
 };

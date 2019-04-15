@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="en">
+
+<% include ../layouts/head %>
+
+<body class="kw">
+
+    <% include ../layouts/nav %>
+    <% include ../layouts/sideNav %>
+    <main class="main-body-space tpd-60 bpd-100">
+        <div>
+            <div class="slds-p-around_small">
+
+                <div class="">
+
+                        <!-- header start end -->
+                        <div class="slds-card slds-m-bottom_medium">
+                            <div class="slds-grid slds-wrap slds-p-around_small">
+                                <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                                    <div class="slds-grid">
+                                        <div class="slds-no-flex slds-p-right_x-small">
+                                            <span class="slds-icon_container slds-icon-custom-custom88">
+                                                <i class="fa fa-dollar-sign text-size-21 text-white slds-icon"></i>
+                                            </span>
+                                        </div>
+                                        <div class="slds-has-flexi-truncate">
+                                        <div class="slds-text-body_small text-height-normal">
+                                            Company Settings
+                                        </div>
+                                        <h1 class="slds-page-header__title slds-p-right_x-small text-height-normal">
+                                            <div class="slds-dropdown-trigger slds-dropdown-trigger_click cursor-pointer" aria-haspopup="true" title="" onclick="openDropdown(this, event, true);">
+                                                <div class="slds-grid slds-has-flexi-truncate slds-grid_vertical-align-center">
+                                                    <span class="slds-truncate" title="">Expense</span>
+                                                    <i class="fa fa-caret-down lpd-5"></i>
+                                                </div>
+                                                <% include ../layouts/org-settings-dropdown %>
+                                            </div>
+                                        </h1>
+                                    </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            <div class="">
+
+
+                                <ul class="slds-tabs_default__nav radius-4 scroll-x-auto bpd-2 text-size-14">
+
+                                    <li class="slds-tabs_default__item slds-is-active" onclick="openTab(this, 'org-sett-export')">
+                                        <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="-1">
+                                            Export Data
+                                        </a>
+                                    </li>
+
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- header end -->
+
+                        <!-- body start -->
+                        <div class="slds-grid slds-wrap slds-grid_pull-padded" target-tab="org-sett-export">
+                          <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_12-of-12 slds-p-horizontal_small">
+                              <div class="slds-card slds-p-around_medium sm-pd-10 slds-m-bottom_large">
+                                <div class="slds-grid">
+                                  <div class="slds-size_1-of-1 slds-medium-size_2-of-3">
+                                    <div class="slds-form-element slds-m-bottom_medium" notauthorized="" reset="errorclass">
+                                        <label class="slds-form-element__label">
+                                            Export Data
+                                            <abbr class="slds-required" title="required">*</abbr>
+                                        </label>
+                                        <div class="slds-form-element__control slds-m-around_xxx-small">
+                                            <div class="slds-select_container">
+                                                <select class="slds-select" required="" getformdata="" name="export_object" id="export_object" reset="value">
+                                                    <option value="generateProjectCsv">Project</option>
+                                                    <option value="generateTimesheetCsv">Timesheet</option>
+                                                    <option value="generateExpenseCsv">Expense</option>
+                                                    <option value="generateInvoiceCsv">Invoice</option>
+
+                                                </select>
+                                            </div>
+                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset="errmsg"></div>
+                                        </div>
+                                    </div>
+                                  </div>
+                                  <div class="slds-size_1-of-1 slds-medium-size_1-of-3">
+                                    <div class="slds-m-bottom_medium">
+                                      <button class="slds-button slds-button_brand slds-m-around_large" id="exportBtn" onclick="exportToCsv()" >
+                                          Export Data
+                                      </button>
+                                    </div>
+                                  </div>
+                                  </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- body end -->
+
+                </div>
+            </div>
+        </div>
+
+        <% include ../layouts/footer %>
+    </main>
+
+
+    <% include ../layouts/scripts %>
+    <script>
+      function exportToCsv(){
+        let csvEndPoint = $("#export_object option:selected").val();
+        console.log(`/${csvEndPoint}`);
+        window.location.href=`/${csvEndPoint}`;
+
+      }
+    </script>
+</body>
+
+</html>

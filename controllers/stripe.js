@@ -3,8 +3,8 @@ const pool = require('./../config/dbconfig');
 const handleResponse = require('./page-error-handle');
 const moment = require('moment-timezone');
 const setting = require('./company-setting');
-const stripe = require("stripe")("sk_test_2sfwqXE4Fa4YVsV0yPD9KPAr00hTIfAuJD");
-stripe.setApiVersion('2019-03-14');
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+stripe.setApiVersion(process.env.STRIPE_VERSION);
 
 
 // Set your secret key: remember to change this to your live secret key in production
@@ -69,36 +69,41 @@ function addStripeToken(req,res,customer){
 exports.initiateStripe = (req, res) => {
     console.log(req.user);
     console.log(req.body);
-    stripe.customers.list({
-      limit: 1,
-      email: req.user.email,
-    }, function(err, customers) {
+    if(req.user.company_info.stripe_customer_id){
+      handleResponse.handleError(res, 'Stripe subscription already enabled', 'Stripe subscription already enabled');
+    }else{
+        stripe.customers.list({
+          limit: 1,
+          email: req.user.email,
+        }, function(err, customers) {
           // console.log('customer data');
           // console.log(customers.data.length);
           // console.log(customers.data);
           if(customers.data.length>0){
-              addStripeToken(req,res,customers.data[0]);
+            addStripeToken(req,res,customers.data[0]);
           }else{
             stripe.customers.create({
               email: req.user.email,
             }, function(err, customer) {
-                if(err) {
-                  // console.log('error in creating customer');
-                  handleResponse.handleError(res, err, 'Error in creating customer');
-                }else{
-                    // console.log('customer');
-                    // console.log(customer);
-                    addStripeToken(req,res,customer);
-                }
+              if(err) {
+                // console.log('error in creating customer');
+                handleResponse.handleError(res, err, 'Error in creating customer');
+              }else{
+                // console.log('customer');
+                // console.log(customer);
+                addStripeToken(req,res,customer);
+              }
             });
           }
-        // asynchronously called
-      }
-    );
-  }
+          // asynchronously called
+        });
+
+    }
+}
 
 exports.disableStripe = (req, res) => {
   pool.connect((err, client, done) => {
+    console.log('SELECT stripe_customer_id,stripe_subscription_id FROM SETTING WHERE company_id=$1'+req.user.company_id);
       client.query('SELECT stripe_customer_id,stripe_subscription_id FROM SETTING WHERE company_id=$1',[req.user.company_id], function(err, stripeSetting) {
         if (err){
           handleResponse.shouldAbort(err, client, done);
