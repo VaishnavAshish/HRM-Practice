@@ -94,23 +94,25 @@ exports.disconnectQuickbook = (req,res) =>{
             console.log('companySetting');
             console.log(companySetting.rows[0]);
             if(companySetting.rows[0].quickbook_token!=null){
-              let quickbook_token = JSON.parse(companySetting.rows[0].quickbook_token).token;
+              let quickbook_token = JSON.parse(companySetting.rows[0].quickbook_token);
               console.log('quickbook_token');
               // console.log(quickbook_token);
               let tokenJSON = {
-                "token_type": quickbook_token.token_type,
-                "expires_in": quickbook_token.expires_in,
-                "refresh_token":quickbook_token.refresh_token,
-                "x_refresh_token_expires_in":quickbook_token.x_refresh_token_expires_in,
-                "access_token":quickbook_token.access_token
+                "token_type": quickbook_token.token.token_type,
+                "expires_in": quickbook_token.token.expires_in,
+                "refresh_token":quickbook_token.token.refresh_token,
+                "x_refresh_token_expires_in":quickbook_token.token.x_refresh_token_expires_in,
+                "access_token":quickbook_token.token.access_token
               }
               console.log(tokenJSON);
               oauthClient = new OAuthClient({
                   clientId: quickbook_token.clientId,
                   clientSecret: quickbook_token.clientSecret,
                   environment: quickbook_token.environment,
-                  redirectUri: quickbook_token.redirectUri
+                  redirectUri: quickbook_token.redirectUri,
+                  token: quickbook_token.redirectUri
               });
+
               oauthClient.revoke(tokenJSON)
               .then(function(authResponse) {
                 console.log('Tokens revoked : ' + JSON.stringify(authResponse.json()));
