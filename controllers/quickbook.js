@@ -34,7 +34,7 @@ exports.getAuthCode = (req,res) => {
              oauth2_token_json = JSON.stringify(authResponse.getJson(), null,2);
              console.log('oauth2_token_json');
              console.log(oauth2_token_json);
-             console.log(oauthClient);
+             console.log(oauthClient); 
          })
         .catch(function(e) {
              console.error(e);
