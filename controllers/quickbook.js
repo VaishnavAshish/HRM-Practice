@@ -37,5 +37,5 @@ exports.getAuthCode = (req,res) => {
              console.error(e);
          });
 
-    res.send('');
+    res.redirect('/');
 }
