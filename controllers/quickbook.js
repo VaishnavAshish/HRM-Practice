@@ -93,18 +93,18 @@ exports.disconnectQuickbook = (req,res) =>{
         } else {
             console.log('companySetting');
             console.log(companySetting.rows[0]);
-            if(companySetting.rows[0].quickbook_token!=null){
-              let quickbook_token = JSON.parse(companySetting.rows[0].quickbook_token);
-              console.log('quickbook_token');
-              // console.log(quickbook_token);
-              let tokenJSON = {
-                "token_type": quickbook_token.token.token_type,
-                "expires_in": quickbook_token.token.expires_in,
-                "refresh_token":quickbook_token.token.refresh_token,
-                "x_refresh_token_expires_in":quickbook_token.token.x_refresh_token_expires_in,
-                "access_token":quickbook_token.token.access_token
-              }
-              console.log(tokenJSON);
+            // if(companySetting.rows[0].quickbook_token!=null){
+              // let quickbook_token = JSON.parse(companySetting.rows[0].quickbook_token);
+              // console.log('quickbook_token');
+              // // console.log(quickbook_token);
+              // let tokenJSON = {
+              //   "token_type": quickbook_token.token.token_type,
+              //   "expires_in": quickbook_token.token.expires_in,
+              //   "refresh_token":quickbook_token.token.refresh_token,
+              //   "x_refresh_token_expires_in":quickbook_token.token.x_refresh_token_expires_in,
+              //   "access_token":quickbook_token.token.access_token
+              // }
+              // console.log(tokenJSON);
               // oauthClient = new OAuthClient({
               //     clientId: quickbook_token.clientId,
               //     clientSecret: quickbook_token.clientSecret,
@@ -112,10 +112,10 @@ exports.disconnectQuickbook = (req,res) =>{
               //     redirectUri: quickbook_token.redirectUri,
               //     token:quickbook_token.token.refresh_token
               // });
-
-              oauthClient.revoke(tokenJSON)
-              .then(function(authResponse) {
-                console.log('Tokens revoked : ' + JSON.stringify(authResponse.json()));
+              //
+              // oauthClient.revoke(tokenJSON)
+              // .then(function(authResponse) {
+              //   console.log('Tokens revoked : ' + JSON.stringify(authResponse.json()));
                 client.query('UPDATE SETTING set quickbook_token=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedSetting) {
                   if (err){
                     handleResponse.shouldAbort(err, client, done);
@@ -125,12 +125,12 @@ exports.disconnectQuickbook = (req,res) =>{
                     handleResponse.sendSuccess(res,'settings updated successfully',{});
                   }
                 });
-              })
-              .catch(function(e) {
-                console.error("The error message is :"+e.originalMessage);
-                console.error(e.intuit_tid);
-                handleResponse.handleError(res, e, ' Error in revoking token'+e);
-              });
+              // })
+              // .catch(function(e) {
+              //   console.error("The error message is :"+e.originalMessage);
+              //   console.error(e.intuit_tid);
+              //   handleResponse.handleError(res, e, ' Error in revoking token'+e);
+              // });
             }else{
               handleResponse.handleError(res, 'Error in fetching quickbook settings', 'Error in fetching quickbook settings');
             }
