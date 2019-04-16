@@ -104,7 +104,7 @@ exports.disconnectQuickbook = (req,res) =>{
                 "x_refresh_token_expires_in":quickbook_token.token.x_refresh_token_expires_in,
                 "access_token":quickbook_token.token.access_token
               }
-              // console.log(tokenJSON);
+              console.log(tokenJSON);
 
               oauthClient = new OAuthClient({
                   clientId: quickbook_token.clientId,
@@ -122,7 +122,7 @@ exports.disconnectQuickbook = (req,res) =>{
               console.log(oauthClient);
               if(!oauthClient.isAccessTokenValid()) {
                 console.log('inside if');
-                oauthClient.refresh()
+                oauthClient.refreshUsingToken(oauthClient.token.refresh_token)
                    .then(function(authResponse) {
                        console.log('Tokens refreshed : ' + JSON.stringify(authResponse.json()));
                        console.log(oauthClient);
