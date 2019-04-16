@@ -111,6 +111,7 @@ exports.disconnectQuickbook = (req,res) =>{
                   clientSecret: quickbook_token.clientSecret,
                   environment: quickbook_token.environment,
                   redirectUri: quickbook_token.redirectUri,
+                  logging:true,
                   token:quickbook_token.token
               });
               // var authToken = oauthClient.token.getToken();
@@ -122,11 +123,11 @@ exports.disconnectQuickbook = (req,res) =>{
               console.log(oauthClient);
               if(!oauthClient.isAccessTokenValid()) {
                 console.log('inside if');
-                oauthClient.refresh()
+                oauthClient.refreshUsingToken(oauthClient.token.refresh_token)
                    .then(function(authResponse) {
                        console.log('Tokens refreshed : ' + JSON.stringify(authResponse.json()));
                        console.log(oauthClient);
-                       oauthClient.revoke(oauthClient.token)
+                       oauthClient.revoke({token:oauthClient.token.refresh_token})
                        .then(function(authResponse) {
                          console.log('Tokens revoked : ' + JSON.stringify(authResponse.json()));
                          client.query('UPDATE SETTING set quickbook_token=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedSetting) {
@@ -148,10 +149,12 @@ exports.disconnectQuickbook = (req,res) =>{
                    .catch(function(e) {
                        console.error("The error message is :"+e.originalMessage);
                        console.error(e.intuit_tid);
+                       handleResponse.handleError(res, e, ' Error in refreshing token'+e);
                    });
                }else{
+                 console.log('inside else')
                  console.log(oauthClient);
-                 oauthClient.revoke(quickbook_token.token.refresh_token)
+                 oauthClient.revoke({token:oauthClient.token.refresh_token})
                  .then(function(authResponse) {
                    console.log('Tokens revoked : ' + JSON.stringify(authResponse.json()));
                    client.query('UPDATE SETTING set quickbook_token=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedSetting) {
