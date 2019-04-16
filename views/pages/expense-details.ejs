@@ -229,6 +229,86 @@
                                             <textarea class="slds-textarea" id="note" placeholder="Placeholder Text" ><%= expense.note%></textarea>
                                         </div>
                                     </div>
+                                  <form action="expenseDocUpload" method="post" enctype="multipart/form-data">
+                                    <div class="slds-form-element slds-m-bottom_medium">
+                                          <div class="slds-form-element__control">
+                                              <div class="slds-file-selector slds-file-selector_files">
+                                                  <div class="">
+                                                      <input type="hidden" name="expenseId" value="<%= expense.id %>">
+                                                      <input type="file" class="slds-file-selector__input slds-assistive-text" accept="" id="expenseDocument" name="expenseDocument" aria-labelledby="file-selector-primary-label file-selector-secondary-label" onchange="uploadExpenseDocument(this);">
+                                                      <label class="slds-file-selector__body" for="expenseDocument" id="file-selector-secondary-label">
+                                                          <span class="slds-file-selector__button slds-button slds-button_neutral">
+                                                              <i class="fa fa-paperclip rpd-10"></i>
+                                                              Attachments
+                                                          </span>
+                                                      </label>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                    </form>
+
+                                      <div class="">
+                                          <div>
+                                              <ul id="documentList">
+                                                <% if(expense.document !=null){ %>
+                                                    <li class="line-top slds-p-vertical_xx-small">
+                                                      <div class="slds-grid">
+                                                        <div class="slds-has-flexi-truncate">
+                                                          <a href="/downloadExpenseDoc?expenseId=<%= expense.id %>" class="slds-truncate view-inline">
+                                                            <%= expense.doc_file_name %>
+                                                          </a>
+                                                        </div>
+                                                        <div class="slds-no-flex slds-p-horizontal_small">
+                                                          <span class="text-dull text-uppercase"><%= expense.document.length %> KB</span>
+                                                        </div>
+                                                        <div class="slds-no-flex">
+                                                          <% if(user.permissions.indexOf('expenseApprover')==-1) { %>
+                                                              <% if(expense.submitted) { %>
+                                                                <button class="slds-button slds-button_icon" title="Remove" onclick="removeExpenseDoc(this);" disabled>
+                                                                  <i class="fa fa-times-circle text-red"></i>
+                                                                </button>
+                                                              <% } else { %>
+                                                                <button class="slds-button slds-button_icon" title="Remove" onclick="removeExpenseDoc(this);">
+                                                                  <i class="fa fa-times-circle text-red"></i>
+                                                                </button>
+                                                            <% } } else { %>
+                                                                <% if(!expense.invoiced){ %>
+                                                                      <button class="slds-button slds-button_icon" title="Remove" onclick="removeExpenseDoc(this);">
+                                                                        <i class="fa fa-times-circle text-red"></i>
+                                                                      </button>
+                                                                <% } else { %>
+                                                                  <button class="slds-button slds-button_icon" title="Remove" onclick="removeExpenseDoc(this);" disabled>
+                                                                    <i class="fa fa-times-circle text-red"></i>
+                                                                  </button>
+                                                              <% } }%>
+
+
+                                                        </div>
+                                                      </div>
+                                                    </li>
+
+                                                  <% } %>
+                                                  <!-- <li class="line-top slds-p-vertical_xx-small">
+                                                      <div class="slds-grid">
+                                                          <div class="slds-has-flexi-truncate">
+                                                              <a href="" class="slds-truncate view-inline">
+                                                                  file-name.txt
+                                                              </a>
+                                                          </div>
+                                                          <div class="slds-no-flex slds-p-horizontal_small">
+                                                              <span class="text-dull text-uppercase">(98 kb)</span>
+                                                          </div>
+                                                          <div class="slds-no-flex">
+                                                              <button class="slds-button slds-button_icon" title="Remove" onclick="">
+                                                                  <i class="fa fa-times-circle text-red"></i>
+                                                              </button>
+                                                          </div>
+                                                      </div>
+                                                  </li> -->
+                                              </ul>
+                                          </div>
+                                      </div>
                                     <!--  <div class="slds-form-element slds-m-bottom_medium">
                                         <div class="slds-form-element__control">
                                             <div class="slds-file-selector slds-file-selector_files">

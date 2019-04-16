@@ -368,7 +368,7 @@ exports.getExpenseDetail = (req, res) => {
             /*handleResponse.handleError(res, 'incorrect expense id', ' Expense id is not correct');*/
         } else {
             pool.connect((err, client, done) => {
-                client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id,e.submitted FROM EXPENSE e where id=$1 AND company_id=$2', [req.query.expenseId, req.user.company_id], function(err, expense) {
+                client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id,e.submitted,e.content_type,e.document,e.doc_file_name FROM EXPENSE e where id=$1 AND company_id=$2', [req.query.expenseId, req.user.company_id], function(err, expense) {
                     if (err) {
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);
@@ -449,7 +449,8 @@ exports.getExpenseDetail = (req, res) => {
                                                     expense.rows[0]["modified_date"] = modified_date;
                                                     expense.rows[0]["expense_date"] = expense_date;
                                                 }
-                                                // console.log(expense);
+                                                console.log('expense');
+                                                console.log(expense.rows[0]);
                                                 done();
                                                 handleResponse.responseToPage(res, 'pages/expense-details', {
                                                     expense: expense.rows[0],
@@ -790,6 +791,78 @@ function createAccountArray(accounts,accountIdArr,cb){
             return cb(accountIdArr);
         }
     }
+}
+
+exports.expenseDocUpload = (req,res) => {
+    console.log('req.body');
+    console.log(req.body);
+    console.log('req.files');
+    console.log(req.files.expenseDocument);
+    if (!req.files||req.files.expenseDocument==null||req.files.expenseDocument==undefined){
+      return res.status(500).redirect('/expense-details?expenseId='+req.body.expenseId);
+    }else{
+      pool.connect((err, client, done) => {
+          client.query('UPDATE EXPENSE set content_type=$1,document=$2,doc_file_name=$3 where id=$4 RETURNING *',[req.files.expenseDocument.mimetype,req.files.expenseDocument.data,req.files.expenseDocument.name,req.body.expenseId], function(err, updatedExpense) {
+              if (err){
+                handleResponse.shouldAbort(err, client, done);
+                return res.status(500).redirect('/expense-details?expenseId='+req.body.expenseId);
+              } else {
+                done();
+                res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+                res.header('Expires', '-1');
+                res.header('Pragma', 'no-cache');
+                return res.status(200).redirect('/expense-details?expenseId='+req.body.expenseId);
+
+              }
+          });
+      });
+    }
+}
+
+exports.deleteExpenseDoc = (req,res) => {
+  pool.connect((err, client, done) => {
+      client.query('UPDATE EXPENSE set content_type=$1,document=$2,doc_file_name=$3 where id=$4 RETURNING *',[null,null,null,req.body.expenseId], function(err, updatedExpense) {
+          if (err){
+            handleResponse.shouldAbort(err, client, done);
+            handleResponse.handleError(res, err, ' Error in deleting expense document');
+          } else {
+            done();
+            handleResponse.sendSuccess(res, 'Expense document deleted successfully', {});
+          }
+      });
+  });
+}
+
+exports.downloadExpenseDoc = (req,res) => {
+  console.log(req.query.expenseId);
+  pool.connect((err, client, done) => {
+      client.query("SELECT document,content_type,doc_file_name FROM EXPENSE WHERE id=$1", [req.query.expenseId], function (err, expenseDocument) {
+        if (err) {
+          handleResponse.shouldAbort(err, client, done);
+          handleResponse.responseToPage(res,'/expense-details?expenseId='+req.body.expenseId,{setting:{},user:req.user, error:err},"error","  Error in finding expense document data");
+        } else {
+            done();
+            if(expenseDocument.rows[0].document!=null){
+              console.log('expense data');
+              console.log(expenseDocument.rows[0].content_type);
+              console.log(expenseDocument.rows[0].document.length);
+              console.log(expenseDocument.rows[0].document);
+              // let document = new Buffer(companySetting.rows[0].company_logo, 'base64');
+              res.setHeader('Content-Disposition', 'attachment; filename=\"' + expenseDocument.rows[0].doc_file_name+ '\"');
+              res.writeHead(200, {
+                 'Content-Type': expenseDocument.rows[0].content_type,
+                 'Content-Length': expenseDocument.rows[0].document.length
+               });
+               res.end(expenseDocument.rows[0].document);
+
+            }
+            else{
+              done();
+              handleResponse.responseToPage(res,'/expense-details?expenseId='+req.body.expenseId,{setting:{},user:req.user, error:"Error in finding expense document data"},"error","  Error in finding expense document data");
+            }
+        }
+      });
+    })
 }
 
 exports.findExpenseForAccount = (req, res) => {

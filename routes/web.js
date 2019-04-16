@@ -136,6 +136,11 @@ module.exports = function(app) {
     app.post('/findInvoiceByCriteria', passportConfig.isAuthenticated,invoiceController.findInvoiceByCriteria);
     app.post('/findCompanyByCriteria', passportConfig.isAuthenticated,adminController.findCompanyByCriteria);
 
+    app.post('/expenseDocUpload', passportConfig.isAuthenticated,expenseController.expenseDocUpload);
+    app.post('/deleteExpenseDoc', passportConfig.isAuthenticated,expenseController.deleteExpenseDoc);
+    app.get('/downloadExpenseDoc', passportConfig.isAuthenticated,expenseController.downloadExpenseDoc);
+
+
     app.post('/addAccount', passportConfig.isAuthenticated, accountController.postAddAccount);
     app.post('/deleteAccount', passportConfig.isAuthenticated, accountController.deleteAccount);
     app.post('/editAccount', passportConfig.isAuthenticated, accountController.postEditAccount);

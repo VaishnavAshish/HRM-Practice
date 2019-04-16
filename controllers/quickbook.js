@@ -3,27 +3,35 @@ const pool = require('./../config/dbconfig');
 const handleResponse = require('./page-error-handle');
 const moment = require('moment-timezone');
 const setting = require('./company-setting');
-const OAuthClient = require('intuit-oauth');
-global.oauthClient = null ;
+// const OAuthClient = require('intuit-oauth');
+const {oauthClient,connectToQuickbook} = require('./../config/quickbook-config');
+
+// var oauthClient = null ;
 
 exports.initiateQuickbook = (req, res) => {
+
     // console.log('req.query');
     // console.log(req.query);
-
-    oauthClient = new OAuthClient({
-        clientId: req.query.client_id,
-        clientSecret: req.query.client_secret,
-        environment: process.env.QUICKBOOK_ENV,
-        redirectUri: process.env.QUICKBOOK_REDIRECTURL
+    connectToQuickbook(client_id,client_secret,function(oauthClient){
+      var authUri = oauthClient.authorizeUri({scope:[OAuthClient.scopes.Accounting,OAuthClient.scopes.OpenId],state:'testState'});  // can be an array of multiple scopes ex : {scope:[OAuthClient.scopes.Accounting,OAuthClient.scopes.OpenId]}
+      // console.log('authUri')
+      // console.log(authUri)
+      res.redirect(authUri);
     });
+    // oauthClient = new OAuthClient({
+    //     clientId: req.query.client_id,
+    //     clientSecret: req.query.client_secret,
+    //     environment: process.env.QUICKBOOK_ENV,
+    //     redirectUri: process.env.QUICKBOOK_REDIRECTURL
+    // });
     // console.log('oauthClient');
     // console.log(oauthClient);
 
     // AuthorizationUri
-    var authUri = oauthClient.authorizeUri({scope:[OAuthClient.scopes.Accounting,OAuthClient.scopes.OpenId],state:'testState'});  // can be an array of multiple scopes ex : {scope:[OAuthClient.scopes.Accounting,OAuthClient.scopes.OpenId]}
-    // console.log('authUri')
-    // console.log(authUri)
-    res.redirect(authUri);
+    // var authUri = oauthClient.authorizeUri({scope:[OAuthClient.scopes.Accounting,OAuthClient.scopes.OpenId],state:'testState'});  // can be an array of multiple scopes ex : {scope:[OAuthClient.scopes.Accounting,OAuthClient.scopes.OpenId]}
+    // // console.log('authUri')
+    // // console.log(authUri)
+    // res.redirect(authUri);
 };
 
 exports.getAuthCode = (req,res) => {
@@ -94,16 +102,16 @@ exports.disconnectQuickbook = (req,res) =>{
             console.log('companySetting');
             console.log(companySetting.rows[0]);
             if(companySetting.rows[0].quickbook_token!=null){
-              // let quickbook_token = JSON.parse(companySetting.rows[0].quickbook_token);
+              let quickbook_token = JSON.parse(companySetting.rows[0].quickbook_token);
               // console.log('quickbook_token');
               // // console.log(quickbook_token);
-              // let tokenJSON = {
-              //   "token_type": quickbook_token.token.token_type,
-              //   "expires_in": quickbook_token.token.expires_in,
-              //   "refresh_token":quickbook_token.token.refresh_token,
-              //   "x_refresh_token_expires_in":quickbook_token.token.x_refresh_token_expires_in,
-              //   "access_token":quickbook_token.token.access_token
-              // }
+              let tokenJSON = {
+                "token_type": quickbook_token.token.token_type,
+                "expires_in": quickbook_token.token.expires_in,
+                "refresh_token":quickbook_token.token.refresh_token,
+                "x_refresh_token_expires_in":quickbook_token.token.x_refresh_token_expires_in,
+                "access_token":quickbook_token.token.access_token
+              }
               // console.log(tokenJSON);
               // oauthClient = new OAuthClient({
               //     clientId: quickbook_token.clientId,
@@ -113,9 +121,9 @@ exports.disconnectQuickbook = (req,res) =>{
               //     token:quickbook_token.token.refresh_token
               // });
               //
-              // oauthClient.revoke(tokenJSON)
-              // .then(function(authResponse) {
-              //   console.log('Tokens revoked : ' + JSON.stringify(authResponse.json()));
+            oauthClient.revoke(tokenJSON)
+              .then(function(authResponse) {
+                console.log('Tokens revoked : ' + JSON.stringify(authResponse.json()));
                 client.query('UPDATE SETTING set quickbook_token=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedSetting) {
                   if (err){
                     handleResponse.shouldAbort(err, client, done);
@@ -125,12 +133,12 @@ exports.disconnectQuickbook = (req,res) =>{
                     handleResponse.sendSuccess(res,'settings updated successfully',{});
                   }
                 });
-              // })
-              // .catch(function(e) {
-              //   console.error("The error message is :"+e.originalMessage);
-              //   console.error(e.intuit_tid);
-              //   handleResponse.handleError(res, e, ' Error in revoking token'+e);
-              // });
+              })
+              .catch(function(e) {
+                console.error("The error message is :"+e.originalMessage);
+                console.error(e.intuit_tid);
+                handleResponse.handleError(res, e, ' Error in revoking token'+e);
+              });
             }else{
               handleResponse.handleError(res, 'Error in fetching quickbook settings', 'Error in fetching quickbook settings');
             }
