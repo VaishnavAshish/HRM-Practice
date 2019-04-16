@@ -12,7 +12,7 @@ exports.initiateQuickbook = (req, res) => {
 
     // console.log('req.query');
     // console.log(req.query);
-    connectToQuickbook(client_id,client_secret,function(oauthClient){
+    connectToQuickbook(req.query.client_id,req.query.client_secret,function(oauthClient){
       var authUri = oauthClient.authorizeUri({scope:[OAuthClient.scopes.Accounting,OAuthClient.scopes.OpenId],state:'testState'});  // can be an array of multiple scopes ex : {scope:[OAuthClient.scopes.Accounting,OAuthClient.scopes.OpenId]}
       // console.log('authUri')
       // console.log(authUri)
