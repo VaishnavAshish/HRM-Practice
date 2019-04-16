@@ -3,7 +3,7 @@ const pool = require('./../config/dbconfig');
 const handleResponse = require('./page-error-handle');
 const moment = require('moment-timezone');
 const setting = require('./company-setting');
-// const OAuthClient = require('intuit-oauth');
+const OAuthClient = require('intuit-oauth');
 const {oauthClient,connectToQuickbook} = require('./../config/quickbook-config');
 
 // var oauthClient = null ;
