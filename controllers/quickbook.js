@@ -104,7 +104,7 @@ exports.disconnectQuickbook = (req,res) =>{
                 "x_refresh_token_expires_in":quickbook_token.token.x_refresh_token_expires_in,
                 "access_token":quickbook_token.token.access_token
               }
-              console.log(tokenJSON);
+              // console.log(tokenJSON);
 
               oauthClient = new OAuthClient({
                   clientId: quickbook_token.clientId,
@@ -153,7 +153,7 @@ exports.disconnectQuickbook = (req,res) =>{
                }else{
                  console.log('inside else')
                  console.log(oauthClient);
-                 oauthClient.revoke(tokenJSON)
+                 oauthClient.revoke({tokenJSON.refresh_token})
                  .then(function(authResponse) {
                    console.log('Tokens revoked : ' + JSON.stringify(authResponse.json()));
                    client.query('UPDATE SETTING set quickbook_token=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedSetting) {
