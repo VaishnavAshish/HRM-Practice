@@ -111,6 +111,7 @@ exports.disconnectQuickbook = (req,res) =>{
                   clientSecret: quickbook_token.clientSecret,
                   environment: quickbook_token.environment,
                   redirectUri: quickbook_token.redirectUri,
+                  logging:true,
                   token:quickbook_token.token
               });
               // var authToken = oauthClient.token.getToken();
