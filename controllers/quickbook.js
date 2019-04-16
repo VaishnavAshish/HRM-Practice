@@ -113,8 +113,9 @@ exports.disconnectQuickbook = (req,res) =>{
                   redirectUri: quickbook_token.redirectUri,
                   token:quickbook_token.token
               });
-              // var authToken = oauthClient.token.getToken();
-              // oauthClient.setToken(authToken);
+              var authToken = oauthClient.token.getToken();
+              console.log(authToken);
+              console.log(oauthClient.setToken(authToken));
 
               console.log(oauthClient);
               oauthClient.revoke(quickbook_token.token.refresh_token)
