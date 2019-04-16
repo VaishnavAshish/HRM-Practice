@@ -17,9 +17,9 @@ function disconnectFromQuickbook(modalId){
 					hideLoader('#globalLoader');
           closeModal(modalId);
 					showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
-					setTimeout(function(){
-						location.reload();
-					},5000)
+					// setTimeout(function(){
+					// 	location.reload();
+					// },5000)
 					console.log('error is : '+JSON.stringify(response));
 
 				}
