@@ -130,6 +130,7 @@ exports.disconnectQuickbook = (req,res) =>{
                        console.error(e.intuit_tid);
                    });
               }
+              console.log(oauthClient);
               oauthClient.revoke(quickbook_token.token.refresh_token)
               .then(function(authResponse) {
                 console.log('Tokens revoked : ' + JSON.stringify(authResponse.json()));
