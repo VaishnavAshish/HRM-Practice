@@ -118,6 +118,9 @@ exports.disconnectQuickbook = (req,res) =>{
               console.log(oauthClient.setToken(authToken));
 
               console.log(oauthClient);
+              if(oauthClient.isAccessTokenValid()) {
+                    console.log("The access_token is valid");
+                }
               oauthClient.revoke(quickbook_token.token.refresh_token)
               .then(function(authResponse) {
                 console.log('Tokens revoked : ' + JSON.stringify(authResponse.json()));
