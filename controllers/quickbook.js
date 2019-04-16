@@ -120,7 +120,7 @@ exports.disconnectQuickbook = (req,res) =>{
               // oauthClient.setToken(authToken);
 
               console.log(oauthClient);
-              if(!oauthClient.isAccessTokenValid()) {
+              if(oauthClient.isAccessTokenValid()) {
                 console.log('inside if');
                 oauthClient.refreshUsingToken(oauthClient.token.refresh_token)
                    .then(function(authResponse) {
