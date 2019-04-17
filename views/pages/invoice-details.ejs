@@ -59,7 +59,7 @@
                                 <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
                                     <div class="text-right sm-tpd-15">
                                       <div class="slds-button-group" role="group">
-                                               <button class="slds-button slds-button_neutral" onclick="openModal('#modalAddNewTsheetWeek')">
+                                               <button class="slds-button slds-button_neutral" onclick="openModal('#modalEmailInvoice')">
                                                    <i class=" fa fa-envelope" aria-hidden="true"></i>
                                                    Send Invoice
                                                </button>
@@ -84,7 +84,8 @@
                                                    </div>
                                                </div>
                                            </div>
-                                           <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteInvoice(\'<%= invoiceDetails.id %>\')')">
+
+                                           <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteInvoice(\'<%= invoiceDetails.id %>\')')" title="Delete">
                                              <span class="slds-button__icon">
                                                <i class=" fa fa-trash text-red" aria-hidden="true"></i>
                                              </span>
