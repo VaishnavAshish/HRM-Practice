@@ -28,6 +28,7 @@ const PgStore=require('connect-pg-simple')(session);
 const routes = require('./routes/web.js');
 const handlebars = require('express3-handlebars');
 const fileUpload = require('express-fileupload');
+const ngrok =  (process.env.NGROK_ENABLED==="true") ? require('ngrok'):null;
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
  */
@@ -147,7 +148,14 @@ function errorNotification(err, str, req) {
 app.listen(app.get('port'), () => {
   console.log('%s App is running at %s in %s mode', chalk.green('✓'),process.env.BASE_URL, app.get('env'));
   console.log('  Press CTRL-C to stop\n');
+  if(!ngrok){
+    redirectUri = `${server.address().port}` + '/callback';
+    console.log(`💳  See the Sample App in your browser : ` + 'http://localhost:' + `${server.address().port}`);
+    console.log(`💳  Copy this into Redirect URI on the browser : ` + 'http://localhost:' + `${server.address().port}` + '/callback');
+    console.log(`💻  Make Sure this redirect URI is also copied on your app in : https://developer.intuit.com`);
+}
 });
+
 
 
 process.on('uncaughtException', (err) => {

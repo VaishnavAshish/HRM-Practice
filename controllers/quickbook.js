@@ -4,6 +4,7 @@ const handleResponse = require('./page-error-handle');
 const moment = require('moment-timezone');
 const setting = require('./company-setting');
 const OAuthClient = require('intuit-oauth');
+
 var oauthClient = null ;
 
 exports.initiateQuickbook = (req, res) => {
@@ -32,6 +33,8 @@ exports.getAuthCode = (req,res) => {
   oauthClient.createToken(req.url)
        .then(function(authResponse) {
              oauth2_token_json = JSON.stringify(authResponse.getJson(), null,2);
+             console.log('oauth2_token_json');
+             console.log(oauth2_token_json);
              pool.connect((err, client, done) => {
                  client.query('UPDATE SETTING set quickbook_token=$1 where company_id=$2 RETURNING id',[oauthClient, req.user.company_id], function(err, updatedSetting) {
                    if (err){
