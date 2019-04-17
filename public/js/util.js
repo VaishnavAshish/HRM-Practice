@@ -40,6 +40,11 @@ function modifyInputEvent(ele){
   })
 }
 
+function exportToCsv(csvEndPoint){
+  console.log(`/${csvEndPoint}`);
+  window.location.href=`/${csvEndPoint}`;
+
+}
 function setDateToFlatpicker(inputId, date) {
     $(date).flatpickr({
         onReady: function (selectedDates, dateStr, instance) {
