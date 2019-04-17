@@ -52,7 +52,9 @@
                                             Submit
                                         </button>
                                         <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteExpense(\'<%= expense.id %>\')')" submitted>
-                                            Delete
+                                          <span class="slds-button__icon">
+                                            <i class=" fa fa-trash text-red" aria-hidden="true"></i>
+                                          </span>
                                         </button>
 
                                       <% } else { %>
@@ -60,7 +62,9 @@
                                             Submit
                                         </button>
                                         <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteExpense(\'<%= expense.id %>\')')" disabled submitted>
-                                            Delete
+                                          <span class="slds-button__icon">
+                                            <i class=" fa fa-trash text-red" aria-hidden="true"></i>
+                                          </span>
                                         </button>
                                       <% } %>
                                   <% } else { %>
@@ -75,7 +79,9 @@
                                           </button>
                                         <% } %>
                                         <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteExpense(\'<%= expense.id %>\')')" submitted>
-                                            Delete
+                                          <span class="slds-button__icon">
+                                            <i class=" fa fa-trash text-red" aria-hidden="true"></i>
+                                          </span>
                                         </button>
 
                                       <% } else { %>
@@ -83,7 +89,9 @@
                                             Submit
                                         </button>
                                         <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteExpense(\'<%= expense.id %>\')')" disabled submitted>
-                                            Delete
+                                          <span class="slds-button__icon">
+                                            <i class=" fa fa-trash text-red" aria-hidden="true"></i>
+                                          </span>
                                         </button>
                                       <% } %>
                                   <% } %>
