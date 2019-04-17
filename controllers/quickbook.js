@@ -5,7 +5,7 @@ const moment = require('moment-timezone');
 const setting = require('./company-setting');
 const OAuthClient = require('intuit-oauth');
 
-var oauthClient = null ;
+oauthClient = null ;
 
 exports.initiateQuickbook = (req, res) => {
     // console.log('req.query');
@@ -98,15 +98,15 @@ exports.disconnectQuickbook = (req,res) =>{
             // console.log(companySetting.rows[0]);
             if(companySetting.rows[0].quickbook_token!=null){
               let quickbook_token = JSON.parse(companySetting.rows[0].quickbook_token);
-              console.log('quickbook_token');
-              console.log(quickbook_token);
-              let tokenJSON = {
-                "token_type": quickbook_token.token.token_type,
-                "expires_in": quickbook_token.token.expires_in,
-                "refresh_token":quickbook_token.token.refresh_token,
-                "x_refresh_token_expires_in":quickbook_token.token.x_refresh_token_expires_in,
-                "access_token":quickbook_token.token.access_token
-              }
+              // console.log('quickbook_token');
+              // console.log(quickbook_token);
+              // let tokenJSON = {
+              //   "token_type": quickbook_token.token.token_type,
+              //   "expires_in": quickbook_token.token.expires_in,
+              //   "refresh_token":quickbook_token.token.refresh_token,
+              //   "x_refresh_token_expires_in":quickbook_token.token.x_refresh_token_expires_in,
+              //   "access_token":quickbook_token.token.access_token
+              // }
               // console.log(tokenJSON);
 
               oauthClient = new OAuthClient({
@@ -117,66 +117,37 @@ exports.disconnectQuickbook = (req,res) =>{
                   logging:true,
                   token:quickbook_token.token
               });
-              // var authToken = oauthClient.token.getToken();
-              // console.log('authToken');
-              // console.log(authToken);
 
-              // oauthClient.setToken(authToken);
-
-              console.log(oauthClient);
-              if(!oauthClient.isAccessTokenValid()) {
-                console.log('inside if');
-                oauthClient.refreshUsingToken(oauthClient.token.refresh_token)
-                   .then(function(authResponse) {
-                       console.log('Tokens refreshed : ' + JSON.stringify(authResponse.json()));
-                       console.log(oauthClient);
-                       oauthClient.revoke({token:oauthClient.token.refresh_token})
-                       .then(function(authResponse) {
-                         console.log('Tokens revoked : ' + JSON.stringify(authResponse.json()));
-                         client.query('UPDATE SETTING set quickbook_token=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedSetting) {
-                           if (err){
-                             handleResponse.shouldAbort(err, client, done);
-                             handleResponse.handleError(res, err, ' Error in updating settings');
-                           } else {
-                             done();
-                             handleResponse.sendSuccess(res,'settings updated successfully',{});
-                           }
-                         });
-                       })
-                       .catch(function(e) {
-                         console.error("The error message is :"+e.originalMessage);
-                         console.error(e.intuit_tid);
-                         handleResponse.handleError(res, e, ' Error in revoking token'+e);
-                       });
-                   })
-                   .catch(function(e) {
-                       console.error("The error message is :"+e.originalMessage);
-                       console.error(e.intuit_tid);
-                       handleResponse.handleError(res, e, ' Error in refreshing token'+e);
-                   });
-               }else{
-                 console.log('inside else')
-                 console.log(oauthClient);
-                 oauthClient.revoke({token:oauthClient.token.refresh_token})
+              oauthClient.refresh()
                  .then(function(authResponse) {
-                   console.log('Tokens revoked : ' + JSON.stringify(authResponse.json()));
-                   client.query('UPDATE SETTING set quickbook_token=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedSetting) {
-                     if (err){
-                       handleResponse.shouldAbort(err, client, done);
-                       handleResponse.handleError(res, err, ' Error in updating settings');
-                     } else {
-                       done();
-                       handleResponse.sendSuccess(res,'settings updated successfully',{});
-                     }
-                   });
+                     console.log('Tokens refreshed : ' + JSON.stringify(authResponse));
+                     quickbook_token.token =authResponse.token;
+                    //  console.log(oauthClient);
+                     oauthClient.revoke({token:quickbook_token.token.refresh_token})
+                     .then(function(authResponse) {
+                       console.log('Tokens revoked : ' + JSON.stringify(authResponse));
+                       client.query('UPDATE SETTING set quickbook_token=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedSetting) {
+                         if (err){
+                           handleResponse.shouldAbort(err, client, done);
+                           handleResponse.handleError(res, err, ' Error in updating settings');
+                         } else {
+                           done();
+                           handleResponse.sendSuccess(res,'settings updated successfully',{});
+                         }
+                       });
+                     })
+                     .catch(function(e) {
+                       console.error("The error message for revoking token is :"+e.originalMessage);
+                       console.error(e.intuit_tid);
+                       handleResponse.handleError(res, e, ' Error in revoking token'+e);
+                     });
                  })
                  .catch(function(e) {
-                   console.error("The error message is :"+e.originalMessage);
-                   console.error(e.intuit_tid);
-                   handleResponse.handleError(res, e, ' Error in revoking token'+e);
+                     console.error("The error message for refreshing token  is :"+e.originalMessage);
+                     console.error(e.intuit_tid);
+                     handleResponse.handleError(res, e, ' Error in refreshing token'+e);
                  });
 
-               }
             }else{
               handleResponse.handleError(res, 'Error in fetching quickbook settings', 'Error in fetching quickbook settings');
             }

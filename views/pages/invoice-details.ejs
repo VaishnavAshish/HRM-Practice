@@ -71,23 +71,53 @@
 
                                 <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
                                     <div class="text-right sm-tpd-15">
-
+                                      <div class="slds-button-group" role="group">
+                                               <button class="slds-button slds-button_neutral" onclick="openModal('#modalAddNewTsheetWeek')">
+                                                   <i class=" fa fa-envelope" aria-hidden="true"></i>
+                                                   Send Invoice
+                                               </button>
+                                               <div class="slds-dropdown-trigger slds-dropdown-trigger_click slds-button_last" onclick="openDropdown(this, event, true)">
+                                                   <button class="slds-button slds-button_icon slds-button_icon-border-filled" title="Show More">
+                                                       <i class="fa fa-caret-down"></i>
+                                                   </button>
+                                                   <div class="slds-dropdown slds-dropdown_right slds-dropdown_actions" style="">
+                                                       <ul class="slds-dropdown__list">
+                                                           <li class="slds-dropdown__item">
+                                                               <a href="/invoice-html-view" tabindex="0"  onclick="window.location.href='/invoice-html-view/<%= invoiceDetails.id %>'">
+                                                                   <span class="slds-truncate">Invoice Web View</span>
+                                                               </a>
+                                                           </li>
+                                                           <li class="slds-dropdown__item">
+                                                               <a href="javascript:void(0);" tabindex="0" onclick="exportToCsv('generateInvoiceDetailCsv/<%= invoiceDetails.id %>')">
+                                                                    <i class="fa fa-file-export"></i>
+                                                                   <span class="slds-truncate">Export Invoice Detail</span>
+                                                               </a>
+                                                           </li>
+                                                       </ul>
+                                                   </div>
+                                               </div>
+                                           </div>
+                                           <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteInvoice(\'<%= invoiceDetails.id %>\')')">
+                                             <span class="slds-button__icon">
+                                               <i class=" fa fa-trash text-red" aria-hidden="true"></i>
+                                             </span>
+                                           </button>
                                         <!-- <button class="slds-button slds-button_brand slds-align-top" onclick="updateInvoiceDetails('<%= invoiceDetails.id %>', '#invoice-details-form')">
                                             Save Invoice
                                         </button> -->
 
-                                          <button class="slds-button slds-button_neutral" onclick="window.location.href='/generateInvoiceDetailCsv/<%= invoiceDetails.id %>'">
-                                              Export Invoice Detail
-                                          </button>
+                                          <!-- <button class="slds-button slds-button_neutral" onclick="exportToCsv('generateInvoiceDetailCsv/<%= invoiceDetails.id %>')">
+                                            <i class="fa fa-file-export"></i>
+                                            <span class="sm-hide">Export Invoice Detail</span>
+                                          </button> -->
 
-                                            <button class="slds-button slds-button_neutral" onclick="window.location.href='/invoice-html-view/<%= invoiceDetails.id %>'">
-                                                <!-- <i class=" fa fa-envelope" aria-hidden="true"></i> -->
+                                            <!-- <button class="slds-button slds-button_neutral" onclick="window.location.href='/invoice-html-view/<%= invoiceDetails.id %>'">
                                                 Invoice Web View
 
                                             </button>
                                             <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteInvoice(\'<%= invoiceDetails.id %>\')')">
                                                 Delete
-                                            </button>
+                                            </button> -->
                                         </div>
 
                                     </div>
