@@ -9,20 +9,7 @@
             pointer-events:none;
             opacity:0.6;
         }
-       .kw .invoice-row .invoice-col:nth-child(1){
-           width: 15%;
-       }
-       .kw .invoice-row .invoice-col:nth-child(2),
-       .kw .invoice-row .invoice-col:nth-child(3),
-       .kw .invoice-row .invoice-col:nth-child(5) {
-           width: 22%;
-       }
-       .kw .invoice-row .invoice-col:nth-child(4){
-           width: 12%;
-       }
-       .kw .invoice-row .invoice-col:nth-child(6) {
-           width: 7%;
-       }
+       
 
     </style>
 </head>
@@ -573,20 +560,18 @@
                                                                 <%= item.total_amount %>
                                                             </div>
                                                         </div>
-                                                        <div class="slds-no-flex slds-p-horizontal_small invoice-col" style="width:2%;">
+                                                        <div class="slds-no-flex slds-p-horizontal_small invoice-col" >
                                                             <div class="text-center tpd-5">
                                                                 <button class="slds-button slds-button_icon" title="Save" onclick="saveInvoiceItem('<%= item.id %>',this)" disabled save-line-item>
                                                                     <i class="fa fa-save text-blue"></i>
                                                                 </button>
-                                                            </div>
-                                                        </div>
-                                                        <div class="slds-no-flex slds-p-horizontal_small invoice-col" style="width:2%;">
-                                                            <div class="text-center tpd-5">
-                                                                <button class="slds-button slds-button_icon" title="Remove" onclick="deleteBeforeConfirm('#globalAlert', 'deleteInvoiceItem(this,\'<%= item.id %>\', \'<%= item.timesheet_id %>\', \'<%= item.expense_id %>\', \'<%= item.type %>\')')">
+                                                                <span>&nbsp;&nbsp;</span>
+                                                                <button class="slds-button slds-button_icon " title="Remove" onclick="deleteBeforeConfirm('#globalAlert', 'deleteInvoiceItem(this,\'<%= item.id %>\', \'<%= item.timesheet_id %>\', \'<%= item.expense_id %>\', \'<%= item.type %>\')')">
                                                                     <i class="fa fa-times text-red"></i>
                                                                 </button>
                                                             </div>
                                                         </div>
+                                                       
                                                     </div>
                                                     <div class="hide sm-show">
                                                         <div class="slds-grid slds-grid_pull-padded slds-p-bottom_small">
@@ -621,14 +606,14 @@
 
 
                                         </ul>
-                                        <div class="slds-col--bump-left slds-p-around_xx-small">
-                                          <div class="">
-                                              <button class="slds-button slds-button_neutral slds-align-top" onclick="openModal('#modalAddNewInvItem', true)">
-                                                <i class="fa fa-plus"></i>
-                                                <span class="sm-hide">Add Row</span>
-                                              </button>
-                                          </div>
-                                        </div>
+                                        
+                                      <div class="slds-p-bottom_x-small">
+                                          <button class="slds-button slds-button_neutral slds-align-top" onclick="openModal('#modalAddNewInvItem', true)">
+                                            <i class="fa fa-plus"></i>
+                                            <span class="sm-hide">Add Row</span>
+                                          </button>
+                                      </div>
+                                        
                                         <div class="slds-p-top_small line-top">
                                             <div class="slds-grid slds-wrap slds-grid_pull-padded">
                                                 <div class="slds-size_1-of-1 slds-medium-size_1-of-2 slds-p-horizontal_small">
