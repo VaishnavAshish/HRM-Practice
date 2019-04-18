@@ -145,7 +145,7 @@ function errorNotification(err, str, req) {
 /**
  * Start Express server.
  */
-app.listen(app.get('port'), () => {
+const server = app.listen(app.get('port'), () => {
   console.log('%s App is running at %s in %s mode', chalk.green('✓'),process.env.BASE_URL, app.get('env'));
   console.log('  Press CTRL-C to stop\n');
   if(!ngrok){
@@ -153,7 +153,7 @@ app.listen(app.get('port'), () => {
     console.log(`💳  See the Sample App in your browser : ` + 'http://localhost:' + `${server.address().port}`);
     console.log(`💳  Copy this into Redirect URI on the browser : ` + 'http://localhost:' + `${server.address().port}` + '/callback');
     console.log(`💻  Make Sure this redirect URI is also copied on your app in : https://developer.intuit.com`);
-}
+  } 
 });
 
 

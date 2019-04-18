@@ -1,581 +1,632 @@
 <script>
-
-    var invoice_account_id=null,project_list={};
-    var invoice_item_id=null;
-    let currentdate;
-    $(document).ready(function(){
-        companyDefaultTimezone = "<%= companyDefaultTimezone %>";
-        currentdate = "<%= currentdate %>"
-        var invoiceDetails=<%- JSON.stringify(invoiceDetails) %>;
-        invoice_account_id=<%= invoiceDetails.account_id ;%>;
-        invoice_item_id=<%= invoiceDetails.id ;%>;
-        $("#invoice_note").val('<%= invoiceDetails.description %>');
-        $("#currency").val('<%= invoiceDetails.currency %>');
-        var invoiceItems = <%- JSON.stringify(invoiceItems) %>;
-        var tax = parseInt('<%= invoiceDetails.tax%>');
-        let total_amount=parseFloat(<%= invoiceDetails.total_amount%>);
-        $("#invoice_amount").text(parseFloat(<%= invoiceDetails.total_amount%>));
-        let inv_tax = (total_amount * tax) / 100;
-        $("#invoice-tax").text(inv_tax.toFixed(2));
-        $("#invoice_total_amount").text((parseFloat(total_amount) + parseFloat(inv_tax)).toFixed(2));
-        invoiceItems.forEach(function (item) {
-                let invoiceLi=$("#invoiceLineItem #"+item.id);
-                $("#invoiceLineItem #"+item.id+' #type').val(item.type);
-                $("#invoiceLineItem #"+item.id+' #invoice-project').val(item.project_id);
-/*                $("#invoiceLineItem #"+item.id+' #account').val(item.account_id);
-                getAccountProject($("#invoiceLineItem #"+item.id+' #account'),item.id);
-                getProjectExpense($("#invoiceLineItem #"+item.id+' #project'),item.id);
-                $("#invoiceLineItem #"+item.id+' #expense').val(item.expense_id);*/
-        });
+  var invoice_account_id = null,
+  project_list = {};
+  var invoice_item_id = null;
+  let currentdate;
+  $(document).ready(function() {
+    companyDefaultTimezone = "<%= companyDefaultTimezone %>";
+    currentdate = "<%= currentdate %>"
+    var invoiceDetails = <%- JSON.stringify(invoiceDetails) %>;
+    invoice_account_id = <%= invoiceDetails.account_id ;%>;
+    invoice_item_id = <%= invoiceDetails.id ;%>;
+    $("#invoice_note").val('<%= invoiceDetails.description %>');
+    $("#currency").val('<%= invoiceDetails.currency %>');
+    var invoiceItems = <%- JSON.stringify(invoiceItems) %>;
+    var tax = parseInt('<%= invoiceDetails.tax%>');
+    let total_amount = parseFloat(<%= invoiceDetails.total_amount%>);
+    $("#invoice_amount").text(parseFloat(<%= invoiceDetails.total_amount%>));
+    let inv_tax = (total_amount * tax) / 100;
+    $("#invoice-tax").text(inv_tax.toFixed(2));
+    $("#invoice_total_amount").text((parseFloat(total_amount) + parseFloat(inv_tax)).toFixed(2));
+    invoiceItems.forEach(function(item) {
+      let invoiceLi = $("#invoiceLineItem #" + item.id);
+      $("#invoiceLineItem #" + item.id + ' #type').val(item.type);
+      $("#invoiceLineItem #" + item.id + ' #invoice-project').val(item.project_id);
+      /*                $("#invoiceLineItem #"+item.id+' #account').val(item.account_id);
+                      getAccountProject($("#invoiceLineItem #"+item.id+' #account'),item.id);
+                      getProjectExpense($("#invoiceLineItem #"+item.id+' #project'),item.id);
+                      $("#invoiceLineItem #"+item.id+' #expense').val(item.expense_id);*/
     });
+  });
 
-    function calculateTax(ele) {
-        var tax_per = $(ele).val();
-        if(tax_per > 100) {
-            tax_per = 100;
-        }
-        console.log(tax_per)
-        var tax_amount = ((parseFloat($('#invoice_amount').text()) * tax_per) / 100).toFixed(2);
-        console.log(tax_amount);
-        var total_amount = parseFloat(tax_amount) + parseFloat($('#invoice_amount').text());
-        console.log(total_amount);
-        $("#invoice-tax").text(tax_amount);
-        $("#invoice_total_amount").text(total_amount);
+  function calculateTax(ele) {
+    var tax_per = $(ele).val();
+    if (tax_per > 100) {
+      tax_per = 100;
     }
+    console.log(tax_per)
+    var tax_amount = ((parseFloat($('#invoice_amount').text()) * tax_per) / 100).toFixed(2);
+    console.log(tax_amount);
+    var total_amount = parseFloat(tax_amount) + parseFloat($('#invoice_amount').text());
+    console.log(total_amount);
+    $("#invoice-tax").text(tax_amount);
+    $("#invoice_total_amount").text(total_amount);
+  }
 
-    function isDateRangeDisabled(ele) {
-        if($(ele).attr('for') == "all") {
-            $(ele).closest('div[modal-body]').find('input.open-date-pik').attr('disabled', 'disabled');
-        } else {
-            $(ele).closest('div[modal-body]').find('input.open-date-pik').removeAttr('disabled');
-        }
+  function isDateRangeDisabled(ele) {
+    if ($(ele).attr('for') == "all") {
+      $(ele).closest('div[modal-body]').find('input.open-date-pik').attr('disabled', 'disabled');
+    } else {
+      $(ele).closest('div[modal-body]').find('input.open-date-pik').removeAttr('disabled');
     }
+  }
 
-     /*function clearError(id, errMsgId) {
+  /*function clearError(id, errMsgId) {
         $(id).closest('.slds-form-element').removeClass('slds-has-error');
             $(errMsgId).html('');
     }*/
-    /*function getProjects(invoice_account_id) {
+  /*function getProjects(invoice_account_id) {
+          $.ajax({
+              type: 'POST',
+              url : '/getProjectList',
+              contentType: 'application/json',
+              dataType: 'json',
+              data : JSON.stringify({"accountId":invoice_account_id}),
+              success : function(response){
+                  if(response.success == true) {
+                      let option = '';
+                      if(response.projects.length > 0) {
+                          project_list=response.projects;
+
+                      } else {
+                          project_list={};
+                      }
+
+                  } else {
+
+                      showGlobalToast('#globalToast', 'error', 'Something went wrong.', 4000);
+                  }
+              },
+              error: function(response){
+                      console.log(response);
+
+                      showGlobalToast('#globalToast', 'error', 'Error in fetch project list.', 4000);
+              }
+          });
+
+  }*/
+  function addInvoiceItem(next) {
+
+    let invoiceItemArray = [];
+    let liList = $('#invoiceLineItem li[data-editable=true]');
+    if (liList.length > 0) {
+      $.each(liList, function(index, li) {
+        let project_id = $(li).find('#invoice-project option:selected').val();
+        console.log(project_id);
+        if (project_id == null || project_id == undefined || project_id == "") {
+          hideLoader('#globalLoader');
+          addError($(li).find('#invoice-project'), "Please select a project");
+          next(false, null);
+        } else {
+          clearError($(li).find('#invoice-project'));
+          showLoader('#globalLoader');
+          let invoiceItemData = {};
+          invoiceItemData.id = $(li).attr('id');
+          invoiceItemData.project_id = project_id;
+          invoiceItemData.account_id = invoice_account_id;
+          invoiceItemData.type = $(li).find("#type option:selected").val();
+          invoiceItemData.invoice_id = invoice_item_id;
+          invoiceItemData.item_date = ($(li).find("#item_date").val() == "") ? moment.tz(currentdate, companyDefaultTimezone).format('YYYY-MM-DD') : moment.tz($(li).find("#item_date").val(), companyDefaultTimezone).format('YYYY-MM-DD');
+          invoiceItemData.total_amount = ($(li).find('#amount').val() == "") ? 0 : $(li).find('#amount').val();
+          invoiceItemData.note = $(li).find('#note').val();
+          console.log(invoiceItemData);
+          invoiceItemArray.push(invoiceItemData);
+          if (liList.length === invoiceItemArray.length) {
             $.ajax({
-                type: 'POST',
-                url : '/getProjectList',
-                contentType: 'application/json',
-                dataType: 'json',
-                data : JSON.stringify({"accountId":invoice_account_id}),
-                success : function(response){
-                    if(response.success == true) {
-                        let option = '';
-                        if(response.projects.length > 0) {
-                            project_list=response.projects;
-
-                        } else {
-                            project_list={};
-                        }
-
-                    } else {
-
-                        showGlobalToast('#globalToast', 'error', 'Something went wrong.', 4000);
-                    }
-                },
-                error: function(response){
-                        console.log(response);
-
-                        showGlobalToast('#globalToast', 'error', 'Error in fetch project list.', 4000);
-                }
-            });
-
-    }*/
-    function addInvoiceItem(next){
-
-        let invoiceItemArray=[];
-        let liList=$('#invoiceLineItem li[data-editable=true]');
-        if(liList.length>0){
-            $.each(liList,function(index, li) {
-                let project_id=$(li).find('#invoice-project option:selected').val();
-                console.log(project_id);
-                if(project_id==null||project_id==undefined||project_id==""){
-                    hideLoader('#globalLoader');
-                    addError($(li).find('#invoice-project'),"Please select a project");
-                    next(false,null);
-                }else{
-                    clearError($(li).find('#invoice-project'));
-                    showLoader('#globalLoader');
-                    let invoiceItemData = {};
-                    invoiceItemData.id=$(li).attr('id');
-                    invoiceItemData.project_id=project_id;
-                    invoiceItemData.account_id = invoice_account_id;
-                    invoiceItemData.type = $(li).find("#type option:selected").val();
-                    invoiceItemData.invoice_id = invoice_item_id;
-                    invoiceItemData.item_date =($(li).find("#item_date").val()=="")?moment.tz(currentdate, companyDefaultTimezone).format('YYYY-MM-DD'):moment.tz($(li).find("#item_date").val(), companyDefaultTimezone).format('YYYY-MM-DD');
-                    invoiceItemData.total_amount = ($(li).find('#amount').val()=="")?0:$(li).find('#amount').val();
-                    invoiceItemData.note=$(li).find('#note').val();
-                    console.log(invoiceItemData);
-                    invoiceItemArray.push(invoiceItemData);
-                    if(liList.length===invoiceItemArray.length){
-                        $.ajax({
-                                type: 'POST',
-                                url : '/addInvoiceItem',
-                                contentType: 'application/json',
-                                dataType: 'json',
-                                data:JSON.stringify({"invoiceItemArray":invoiceItemArray}),
-                                success : function(response){
-                                    if(response.success == true) {
-                                        console.log(response);
-                                        hideLoader('#globalLoader');
-                                        /*location.reload();*/
-                                        next(null,true);
-                                    } else {
-                                        hideLoader('#globalLoader');
-                                        showGlobalToast('#globalToast', 'error', response.message, 4000);
-                                        next(false,null);
-                                    }
-
-                                },
-                                error: function(response){
-                                    console.log(response);
-                                    hideLoader('#globalLoader');
-                                    showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
-                                    next(false,null);
-                                }
-                            });
-
-                    }
-                }
-            });
-        }else{
-            next(null,true);
-        }
-
-    }
-
-    function enableSaveButton(ele){
-      let description = $(ele).closest('li').find('button[save-line-item]').removeAttr('disabled');
-    }
-
-    function saveInvoiceItem(invoiceItemId,ele){
-        let description = $(ele).closest('li').find('textarea').val();
-        $.ajax({
-            type: 'POST',
-            url : '/updateInvoiceItemData',
-            contentType: 'application/json',
-            dataType: 'json',
-            data:JSON.stringify({invoiceItemId:invoiceItemId,description:description}),
-            success : function(response){
-                if(response.success == true) {
-                    console.log(response);
-                    location.reload();
-
+              type: 'POST',
+              url: '/addInvoiceItem',
+              contentType: 'application/json',
+              dataType: 'json',
+              data: JSON.stringify({
+                "invoiceItemArray": invoiceItemArray
+              }),
+              success: function(response) {
+                if (response.success == true) {
+                  console.log(response);
+                  hideLoader('#globalLoader');
+                  /*location.reload();*/
+                  next(null, true);
                 } else {
-                    hideLoader('#globalLoader');
-                    showGlobalToast('#globalToast', 'error', "Error in saving invoice item.", 4000);
+                  hideLoader('#globalLoader');
+                  showGlobalToast('#globalToast', 'error', response.message, 4000);
+                  next(false, null);
                 }
 
-            },
-            error: function(response){
+              },
+              error: function(response) {
                 console.log(response);
                 hideLoader('#globalLoader');
-                showGlobalToast('#globalToast', 'error', response.responseText, 4000);
+                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+                next(false, null);
+              }
+            });
 
-            }
-        });
+          }
+        }
+      });
+    } else {
+      next(null, true);
     }
 
-/*    function saveInvoiceItem(obj,invoiceItemId){
-        let url = new URL(window.location.href);
-        invoiceId = url.searchParams.get("invoiceId");
-        console.log('save invoice item '+invoiceItemId+' invoice id is '+invoiceId);
-        var itemLi=$(obj).closest("li")[0];
+  }
 
+  function enableSaveButton(ele) {
+    let description = $(ele).closest('li').find('button[save-line-item]').removeAttr('disabled');
+  }
 
-        if(invoiceItemId==undefined){
-
-            showLoader('#globalLoader');
-
-            let invoiceItemData = {};
-            invoiceItemData.type = $(itemLi).find("#type option:selected").val();
-            invoiceItemData.invoiceId=invoiceId;
-            invoiceItemData.item_date = new Date($(itemLi).find("#item_date").val());
-            invoiceItemData.hours = ($(itemLi).find("#hours").val()=="")?0:$(itemLi).find("#hours").val();
-            invoiceItemData.bill_rate = ($(itemLi).find('#bill_rate').val()=="")?0:$(itemLi).find('#bill_rate').val();
-            invoiceItemData.tax = ($(itemLi).find('#tax_rate').val()=="")?0:$(itemLi).find('#tax_rate').val();
-            invoiceItemData.note = $(itemLi).find('#note').val();
-            invoiceItemData.expense_id = invoice_expense_id;
-            invoiceItemData.account_id = invoice_account_id;
-            invoiceItemData.project_id = invoice_project_id;
-            invoiceItemData.amount = parseInt(invoiceItemData.hours)*parseInt(invoiceItemData.bill_rate);
-            invoiceItemData.total_amount = parseInt(invoiceItemData.amount)+parseInt(invoiceItemData.tax);
-            console.log(invoiceItemData);
-            $.ajax({
-                type: 'POST',
-                url : '/addInvoiceItem',
-                contentType: 'application/json',
-                dataType: 'json',
-                data:JSON.stringify(invoiceItemData),
-                success : function(response){
-                    if(response.success == true) {
-                        console.log(response);
-                        location.reload();
-
-                    } else {
-                        hideLoader('#globalLoader');
-
-                        showGlobalToast('#globalToast', 'error', "Error in add invoice line item.", 4000);
-                    }
-
-                },
-                error: function(response){
-                    console.log(response);
-                    hideLoader('#globalLoader');
-                    showGlobalToast('#globalToast', 'error', response.responseText, 4000);
-
-                }
-            });
+  function saveInvoiceItem(invoiceItemId, ele) {
+    let description = $(ele).closest('li').find('textarea').val();
+    $.ajax({
+      type: 'POST',
+      url: '/updateInvoiceItemData',
+      contentType: 'application/json',
+      dataType: 'json',
+      data: JSON.stringify({
+        invoiceItemId: invoiceItemId,
+        description: description
+      }),
+      success: function(response) {
+        if (response.success == true) {
+          console.log(response);
+          location.reload();
 
         } else {
-
-            showLoader('#globalLoader');
-            let invoiceItemData = {};
-            invoiceItemData.invoice_item_id=invoiceItemId;
-            invoiceItemData.type = $("#"+invoiceItemId+" #type option:selected").val();
-            invoiceItemData.item_date = new Date($("#"+invoiceItemId+" #item_date").val());
-            invoiceItemData.hours = ($("#"+invoiceItemId+" #hours").val()=="")?0:$("#"+invoiceItemId+" #hours").val();
-            invoiceItemData.bill_rate = ($("#"+invoiceItemId+' #bill_rate').val()=="")?0:$("#"+invoiceItemId+' #bill_rate').val();
-            invoiceItemData.tax = ($("#"+invoiceItemId+' #tax_rate').val()=="")?0:$("#"+invoiceItemId+' #tax_rate').val();
-            invoiceItemData.note = $("#"+invoiceItemId+' #note').val();
-            invoiceItemData.expense_id = invoice_expense_id;
-            invoiceItemData.account_id = invoice_project_id;
-            invoiceItemData.project_id = invoice_account_id;
-            invoiceItemData.amount = parseInt(invoiceItemData.hours)*parseInt(invoiceItemData.bill_rate);
-            invoiceItemData.total_amount = parseInt(invoiceItemData.amount)+parseInt(invoiceItemData.tax);
-            console.log(invoiceItemData);
-            $.ajax({
-                type: 'POST',
-                url : '/editInvoiceItem',
-                contentType: 'application/json',
-                dataType: 'json',
-                data:JSON.stringify(invoiceItemData),
-                success : function(response){
-                    if(response.success == true) {
-                        console.log(response);
-                        location.reload();
-
-                    } else {
-                        hideLoader('#globalLoader');
-                        showGlobalToast('#globalToast', 'error', "Error in edit invoice item.", 4000);
-                    }
-
-                },
-                error: function(response){
-                    console.log(response);
-                    hideLoader('#globalLoader');
-                    showGlobalToast('#globalToast', 'error', response.responseText, 4000);
-
-                }
-            });
-
+          hideLoader('#globalLoader');
+          showGlobalToast('#globalToast', 'error', "Error in saving invoice item.", 4000);
         }
+
+      },
+      error: function(response) {
+        console.log(response);
+        hideLoader('#globalLoader');
+        showGlobalToast('#globalToast', 'error', response.responseText, 4000);
+
+      }
+    });
+  }
+
+  /*    function saveInvoiceItem(obj,invoiceItemId){
+          let url = new URL(window.location.href);
+          invoiceId = url.searchParams.get("invoiceId");
+          console.log('save invoice item '+invoiceItemId+' invoice id is '+invoiceId);
+          var itemLi=$(obj).closest("li")[0];
+
+
+          if(invoiceItemId==undefined){
+
+              showLoader('#globalLoader');
+
+              let invoiceItemData = {};
+              invoiceItemData.type = $(itemLi).find("#type option:selected").val();
+              invoiceItemData.invoiceId=invoiceId;
+              invoiceItemData.item_date = new Date($(itemLi).find("#item_date").val());
+              invoiceItemData.hours = ($(itemLi).find("#hours").val()=="")?0:$(itemLi).find("#hours").val();
+              invoiceItemData.bill_rate = ($(itemLi).find('#bill_rate').val()=="")?0:$(itemLi).find('#bill_rate').val();
+              invoiceItemData.tax = ($(itemLi).find('#tax_rate').val()=="")?0:$(itemLi).find('#tax_rate').val();
+              invoiceItemData.note = $(itemLi).find('#note').val();
+              invoiceItemData.expense_id = invoice_expense_id;
+              invoiceItemData.account_id = invoice_account_id;
+              invoiceItemData.project_id = invoice_project_id;
+              invoiceItemData.amount = parseInt(invoiceItemData.hours)*parseInt(invoiceItemData.bill_rate);
+              invoiceItemData.total_amount = parseInt(invoiceItemData.amount)+parseInt(invoiceItemData.tax);
+              console.log(invoiceItemData);
+              $.ajax({
+                  type: 'POST',
+                  url : '/addInvoiceItem',
+                  contentType: 'application/json',
+                  dataType: 'json',
+                  data:JSON.stringify(invoiceItemData),
+                  success : function(response){
+                      if(response.success == true) {
+                          console.log(response);
+                          location.reload();
+
+                      } else {
+                          hideLoader('#globalLoader');
+
+                          showGlobalToast('#globalToast', 'error', "Error in add invoice line item.", 4000);
+                      }
+
+                  },
+                  error: function(response){
+                      console.log(response);
+                      hideLoader('#globalLoader');
+                      showGlobalToast('#globalToast', 'error', response.responseText, 4000);
+
+                  }
+              });
+
+          } else {
+
+              showLoader('#globalLoader');
+              let invoiceItemData = {};
+              invoiceItemData.invoice_item_id=invoiceItemId;
+              invoiceItemData.type = $("#"+invoiceItemId+" #type option:selected").val();
+              invoiceItemData.item_date = new Date($("#"+invoiceItemId+" #item_date").val());
+              invoiceItemData.hours = ($("#"+invoiceItemId+" #hours").val()=="")?0:$("#"+invoiceItemId+" #hours").val();
+              invoiceItemData.bill_rate = ($("#"+invoiceItemId+' #bill_rate').val()=="")?0:$("#"+invoiceItemId+' #bill_rate').val();
+              invoiceItemData.tax = ($("#"+invoiceItemId+' #tax_rate').val()=="")?0:$("#"+invoiceItemId+' #tax_rate').val();
+              invoiceItemData.note = $("#"+invoiceItemId+' #note').val();
+              invoiceItemData.expense_id = invoice_expense_id;
+              invoiceItemData.account_id = invoice_project_id;
+              invoiceItemData.project_id = invoice_account_id;
+              invoiceItemData.amount = parseInt(invoiceItemData.hours)*parseInt(invoiceItemData.bill_rate);
+              invoiceItemData.total_amount = parseInt(invoiceItemData.amount)+parseInt(invoiceItemData.tax);
+              console.log(invoiceItemData);
+              $.ajax({
+                  type: 'POST',
+                  url : '/editInvoiceItem',
+                  contentType: 'application/json',
+                  dataType: 'json',
+                  data:JSON.stringify(invoiceItemData),
+                  success : function(response){
+                      if(response.success == true) {
+                          console.log(response);
+                          location.reload();
+
+                      } else {
+                          hideLoader('#globalLoader');
+                          showGlobalToast('#globalToast', 'error', "Error in edit invoice item.", 4000);
+                      }
+
+                  },
+                  error: function(response){
+                      console.log(response);
+                      hideLoader('#globalLoader');
+                      showGlobalToast('#globalToast', 'error', response.responseText, 4000);
+
+                  }
+              });
+
+          }
+      }
+  */
+  function deleteInvoiceItem(obj, invoiceItemId, timesheetId, expenseId, type) {
+    console.log('invoiceItemId id is ' + invoiceItemId);
+    if (invoiceItemId == undefined) {
+      console.log(obj + ' ' + $(obj).closest("li"))
+      var a = $(obj).closest("li").remove();
+      return;
     }
-*/
-    function deleteInvoiceItem(obj,invoiceItemId, timesheetId, expenseId, type){
-        console.log('invoiceItemId id is '+invoiceItemId);
-        if(invoiceItemId==undefined){
-            console.log(obj+' '+$(obj).closest("li"))
-            var a=$(obj).closest("li").remove();
-            return;
-        }
-        var deleteRecord = "lineItem";
-        // if(type == "Expense") {
-        //     deleteRecord = "EXPENSE";
-        // } else if (type == "Timesheet") {
-        //     deleteRecord = "TIMESHEET";
-        // }
-        if(expenseId){
-          deleteRecord = "EXPENSE";
-        }else if(timesheetId){
-          deleteRecord = "TIMESHEET";
-        }else{
-          deleteRecord = "OTHERS";
-        }
-        console.log(JSON.stringify({"invoiceItemId":invoiceItemId, "timesheetId":timesheetId, "expenseId":expenseId, "deleteRecord":deleteRecord}));
+    var deleteRecord = "lineItem";
+    // if(type == "Expense") {
+    //     deleteRecord = "EXPENSE";
+    // } else if (type == "Timesheet") {
+    //     deleteRecord = "TIMESHEET";
+    // }
+    if (expenseId) {
+      deleteRecord = "EXPENSE";
+    } else if (timesheetId) {
+      deleteRecord = "TIMESHEET";
+    } else {
+      deleteRecord = "OTHERS";
+    }
+    console.log(JSON.stringify({
+      "invoiceItemId": invoiceItemId,
+      "timesheetId": timesheetId,
+      "expenseId": expenseId,
+      "deleteRecord": deleteRecord
+    }));
+    showLoader('#globalLoader');
+    $.ajax({
+      type: 'POST',
+      url: '/deleteInvoiceItem',
+      contentType: 'application/json',
+      dataType: 'json',
+      data: JSON.stringify({
+        "invoiceItemId": invoiceItemId,
+        "timesheetId": timesheetId,
+        "expenseId": expenseId,
+        "deleteRecord": deleteRecord
+      }),
+      success: function(response) {
+        console.log(response);
+        /*window.location.href = document.referrer;*/
+        location.reload();
+        hideLoader('#globalLoader');
+
+      },
+      error: function(response) {
+        hideLoader('#globalLoader');
+        console.log(response.responseJSON.message);
+        showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+      }
+    });
+  }
+
+  function addExpInvoiceItem(modalId) {
+    clearError("#invoice-expense-project");
+    clearError("#exp_start_date");
+    clearError("#exp_end_date");
+    let project = $("#invoice-expense-project").val();
+    if (project == "" || project == null || project == undefined) {
+      addError("#invoice-expense-project", "Please Select any project");
+    } else {
+      clearError("#invoice-expense-project");
+      let selectExpenseOpt = $('input[name=invoice_gen_cat]:checked').val();
+      if (selectExpenseOpt == "All uninvoiced Expenses") {
         showLoader('#globalLoader');
+        console.log('selected all');
         $.ajax({
           type: 'POST',
-          url : '/deleteInvoiceItem',
+          url: '/insertExpenseInvoiceItem',
           contentType: 'application/json',
           dataType: 'json',
-          data:JSON.stringify({"invoiceItemId":invoiceItemId, "timesheetId":timesheetId, "expenseId":expenseId, "deleteRecord":deleteRecord}),
-           success : function(response){
-                console.log(response);
-                /*window.location.href = document.referrer;*/
-                location.reload();
-                hideLoader('#globalLoader');
-
-            },
-           error: function(response){
-                hideLoader('#globalLoader');
-                console.log(response.responseJSON.message);
-                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
-            }
-        });
-    }
-    function addExpInvoiceItem(modalId){
-        clearError("#invoice-expense-project");
-        clearError("#exp_start_date");
-        clearError("#exp_end_date");
-        let project=$("#invoice-expense-project").val();
-        if(project==""||project==null||project==undefined) {
-            addError("#invoice-expense-project","Please Select any project");
-        } else {
-            clearError("#invoice-expense-project");
-            let selectExpenseOpt=$('input[name=invoice_gen_cat]:checked').val();
-            if(selectExpenseOpt=="All uninvoiced Expenses") {
-                showLoader('#globalLoader');
-                console.log('selected all');
-                $.ajax({
-                    type: 'POST',
-                    url : '/insertExpenseInvoiceItem',
-                    contentType: 'application/json',
-                    dataType: 'json',
-                    data : JSON.stringify({"projectId":project,"accountId":invoice_account_id,"invoiceId":invoice_item_id}),
-                    success : function(response){
-                        if(response.success == true) {
-                            console.log(response);
-                            closeModal(modalId);
-                            hideLoader('#globalLoader');
-                            location.reload();
-                        } else {
-                            closeModal(modalId);
-                            hideLoader('#globalLoader');
-                            showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
-                        }
-                    },
-                    error: function(response){
-                            console.log(response);
-                            closeModal(modalId);
-                            hideLoader('#globalLoader');
-                            showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
-                    }
-                });
+          data: JSON.stringify({
+            "projectId": project,
+            "accountId": invoice_account_id,
+            "invoiceId": invoice_item_id
+          }),
+          success: function(response) {
+            if (response.success == true) {
+              console.log(response);
+              closeModal(modalId);
+              hideLoader('#globalLoader');
+              location.reload();
             } else {
-                let start_date=$("#exp_start_date").val();
-                let end_date=$("#exp_end_date").val();
-                if(start_date==""||start_date==null||start_date==undefined){
-                    addError("#exp_start_date","Please select start date");
-                }else{
-                    if(end_date==""||end_date==null||end_date==undefined){
-                        addError("#exp_end_date","Please select end date");
-                    }else if(start_date>end_date){
-                        addError("#exp_end_date","Please enter end date greater than start date");
-                    }else{
-                        showLoader('#globalLoader');
-                        $.ajax({
-                            type: 'POST',
-                            url : '/insertExpenseInvoiceItem',
-                            contentType: 'application/json',
-                            dataType: 'json',
-                            data : JSON.stringify({"projectId":project,"accountId":invoice_account_id,"invoiceId":invoice_item_id,"start_date":start_date,"end_date":end_date}),
-                            success : function(response){
-                                if(response.success == true) {
-                                    console.log(response);
-                                    closeModal(modalId);
-                                    hideLoader('#globalLoader');
-                                    location.reload();
-                                } else {
-                                    closeModal(modalId);
-                                    hideLoader('#globalLoader');
-                                    showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
-                                }
-                            },
-                            error: function(response){
-                                    console.log(response);
-                                    closeModal(modalId);
-                                    hideLoader('#globalLoader');
-                                    showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
-                            }
-                        });
-                    }
-                }
-
+              closeModal(modalId);
+              hideLoader('#globalLoader');
+              showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
             }
-        }
-
-    }
-
-    function addInvoiceLineItem(modalId){
-      clearError($("select[id=invoice-type]"));
-      clearError($("input[id=invoice-quantity]"));
-      clearError($("input[id=invoice-unit-price]"));
-      let invoice_line_type=$("select[id=invoice-type]").val();
-      let invoice_quantity = $("input[id=invoice-quantity]").val();
-      let invoice_unit_price = $("input[id=invoice-unit-price]").val();
-      let description = $("textarea[id=invoice-description]").val();
-      if(invoice_line_type==""||invoice_line_type==null||invoice_line_type==undefined){
-          addError($("select[id=invoice-type]"),"Please select any invoice line item type ");
-      }else if(invoice_quantity==""||invoice_quantity==null||invoice_quantity==undefined){
-          addError($("input[id=invoice-quantity]"),"Please enter the quantity ");
-      }else if(invoice_unit_price==""||invoice_unit_price==null||invoice_unit_price==undefined){
-          addError($("input[id=invoice-unit-price]"),"Please enter the unit price ");
-      }else{
-        clearError($("select[id=invoice-type]"));
-        clearError($("input[id=invoice-quantity]"));
-        clearError($("input[id=invoice-unit-price]"));
-        showLoader('#globalLoader');
-        $.ajax({
-            type: 'POST',
-            url : '/insertNewInvoiceItem',
-            contentType: 'application/json',
-            dataType: 'json',
-            data : JSON.stringify({"invoice_line_type":invoice_line_type,"invoice_quantity":invoice_quantity,"invoice_unit_price":invoice_unit_price,"description":description,"accountId":invoice_account_id, "invoiceId":invoice_item_id,}),
-            success : function(response){
-                if(response.success == true) {
-                    console.log(response);
-                    closeModal(modalId);
-                    hideLoader('#globalLoader');
-                    location.reload();
-                } else {
-                    closeModal(modalId);
-                    hideLoader('#globalLoader');
-                    showGlobalToast('#globalToast', 'error', response.message, 4000);
-                }
-            },
-            error: function(response){
-                    console.log(response);
-                    closeModal(modalId);
-                    hideLoader('#globalLoader');
-                    showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
-            }
+          },
+          error: function(response) {
+            console.log(response);
+            closeModal(modalId);
+            hideLoader('#globalLoader');
+            showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+          }
         });
+      } else {
+        let start_date = $("#exp_start_date").val();
+        let end_date = $("#exp_end_date").val();
+        if (start_date == "" || start_date == null || start_date == undefined) {
+          addError("#exp_start_date", "Please select start date");
+        } else {
+          if (end_date == "" || end_date == null || end_date == undefined) {
+            addError("#exp_end_date", "Please select end date");
+          } else if (start_date > end_date) {
+            addError("#exp_end_date", "Please enter end date greater than start date");
+          } else {
+            showLoader('#globalLoader');
+            $.ajax({
+              type: 'POST',
+              url: '/insertExpenseInvoiceItem',
+              contentType: 'application/json',
+              dataType: 'json',
+              data: JSON.stringify({
+                "projectId": project,
+                "accountId": invoice_account_id,
+                "invoiceId": invoice_item_id,
+                "start_date": start_date,
+                "end_date": end_date
+              }),
+              success: function(response) {
+                if (response.success == true) {
+                  console.log(response);
+                  closeModal(modalId);
+                  hideLoader('#globalLoader');
+                  location.reload();
+                } else {
+                  closeModal(modalId);
+                  hideLoader('#globalLoader');
+                  showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+                }
+              },
+              error: function(response) {
+                console.log(response);
+                closeModal(modalId);
+                hideLoader('#globalLoader');
+                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+              }
+            });
+          }
+        }
 
       }
     }
 
-    function addProjectInvoiceItem(modalId){
-        clearError("#invoice-fixed-project");
-        let project=$("#invoice-fixed-project").val();
-        let project_type = $("#invoice-fixed-project option:selected").attr('pr_type');
-        if(project==""||project==null||project==undefined){
-            addError("#invoice-fixed-project","Please select any project");
-        }else{
-            clearError("#invoice-fixed-project");
+  }
+
+  function addInvoiceLineItem(modalId) {
+    clearError($("select[id=invoice-type]"));
+    clearError($("input[id=invoice-quantity]"));
+    clearError($("input[id=invoice-unit-price]"));
+    let invoice_line_type = $("select[id=invoice-type]").val();
+    let invoice_quantity = $("input[id=invoice-quantity]").val();
+    let invoice_unit_price = $("input[id=invoice-unit-price]").val();
+    let description = $("textarea[id=invoice-description]").val();
+    if (invoice_line_type == "" || invoice_line_type == null || invoice_line_type == undefined) {
+      addError($("select[id=invoice-type]"), "Please select any invoice line item type ");
+    } else if (invoice_quantity == "" || invoice_quantity == null || invoice_quantity == undefined) {
+      addError($("input[id=invoice-quantity]"), "Please enter the quantity ");
+    } else if (invoice_unit_price == "" || invoice_unit_price == null || invoice_unit_price == undefined) {
+      addError($("input[id=invoice-unit-price]"), "Please enter the unit price ");
+    } else {
+      clearError($("select[id=invoice-type]"));
+      clearError($("input[id=invoice-quantity]"));
+      clearError($("input[id=invoice-unit-price]"));
+      showLoader('#globalLoader');
+      $.ajax({
+        type: 'POST',
+        url: '/insertNewInvoiceItem',
+        contentType: 'application/json',
+        dataType: 'json',
+        data: JSON.stringify({
+          "invoice_line_type": invoice_line_type,
+          "invoice_quantity": invoice_quantity,
+          "invoice_unit_price": invoice_unit_price,
+          "description": description,
+          "accountId": invoice_account_id,
+          "invoiceId": invoice_item_id,
+        }),
+        success: function(response) {
+          if (response.success == true) {
+            console.log(response);
+            closeModal(modalId);
+            hideLoader('#globalLoader');
+            location.reload();
+          } else {
+            closeModal(modalId);
+            hideLoader('#globalLoader');
+            showGlobalToast('#globalToast', 'error', response.message, 4000);
+          }
+        },
+        error: function(response) {
+          console.log(response);
+          closeModal(modalId);
+          hideLoader('#globalLoader');
+          showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+        }
+      });
+
+    }
+  }
+
+  function addProjectInvoiceItem(modalId) {
+    clearError("#invoice-fixed-project");
+    let project = $("#invoice-fixed-project").val();
+    let project_type = $("#invoice-fixed-project option:selected").attr('pr_type');
+    if (project == "" || project == null || project == undefined) {
+      addError("#invoice-fixed-project", "Please select any project");
+    } else {
+      clearError("#invoice-fixed-project");
+      showLoader('#globalLoader');
+      $.ajax({
+        type: 'POST',
+        url: '/insertTimesheetInvoiceItem',
+        contentType: 'application/json',
+        dataType: 'json',
+        data: JSON.stringify({
+          "projectId": project,
+          "accountId": invoice_account_id,
+          "invoiceId": invoice_item_id,
+          "project_type": project_type
+        }),
+        success: function(response) {
+          if (response.success == true) {
+            console.log(response);
+            closeModal(modalId);
+            hideLoader('#globalLoader');
+            location.reload();
+          } else {
+            closeModal(modalId);
+            hideLoader('#globalLoader');
+            showGlobalToast('#globalToast', 'error', response.message, 4000);
+          }
+        },
+        error: function(response) {
+          console.log(response);
+          closeModal(modalId);
+          hideLoader('#globalLoader');
+          showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+        }
+      });
+
+    }
+
+  }
+
+  function addTimeInvoiceItem(modalId) {
+    clearError("#invoice-time-project");
+    clearError("#time_start_date");
+    clearError("#time_end_date");
+    let project = $("#invoice-time-project").val();
+    let project_type = $("#invoice-time-project option:selected").attr('pr_type');
+    if (project == "" || project == null || project == undefined) {
+      addError("#invoice-time-project", "Please Select any project");
+    } else {
+      clearError("#invoice-time-project");
+      let selectTimesheetOpt = $('input[name=time_invoice_gen_cat]:checked').val();
+      if (selectTimesheetOpt == "All uninvoiced billable hours") {
+        showLoader('#globalLoader');
+        console.log('selected all');
+        $.ajax({
+          type: 'POST',
+          url: '/insertTimesheetInvoiceItem',
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify({
+            "projectId": project,
+            "accountId": invoice_account_id,
+            "invoiceId": invoice_item_id,
+            "project_type": project_type
+          }),
+          success: function(response) {
+            if (response.success == true) {
+              console.log(response);
+              closeModal(modalId);
+              hideLoader('#globalLoader');
+              location.reload();
+            } else {
+              closeModal(modalId);
+              hideLoader('#globalLoader');
+              showGlobalToast('#globalToast', 'error', response.message, 4000);
+            }
+          },
+          error: function(response) {
+            console.log(response);
+            closeModal(modalId);
+            hideLoader('#globalLoader');
+            showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+          }
+        });
+      } else {
+        let start_date = $("#time_start_date").val();
+        let end_date = $("#time_end_date").val();
+        if (start_date == "" || start_date == null || start_date == undefined) {
+          addError("#time_start_date", "Please select start date");
+        } else {
+          if (end_date == "" || end_date == null || end_date == undefined) {
+            addError("#time_end_date", "Please select end date");
+          } else if (start_date > end_date) {
+            addError("#time_end_date", "Please enter end date greater than start date");
+          } else {
             showLoader('#globalLoader');
             $.ajax({
-                type: 'POST',
-                url : '/insertTimesheetInvoiceItem',
-                contentType: 'application/json',
-                dataType: 'json',
-                data : JSON.stringify({"projectId":project, "accountId":invoice_account_id, "invoiceId":invoice_item_id, "project_type":project_type}),
-                success : function(response){
-                    if(response.success == true) {
-                        console.log(response);
-                        closeModal(modalId);
-                        hideLoader('#globalLoader');
-                        location.reload();
-                    } else {
-                        closeModal(modalId);
-                        hideLoader('#globalLoader');
-                        showGlobalToast('#globalToast', 'error', response.message, 4000);
-                    }
-                },
-                error: function(response){
-                        console.log(response);
-                        closeModal(modalId);
-                        hideLoader('#globalLoader');
-                        showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+              type: 'POST',
+              url: '/insertTimesheetInvoiceItem',
+              contentType: 'application/json',
+              dataType: 'json',
+              data: JSON.stringify({
+                "projectId": project,
+                "accountId": invoice_account_id,
+                "invoiceId": invoice_item_id,
+                "start_date": start_date,
+                "end_date": end_date,
+                "project_type": project_type
+              }),
+              success: function(response) {
+                if (response.success == true) {
+                  console.log(response);
+                  closeModal(modalId);
+                  hideLoader('#globalLoader');
+                  location.reload();
+                } else {
+                  closeModal(modalId);
+                  hideLoader('#globalLoader');
+                  showGlobalToast('#globalToast', 'error', response.message, 4000);
                 }
+              },
+              error: function(response) {
+                console.log(response);
+                closeModal(modalId);
+                hideLoader('#globalLoader');
+                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+              }
             });
-
+          }
         }
 
+      }
     }
 
-    function addTimeInvoiceItem(modalId){
-        clearError("#invoice-time-project");
-        clearError("#time_start_date");
-        clearError("#time_end_date");
-        let project=$("#invoice-time-project").val();
-        let project_type = $("#invoice-time-project option:selected").attr('pr_type');
-        if(project==""||project==null||project==undefined){
-            addError("#invoice-time-project","Please Select any project");
-        }else{
-            clearError("#invoice-time-project");
-            let selectTimesheetOpt=$('input[name=time_invoice_gen_cat]:checked').val();
-            if(selectTimesheetOpt=="All uninvoiced billable hours"){
-                showLoader('#globalLoader');
-                console.log('selected all');
-                $.ajax({
-                    type: 'POST',
-                    url : '/insertTimesheetInvoiceItem',
-                    contentType: 'application/json',
-                    dataType: 'json',
-                    data : JSON.stringify({"projectId":project, "accountId":invoice_account_id, "invoiceId":invoice_item_id, "project_type":project_type}),
-                    success : function(response){
-                        if(response.success == true) {
-                            console.log(response);
-                            closeModal(modalId);
-                            hideLoader('#globalLoader');
-                            location.reload();
-                        } else {
-                            closeModal(modalId);
-                            hideLoader('#globalLoader');
-                            showGlobalToast('#globalToast', 'error', response.message, 4000);
-                        }
-                    },
-                    error: function(response){
-                            console.log(response);
-                            closeModal(modalId);
-                            hideLoader('#globalLoader');
-                            showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
-                    }
-                });
-            }else{
-                let start_date=$("#time_start_date").val();
-                let end_date=$("#time_end_date").val();
-                if(start_date==""||start_date==null||start_date==undefined){
-                    addError("#time_start_date","Please select start date");
-                }else{
-                    if(end_date==""||end_date==null||end_date==undefined){
-                        addError("#time_end_date","Please select end date");
-                    }else if(start_date>end_date){
-                        addError("#time_end_date","Please enter end date greater than start date");
-                    }else{
-                        showLoader('#globalLoader');
-                        $.ajax({
-                            type: 'POST',
-                            url : '/insertTimesheetInvoiceItem',
-                            contentType: 'application/json',
-                            dataType: 'json',
-                            data : JSON.stringify({"projectId":project,"accountId":invoice_account_id,"invoiceId":invoice_item_id,"start_date":start_date,"end_date":end_date, "project_type":project_type}),
-                            success : function(response){
-                                if(response.success == true) {
-                                    console.log(response);
-                                    closeModal(modalId);
-                                    hideLoader('#globalLoader');
-                                    location.reload();
-                                } else {
-                                    closeModal(modalId);
-                                    hideLoader('#globalLoader');
-                                    showGlobalToast('#globalToast', 'error', response.message, 4000);
-                                }
-                            },
-                            error: function(response){
-                                    console.log(response);
-                                    closeModal(modalId);
-                                    hideLoader('#globalLoader');
-                                    showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
-                            }
-                        });
-                    }
-                }
+  }
 
-            }
-        }
+  function addNewInvoiceItem() {
+    console.log('inside add new invoiceItem');
 
-    }
-
-    function addNewInvoiceItem(){
-        console.log('inside add new invoiceItem');
-
-        let lineItemHtml =  `<li class="line-bottom slds-p-top_small">
+    let lineItemHtml =
+      `<li class="line-bottom slds-p-top_small">
                                 <div class="slds-grid slds-grid_pull-padded invoice-row sm-hide">
                                     <div class="slds-no-flex slds-p-horizontal_small invoice-col">
                                         <div class="slds-form-element slds-m-bottom_small">
@@ -634,13 +685,38 @@
                                     </div>
                                 </div>
                             </li>`;
-        $("#invoiceLineItem").append(lineItemHtml);
-    }
+    $("#invoiceLineItem").append(lineItemHtml);
+  }
 
+  function sendInvoiceEmail(modalId) {
+    showLoader('#globalLoader');
+    let client_email = "<%= account.email %>"
+    let extra_email = $("#extra_email").val();
+    $.ajax({
+        type: 'POST',
+        url : '/sendInvoiceEmail',
+        contentType: 'application/json',
+        dataType: 'json',
+        data : JSON.stringify({"client_email":client_email,"extra_email":extra_email,"invoiceId":<%= invoiceDetails.id %>}),
+        success : function(response){
+            hideLoader('#globalLoader');
+            closeModal(modalId);
+            if(response.success == true) {
+                showGlobalToast('#globalToast', 'success', 'Email send successfully', 4000);
+            } else {
+                showGlobalToast('#globalToast', 'error', 'Something went wrong.', 4000);
+            }
+        },
+        error: function(response){
+            console.log(response);
+            hideLoader('#globalLoader');
+            closeModal(modalId);
+            showGlobalToast('#globalToast', 'error', 'Error in sending email.Please try again', 4000);
+        }
+    });
+  }
 
-    /*function generateHtml(){
-        window.location.href='/generateHtml';
-    }*/
-
-
+  /*function generateHtml(){
+      window.location.href='/generateHtml';
+  }*/
 </script>

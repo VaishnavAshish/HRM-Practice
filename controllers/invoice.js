@@ -10,6 +10,7 @@ const moment = require('moment-timezone');
 const setting = require('./company-setting');
 const companySettingFile = require('./setting');
 const jsonexport = require('jsonexport');
+const email = require('./email');
 let companyDefaultTimezone;
 let companyDefaultCurrency;
 
@@ -229,7 +230,7 @@ exports.getInvoice = (req, res) => {
                                 done();
                                 /*draftInvoice=invoiceListArr.filter(inv => inv.status=="DRAFT");
                                 paidInvoice=invoiceListArr.filter(inv => inv.status=="PAID");*/
-                                handleResponse.responseToPage(res,'pages/invoices-listing',{accounts: accountList.rows, invoiceList: invoiceListArr,totalCount:totalCount, draftCount:draftCount, paidCount:paidCount, user: req.user ,companyDefaultTimezone:companyDefaultTimezone,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD'),stripeCustomerId:result.stripe_customer_id},"success","Successfully rendered");
+                                handleResponse.responseToPage(res,'pages/invoices-listing',{accounts: accountList.rows, invoiceList: invoiceListArr,totalCount:totalCount, draftCount:draftCount, paidCount:paidCount, user: req.user ,companyDefaultTimezone:companyDefaultTimezone,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD')},"success","Successfully rendered");
                                 /*res.render('pages/invoices-listing', { accounts: accountList.rows, invoiceList: invoiceList.rows, user: req.user });*/
                             }
                         });
@@ -921,7 +922,8 @@ exports.insertExpenseInvoiceItem = (req, res) => {
                                     expense.user_role = '';
                                     expense.quantity = '1';
                                     expense.type = 'Expense';
-                                    expense.unit_price = expense.amount;
+                                    expense.amount = expense.total_amount;
+                                    expense.unit_price = expense.total_amount;
                                     addInvoiceLineItem(req, res, client, err, done, expense, function (result) {
                                         // console.log("Step 3");
                                         if(result) {
@@ -963,7 +965,8 @@ exports.insertExpenseInvoiceItem = (req, res) => {
                                     expense.user_role = '';
                                     expense.quantity = '1';
                                     expense.type = 'Expense';
-                                    expense.unit_price = expense.amount;
+                                    expense.amount = expense.total_amount;
+                                    expense.unit_price = expense.total_amount;
                                     addInvoiceLineItem(req, res, client, err, done, expense, function (result) {
                                         if(result) {
                                             updateExpenseRecord(req, res, client, err, done, expense, function (result) {
@@ -1093,6 +1096,7 @@ exports.getInvoiceDetails = (req, res) => {
             }else{
 
                 pool.connect((err, client, done) => {
+
                     client.query('SELECT i.id ,i.status ,i.account_id ,i.company_id ,i.created_by ,i.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,i.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,i.archived ,i.account_name ,i.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,i.due_date at time zone \''+companyDefaultTimezone+'\' as due_date ,i.description ,i.project_id ,i.project_name ,i.total_amount ,i.record_id ,i.currency ,i.tax  FROM INVOICE i WHERE company_id=$1 AND id=$2', [req.user.company_id, req.query.invoiceId], function (err, invoiceDetails) {
                         if (err) {
                             console.error(err);
@@ -1101,92 +1105,104 @@ exports.getInvoiceDetails = (req, res) => {
                             /*handleResponse.handleError(res, err, ' Error in finding invoice data');*/
                         }  else {
                             if(invoiceDetails.rows.length>0){
-                                // console.log('account id is '+invoiceDetails.rows[0].account_id)
-                                client.query('SELECT * FROM PROJECT WHERE company_id=$1 AND account_id=$2 AND archived=$3', [req.user.company_id, invoiceDetails.rows[0].account_id,false], function (err, projects) {
-                                    if (err) {
-                                        console.error(err);
-                                            handleResponse.shouldAbort(err, client, done);
-                                            handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.user, userList:[], error:err},"error"," Error in finding project data");
-                                            /*handleResponse.handleError(res, err, ' Error in finding project data');*/
-                                        }  else {
-                                                // console.log('projects are '+JSON.stringify(projects));
-                                                client.query('SELECT il.id ,il.type ,il.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,il.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,il.item_date at time zone \''+companyDefaultTimezone+'\' as item_date ,il.archived ,il.hours ,il.unit_price ,il.cost_rate ,il.note ,il.amount ,il.tax ,il.total_amount ,il.timesheet_id ,il.expense_id ,il.project_id ,il.account_id ,il.invoice_id ,il.company_id ,il.user_id ,il.user_role ,il.quantity ,il.record_id ,il.currency ,il.timesheet_row_id FROM INVOICE_LINE_ITEM il WHERE company_id=$1 AND invoice_id=$2 AND archived=$3 ORDER BY project_id,timesheet_id,expense_id,created_date', [req.user.company_id, req.query.invoiceId, false], function (err, invoiceItems) {
-                                                if (err) {
-                                                    console.error(err);
-                                                    handleResponse.shouldAbort(err, client, done);
-                                                    handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.user, userList:[], error:err},"error"," Error in finding invoice line item data");
-                                                    /*handleResponse.handleError(res, err, ' Error in finding invoice line item data');*/
-                                                } else {
-                                                    let invoice_total_amount=0;
-                                                    if (invoiceItems.rows.length > 0) {
-                                                        invoiceItems.rows.forEach(function (lineItem) {
-                                                            // lineItem["item_date"] = dateFormat(moment.tz(lineItem.item_date, companyDefaultTimezone).format());
-                                                            lineItem["item_date"] = dateFormat(lineItem.item_date);
-                                                            lineItem.inv_qauntity = lineItem.quantity;
-                                                            console.log('lineItem');
-                                                            console.log(lineItem);
-                                                            if(lineItem.type == "Timesheet" && lineItem.timesheet_row_id) {
-                                                                lineItem.inv_qauntity = minuteToHours(lineItem.quantity);
-                                                            }
-                                                            console.log(lineItem.total_amount+' '+typeof(lineItem.total_amount)+' '+parseFloat(lineItem.total_amount));
-                                                            let currentCurrency=currencyWithSymbolArray.filter(function(currency){
-                                                              return currency.name == invoiceDetails.rows[0].currency;
-                                                            })
+                              client.query('SELECT * FROM ACCOUNT WHERE id=$1', [invoiceDetails.rows[0].account_id], function (err, accountData) {
+                                if (err) {
+                                  console.error(err);
+                                  handleResponse.shouldAbort(err, client, done);
+                                  handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.user, userList:[], error:err},"error"," Error in finding account data");
+                                  /*handleResponse.handleError(res, err, ' Error in finding invoice data');*/
+                                }  else {
+                                    // console.log('account id is '+invoiceDetails.rows[0].account_id)
+                                    client.query('SELECT * FROM PROJECT WHERE company_id=$1 AND account_id=$2 AND archived=$3', [req.user.company_id, invoiceDetails.rows[0].account_id,false], function (err, projects) {
+                                        if (err) {
+                                            console.error(err);
+                                                handleResponse.shouldAbort(err, client, done);
+                                                handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.user, userList:[], error:err},"error"," Error in finding project data");
+                                                /*handleResponse.handleError(res, err, ' Error in finding project data');*/
+                                            }  else {
+                                                    // console.log('projects are '+JSON.stringify(projects));
+                                                    client.query('SELECT il.id ,il.type ,il.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,il.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,il.item_date at time zone \''+companyDefaultTimezone+'\' as item_date ,il.archived ,il.hours ,il.unit_price ,il.cost_rate ,il.note ,il.amount ,il.tax ,il.total_amount ,il.timesheet_id ,il.expense_id ,il.project_id ,il.account_id ,il.invoice_id ,il.company_id ,il.user_id ,il.user_role ,il.quantity ,il.record_id ,il.currency ,il.timesheet_row_id FROM INVOICE_LINE_ITEM il WHERE company_id=$1 AND invoice_id=$2 AND archived=$3 ORDER BY project_id,timesheet_id,expense_id,created_date', [req.user.company_id, req.query.invoiceId, false], function (err, invoiceItems) {
+                                                    if (err) {
+                                                        console.error(err);
+                                                        handleResponse.shouldAbort(err, client, done);
+                                                        handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.user, userList:[], error:err},"error"," Error in finding invoice line item data");
+                                                        /*handleResponse.handleError(res, err, ' Error in finding invoice line item data');*/
+                                                    } else {
+                                                        let invoice_total_amount=0;
+                                                        if (invoiceItems.rows.length > 0) {
+                                                            invoiceItems.rows.forEach(function (lineItem) {
+                                                                // lineItem["item_date"] = dateFormat(moment.tz(lineItem.item_date, companyDefaultTimezone).format());
+                                                                lineItem["item_date"] = dateFormat(lineItem.item_date);
+                                                                lineItem.inv_qauntity = lineItem.quantity;
+                                                                console.log('lineItem');
+                                                                console.log(lineItem);
+                                                                if(lineItem.type == "Timesheet" && lineItem.timesheet_row_id) {
+                                                                    lineItem.inv_qauntity = minuteToHours(lineItem.quantity);
+                                                                }
+                                                                console.log(lineItem.total_amount+' '+typeof(lineItem.total_amount)+' '+parseFloat(lineItem.total_amount));
+                                                                let currentCurrency=currencyWithSymbolArray.filter(function(currency){
+                                                                  return currency.name == invoiceDetails.rows[0].currency;
+                                                                })
 
-                                                            currentCurrency=parseFloat(currentCurrency[0].value);
-                                                            console.log('currentCurrency '+JSON.stringify(currentCurrency));
+                                                                currentCurrency=parseFloat(currentCurrency[0].value);
+                                                                console.log('currentCurrency '+JSON.stringify(currentCurrency));
 
-                                                            console.log('lineItem.currency' +lineItem.currency);
-                                                            let previousCurrency=currencyWithSymbolArray.filter(function(currency){
-                                                              return currency.name == lineItem.currency;
-                                                            })
-                                                            console.log('previousCurrency '+JSON.stringify(previousCurrency));
-                                                            previousCurrency=parseFloat(previousCurrency[0].value);
-                                                            let line_total_amount=(currentCurrency/previousCurrency*parseFloat(lineItem.total_amount));
-                                                            // console.log('total_amount '+line_total_amount);
-                                                            invoice_total_amount+=parseFloat(line_total_amount);
-                                                            // console.log('total_amount '+invoice_total_amount);
+                                                                console.log('lineItem.currency' +lineItem.currency);
+                                                                let previousCurrency=currencyWithSymbolArray.filter(function(currency){
+                                                                  return currency.name == lineItem.currency;
+                                                                })
+                                                                console.log('previousCurrency '+JSON.stringify(previousCurrency));
+                                                                previousCurrency=parseFloat(previousCurrency[0].value);
+                                                                let line_total_amount=(currentCurrency/previousCurrency*parseFloat(lineItem.total_amount));
+                                                                // console.log('total_amount '+line_total_amount);
+                                                                invoice_total_amount+=parseFloat(line_total_amount);
+                                                                // console.log('total_amount '+invoice_total_amount);
 
-                                                        });
-                                                        // console.log("************ invoiceItems *************");
-                                                        // console.log(invoiceItems);
-                                                    }
-                                                    if(invoiceDetails.rows.length>0){
-                                                        /*// console.log('total_amount '+invoice_total_amount); */
-                                                        invoiceDetails.rows[0].total_amount=invoice_total_amount.toFixed(2);
-                                                        // invoiceDetails.rows[0]['startDateFormatted'] = invoiceDetails.rows[0].start_date == null ? '' : dateFormat(moment.tz(invoiceDetails.rows[0].start_date, companyDefaultTimezone).format());
-                                                        // invoiceDetails.rows[0]['dueDateFormatted'] = invoiceDetails.rows[0].due_date == null ? '' : dateFormat(moment.tz(invoiceDetails.rows[0].due_date, companyDefaultTimezone).format());
-                                                        invoiceDetails.rows[0]['startDateFormatted'] = invoiceDetails.rows[0].start_date == null ? '' : dateFormat(invoiceDetails.rows[0].start_date);
-                                                        invoiceDetails.rows[0]['dueDateFormatted'] = invoiceDetails.rows[0].due_date == null ? '' : dateFormat(invoiceDetails.rows[0].due_date);
-                                                    }
-                                                    let invoice_tax=(parseFloat(invoice_total_amount) * parseFloat(invoiceDetails.rows[0].tax)) / 100;
-                                                    invoice_total_amount=(parseFloat(invoice_total_amount)+parseFloat(invoice_tax)).toFixed(2);
-                                                    let newDate=moment.tz(new Date(), companyDefaultTimezone).format();
-                                                    client.query('UPDATE INVOICE SET total_amount=$1 ,updated_date=$2 WHERE id=$3 RETURNING *', [invoice_total_amount,'now()',req.query.invoiceId], function (err, invoiceUpdated) {
-                                                        if (err) {
-                                                            console.error(err);
-                                                            handleResponse.shouldAbort(err, client, done);
-                                                            handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.user, userList:[], error:err},"error"," Error in updating invoice data");
-                                                            /*handleResponse.handleError(res, err, ' Error in updating invoice data');*/
-                                                        } else {
-
-                                                            getUserDetails(req, res, client, err, done, function (response) {
-
-                                                                // console.log("response");
-                                                                // // console.log(projects.rows);
-                                                                // console.log('invoice_total_amount '+invoice_total_amount);
-                                                                done();
-                                                                handleResponse.responseToPage(res,'pages/invoice-details',{projects:projects.rows, invoiceDetails: invoiceDetails.rows[0], invoiceItems: invoiceItems.rows, user: req.user, userList:response ,companyDefaultTimezone:companyDefaultTimezone,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD'),stripeCustomerId:result.stripe_customer_id },"success","Successfully rendered");
-                                                            })
-
+                                                            });
+                                                            // console.log("************ invoiceItems *************");
+                                                            // console.log(invoiceItems);
                                                         }
-                                                    });
-                                                }
-                                            });
-                                        }
-                                });
-                            }
-                        }
+                                                        if(invoiceDetails.rows.length>0){
+                                                            /*// console.log('total_amount '+invoice_total_amount); */
+                                                            invoiceDetails.rows[0].total_amount=invoice_total_amount.toFixed(2);
+                                                            // invoiceDetails.rows[0]['startDateFormatted'] = invoiceDetails.rows[0].start_date == null ? '' : dateFormat(moment.tz(invoiceDetails.rows[0].start_date, companyDefaultTimezone).format());
+                                                            // invoiceDetails.rows[0]['dueDateFormatted'] = invoiceDetails.rows[0].due_date == null ? '' : dateFormat(moment.tz(invoiceDetails.rows[0].due_date, companyDefaultTimezone).format());
+                                                            invoiceDetails.rows[0]['startDateFormatted'] = invoiceDetails.rows[0].start_date == null ? '' : dateFormat(invoiceDetails.rows[0].start_date);
+                                                            invoiceDetails.rows[0]['dueDateFormatted'] = invoiceDetails.rows[0].due_date == null ? '' : dateFormat(invoiceDetails.rows[0].due_date);
+                                                        }
+                                                        let invoice_tax=(parseFloat(invoice_total_amount) * parseFloat(invoiceDetails.rows[0].tax)) / 100;
+                                                        invoice_total_amount=(parseFloat(invoice_total_amount)+parseFloat(invoice_tax)).toFixed(2);
+                                                        let newDate=moment.tz(new Date(), companyDefaultTimezone).format();
+                                                        client.query('UPDATE INVOICE SET total_amount=$1 ,updated_date=$2 WHERE id=$3 RETURNING *', [invoice_total_amount,'now()',req.query.invoiceId], function (err, invoiceUpdated) {
+                                                            if (err) {
+                                                                console.error(err);
+                                                                handleResponse.shouldAbort(err, client, done);
+                                                                handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.user, userList:[], error:err},"error"," Error in updating invoice data");
+                                                                /*handleResponse.handleError(res, err, ' Error in updating invoice data');*/
+                                                            } else {
+
+                                                                getUserDetails(req, res, client, err, done, function (response) {
+
+                                                                    // console.log("response");
+                                                                    // // console.log(projects.rows);
+                                                                    // console.log('invoice_total_amount '+invoice_total_amount);
+                                                                    done();
+                                                                    handleResponse.responseToPage(res,'pages/invoice-details',{projects:projects.rows, invoiceDetails: invoiceDetails.rows[0], invoiceItems: invoiceItems.rows, user: req.user,account:accountData.rows[0], userList:response ,companyDefaultTimezone:companyDefaultTimezone,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD') },"success","Successfully rendered");
+                                                                })
+
+                                                            }
+                                                        });
+                                                    }
+                                                });
+                                            }
+                                    });
+                                  }
+                              });
+                          }else{
+                            done();
+                            handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.user, userList:[], error:'error'},"error"," Error in finding invoice data");
+                          }
+                      }
                     });
                 });
             }
@@ -1622,11 +1638,15 @@ exports.findInvoiceForAccount = (req, res) => {
         }
     });
 };
+exports.sendInvoiceEmail = (req,res) =>{
+    invoiceHtmlData(req,res,false,'send-email');
+}
 
-function invoiceHtmlData (req,res,invoiceHtml){
-    let invId = req.params.invoiceId;
-    // console.log("invId");
-    // console.log(invId);
+
+function invoiceHtmlData (req,res,invoiceHtml,responseType){
+    let invId = req.params.invoiceId?req.params.invoiceId:req.body.invoiceId;
+    console.log("invId");
+    console.log(invId);
     setting.getCompanySetting(req, res ,(err,result)=>{
        if(err==true){
          // console.log('error in setting');
@@ -1759,10 +1779,10 @@ function invoiceHtmlData (req,res,invoiceHtml){
                                                                                             /*// console.log('dates are');
                                                                                             // console.log(invoiceDetails.rows[0].startDateFormatted+' '+invoiceDetails.rows[0].created_date);
                                                                                             // console.log(invoiceDetails.rows[0].dueDateFormatted+' '+invoiceDetails.rows[0].due_date);*/
-                                                                                            handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.user, error:err, invoiceDetails : invoiceDetails.rows[0], lineItems : invoiceLineList, accountDetails:accountDetails.rows[0],companySetting:companySetting.rows[0], projects:projects.rows,companyName:companyName.rows[0].name,stripeCustomerId:result.stripe_customer_id},"success","Successfully rendered");
+                                                                                            handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.user, error:err, invoiceDetails : invoiceDetails.rows[0], lineItems : invoiceLineList, accountDetails:accountDetails.rows[0],companySetting:companySetting.rows[0], projects:projects.rows,companyName:companyName.rows[0].name},"success","Successfully rendered");
                                                                                         }else{
 
-                                                                                            generatePdf(req,res,invoiceDetails.rows[0],invoiceLineList,accountDetails.rows[0],companySetting.rows[0], projects.rows,companyName.rows[0].name);
+                                                                                            generatePdf(req,res,invoiceDetails.rows[0],invoiceLineList,accountDetails.rows[0],companySetting.rows[0], projects.rows,companyName.rows[0].name,responseType);
                                                                                         }
 
                                                                                 }
@@ -1782,7 +1802,7 @@ function invoiceHtmlData (req,res,invoiceHtml){
                                                                         console.log('start and due dates arre'+startDateFormatted+' '+dueDateFormatted);
                                                                         invoiceDetails.rows[0]['startDateFormatted'] = startDateFormatted;
                                                                         invoiceDetails.rows[0]['dueDateFormatted'] = dueDateFormatted;
-                                                                        handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.user, error:err, invoiceDetails : invoiceDetails.rows[0], lineItems : [], accountDetails:accountDetails.rows[0],companySetting:companySetting.rows[0], projects:projects.rows,companyName:companyName.rows[0].name,stripeCustomerId:result.stripe_customer_id},"success","Successfully rendered");
+                                                                        handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.user, error:err, invoiceDetails : invoiceDetails.rows[0], lineItems : [], accountDetails:accountDetails.rows[0],companySetting:companySetting.rows[0], projects:projects.rows,companyName:companyName.rows[0].name},"success","Successfully rendered");
                                                                     }
 
                                                           })
@@ -1804,7 +1824,7 @@ function invoiceHtmlData (req,res,invoiceHtml){
       });
 }
 exports.generateInvoiceHTML = (req, res) => {
-    invoiceHtmlData(req,res,true);
+    invoiceHtmlData(req,res,true,'');
 
 }
 function isComma(string) {
@@ -1814,7 +1834,7 @@ function isComma(string) {
         return '';
     }
 }
-function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companySetting, projects,companyName) {
+function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companySetting, projects,companyName,responseType) {
     console.log('inside generate pdf '+invoiceDetails.currency);
     // console.log(companySettingFile.getCompanyLogoJSON(req, res));
 
@@ -2179,24 +2199,204 @@ let account_address = `<strong>${accountDetails.name}</strong><BR />
     var options = { format: 'A4',height: "14.5in",width: "11in"};
     // console.log('hmtl is:');
     // console.log(pdfHTML);
-    pdf.create(pdfHTML, options).toStream(function (err, stream) {
-        if (err) {
-            handleResponse.handleError(res, err, ' Error in generating pdf data');
-        }
-        else{
+    console.log('responseType'+responseType)
+    if(responseType =='send-email') {
+        console.log('inside if')
+      pdf.create(pdfHTML, options).toBuffer(function(err, buffer){
+          if (err) {
+              handleResponse.handleError(res, err, ' Error in generating pdf data');
+          }
+          else{
+            req.body.pdfFile =  buffer;
+            console.log('req.body.pdfFile')
+            console.log(req.body.pdfFile)
+            sendEmail(req,res,invoiceDetails,accountDetails,companyName, function(error, info) {
+              if (error) {
+                handleResponse.handleError(res, error, 'Error in sending email');
+              } else {
+                handleResponse.sendSuccess(res, 'Invoice mailed successfully', {});
+              }
+            })
 
-            res.setHeader('Content-Type', 'application/force-download');
-            res.setHeader('Content-disposition', 'attachment;filename=invoice.pdf');
-            res.setHeader('content-type', 'application/pdf');
+          }
+      });
 
-            stream.pipe(res);
-        }
-    });
+
+    } else {
+      console.log('inside else')
+        pdf.create(pdfHTML, options).toStream(function (err, stream) {
+            if (err) {
+                handleResponse.handleError(res, err, ' Error in generating pdf data');
+            }
+            else{
+                  res.setHeader('Content-Type', 'application/force-download');
+                  res.setHeader('Content-disposition', 'attachment;filename=invoice.pdf');
+                  res.setHeader('content-type', 'application/pdf');
+
+                  stream.pipe(res);
+
+            }
+        });
+      }
 
 }
+
+sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
+  let serverName = process.env.BASE_URL;
+  let redirectUrl = serverName + '/invoice-html-view/' + req.body.invoiceId;
+  console.log("redirectUrl");
+  console.log(redirectUrl);
+  let html = `<html><head></head><body><div style="background-color: #f7f8f9;">
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#f7f8f9">
+                <tbody>
+                    <tr>
+                        <td valign="top" align="center" style="padding-top: 20px; padding-bottom: 10px;">
+                            <a href="/" target="_blank"><img src="../img/krow-logo.png" alt=""></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td valign="top" align="center">
+                            <table border="0" cellpadding="0" cellspacing="0" height="100%" width="600px">
+                                <tbody><tr>
+                                    <td valign="top">
+                                        <table cellpadding="0" cellspacing="0" width="100%" style="background: #fff; border: 1px solid #eee; margin: 0; padding: 30px; ">
+                                            <tbody>
+                                                <tr>
+                                                    <td valign="top">
+                                                        <h5 style="font-family: arial,sans-serif; font-size:16px; font-weight:normal;margin: 15px 0 ; ">
+                                                            Hi ${accountDetails.first_name?accountDetails.first_name:''} ${accountDetails.last_name?accountDetails.last_name:''},
+                                                        </h5>
+                                                        <h1 style="font-family: arial,sans-serif; font-size:24px; font-weight:normal; line-height: 20px; color: orange;">
+                                                                Please view the details of the invoice below.
+                                                        </h1>
+
+                                                            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td align="" style=" font-size:14px;font-family: arial,sans-serif; padding:10px; border-bottom: 1px solid #eee; color: #999;">
+                                                                            Invoice
+                                                                        </td>
+                                                                        <td align="right" style=" font-size:14px;font-family: arial,sans-serif; padding:10px; border-bottom: 1px solid #eee; ">
+                                                                            ${invoiceDetails.record_id}
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td align="" style=" font-size:14px;font-family: arial,sans-serif; padding:10px; border-bottom: 1px solid #eee; color: #999;">
+                                                                            Issue Date
+                                                                        </td>
+                                                                        <td align="right" style=" font-size:14px;font-family: arial,sans-serif; padding:10px; border-bottom: 1px solid #eee; ">
+                                                                            ${dateFormat(invoiceDetails.created_date)}
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td align="" style=" font-size:14px;font-family: arial,sans-serif; padding:10px; border-bottom: 1px solid #eee; color: #999;">
+                                                                            Due Date
+                                                                        </td>
+                                                                        <td align="right" style=" font-size:14px;font-family: arial,sans-serif; padding:10px; border-bottom: 1px solid #eee; ">
+                                                                            ${dateFormat(invoiceDetails.due_date)}
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td align="" style=" font-size:18px;font-family: arial,sans-serif; padding:10px; border-bottom: 1px solid #eee; color: #999;">
+                                                                            Invoice Total
+                                                                        </td>
+                                                                        <td align="right" style=" font-size:18px;font-family: arial,sans-serif; padding:10px; border-bottom: 1px solid #eee; font-weight: bold;">
+                                                                            ${invoiceDetails.total_amount}
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+
+                                                        <p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; line-height: 20px;">
+                                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed accumsan convallis iaculis. Quisque at convallis leo.
+                                                        </p>
+                                                        <p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; margin-bottom: 5px;">
+                                                            Thank you for your business,
+                                                        </p>
+                                                        <p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; margin-top: 5px;">
+                                                            ${companyName}
+                                                        </p>
+                                                    </td>
+                                                </tr>
+
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody></table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td valign="top" align="center" style=" font-family: arial,sans-serif; padding:20px 20px 20px 20px; color: #999; font-size: 14px;">
+                            For more help and support <a href="${process.env.BASE_URL}" target="_blank" style="color: #4387fd;">contact us</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div></body></html>`;
+        // <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        //     <tbody>
+        //         <tr>
+        //             <td align="center" style="padding: 15px;">
+        //                 <table cellpadding="0" cellspacing="0" width="300px" style="margin: 0; padding: 0;">
+        //                     <tbody>
+        //                         <tr>
+        //                             <td align="center" style="font-family: arial,sans-serif;">
+        //                                 <a href="${redirectUrl}" target="_blank" style="font-size:14px; color: #ffffff; font-weight:normal; background: #0070d2; border-radius: 4px; display:block; padding: 12px 30px 12px 30px; text-decoration: none;">View Online</a>
+        //                             </td>
+        //                         </tr>
+        //                     </tbody>
+        //                 </table>
+        //             </td>
+        //         </tr>
+        //     </tbody>
+        // </table>
+  // console.log("Inside send mail " + req.body);
+  let extra_email = req.body.extra_email.split(',');
+  extra_email = extra_email.filter(email_id => isValidEmail(email_id));
+  console.log('extra_email')
+  console.log(extra_email)
+  const mailOptions = {
+    to: req.body.client_email,
+    cc: req.body.extra_email.split(','),
+    from: 'krowtesting@athenalogics.com',
+    subject: "Invoice from " + companyName + " on krow timesheet app",
+    html: html,
+    attachments :[
+      {
+          filename: 'Timesheet-invoice.pdf',
+          contentType: 'application/pdf',
+          content: req.body.pdfFile
+      }
+    ]
+  };
+
+  req.mailOptions = mailOptions;
+  // console.log('transpoter');
+  email.sendMail(req, res, function(error, info) {
+    // console.log('transpoter');
+    if (error) {
+      console.log(error);
+      next(error, null);
+    } else {
+      // console.log('Message sent: ' + info.response);
+      next(null, info);
+      /*res.status(200).json({"success": true,"message":"success" });*/
+    }
+  });
+};
+
+function isValidEmail(inputtxt){
+  var emailReg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+  if(inputtxt.match(emailReg)) {
+      return true;
+  }
+  return false;
+}
+
 exports.generatePdfFromHtml= (req, res) => {
-    // console.log(req.params.invoiceId);
-    invoiceHtmlData(req,res,false);
+    console.log('req.params.invoiceId');
+    invoiceHtmlData(req,res,false,'');
     /*let invoiceDetails=JSON.parse(req.query.invoiceDetails);
     let lineItems=JSON.parse(req.query.lineItems);*/
 

@@ -933,7 +933,7 @@ DECLARE
 BEGIN
 
  IF TG_OP = 'DELETE' THEN
-	SELECT INTO total_expense_cal SUM(amount) FROM expense WHERE project_id = OLD.project_id AND archived = false;
+	SELECT INTO total_expense_cal SUM(total_amount) FROM expense WHERE project_id = OLD.project_id AND archived = false;
 	RAISE NOTICE 'total_expense_amount(%)', total_expense_cal;
   IF total_expense_cal IS NULL THEN
     UPDATE PROJECT SET total_expense_amount = 0 WHERE id = OLD.project_id;
@@ -941,13 +941,13 @@ BEGIN
     UPDATE PROJECT SET total_expense_amount = total_expense_cal WHERE id = OLD.project_id;
   END IF;
  ELSE
-	SELECT INTO total_expense_cal SUM(amount) FROM expense WHERE project_id = NEW.project_id AND archived = false;
+	SELECT INTO total_expense_cal SUM(total_amount) FROM expense WHERE project_id = NEW.project_id AND archived = false;
 	RAISE NOTICE 'total_expense_amount(%)', total_expense_cal;
   IF total_expense_cal IS NULL THEN
     UPDATE PROJECT SET total_expense_amount = 0 WHERE id = NEW.project_id;
   ELSE
     UPDATE PROJECT SET total_expense_amount = total_expense_cal WHERE id = NEW.project_id;
-  END IF;	
+  END IF;
  END IF;
 
  RETURN NEW;
@@ -1050,9 +1050,50 @@ BEGIN
 END;
 $BODY$
 
-
+-- 08-04-2019 --
 CREATE TRIGGER update_project_total_invoice_data
-    AFTER INSERT OR DELETE
-    ON invoice_line_item
-    FOR EACH ROW
-    EXECUTE PROCEDURE calculate_total_invoice_data();
+  AFTER INSERT OR DELETE
+  ON invoice_line_item
+  FOR EACH ROW
+  EXECUTE PROCEDURE calculate_total_invoice_data();
+
+
+CREATE OR REPLACE FUNCTION calculate_invoice_final_amount()
+  RETURNS trigger LANGUAGE plpgsql AS
+$BODY$
+DECLARE
+  final_amount_cal INTEGER;
+BEGIN
+
+ IF TG_OP = 'DELETE' THEN
+ 	IF OLD.project_id IS NOT NULL THEN
+		SELECT INTO total_amount_cal SUM(total_amount) FROM invoice_line_item WHERE project_id = OLD.project_id;
+		RAISE NOTICE 'total_amount_cal(%)', total_amount_cal;
+		IF total_amount_cal IS NULL THEN
+			UPDATE PROJECT SET total_invoice_amount = 0 WHERE id = OLD.project_id;
+		ELSE
+			UPDATE PROJECT SET total_invoice_amount = total_amount_cal WHERE id = OLD.project_id;
+		END IF;
+	END IF;
+ ELSE
+ 	IF NEW.project_id IS NOT NULL THEN
+		SELECT INTO total_amount_cal SUM(total_amount) FROM invoice_line_item WHERE project_id = NEW.project_id;
+		RAISE NOTICE 'total_amount_cal(%)', total_amount_cal;
+		IF total_amount_cal IS NULL THEN
+			UPDATE PROJECT SET total_invoice_amount = 0 WHERE id = NEW.project_id;
+		ELSE
+			UPDATE PROJECT SET total_invoice_amount = total_amount_cal WHERE id = NEW.project_id;
+		END IF;
+	END IF;
+ END IF;
+
+ RETURN NEW;
+END;
+$BODY$
+
+
+CREATE TRIGGER update_invoice_final_amount
+AFTER INSERT OR DELETE
+ON invoice_line_item
+FOR EACH ROW
+EXECUTE PROCEDURE calculate_invoice_final_amount();

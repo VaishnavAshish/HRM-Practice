@@ -59,7 +59,7 @@
                                 <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
                                     <div class="text-right sm-tpd-15">
                                       <div class="slds-button-group" role="group">
-                                               <button class="slds-button slds-button_neutral" onclick="openModal('#modalEmailInvoice')">
+                                               <button class="slds-button slds-button_neutral" onclick="openModal('#modalEmailInvoice',true)">
                                                    <i class=" fa fa-envelope" aria-hidden="true"></i>
                                                    Send Invoice
                                                </button>
@@ -765,6 +765,7 @@
         <% include ../modals/modal-add-invoice-timesheet %>
         <% include ../modals/modal-add-invoice-expenses %>
         <% include ../modals/modal-add-invoice-fixed-fee %>
+        <% include ../modals/modal-email-invoice %>
         <% include ../layouts/footer %>
     </main>
 
@@ -774,6 +775,7 @@
     <% include ../layouts/scripts %>
     <% include ../layouts/invoice-script %>
     <% include ../layouts/invoice-det-script %>
+
 </body>
 
 </html>

@@ -58,6 +58,7 @@ module.exports = function(app) {
         });
     });
 
+
     app.get('/check-domain', function(req, res) {
         res.render('pages/company-admin-details', {
             domain: req.query.domain,
@@ -124,6 +125,8 @@ module.exports = function(app) {
     app.post('/findInvoiceForAccount', passportConfig.isAuthenticated,invoiceController.findInvoiceForAccount);
 
     app.get('/generatePdfFromHtml/:invoiceId', passportConfig.isAuthenticated,invoiceController.generatePdfFromHtml);
+    app.post('/sendInvoiceEmail', passportConfig.isAuthenticated,invoiceController.sendInvoiceEmail);
+
 
 
 
