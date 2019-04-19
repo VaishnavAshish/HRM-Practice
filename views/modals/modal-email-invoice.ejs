@@ -1,0 +1,45 @@
+<!-- modal email invoice start-->
+<div id="modalEmailInvoice">
+    <section role="dialog" tabindex="-1" class="slds-modal">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="closeModal('#modalEmailInvoice');">
+                    <span class="slds-button__icon">
+                        <i class="fa fa-times text-size-21"></i>
+                    </span>
+                </button>
+                <h2  class="slds-text-heading_medium slds-hyphenate">Email Invoice</h2>
+            </header>
+            <div class="slds-modal__content slds-p-around_medium" modal-body>
+                <div>
+
+                    <div class="slds-form-element slds-m-bottom_medium" reset="errorclass">
+                          <label class="slds-form-element__label">
+                              To
+                              <abbr class="slds-required" title="required">*</abbr>
+                          </label>
+                          <div class="slds-form-element__control">
+                              <input type="text" id="client_email" name="client_email" class="slds-input" value="<%= account.email %>" disabled>
+                              <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset="errmsg"></div>
+                          </div>
+                      </div>
+                      <div class="slds-form-element slds-m-bottom_medium" reset="errorclass">
+                            <label class="slds-form-element__label">
+                                CC
+                            </label>
+                            <div class="slds-form-element__control">
+                                <input type="text" id="extra_email" name="extra_email" class="slds-input" reset='value' placeholder="Enter comma seperated email id to send copy of email.">
+                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset="errmsg"></div>
+                            </div>
+                        </div>
+                </div>
+            </div>
+            <footer class="slds-modal__footer">
+                <button class="slds-button slds-button_neutral" onclick="closeModal('#modalEmailInvoice');">Cancel</button>
+                <button class="slds-button slds-button_brand" onclick="sendInvoiceEmail('#modalEmailInvoice')">Send Email</button>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop"></div>
+</div>
+<!-- modal email invoice end-->
