@@ -1128,7 +1128,7 @@ exports.getInvoiceDetails = (req, res) => {
                                                         handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.user, userList:[], error:err},"error"," Error in finding invoice line item data");
                                                         /*handleResponse.handleError(res, err, ' Error in finding invoice line item data');*/
                                                     } else {
-                                                        let invoice_total_amount=0;
+                                                        let invoice_total_amount=0,invoice_taxable_amount=0;
                                                         if (invoiceItems.rows.length > 0) {
                                                             invoiceItems.rows.forEach(function (lineItem) {
                                                                 // lineItem["item_date"] = dateFormat(moment.tz(lineItem.item_date, companyDefaultTimezone).format());
@@ -1155,6 +1155,9 @@ exports.getInvoiceDetails = (req, res) => {
                                                                 previousCurrency=parseFloat(previousCurrency[0].value);
                                                                 let line_total_amount=(currentCurrency/previousCurrency*parseFloat(lineItem.total_amount));
                                                                 // console.log('total_amount '+line_total_amount);
+                                                                if(lineItem.expense_id==null){
+                                                                  invoice_taxable_amount+=parseFloat(line_total_amount);
+                                                                }
                                                                 invoice_total_amount+=parseFloat(line_total_amount);
                                                                 // console.log('total_amount '+invoice_total_amount);
 
@@ -1165,6 +1168,15 @@ exports.getInvoiceDetails = (req, res) => {
                                                         if(invoiceDetails.rows.length>0){
                                                             /*// console.log('total_amount '+invoice_total_amount); */
                                                             invoiceDetails.rows[0].total_amount=invoice_total_amount.toFixed(2);
+                                                            console.log('invoiceDetails.tax '+(invoice_taxable_amount*invoiceDetails.rows[0].tax/100)+' '+invoice_total_amount);
+                                                            invoiceDetails.rows[0].tax =parseInt(invoiceDetails.rows[0].tax);
+                                                            if(invoiceDetails.rows[0].tax&&invoiceDetails.rows[0].tax>0){
+                                                              invoiceDetails.rows[0].final_amount=parseFloat(invoice_total_amount.toFixed(2))+parseFloat(invoice_taxable_amount*invoiceDetails.rows[0].tax/100);
+                                                            }else{
+                                                              invoiceDetails.rows[0].final_amount=invoice_total_amount.toFixed(2);
+                                                            }
+
+
                                                             // invoiceDetails.rows[0]['startDateFormatted'] = invoiceDetails.rows[0].start_date == null ? '' : dateFormat(moment.tz(invoiceDetails.rows[0].start_date, companyDefaultTimezone).format());
                                                             // invoiceDetails.rows[0]['dueDateFormatted'] = invoiceDetails.rows[0].due_date == null ? '' : dateFormat(moment.tz(invoiceDetails.rows[0].due_date, companyDefaultTimezone).format());
                                                             invoiceDetails.rows[0]['startDateFormatted'] = invoiceDetails.rows[0].start_date == null ? '' : dateFormat(invoiceDetails.rows[0].start_date);

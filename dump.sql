@@ -1146,11 +1146,13 @@ BEGIN
 	IF OLD.tax <> NEW.tax THEN
 
 		SELECT INTO taxable_amount SUM(total_amount) FROM invoice_line_item WHERE invoice_id = NEW.id AND expense_id IS null;
+    RAISE NOTICE 'taxable_amount(%)', taxable_amount;
 		IF taxable_amount IS NOT NULL THEN
         	SELECT INTO final_amount_cal total_amount+(taxable_amount*tax/100) FROM invoice WHERE id = NEW.id;
       	ELSE
-          SELECT INTO final_amount_cal total_amount WHERE id = NEW.id;
+          SELECT INTO final_amount_cal total_amount FROM invoice WHERE id = NEW.id;
 		END IF;
+    RAISE NOTICE 'final_amount_cal(%)', final_amount_cal;
 		UPDATE INVOICE SET final_amount = final_amount_cal WHERE id = NEW.id;
   	END IF;
  RETURN NEW;

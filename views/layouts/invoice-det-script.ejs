@@ -19,7 +19,7 @@
     // $("#invoice-tax").text(inv_tax.toFixed(2));
     if(parseFloat(<%= invoiceDetails.final_amount%>)-parseFloat(<%= invoiceDetails.total_amount%>)>0){
       $("#invoice-tax").closest('.text-right').show();
-      $("#invoice-tax").text(<%= invoiceDetails.final_amount%>-<%= invoiceDetails.total_amount%>);
+      $("#invoice-tax").text((<%= invoiceDetails.final_amount%>-<%= invoiceDetails.total_amount%>).toFixed(2));
     }else{
       $("#invoice-tax").closest('.text-right').hide();
     }
