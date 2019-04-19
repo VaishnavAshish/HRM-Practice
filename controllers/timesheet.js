@@ -1127,7 +1127,13 @@ exports.submitWeeklyTimesheetByProjectTaskId = (req, res) => {
   if(req.user) {
     console.log(req.user.company_id+' '+ req.user.id+' '+ req.body.project_id+' '+ req.body.task_id+' '+ req.body.user_role, moment.tz(req.body.created_date.split(' ')[0].split('T')[0], companyDefaultTimezone).format()+' '+moment.tz(req.body.created_date.split(' ')[0].split('T')[0]+' 23:59:59', companyDefaultTimezone).format());
     pool.connect((err, client, done) => {
-      client.query('SELECT tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category ,EXTRACT(DOW FROM tl.created_date at time zone \''+companyDefaultTimezone+'\') as week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime at time zone \''+companyDefaultTimezone+'\' as lastruntime ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id FROM TIMESHEET_LINE_ITEM tl WHERE company_id=$1 AND resource_id=$2 AND project_id=$3 AND task_id=$4 AND user_role=$5 AND created_date at time zone \''+companyDefaultTimezone+'\' BETWEEN $6 AND $7',[req.user.company_id, req.user.id, req.body.project_id, req.body.task_id, req.body.user_role, moment.tz(req.body.created_date.split(' ')[0].split('T')[0], companyDefaultTimezone).format(),moment.tz(req.body.created_date.split(' ')[0].split('T')[0]+' 23:59:59', companyDefaultTimezone).format()], function(err, timesheetLiRec) {
+      let queryToExec = 'SELECT tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category ,EXTRACT(DOW FROM tl.created_date at time zone \''+companyDefaultTimezone+'\') as week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime at time zone \''+companyDefaultTimezone+'\' as lastruntime ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id FROM TIMESHEET_LINE_ITEM tl WHERE company_id=$1 AND resource_id=$2 AND project_id=$3 AND user_role=$4 AND created_date at time zone \''+companyDefaultTimezone+'\' BETWEEN $5 AND $6';
+      let queryParamArr = [req.user.company_id, req.user.id, req.body.project_id, req.body.user_role, moment.tz(req.body.created_date.split(' ')[0].split('T')[0], companyDefaultTimezone).format(),moment.tz(req.body.created_date.split(' ')[0].split('T')[0]+' 23:59:59', companyDefaultTimezone).format()];
+      if(req.body.task_id){
+        queryToExec += ' AND task_id = $7';
+        queryParamArr.push(req.body.task_id);
+      }
+      client.query(queryToExec,queryParamArr, function(err, timesheetLiRec) {
         if(err) {
           console.error(err);
           handleResponse.shouldAbort(err, client, done);
@@ -1144,14 +1150,14 @@ exports.submitWeeklyTimesheetByProjectTaskId = (req, res) => {
                   if(err) {
                     console.error(err);
                     handleResponse.shouldAbort(err, client, done);
-                    handleResponse.handleError(res, err, ' Error in finding timesheet detail data 2');
+                    handleResponse.handleError(res, err, ' Error in updating timesheet detail data');
                   } else {
                     client.query('UPDATE TIMESHEET_LINE_ITEM SET submitted=$1, timesheet_id=$2 WHERE company_id=$3 AND resource_id=$4 AND project_id=$5 AND task_id=$6 AND user_role=$7 AND created_date at time zone \''+companyDefaultTimezone+'\' BETWEEN $8 AND $9 RETURNING *', [true, response.timesheetMasterId, req.user.company_id, req.user.id, req.body.project_id, req.body.task_id, req.body.user_role, moment.tz(req.body.created_date.split(' ')[0].split('T')[0], companyDefaultTimezone).format(),moment.tz(req.body.created_date.split(' ')[0].split('T')[0]+' 23:59:59', companyDefaultTimezone).format()], function(err, data) {
                       if(err) {
                         // console.log('this.sql');
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);
-                        handleResponse.handleError(res, err, ' Error in finding timesheet detail data 3');
+                        handleResponse.handleError(res, err, ' Error in updating timesheet line item');
                       } else {
                         console.log("Data updated");
                         console.log(data.rows);
@@ -1169,7 +1175,14 @@ exports.submitWeeklyTimesheetByProjectTaskId = (req, res) => {
                     handleResponse.shouldAbort(err, client, done);
                     handleResponse.handleError(res, err, ' Error in finding timesheet detail data 2');
                   } else {
-                    client.query('UPDATE TIMESHEET_LINE_ITEM SET submitted=$1, timesheet_id=$2 WHERE company_id=$3 AND resource_id=$4 AND project_id=$5 AND task_id=$6 AND user_role=$7 AND created_date at time zone \''+companyDefaultTimezone+'\' BETWEEN $8 AND $9 RETURNING *', [true, insertedRec.rows[0].id, req.user.company_id, req.user.id, req.body.project_id, req.body.task_id, req.body.user_role, moment.tz(req.body.created_date.split(' ')[0].split('T')[0], companyDefaultTimezone).format(),moment.tz(req.body.created_date.split(' ')[0].split('T')[0]+' 23:59:59', companyDefaultTimezone).format()], function(err, data) {
+                    let queryToExec = 'UPDATE TIMESHEET_LINE_ITEM SET submitted=$1, timesheet_id=$2 WHERE company_id=$3 AND resource_id=$4 AND project_id=$5  AND user_role=$6 AND created_date at time zone \''+companyDefaultTimezone+'\' BETWEEN $7 AND $8 ';
+                    let queryParamArr = [true, insertedRec.rows[0].id, req.user.company_id, req.user.id, req.body.project_id, req.body.user_role, moment.tz(req.body.created_date.split(' ')[0].split('T')[0], companyDefaultTimezone).format(),moment.tz(req.body.created_date.split(' ')[0].split('T')[0]+' 23:59:59', companyDefaultTimezone).format()];
+                    if(req.body.task_id){
+                      queryToExec += ' AND task_id = $9';
+                      queryParamArr.push(req.body.task_id);
+                    }
+                    queryToExec += ' RETURNING *';
+                    client.query(queryToExec,queryParamArr , function(err, data) {
                       if(err) {
                         handleResponse.shouldAbort(err, client, done);
                         handleResponse.handleError(res, err, ' Error in finding timesheet detail data 3');

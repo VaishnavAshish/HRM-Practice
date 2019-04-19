@@ -200,7 +200,7 @@ exports.getInvoice = (req, res) => {
                         // console.log(" *** accountIdArr *** ");
                         // console.log(accountIdArr);
                         whereClause='WHERE company_id=$1 AND archived=$2 AND account_id IN(SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) '
-                        client.query('SELECT i.id ,i.status ,i.account_id ,i.company_id ,i.created_by ,i.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,i.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,i.archived ,i.account_name ,i.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,i.due_date at time zone \''+companyDefaultTimezone+'\' as due_date ,i.description ,i.project_id ,i.project_name ,i.total_amount ,i.record_id ,i.currency ,i.tax ,(SELECT count(*) FROM INVOICE '+whereClause+') as totalCount,(SELECT count(*) FROM INVOICE '+whereClause+' AND status ilike $3) as draftCount,(SELECT count(*) FROM INVOICE '+whereClause+' AND status ilike $4) as paidCount FROM INVOICE i '+whereClause+' ORDER BY start_date DESC,record_id OFFSET 0 LIMIT ' + process.env.PAGE_RECORD_NO, [req.user.company_id, false,'Draft','Paid'], function (err, invoiceList) {
+                        client.query('SELECT i.id ,i.status ,i.account_id ,i.company_id ,i.created_by ,i.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,i.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,i.archived ,i.account_name ,i.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,i.due_date at time zone \''+companyDefaultTimezone+'\' as due_date ,i.description ,i.project_id ,i.project_name ,i.total_amount ,i.record_id ,i.currency ,i.tax,i.final_amount ,(SELECT count(*) FROM INVOICE '+whereClause+') as totalCount,(SELECT count(*) FROM INVOICE '+whereClause+' AND status ilike $3) as draftCount,(SELECT count(*) FROM INVOICE '+whereClause+' AND status ilike $4) as paidCount FROM INVOICE i '+whereClause+' ORDER BY start_date DESC,record_id OFFSET 0 LIMIT ' + process.env.PAGE_RECORD_NO, [req.user.company_id, false,'Draft','Paid'], function (err, invoiceList) {
                             if (err) {
                                 console.error(err);
                                 handleResponse.shouldAbort(err, client, done);
@@ -1097,7 +1097,7 @@ exports.getInvoiceDetails = (req, res) => {
 
                 pool.connect((err, client, done) => {
 
-                    client.query('SELECT i.id ,i.status ,i.account_id ,i.company_id ,i.created_by ,i.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,i.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,i.archived ,i.account_name ,i.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,i.due_date at time zone \''+companyDefaultTimezone+'\' as due_date ,i.description ,i.project_id ,i.project_name ,i.total_amount ,i.record_id ,i.currency ,i.tax  FROM INVOICE i WHERE company_id=$1 AND id=$2', [req.user.company_id, req.query.invoiceId], function (err, invoiceDetails) {
+                    client.query('SELECT i.id ,i.status ,i.account_id ,i.company_id ,i.created_by ,i.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,i.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,i.archived ,i.account_name ,i.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,i.due_date at time zone \''+companyDefaultTimezone+'\' as due_date ,i.description ,i.project_id ,i.project_name ,i.total_amount ,i.record_id ,i.currency ,i.tax,i.final_amount  FROM INVOICE i WHERE company_id=$1 AND id=$2', [req.user.company_id, req.query.invoiceId], function (err, invoiceDetails) {
                         if (err) {
                             console.error(err);
                             handleResponse.shouldAbort(err, client, done);
@@ -1170,8 +1170,8 @@ exports.getInvoiceDetails = (req, res) => {
                                                             invoiceDetails.rows[0]['startDateFormatted'] = invoiceDetails.rows[0].start_date == null ? '' : dateFormat(invoiceDetails.rows[0].start_date);
                                                             invoiceDetails.rows[0]['dueDateFormatted'] = invoiceDetails.rows[0].due_date == null ? '' : dateFormat(invoiceDetails.rows[0].due_date);
                                                         }
-                                                        let invoice_tax=(parseFloat(invoice_total_amount) * parseFloat(invoiceDetails.rows[0].tax)) / 100;
-                                                        invoice_total_amount=(parseFloat(invoice_total_amount)+parseFloat(invoice_tax)).toFixed(2);
+                                                        // let invoice_tax=(parseFloat(invoice_total_amount) * parseFloat(invoiceDetails.rows[0].tax)) / 100;
+                                                        // invoice_total_amount=(parseFloat(invoice_total_amount)+parseFloat(invoice_tax)).toFixed(2);
                                                         let newDate=moment.tz(new Date(), companyDefaultTimezone).format();
                                                         client.query('UPDATE INVOICE SET total_amount=$1 ,updated_date=$2 WHERE id=$3 RETURNING *', [invoice_total_amount,'now()',req.query.invoiceId], function (err, invoiceUpdated) {
                                                             if (err) {
@@ -1656,7 +1656,7 @@ function invoiceHtmlData (req,res,invoiceHtml,responseType){
        }else{
              companyDefaultTimezone = result.timezone;
             pool.connect((err, client, done) => {
-                client.query('SELECT i.id ,i.status ,i.account_id ,i.company_id ,i.created_by ,i.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,i.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,i.archived ,i.account_name ,i.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,i.due_date at time zone \''+companyDefaultTimezone+'\' as due_date ,i.description ,i.project_id ,i.project_name ,i.total_amount ,i.record_id ,i.currency ,i.tax  FROM invoice i WHERE id=$1',[invId], function (err, invoiceDetails) {
+                client.query('SELECT i.id ,i.status ,i.account_id ,i.company_id ,i.created_by ,i.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,i.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,i.archived ,i.account_name ,i.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,i.due_date at time zone \''+companyDefaultTimezone+'\' as due_date ,i.description ,i.project_id ,i.project_name ,i.total_amount ,i.record_id ,i.currency ,i.tax,i.final_amount  FROM invoice i WHERE id=$1',[invId], function (err, invoiceDetails) {
                     if (err) {
                         handleResponse.shouldAbort(err, client, done);
                         if(invoiceHtml==true){
@@ -1865,11 +1865,11 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
                     note = invLineDetails.note;
                 }
                 let notes = ` ${note} `;
-                if(projectObj.length>0){
-                    notes = `Project:  ${projectObj[0].name}
-                              <br />
-                               ${note} `;
-                }
+                // if(projectObj.length>0){
+                //     notes = `Project:  ${projectObj[0].name}
+                //               <br />
+                //                ${note} `;
+                // }
                 // '<td align="left">'+
                 // invLineDetails.type+
                 // '</td>'+
@@ -1923,6 +1923,17 @@ let account_address = `<strong>${accountDetails.name}</strong><BR />
                             ${accountDetails.country?accountDetails.country:''}${isComma(accountDetails.country)}
                             ${accountDetails.zip_code?accountDetails.zip_code:''} <BR />`;
     /*// console.log(company_logo);*/
+    let taxHTML =``;
+    if(invoiceDetails.final_amount-invoiceDetails.total_amount>0){
+      taxHTML = `<tr>
+                    <td align="right">
+                        Tax
+                    </td>
+                    <td align="right" width="20%">
+                        ${currency_symbols[0].symbol} ${invoiceDetails.final_amount-invoiceDetails.total_amount}
+                    </td>
+                </tr>`;
+    }
     let pdfHTML=`<!DOCTYPE html>
                     <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://ww.w3.org/1999/xlink" lang="en">
 
@@ -2147,17 +2158,11 @@ let account_address = `<strong>${accountDetails.name}</strong><BR />
                                                 Subtotal
                                             </td>
                                             <td align="right" width="20%">
-                                                ${currency_symbols[0].symbol} ${sumOfTotalAmount}
+                                                ${currency_symbols[0].symbol} ${invoiceDetails.total_amount}
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td align="right">
-                                                Tax
-                                            </td>
-                                            <td align="right" width="20%">
-                                                ${currency_symbols[0].symbol} ${taxAmount}
-                                            </td>
-                                        </tr>
+                                        ${taxHTML}
+
 
                                         <tr class="bg-dull">
                                             <td align="right">
@@ -2167,7 +2172,7 @@ let account_address = `<strong>${accountDetails.name}</strong><BR />
                                             </td>
                                             <td align="right" width="20%">
                                                 <strong class="text-size-18">
-                                                    ${currency_symbols[0].symbol} ${(totalPaidAmount)}
+                                                    ${currency_symbols[0].symbol} ${invoiceDetails.final_amount}
                                                 </strong>
                                             </td>
                                         </tr>

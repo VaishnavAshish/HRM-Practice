@@ -929,7 +929,7 @@ CREATE OR REPLACE FUNCTION calculate_total_expense_amount()
   RETURNS trigger LANGUAGE plpgsql AS
 $BODY$
 DECLARE
-  total_expense_cal INTEGER;
+  total_expense_cal FLOAT;
 BEGIN
 
  IF TG_OP = 'DELETE' THEN
@@ -964,7 +964,7 @@ CREATE OR REPLACE FUNCTION calculate_total_invoice_amount()
   RETURNS trigger LANGUAGE plpgsql AS
 $BODY$
 DECLARE
-  total_amount_cal INTEGER;
+  total_amount_cal FLOAT;
 BEGIN
 
  IF TG_OP = 'DELETE' THEN
@@ -1005,7 +1005,7 @@ CREATE OR REPLACE FUNCTION calculate_total_invoice_data()
 $BODY$
 DECLARE
   total_hours_cal INTEGER;
-  total_expense_invoice INTEGER;
+  total_expense_invoice FLOAT;
 BEGIN
 
  IF TG_OP = 'DELETE' THEN
@@ -1062,28 +1062,62 @@ CREATE OR REPLACE FUNCTION calculate_invoice_final_amount()
   RETURNS trigger LANGUAGE plpgsql AS
 $BODY$
 DECLARE
-  final_amount_cal INTEGER;
+  taxable_amount FLOAT;
+  final_amount_cal FLOAT;
+  tax_per FLOAT;
+  total_amount_cal FLOAT;
 BEGIN
 
  IF TG_OP = 'DELETE' THEN
- 	IF OLD.project_id IS NOT NULL THEN
-		SELECT INTO total_amount_cal SUM(total_amount) FROM invoice_line_item WHERE project_id = OLD.project_id;
-		RAISE NOTICE 'total_amount_cal(%)', total_amount_cal;
-		IF total_amount_cal IS NULL THEN
-			UPDATE PROJECT SET total_invoice_amount = 0 WHERE id = OLD.project_id;
+ 	IF OLD.invoice_id IS NOT NULL THEN
+		SELECT tax INTO tax_per  FROM invoice WHERE id = OLD.invoice_id;
+		SELECT total_amount INTO total_amount_cal  FROM invoice WHERE id = OLD.invoice_id;
+
+		IF tax_per>0 THEN
+			SELECT INTO taxable_amount SUM(total_amount) FROM invoice_line_item WHERE invoice_id = OLD.invoice_id AND expense_id IS null;
+			RAISE NOTICE 'taxable_amount(%)', taxable_amount;
+			IF taxable_amount IS NOT NULL THEN
+				SELECT INTO final_amount_cal total_amount-OLD.total_amount+(taxable_amount*tax_per/100) FROM invoice WHERE id = OLD.invoice_id;
+			ELSE
+				SELECT INTO final_amount_cal total_amount-OLD.total_amount FROM invoice WHERE id = OLD.invoice_id;
+				RAISE NOTICE 'non_taxable_amount(%)', final_amount_cal;
+			END IF;
+			RAISE NOTICE 'final_amount_cal(%)', final_amount_cal;
+			IF final_amount_cal IS NULL THEN
+				UPDATE INVOICE SET final_amount = 0.00 WHERE id = OLD.invoice_id;
+			ELSE
+				UPDATE INVOICE SET final_amount = final_amount_cal WHERE id = OLD.invoice_id;
+			END IF;
 		ELSE
-			UPDATE PROJECT SET total_invoice_amount = total_amount_cal WHERE id = OLD.project_id;
+			UPDATE INVOICE SET final_amount = total_amount_cal-OLD.total_amount WHERE id = OLD.invoice_id;
 		END IF;
 	END IF;
  ELSE
- 	IF NEW.project_id IS NOT NULL THEN
-		SELECT INTO total_amount_cal SUM(total_amount) FROM invoice_line_item WHERE project_id = NEW.project_id;
+ 	IF NEW.invoice_id IS NOT NULL THEN
+		SELECT tax INTO tax_per  FROM invoice WHERE id = NEW.invoice_id;
+		SELECT total_amount INTO total_amount_cal  FROM invoice WHERE id = NEW.invoice_id;
+		RAISE NOTICE 'tax_per(%)', tax_per;
 		RAISE NOTICE 'total_amount_cal(%)', total_amount_cal;
-		IF total_amount_cal IS NULL THEN
-			UPDATE PROJECT SET total_invoice_amount = 0 WHERE id = NEW.project_id;
-		ELSE
-			UPDATE PROJECT SET total_invoice_amount = total_amount_cal WHERE id = NEW.project_id;
-		END IF;
+			IF tax_per>0 THEN
+
+				SELECT INTO taxable_amount SUM(total_amount) FROM invoice_line_item WHERE invoice_id = NEW.invoice_id AND expense_id IS null;
+				RAISE NOTICE 'taxable_amount(%)', taxable_amount;
+				IF taxable_amount IS NOT NULL THEN
+					SELECT INTO final_amount_cal total_amount+NEW.total_amount+(taxable_amount*tax_per/100) FROM invoice WHERE id = NEW.invoice_id;
+				ELSE
+					SELECT INTO final_amount_cal total_amount+NEW.total_amount FROM invoice WHERE id = NEW.invoice_id;
+					RAISE NOTICE 'non_taxable_amount(%)', final_amount_cal;
+				END IF;
+				RAISE NOTICE 'final_amount_cal(%)', final_amount_cal;
+				IF final_amount_cal IS NULL THEN
+					UPDATE INVOICE SET final_amount = 0.00 WHERE id = NEW.invoice_id;
+				ELSE
+					UPDATE INVOICE SET final_amount = final_amount_cal WHERE id = NEW.invoice_id;
+				END IF;
+			ELSE
+
+				UPDATE INVOICE SET final_amount = total_amount_cal+NEW.total_amount WHERE id = NEW.invoice_id;
+			END IF;
 	END IF;
  END IF;
 
@@ -1097,3 +1131,34 @@ AFTER INSERT OR DELETE
 ON invoice_line_item
 FOR EACH ROW
 EXECUTE PROCEDURE calculate_invoice_final_amount();
+
+
+
+CREATE OR REPLACE FUNCTION calculate_invoice_tax_amount()
+  RETURNS trigger LANGUAGE plpgsql AS
+$BODY$
+DECLARE
+  taxable_amount FLOAT;
+  final_amount_cal FLOAT;
+BEGIN
+	RAISE NOTICE 'OLD.tax(%)', OLD.tax;
+	RAISE NOTICE 'NEW.tax(%)', NEW.tax;
+	IF OLD.tax <> NEW.tax THEN
+
+		SELECT INTO taxable_amount SUM(total_amount) FROM invoice_line_item WHERE invoice_id = NEW.id AND expense_id IS null;
+		IF taxable_amount IS NOT NULL THEN
+        	SELECT INTO final_amount_cal total_amount+(taxable_amount*tax/100) FROM invoice WHERE id = NEW.id;
+      	ELSE
+          SELECT INTO final_amount_cal total_amount WHERE id = NEW.id;
+		END IF;
+		UPDATE INVOICE SET final_amount = final_amount_cal WHERE id = NEW.id;
+  	END IF;
+ RETURN NEW;
+END;
+$BODY$
+
+CREATE TRIGGER update_invoice_tax_amount
+AFTER UPDATE
+ON invoice
+FOR EACH ROW
+EXECUTE PROCEDURE calculate_invoice_tax_amount();

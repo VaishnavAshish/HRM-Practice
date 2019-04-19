@@ -228,12 +228,13 @@
                                                 </td> -->
                                                 <td data-label="Description" class="slds-cell-wrap">
                                                   <div>
-                                                      <% if(projectObj.length<=0) { %>
+                                                           <%= invLineDetails.note %>
+                                                      <!-- <% if(projectObj.length<=0) { %>
                                                              <%= invLineDetails.note %>
                                                       <% } else { %>
                                                             Project: <%= projectObj[0].name %>
                                                             <br>  <%= invLineDetails.note %>
-                                                      <% } %>
+                                                      <% } %> -->
                                                     </div>
                                                 </td>
                                                 <td data-label="Qty / Hr">
@@ -406,21 +407,24 @@
                                                     Subtotal
                                                 </td>
                                                 <td class="slds-cell-wrap slds-text-align_right" width="160px">
-                                                    <%= currency_symbols[0].symbol %> <%= sumOfTotalAmount.toFixed(2) %>
+                                                    <%= currency_symbols[0].symbol %> <%= invoiceDetails.total_amount %>
                                                 </td>
                                             </tr>
-                                            <tr>
-                                                <td class=" slds-text-align_right" valign="top">
-                                                    + TAX
-                                                </td>
-                                                <td class="slds-cell-wrap slds-text-align_right" width="160px">
-                                                    <% var tax = invoiceDetails.tax;
-                                                       var taxAmount =  (sumOfTotalAmount*tax) / 100;
-                                                       var totalAmount = sumOfTotalAmount + taxAmount;
-                                                    %>
-                                                       <%= currency_symbols[0].symbol %> <%= taxAmount %>
-                                                </td>
-                                            </tr>
+                                            <% if((invoiceDetails.final_amount - invoiceDetails.total_amount) > 0) { %>
+                                              <tr>
+                                                  <td class=" slds-text-align_right" valign="top">
+                                                      + TAX
+                                                  </td>
+                                                  <td class="slds-cell-wrap slds-text-align_right" width="160px">
+                                                      <!-- <% var tax = invoiceDetails.tax;
+                                                         var taxAmount =  (sumOfTotalAmount*tax) / 100;
+                                                         var totalAmount = sumOfTotalAmount + taxAmount;
+                                                      %>
+                                                         <%= currency_symbols[0].symbol %> <%= taxAmount %> -->
+                                                         <%= invoiceDetails.final_amount - invoiceDetails.total_amount %>
+                                                  </td>
+                                              </tr>
+                                            <% } %>
                                             <!-- <tr>
                                                 <td class=" slds-text-align_right" valign="top" width="160px">
                                                     - Discount
@@ -438,7 +442,7 @@
                                                 <td class="slds-cell-wrap slds-text-align_right">
                                                     <div class="text-size-18 slds-p-vertical_x-small">
                                                         <strong>
-                                                            <%= currency_symbols[0].symbol %> <%= totalAmount.toFixed(2) %>
+                                                            <%= currency_symbols[0].symbol %> <%= invoiceDetails.final_amount %>
                                                         </strong>
                                                     </div>
                                                 </td>

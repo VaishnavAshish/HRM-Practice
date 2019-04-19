@@ -14,10 +14,17 @@
     var invoiceItems = <%- JSON.stringify(invoiceItems) %>;
     var tax = parseInt('<%= invoiceDetails.tax%>');
     let total_amount = parseFloat(<%= invoiceDetails.total_amount%>);
-    $("#invoice_amount").text(parseFloat(<%= invoiceDetails.total_amount%>));
+    $("#invoice_amount").text('<%= invoiceDetails.total_amount%>');
     let inv_tax = (total_amount * tax) / 100;
-    $("#invoice-tax").text(inv_tax.toFixed(2));
-    $("#invoice_total_amount").text((parseFloat(total_amount) + parseFloat(inv_tax)).toFixed(2));
+    // $("#invoice-tax").text(inv_tax.toFixed(2));
+    if(parseFloat(<%= invoiceDetails.final_amount%>)-parseFloat(<%= invoiceDetails.total_amount%>)>0){
+      $("#invoice-tax").closest('.text-right').show();
+      $("#invoice-tax").text(<%= invoiceDetails.final_amount%>-<%= invoiceDetails.total_amount%>);
+    }else{
+      $("#invoice-tax").closest('.text-right').hide();
+    }
+    // $("#invoice_total_amount").text((parseFloat(total_amount) + parseFloat(inv_tax)).toFixed(2));
+    $("#invoice_total_amount").text('<%= invoiceDetails.final_amount%>');
     invoiceItems.forEach(function(item) {
       let invoiceLi = $("#invoiceLineItem #" + item.id);
       $("#invoiceLineItem #" + item.id + ' #type').val(item.type);
@@ -39,8 +46,8 @@
     console.log(tax_amount);
     var total_amount = parseFloat(tax_amount) + parseFloat($('#invoice_amount').text());
     console.log(total_amount);
-    $("#invoice-tax").text(tax_amount);
-    $("#invoice_total_amount").text(total_amount);
+    // $("#invoice-tax").text(tax_amount);
+    // $("#invoice_total_amount").text(total_amount);
   }
 
   function isDateRangeDisabled(ele) {
