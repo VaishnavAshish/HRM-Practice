@@ -463,7 +463,7 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
                                           projectData.user_id = req.user.id;
                                           projectData.quantity = 1;
                                           projectData.unit_price = projectDetails.rows[0].project_cost != null ? parseInt(projectDetails.rows[0].project_cost) : 0;
-                                          projectData.note = '';
+                                          projectData.note = 'Fixed Fee';
                                           projectData.id = null;
                                           projectData.user_role = '';
                                           projectData.type = 'Fixed Fee Project';
@@ -1198,6 +1198,8 @@ exports.getInvoiceDetails = (req, res) => {
                                                                     // console.log("response");
                                                                     // // console.log(projects.rows);
                                                                     // console.log('invoice_total_amount '+invoice_total_amount);
+                                                                    accountData.rows[0].quickbook_customer_id=accountData.rows[0].quickbook_customer_id?accountData.rows[0].quickbook_customer_id:null;
+                                                                    console.log('accountData.rows[0].quickbook_customer_id '+accountData.rows[0].quickbook_customer_id)
                                                                     done();
                                                                     handleResponse.responseToPage(res,'pages/invoice-details',{projects:projects.rows, invoiceDetails: invoiceDetails.rows[0], invoiceItems: invoiceItems.rows, user: req.user,account:accountData.rows[0], userList:response ,companyDefaultTimezone:companyDefaultTimezone,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD') },"success","Successfully rendered");
                                                                 })

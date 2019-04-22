@@ -723,6 +723,66 @@
     });
   }
 
+  function openQuickbookMapping(modalId){
+    showLoader('#globalLoader');
+    $.ajax({
+        type: 'POST',
+        url : '/getQuickbookData',
+        contentType: 'application/json',
+        dataType: 'json',
+        data : JSON.stringify({"invoiceId":<%= invoiceDetails.id %>,"client_name":"<%= account.name %>","client_qb_id":"<%= account.quickbook_customer_id %>"}),
+        success : function(response){
+          console.log(response);
+            hideLoader('#globalLoader');
+            // showGlobalToast('#globalToast', 'success', response.message, 4000);
+            let itemList = response.itemArray;
+            let options = '<option value="">Please select</option>';
+            for(let key in itemList){
+              options+=`<option value="${itemList[key].Id}" >${itemList[key].Name}</option>`;
+            }
+            $(".slds-select[name=quickbookItemList]").html(options);
+            openModal(modalId);
+
+        },
+        error: function(response){
+            console.log(response);
+            hideLoader('#globalLoader');
+            showGlobalToast('#globalToast', 'error', response.responseText.message, 4000);
+        }
+    });
+
+  }
+
+  function postInvoiceToQuickbook(modalId){
+    $("#quickbookMapping").removeClass('has-error')
+    let timesheet_item = $("#timesheet_qb_item option:selected").val();
+    let fixed_fee_item = $("#fixed_fee_qb_item option:selected").val();
+    let expense_item = $("#expense_qb_item option:selected").val();
+    let other_item = $("#other_qb_item option:selected").val();
+    checkFormValidation("#quickbookMapping");
+    if(!$("#quickbookMapping").hasClass('has-error')) {
+      $.ajax({
+          type: 'POST',
+          url : '/postInvoiceToQuickbook',
+          contentType: 'application/json',
+          dataType: 'json',
+          data : JSON.stringify({"invoiceId":<%= invoiceDetails.id %>}),
+          success : function(response){
+            console.log(response);
+              hideLoader('#globalLoader');
+              showGlobalToast('#globalToast', 'success', response.message, 4000);
+
+
+          },
+          error: function(response){
+              console.log(response);
+              hideLoader('#globalLoader');
+              showGlobalToast('#globalToast', 'error', response.responseText.message, 4000);
+          }
+      });
+    }
+  }
+
   /*function generateHtml(){
       window.location.href='/generateHtml';
   }*/
