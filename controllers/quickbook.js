@@ -356,6 +356,7 @@ exports.getQuickbookData = (req,res) => {
                                handleResponse.handleError(res, err, ' Error in fetching account data');
                              } else {
                                 if(accountInfo.rows.length>0){
+                                      console.log(accountInfo.rows[0].email);
                                       let accountData={
                                         "FullyQualifiedName": accountInfo.rows[0].name,
                                         "PrimaryEmailAddr": {
