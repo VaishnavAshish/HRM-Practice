@@ -1152,7 +1152,14 @@ exports.submitWeeklyTimesheetByProjectTaskId = (req, res) => {
                     handleResponse.shouldAbort(err, client, done);
                     handleResponse.handleError(res, err, ' Error in updating timesheet detail data');
                   } else {
-                    client.query('UPDATE TIMESHEET_LINE_ITEM SET submitted=$1, timesheet_id=$2 WHERE company_id=$3 AND resource_id=$4 AND project_id=$5 AND task_id=$6 AND user_role=$7 AND created_date at time zone \''+companyDefaultTimezone+'\' BETWEEN $8 AND $9 RETURNING *', [true, response.timesheetMasterId, req.user.company_id, req.user.id, req.body.project_id, req.body.task_id, req.body.user_role, moment.tz(req.body.created_date.split(' ')[0].split('T')[0], companyDefaultTimezone).format(),moment.tz(req.body.created_date.split(' ')[0].split('T')[0]+' 23:59:59', companyDefaultTimezone).format()], function(err, data) {
+                    let queryToExec = 'UPDATE TIMESHEET_LINE_ITEM SET submitted=$1, timesheet_id=$2 WHERE company_id=$3 AND resource_id=$4 AND project_id=$5 AND user_role=$6 AND created_date at time zone \''+companyDefaultTimezone+'\' BETWEEN $7 AND $8';
+                    let queryParamArr = [true, response.timesheetMasterId, req.user.company_id, req.user.id, req.body.project_id, req.body.user_role, moment.tz(req.body.created_date.split(' ')[0].split('T')[0], companyDefaultTimezone).format(),moment.tz(req.body.created_date.split(' ')[0].split('T')[0]+' 23:59:59', companyDefaultTimezone).format()];
+                    if(req.query.task_id){
+                      queryToExec += ' AND task_id = $9';
+                      queryParamArr.push(req.body.task_id);
+                    }
+                    queryToExec +=' RETURNING *';
+                    client.query(queryToExec,queryParamArr , function(err, data) {
                       if(err) {
                         // console.log('this.sql');
                         console.error(err);

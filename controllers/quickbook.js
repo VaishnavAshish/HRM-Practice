@@ -109,6 +109,19 @@ OAuthClient.prototype.postApiCall = function(params)  {
 
 };
 
+function minuteToHours(min) {
+    var num = min;
+    var hours = (num / 60);
+    var rhours = Math.floor(hours);
+    var minutes = (hours - rhours) * 60;
+    var rminutes = Math.round(minutes);
+    rminutes = rminutes < 10 ? '0'+rminutes : rminutes;
+    rminutes = parseInt(((rminutes / 60 *100).toFixed(5))*100);
+    console.log(rminutes)
+    return rhours + "." + rminutes;
+}
+
+
 exports.postInvoiceToQuickbook = (req,res) => {
   console.log('postInvoiceToQuickbook');
   console.log(req.body);
@@ -141,76 +154,118 @@ exports.postInvoiceToQuickbook = (req,res) => {
                          var companyID = oauthClient.getToken().realmId;
                          var url = oauthClient.environment == 'Sandbox' ? OAuthClient.environment.sandbox : OAuthClient.environment.production ;
                          console.log(companyID+' companyID');
-                         console.log(req.body.client_qb_id);
-                         if(req.body.client_qb_id!=''&&req.body.client_qb_id!=null&&req.body.client_qb_id!=undefined){
+                         client.query('SELECT * FROM setting WHERE company_id=$1',[req.user.company_id], function (err, companySetting) {
+                           if (err){
+                             handleResponse.shouldAbort(err, client, done);
+                             handleResponse.handleError(res, err, ' Error in fetching company data');
+                           } else {
+                              let companyDefaultTimezone = companySetting.rows[0].timezone;
+                               client.query('SELECT i.id ,i.status ,i.account_id ,i.company_id ,i.created_by ,i.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,i.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,i.archived ,i.account_name ,i.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,i.due_date at time zone \''+companyDefaultTimezone+'\' as due_date ,i.description ,i.project_id ,i.project_name ,i.total_amount ,i.record_id ,i.currency ,i.tax,i.final_amount  FROM invoice i WHERE id=$1',[req.body.invoiceId], function (err, invoiceDetails) {
+                                 if (err){
+                                   handleResponse.shouldAbort(err, client, done);
+                                   handleResponse.handleError(res, err, ' Error in fetching invoice data');
+                                 } else {
+                                    if(invoiceDetails.rows.length>0){
+                                      client.query('SELECT * FROM account WHERE id=$1',[invoiceDetails.rows[0].account_id], function (err, accountDetails) {
+                                        if (err){
+                                          handleResponse.shouldAbort(err, client, done);
+                                          handleResponse.handleError(res, err, ' Error in fetching account data');
+                                        } else {
+                                          client.query('SELECT il.id ,il.type ,il.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,il.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,il.item_date at time zone \''+companyDefaultTimezone+'\' as item_date ,il.archived ,il.hours ,il.unit_price ,il.cost_rate ,il.note ,il.amount ,il.tax ,il.total_amount ,il.timesheet_id ,il.expense_id ,il.project_id ,il.account_id ,il.invoice_id ,il.company_id ,il.user_id ,il.user_role ,il.quantity ,il.record_id ,il.currency ,il.timesheet_row_id FROM invoice_line_item il WHERE  invoice_id=$1',[req.body.invoiceId], function (err, invoiceLineItems) {
+                                            if (err){
+                                              handleResponse.shouldAbort(err, client, done);
+                                              handleResponse.handleError(res, err, ' Error in fetching invoice line item data');
+                                            } else {
+                                                if(invoiceLineItems.rows.length>0){
+                                                  let lineItemArray = [];
 
-                           oauthClient.makeApiCall({url: url + 'v3/company/' + companyID +'/query?query=select * from Item &minorversion=4'})
-                               .then(function(itemData){
-                                   console.log("The response for API call is :"+JSON.stringify(itemData));
-                                   done();
-                                   handleResponse.sendSuccess(res,'Quickbook data fetched successfully',{itemArray:itemData.json.QueryResponse.Item});
-                               })
-                               .catch(function(e) {
-                                   console.error(e);
-                                   handleResponse.handleError(res, e, ' Error in getting item info'+e);
-                               });
-                         }else{
+                                                  for(let key=0 ; key<invoiceLineItems.rows.length;key++){
+                                                    console.log(key);
+                                                    if(invoiceLineItems.rows[key].timesheet_id!=null){
+                                                      invoiceLineItems.rows[key].quantity = minuteToHours(invoiceLineItems.rows[key].quantity);
+                                                    }
+                                                    if(invoiceLineItems.rows[key].type.includes('Timesheet')){
+                                                        invoiceLineItems.rows[key].ItemRef = req.body.timesheet_item;
+                                                        invoiceLineItems.rows[key].ItemRefType = 'Timesheet';
+                                                    } else if(invoiceLineItems.rows[key].type.includes('Fixed Fee')){
+                                                        invoiceLineItems.rows[key].ItemRef = req.body.fixed_fee_item;
+                                                        invoiceLineItems.rows[key].ItemRefType = 'Fixed Fee';
+                                                    } else if(invoiceLineItems.rows[key].type.includes('Expense')){
+                                                        invoiceLineItems.rows[key].ItemRef = req.body.expense_item;
+                                                        invoiceLineItems.rows[key].ItemRefType = 'Expense';
+                                                    } else {
+                                                        invoiceLineItems.rows[key].ItemRef = req.body.other_item;
+                                                        invoiceLineItems.rows[key].ItemRefType = 'Others';
+                                                    }
+                                                    let lineItemObj = {
+                                                      "DetailType": "SalesItemLineDetail",
+                                                      "Amount": invoiceLineItems.rows[key].total_amount,
+                                                      "Description":invoiceLineItems.rows[key].note,
+                                                      "SalesItemLineDetail": {
+                                                        "ItemRef": {
+                                                          "name": invoiceLineItems.rows[key].type,
+                                                          "value": invoiceLineItems.rows[key].ItemRef
+                                                        },
+                                                        "TaxCodeRef": {
+                                                            "value": "TAX"
+                                                         },
+                                                        "UnitPrice":invoiceLineItems.rows[key].unit_price,
+                                                        "Qty":invoiceLineItems.rows[key].quantity,
+                                                      }
+                                                    }
+                                                    lineItemArray.push(lineItemObj);
+                                                  }
 
-                           client.query('SELECT * FROM ACCOUNT where name=$1 and company_id=$2',[req.body.client_name,req.user.company_id], function(err, accountInfo) {
-                             if (err){
-                               handleResponse.shouldAbort(err, client, done);
-                               handleResponse.handleError(res, err, ' Error in fetching account data');
-                             } else {
-                                if(accountInfo.rows.length>0){
-                                      let accountData={
-                                        "FullyQualifiedName": accountInfo.rows[0].name,
-                                        "PrimaryEmailAddr": {
-                                          "Address": accountInfo.rows[0].email
-                                        },
-                                        "DisplayName": accountInfo.rows[0].name,
-                                        "FamilyName": accountInfo.rows[0].first_name?accountInfo.rows[0].first_name:''+' '+accountInfo.rows[0].last_name?accountInfo.rows[0].last_name:'',
-                                        "CompanyName": accountInfo.rows[0].name,
-                                        "BillAddr": {
-                                          "CountrySubDivisionCode": accountInfo.rows[0].state,
-                                          "City": accountInfo.rows[0].city,
-                                          "PostalCode": accountInfo.rows[0].zip_code,
-                                          "Line1": accountInfo.rows[0].street,
-                                          "Country": accountInfo.rows[0].country
-                                        },
-                                        "GivenName": accountInfo.rows[0].first_name?accountInfo.rows[0].first_name:''+' '+accountInfo.rows[0].last_name?accountInfo.rows[0].last_name:''
-                                      }
-                                      oauthClient.postApiCall({url: url + 'v3/company/' + companyID +'/customer',body:accountData})
-                                      .then(function(customerResponse){
-                                        console.log("The response for API call is for posting account:"+JSON.stringify(customerResponse));
-                                        client.query('UPDATE ACCOUNT set quickbook_customer_id=$1 where id=$2',[customerResponse.json.Customer.Id,accountInfo.rows[0].id], function(err, updatedAccountInfo) {
-                                          if (err){
-                                            handleResponse.shouldAbort(err, client, done);
-                                            handleResponse.handleError(res, err, ' Error in updating account');
-                                          } else {
-                                              oauthClient.makeApiCall({url: url + 'v3/company/' + companyID +'/query?query=select * from Item &minorversion=4'})
-                                                  .then(function(itemData){
-                                                      // console.log("The response for API call is :"+JSON.stringify(itemData));
-                                                      done();
-                                                      handleResponse.sendSuccess(res,'Quickbook data fetched successfully',{itemArray:itemData.json.QueryResponse.Item});
+                                                  let invoiceData={
+                                                    "Line": lineItemArray,
+                                                    "TxnDate":invoiceDetails.rows[0].due_date,
+                                                    "ApplyTaxAfterDiscount":false,
+                                                    "AllowOnlinePayment":true,
+                                                    "TxnTaxDetail": {
+                                                        "TxnTaxCodeRef": {
+                                                           "value": "3",
+                                                           "name": "Tucson"
+                                                        },
+                                                        "TotalTax": invoiceDetails.rows[0].final_amount - invoiceDetails.rows[0].total_amount
+                                                     },
+                                                    "CustomerRef": {
+                                                      "value": accountDetails.rows[0].quickbook_customer_id
+                                                    }
+                                                  }
+                                                  oauthClient.postApiCall({url: url + 'v3/company/' + companyID +'/invoice',body:invoiceData})
+                                                  .then(function(invoiceResponse){
+                                                    console.log("The response for API call is for posting account:"+JSON.stringify(invoiceResponse));
+                                                    client.query('UPDATE INVOICE set quickbook_invoice_id=$1 where id=$2',[invoiceResponse.Id,req.body.invoiceId], function(err, updatedInvoiceInfo) {
+                                                      if (err){
+                                                        handleResponse.shouldAbort(err, client, done);
+                                                        handleResponse.handleError(res, err, ' Error in updating invoice');
+                                                      } else {
+                                                          done();
+                                                          handleResponse.sendSuccess(res,'Quickbook invoice created successfully',{});
+                                                      }
+                                                    });
                                                   })
                                                   .catch(function(e) {
-                                                      console.error(e);
-                                                      handleResponse.handleError(res, e, ' Error in getting item info'+e);
+                                                    console.error(e);
+                                                    handleResponse.handleError(res, e, ' Error in posting customer info'+e);
                                                   });
+
+                                                } else {
+                                                    handleResponse.handleError(res, 'Invoice line item for this invoice does not exist.', 'Invoice line item for this invoice does not exist.');
+                                                }
                                             }
                                           });
-                                      })
-                                      .catch(function(e) {
-                                        console.error(e);
-                                        handleResponse.handleError(res, e, ' Error in posting customer info'+e);
+                                        }
                                       });
 
-                                    }else{
-                                      handleResponse.handleError(res, 'Error in getting account information', 'Error in getting account information');
+                                    } else {
+                                      handleResponse.handleError(res, 'Error in getting invoice information', 'Error in getting invoice information');
                                     }
                                   }
                               });
-                         }
+                            }
+                          });
+
 
                        }
                      })
@@ -228,6 +283,23 @@ exports.postInvoiceToQuickbook = (req,res) => {
       });
   });
 
+}
+
+exports.quickbookInvoiceUpdate = (req,res) => {
+  console.log('quickbookInvoiceUpdate');
+  console.log(req.body);
+  res.send(200);
+  // pool.connect((err, client, done) => {
+  //   client.query('UPDATE INVOICE set status=$1 where quickbook_invoice_id=$2',['PAID',req.body.data.object.id], function(err, invoiceUpdated) {
+  //       if (err){
+  //         handleResponse.shouldAbort(err, client, done);
+  //         handleResponse.handleError(res, err, ' Error in updating invoice');
+  //       } else {
+  //           done();
+  //           handleResponse.sendSuccess(res,'Invoice updated successfully',{});
+  //       }
+  //     });
+  // });
 }
 
 

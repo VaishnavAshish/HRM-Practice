@@ -766,7 +766,7 @@
           url : '/postInvoiceToQuickbook',
           contentType: 'application/json',
           dataType: 'json',
-          data : JSON.stringify({"invoiceId":<%= invoiceDetails.id %>}),
+          data : JSON.stringify({"invoiceId":<%= invoiceDetails.id %>,"timesheet_item":timesheet_item,"fixed_fee_item":fixed_fee_item,"expense_item":expense_item,"other_item":other_item}),
           success : function(response){
             console.log(response);
               hideLoader('#globalLoader');

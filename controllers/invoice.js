@@ -1668,7 +1668,7 @@ function invoiceHtmlData (req,res,invoiceHtml,responseType){
          handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.user, error:err},"error"," Error in fetching company setting ");
          /*handleResponse.handleError(res, err, ' error in finding company setting');*/
        }else{
-             companyDefaultTimezone = result.timezone;
+           companyDefaultTimezone = result.timezone;
             pool.connect((err, client, done) => {
                 client.query('SELECT i.id ,i.status ,i.account_id ,i.company_id ,i.created_by ,i.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,i.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,i.archived ,i.account_name ,i.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,i.due_date at time zone \''+companyDefaultTimezone+'\' as due_date ,i.description ,i.project_id ,i.project_name ,i.total_amount ,i.record_id ,i.currency ,i.tax,i.final_amount  FROM invoice i WHERE id=$1',[invId], function (err, invoiceDetails) {
                     if (err) {
