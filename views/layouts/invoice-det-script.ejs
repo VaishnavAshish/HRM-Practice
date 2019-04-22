@@ -754,6 +754,7 @@
   }
 
   function postInvoiceToQuickbook(modalId){
+    showLoader('#globalLoader');
     $("#quickbookMapping").removeClass('has-error')
     let timesheet_item = $("#timesheet_qb_item option:selected").val();
     let fixed_fee_item = $("#fixed_fee_qb_item option:selected").val();
@@ -769,15 +770,14 @@
           data : JSON.stringify({"invoiceId":<%= invoiceDetails.id %>,"timesheet_item":timesheet_item,"fixed_fee_item":fixed_fee_item,"expense_item":expense_item,"other_item":other_item}),
           success : function(response){
             console.log(response);
-              hideLoader('#globalLoader');
-              showGlobalToast('#globalToast', 'success', response.message, 4000);
-
-
+            closeModal(modalId);
+            hideLoader('#globalLoader');
+            showGlobalToast('#globalToast', 'success', response.message, 4000);
           },
           error: function(response){
-              console.log(response);
-              hideLoader('#globalLoader');
-              showGlobalToast('#globalToast', 'error', response.responseText.message, 4000);
+            console.log(response);
+            hideLoader('#globalLoader');
+            showGlobalToast('#globalToast', 'error', response.responseText.message, 4000);
           }
       });
     }

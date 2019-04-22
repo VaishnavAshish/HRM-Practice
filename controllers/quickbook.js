@@ -288,6 +288,23 @@ exports.postInvoiceToQuickbook = (req,res) => {
 exports.quickbookInvoiceUpdate = (req,res) => {
   console.log('quickbookInvoiceUpdate');
   console.log(req.body.eventNotifications[0].dataChangeEvent);
+  let itemListFromWebhook = req.body.eventNotifications[0].dataChangeEvent;
+  itemListFromWebhook = itemListFromWebhook.filter(item => item.operation == 'Update').map(invoice => invoice.id );
+  console.log('itemListFromWebhook')
+  console.log(itemListFromWebhook)
+  // itemListFromWebhook.forEach(invoiceItem => {
+  //   pool.connect((err, client, done) => {
+  //     client.query('UPDATE SETTING set stripe_customer_id=$1,stripe_subscription_id=$2 where stripe_subscription_id=$3',[null,null,req.body.data.object.id], function(err, stripeSetting) {
+  //         if (err){
+  //           handleResponse.shouldAbort(err, client, done);
+  //           handleResponse.handleError(res, err, ' Error in updating settings');
+  //         } else {
+  //             done();
+  //             handleResponse.sendSuccess(res,'Stripes subscription data deleted successfully',{});
+  //         }
+  //       });
+  //   });
+  // })
   res.send(200);
   // pool.connect((err, client, done) => {
   //   client.query('UPDATE INVOICE set status=$1 where quickbook_invoice_id=$2',['PAID',req.body.data.object.id], function(err, invoiceUpdated) {
