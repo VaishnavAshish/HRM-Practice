@@ -24,7 +24,7 @@
       $("#invoice-tax").closest('.text-right').hide();
     }
     // $("#invoice_total_amount").text((parseFloat(total_amount) + parseFloat(inv_tax)).toFixed(2));
-    $("#invoice_total_amount").text('<%= invoiceDetails.final_amount%>');
+    $("#invoice_total_amount").text(<%= invoiceDetails.final_amount%>.toFixed(2));
     invoiceItems.forEach(function(item) {
       let invoiceLi = $("#invoiceLineItem #" + item.id);
       $("#invoiceLineItem #" + item.id + ' #type').val(item.type);
