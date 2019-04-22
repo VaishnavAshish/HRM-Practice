@@ -142,15 +142,13 @@ exports.invoicePaymentDeclined = (req, res) => {
   console.log(JSON.stringify(req.body));
   // handleResponse.sendSuccess(res,'webhook found successfully',{});
   pool.connect((err, client, done) => {
-    client.query('UPDATE SETTING set stripe_customer_id=$1,stripe_subscription_id=$2 where company_id=$3',[null,null,req.user.company_id], function(err, stripeSetting) {
+    client.query('UPDATE SETTING set stripe_customer_id=$1,stripe_subscription_id=$2 where stripe_subscription_id=$3',[null,null,req.body.data.object.id], function(err, stripeSetting) {
         if (err){
           handleResponse.shouldAbort(err, client, done);
-           res.status(404);
-          // handleResponse.handleError(res, err, ' Error in updating settings');
+          handleResponse.handleError(res, err, ' Error in updating settings');
         } else {
             done();
-             res.status(200);
-            // handleResponse.sendSuccess(res,'Stripes subscription data deleted successfully',{});
+            handleResponse.sendSuccess(res,'Stripes subscription data deleted successfully',{});
         }
       });
   });
