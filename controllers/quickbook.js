@@ -287,8 +287,8 @@ exports.postInvoiceToQuickbook = (req,res) => {
 
 exports.quickbookInvoiceUpdate = (req,res) => {
   console.log('quickbookInvoiceUpdate');
-  console.log(req.body.eventNotifications[0].dataChangeEvent);
-  let itemListFromWebhook = req.body.eventNotifications[0].dataChangeEvent;
+  console.log(req.body.eventNotifications[0].dataChangeEvent.entities);
+  let itemListFromWebhook = req.body.eventNotifications[0].dataChangeEvent.entities;
   itemListFromWebhook = itemListFromWebhook.filter(item => item.operation == 'Update').map(invoice => invoice.id );
   console.log('itemListFromWebhook')
   console.log(itemListFromWebhook)
