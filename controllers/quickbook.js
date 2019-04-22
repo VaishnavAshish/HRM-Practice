@@ -287,7 +287,7 @@ exports.postInvoiceToQuickbook = (req,res) => {
 
 exports.quickbookInvoiceUpdate = (req,res) => {
   console.log('quickbookInvoiceUpdate');
-  console.log(req.body);
+  console.log(req.body.eventNotifications[0].dataChangeEvent);
   res.send(200);
   // pool.connect((err, client, done) => {
   //   client.query('UPDATE INVOICE set status=$1 where quickbook_invoice_id=$2',['PAID',req.body.data.object.id], function(err, invoiceUpdated) {
