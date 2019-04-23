@@ -356,6 +356,7 @@ exports.quickbookInvoiceUpdate = (req,res) => {
             handleResponse.handleError(res, err, ' Error in fetching invoice company_id');
           } else {
             if(invoiceDetail.rows.length>0){
+              console.log('inside invoice found');
               client.query('SELECT quickbook_token FROM SETTING where company_id=$1',[invoiceDetail.rows[0].company_id], function(err, companySetting) {
                 if (err){
                   handleResponse.shouldAbort(err, client, done);
@@ -416,7 +417,9 @@ exports.quickbookInvoiceUpdate = (req,res) => {
                     });
 
                   }else{
-                    handleResponse.handleError(res, 'Error in fetching quickbook settings', 'Error in fetching quickbook settings');
+                    if(index == itemListFromWebhook.length-1){
+                      handleResponse.handleError(res, 'Error in fetching quickbook settings', 'Error in fetching quickbook settings');
+                    }
                   }
                 }
               });
