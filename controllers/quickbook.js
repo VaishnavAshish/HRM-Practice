@@ -225,19 +225,61 @@ exports.postInvoiceToQuickbook = (req,res) => {
                                                   if(invoiceDetails.rows[0].quickbook_invoice_id){
                                                       invoiceData.Id = invoiceDetails.rows[0].quickbook_invoice_id;
                                                       invoiceData.sparse =  true;
-                                                      invoiceData.SyncToken = parseInt(invoiceDetails.rows[0].quickbook_sync_token);
-                                                  }
-                                                  oauthClient.postApiCall({url: url + 'v3/company/' + companyID +'/invoice',body:invoiceData})
-                                                  .then(function(invoiceResponse){
-                                                    console.log("The response for API call is for posting account:"+JSON.stringify(invoiceResponse));
-                                                    invoiceResponse = invoiceResponse.json.Invoice;
-                                                    console.log(invoiceResponse.invoiceResponse)
-                                                    invoiceLineItems.rows.forEach((lineItem,index) => {
-                                                      client.query('UPDATE INVOICE_LINE_ITEM set quickbook_invoice_line_id=$1 where id=$2',[invoiceResponse.Line[index].Id,lineItem.id], function(err, updatedInvoiceLineInfo) {
-                                                        if (err){
-                                                          handleResponse.shouldAbort(err, client, done);
-                                                          handleResponse.handleError(res, err, ' Error in updating invoice line item');
-                                                        } else {
+                                                      oauthClient.makeApiCall({url: url + 'v3/company/' + companyID +'/query?query=select SyncToken from Invoice Where id = \''+invoiceData.Id +'\''})
+                                                      .then(function(invoiceDetailData){
+                                                        console.log("The response for API call is :"+JSON.stringify(invoiceDetailData));
+                                                        invoiceData.SyncToken = invoiceDetailData.json.QueryResponse.Invoice[0].SyncToken;
+                                                        oauthClient.postApiCall({url: url + 'v3/company/' + companyID +'/invoice',body:invoiceData})
+                                                        .then(function(invoiceResponse){
+                                                          console.log("The response for API call is for posting account:"+JSON.stringify(invoiceResponse));
+                                                          invoiceResponse = invoiceResponse.json.Invoice;
+
+                                                          invoiceLineItems.rows.forEach((lineItem,index) => {
+                                                            client.query('UPDATE INVOICE_LINE_ITEM set quickbook_invoice_line_id=$1 where id=$2',[invoiceResponse.Line[index].Id,lineItem.id], function(err, updatedInvoiceLineInfo) {
+                                                              if (err){
+                                                                handleResponse.shouldAbort(err, client, done);
+                                                                handleResponse.handleError(res, err, ' Error in updating invoice line item');
+                                                              } else {
+
+                                                                  if(index == (invoiceLineItems.rows.length-1)){
+                                                                    client.query('UPDATE INVOICE set quickbook_invoice_id=$1,quickbook_sync_token=$2 where id=$3',[invoiceResponse.Id,invoiceResponse.SyncToken,req.body.invoiceId], function(err, updatedInvoiceInfo) {
+                                                                      if (err){
+                                                                        handleResponse.shouldAbort(err, client, done);
+                                                                        handleResponse.handleError(res, err, ' Error in updating invoice');
+                                                                      } else {
+                                                                        done();
+                                                                        handleResponse.sendSuccess(res,'Quickbook invoice updated successfully',{});
+                                                                      }
+                                                                    });
+                                                                  }
+                                                                  // done();
+                                                                  // handleResponse.sendSuccess(res,'Quickbook invoice created successfully',{});
+                                                              }
+                                                            });
+                                                          })
+
+                                                        })
+                                                        .catch(function(e) {
+                                                          console.error(e);
+                                                          handleResponse.handleError(res, e, ' Error in posting customer info'+e);
+                                                        });
+                                                      })
+                                                      .catch(function(e) {
+                                                        console.error(e);
+                                                        handleResponse.handleError(res, e, ' Error in getting item info'+e);
+                                                      });
+                                                  }else{
+                                                    oauthClient.postApiCall({url: url + 'v3/company/' + companyID +'/invoice',body:invoiceData})
+                                                    .then(function(invoiceResponse){
+                                                      console.log("The response for API call is for posting account:"+JSON.stringify(invoiceResponse));
+                                                      invoiceResponse = invoiceResponse.json.Invoice;
+                                                      console.log(invoiceResponse.invoiceResponse)
+                                                      invoiceLineItems.rows.forEach((lineItem,index) => {
+                                                        client.query('UPDATE INVOICE_LINE_ITEM set quickbook_invoice_line_id=$1 where id=$2',[invoiceResponse.Line[index].Id,lineItem.id], function(err, updatedInvoiceLineInfo) {
+                                                          if (err){
+                                                            handleResponse.shouldAbort(err, client, done);
+                                                            handleResponse.handleError(res, err, ' Error in updating invoice line item');
+                                                          } else {
 
                                                             if(index == (invoiceLineItems.rows.length-1)){
                                                               client.query('UPDATE INVOICE set quickbook_invoice_id=$1,quickbook_sync_token=$2 where id=$3',[invoiceResponse.Id,invoiceResponse.SyncToken,req.body.invoiceId], function(err, updatedInvoiceInfo) {
@@ -245,22 +287,24 @@ exports.postInvoiceToQuickbook = (req,res) => {
                                                                   handleResponse.shouldAbort(err, client, done);
                                                                   handleResponse.handleError(res, err, ' Error in updating invoice');
                                                                 } else {
-                                                                    done();
-                                                                    handleResponse.sendSuccess(res,'Quickbook invoice created successfully',{});
+                                                                  done();
+                                                                  handleResponse.sendSuccess(res,'Quickbook invoice created successfully',{});
                                                                 }
                                                               });
                                                             }
                                                             // done();
                                                             // handleResponse.sendSuccess(res,'Quickbook invoice created successfully',{});
-                                                        }
-                                                      });
-                                                    })
+                                                          }
+                                                        });
+                                                      })
 
-                                                  })
-                                                  .catch(function(e) {
-                                                    console.error(e);
-                                                    handleResponse.handleError(res, e, ' Error in posting customer info'+e);
-                                                  });
+                                                    })
+                                                    .catch(function(e) {
+                                                      console.error(e);
+                                                      handleResponse.handleError(res, e, ' Error in posting customer info'+e);
+                                                    });
+
+                                                  }
 
                                                 } else {
                                                     handleResponse.handleError(res, 'Invoice line item for this invoice does not exist.', 'Invoice line item for this invoice does not exist.');
@@ -377,6 +421,8 @@ exports.quickbookInvoiceUpdate = (req,res) => {
                 }
               });
 
+            }else{
+                handleResponse.sendSuccess(res,'No invoice Found',{});
             }
           }
         });

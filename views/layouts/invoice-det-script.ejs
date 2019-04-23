@@ -34,6 +34,9 @@
                       getProjectExpense($("#invoiceLineItem #"+item.id+' #project'),item.id);
                       $("#invoiceLineItem #"+item.id+' #expense').val(item.expense_id);*/
     });
+    if('<%= invoiceDetails.status %>' == 'PAID'){
+      $("#invoiceDetailDiv [disableWhenPaid]").attr('disabled','disabled');
+    }
   });
 
   function calculateTax(ele) {

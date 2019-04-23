@@ -18,7 +18,7 @@
     <% include ../layouts/nav %>
     <% include ../layouts/sideNav %>
 
-    <main class="main-body-space tpd-60 bpd-100">
+    <main class="main-body-space tpd-60 bpd-100" id="invoiceDetailDiv">
         <div>
             <div class="slds-p-around_small">
                 <!-- breadcrumb start -->
@@ -59,11 +59,9 @@
                                 <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
                                     <div class="text-right sm-tpd-15">
                                       <% if(user.company_info.quickbook_token){ %>
-                                        <% if(invoiceDetails.status != 'PAID'){ %>
-                                          <button class="slds-button slds-button_brand slds-align-top" onclick="openQuickbookMapping('#modalQuickbookMapping')">
+                                          <button class="slds-button slds-button_brand slds-align-top" onclick="openQuickbookMapping('#modalQuickbookMapping')" disableWhenPaid>
                                               Post To Accounting
                                           </button>
-                                        <% } %>
                                       <% } %>
 
                                       <div class="slds-button-group" role="group">
@@ -94,7 +92,7 @@
                                                </div>
                                            </div>
 
-                                           <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteInvoice(\'<%= invoiceDetails.id %>\')')" title="Delete">
+                                           <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteInvoice(\'<%= invoiceDetails.id %>\')')" title="Delete" disableWhenPaid>
                                              <span class="slds-button__icon">
                                                <i class=" fa fa-trash text-red" aria-hidden="true"></i>
                                              </span>
@@ -162,7 +160,7 @@
                                                         </label>
                                                         <div class="slds-form-element__control">
                                                             <div class="slds-select_container">
-                                                                <select class="slds-select" name="currency" id="currency" getFormData>
+                                                                <select class="slds-select" name="currency" id="currency" getFormData disableWhenPaid>
                                                                   <% currencyWithSymbolArray.forEach(function(currency){ %>
                                                                       <option value="<%= currency.name %>"><%= currency.name %></option>
                                                                   <% }) %>
@@ -183,7 +181,7 @@
                                                             <span class="slds-input__icon slds-input__icon_right">
                                                                 <i class="fa fa-calendar"></i>
                                                             </span>
-                                                            <input type="date" name="due_date" getFormData value="<%= invoiceDetails.dueDateFormatted %>" class="slds-input open-date-pik">
+                                                            <input type="date" name="due_date" getFormData value="<%= invoiceDetails.dueDateFormatted %>" class="slds-input open-date-pik" disableWhenPaid>
                                                         </div>
                                                         <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
@@ -240,7 +238,7 @@
                                                             Tax %
                                                         </label>
                                                         <div class="slds-form-element__control">
-                                                            <input type="number" max="100" min="0" class="slds-input" placeholder="" id="inv-tax-per" onchange="calculateTax(this)" onkeyup="calculateTax(this)" value="<%= invoiceDetails.tax %>" decimal>
+                                                            <input type="number" max="100" min="0" class="slds-input" placeholder="" id="inv-tax-per" onchange="calculateTax(this)" onkeyup="calculateTax(this)" value="<%= invoiceDetails.tax %>" decimal disableWhenPaid>
                                                             <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
                                                             </div>
@@ -277,7 +275,7 @@
                                                 <div class="slds-form-element slds-m-bottom_medium">
                                                         <label class="slds-form-element__label">Note</label>
                                                         <div class="slds-form-element__control">
-                                                            <textarea class="slds-textarea" id="invoice_note" name="description" getFormData placeholder=""><%= invoiceDetails.description %></textarea>
+                                                            <textarea class="slds-textarea" id="invoice_note" name="description" getFormData disableWhenPaid placeholder=""><%= invoiceDetails.description %></textarea>
                                                         </div>
                                                 </div>
                                                 <!-- <div class="slds-form-element slds-m-bottom_medium">
@@ -303,7 +301,7 @@
                                     </div>
                                 </div>
                                 <div class="text-right sm-tpd-15">
-                                    <button class="slds-button slds-button_brand slds-align-top" onclick="updateInvoiceDetails('<%= invoiceDetails.id %>', '#invoice-details-form')" disabled save-btn>
+                                    <button class="slds-button slds-button_brand slds-align-top" onclick="updateInvoiceDetails('<%= invoiceDetails.id %>', '#invoice-details-form')" disabled save-btn disableWhenPaid>
                                         Save Invoice
                                     </button>
                                 </div>
@@ -321,9 +319,9 @@
                                             </div>
                                             <div class="slds-size_1-of-1 slds-medium-size_1-of-2 slds-p-horizontal_small">
                                                 <div class="text-right sm-tpd-15">
-                                                    <button class="slds-button slds-button_outline-brand" onclick="openModal('#modalAddInvoiceTsheet', true);">Add Timesheet</button>
-                                                    <button class="slds-button slds-button_outline-brand" onclick="openModal('#modalAddInvoiceExpenses', true);">Add Expenses</button>
-                                                    <button class="slds-button slds-button_outline-brand" onclick="openModal('#modalAddInvoiceFixedFee', true);">Add Fix Amount</button>
+                                                    <button class="slds-button slds-button_outline-brand" onclick="openModal('#modalAddInvoiceTsheet', true);" disableWhenPaid >Add Timesheet</button>
+                                                    <button class="slds-button slds-button_outline-brand" onclick="openModal('#modalAddInvoiceExpenses', true);" disableWhenPaid >Add Expenses</button>
+                                                    <button class="slds-button slds-button_outline-brand" onclick="openModal('#modalAddInvoiceFixedFee', true);" disableWhenPaid >Add Fix Amount</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -524,7 +522,7 @@
                                                         <div class=" slds-no-flex slds-p-horizontal_small invoice-col" style="width:45%">
                                                             <div class="slds-form-element slds-m-bottom_small">
                                                                 <div class="slds-form-element__control">
-                                                                  <textarea class="slds-textarea"  rows="1" onchange="enableSaveButton(this)"><%= item.note %></textarea>
+                                                                  <textarea class="slds-textarea"  rows="1" onchange="enableSaveButton(this)" disableWhenPaid><%= item.note %></textarea>
                                                                   <!-- <% if(projectObj.length<=0) { %>
                                                                     <textarea class="slds-textarea"  rows="1" onchange="enableSaveButton(this)"> <%= item.note %></textarea>
                                                                   <% } else if(item.timesheet_id) { %>
@@ -602,11 +600,11 @@
                                                         </div>
                                                         <div class="slds-no-flex slds-p-horizontal_small invoice-col" >
                                                             <div class="text-center tpd-5">
-                                                                <button class="slds-button slds-button_icon" title="Save" onclick="saveInvoiceItem('<%= item.id %>',this)" disabled save-line-item>
+                                                                <button class="slds-button slds-button_icon" title="Save" onclick="saveInvoiceItem('<%= item.id %>',this)" disabled save-line-item disableWhenPaid>
                                                                     <i class="fa fa-save text-blue"></i>
                                                                 </button>
                                                                 <span>&nbsp;&nbsp;</span>
-                                                                <button class="slds-button slds-button_icon " title="Remove" onclick="deleteBeforeConfirm('#globalAlert', 'deleteInvoiceItem(this,\'<%= item.id %>\', \'<%= item.timesheet_id %>\', \'<%= item.expense_id %>\', \'<%= item.type %>\')')">
+                                                                <button class="slds-button slds-button_icon " title="Remove" onclick="deleteBeforeConfirm('#globalAlert', 'deleteInvoiceItem(this,\'<%= item.id %>\', \'<%= item.timesheet_id %>\', \'<%= item.expense_id %>\', \'<%= item.type %>\')')" disableWhenPaid>
                                                                     <i class="fa fa-times text-red"></i>
                                                                 </button>
                                                             </div>
@@ -648,7 +646,7 @@
                                         </ul>
 
                                       <div class="slds-p-bottom_x-small">
-                                          <button class="slds-button slds-button_neutral slds-align-top" onclick="openModal('#modalAddNewInvItem', true)">
+                                          <button class="slds-button slds-button_neutral slds-align-top" onclick="openModal('#modalAddNewInvItem', true)" disableWhenPaid>
                                             <i class="fa fa-plus"></i>
                                             <span class="sm-hide">Add Row</span>
                                           </button>
