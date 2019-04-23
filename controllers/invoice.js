@@ -1176,7 +1176,6 @@ exports.getInvoiceDetails = (req, res) => {
                                                               invoiceDetails.rows[0].final_amount=invoice_total_amount.toFixed(2);
                                                             }
 
-
                                                             // invoiceDetails.rows[0]['startDateFormatted'] = invoiceDetails.rows[0].start_date == null ? '' : dateFormat(moment.tz(invoiceDetails.rows[0].start_date, companyDefaultTimezone).format());
                                                             // invoiceDetails.rows[0]['dueDateFormatted'] = invoiceDetails.rows[0].due_date == null ? '' : dateFormat(moment.tz(invoiceDetails.rows[0].due_date, companyDefaultTimezone).format());
                                                             invoiceDetails.rows[0]['startDateFormatted'] = invoiceDetails.rows[0].start_date == null ? '' : dateFormat(invoiceDetails.rows[0].start_date);
@@ -1197,6 +1196,8 @@ exports.getInvoiceDetails = (req, res) => {
 
                                                                     // console.log("response");
                                                                     // // console.log(projects.rows);
+                                                                    console.log('invoice detail is ');
+                                                                    console.log(invoiceDetails.rows[0]);
                                                                     // console.log('invoice_total_amount '+invoice_total_amount);
                                                                     accountData.rows[0].quickbook_customer_id=accountData.rows[0].quickbook_customer_id?accountData.rows[0].quickbook_customer_id:null;
                                                                     console.log('accountData.rows[0].quickbook_customer_id '+accountData.rows[0].quickbook_customer_id)

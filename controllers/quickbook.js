@@ -62,19 +62,6 @@ exports.getAuthCode = (req,res) => {
 
 }
 
-exports.refreshAccessToken = (req,res) =>{
-  oauthClient.refresh()
-        .then(function(authResponse){
-            console.log('The Refresh Token is  '+ JSON.stringify(authResponse.getJson()));
-            oauth2_token_json = JSON.stringify(authResponse.getJson(), null,2);
-            res.send(oauth2_token_json);
-        })
-        .catch(function(e) {
-            console.error(e);
-        });
-
-};
-
 OAuthClient.prototype.postApiCall = function(params)  {
 
     return (new Promise(function(resolve) {
@@ -292,6 +279,60 @@ exports.quickbookInvoiceUpdate = (req,res) => {
   itemListFromWebhook = itemListFromWebhook.filter(item => item.operation == 'Update').map(invoice => invoice.id );
   console.log('itemListFromWebhook')
   console.log(itemListFromWebhook)
+  pool.connect((err, client, done) => {
+      client.query('SELECT quickbook_token FROM SETTING where company_id=$1',[req.user.company_id], function(err, companySetting) {
+        if (err){
+          handleResponse.shouldAbort(err, client, done);
+          handleResponse.handleError(res, err, ' Error in fetching settings');
+        } else {
+            if(companySetting.rows[0].quickbook_token!=null){
+              let quickbook_token = JSON.parse(companySetting.rows[0].quickbook_token);
+              oauthClient = new OAuthClient({
+                  clientId: quickbook_token.clientId,
+                  clientSecret: quickbook_token.clientSecret,
+                  environment: quickbook_token.environment,
+                  redirectUri: quickbook_token.redirectUri,
+                  logging:true,
+                  token:quickbook_token.token
+              });
+
+              oauthClient.refresh()
+                 .then(function(authResponse) {
+                    //  console.log('Tokens refreshed : ' + JSON.stringify(authResponse));
+                     quickbook_token.token =authResponse.token;
+                     client.query('UPDATE SETTING set quickbook_token=$1 where company_id=$2 RETURNING *',[quickbook_token,req.user.company_id], function(err, updatedCompSetting) {
+                       if (err){
+                         handleResponse.shouldAbort(err, client, done);
+                         handleResponse.handleError(res, err, ' Error in updating settings');
+                       } else {
+                         var companyID = oauthClient.getToken().realmId;
+                         var url = oauthClient.environment == 'Sandbox' ? OAuthClient.environment.sandbox : OAuthClient.environment.production ;
+                         console.log(companyID+' companyID');
+                         oauthClient.makeApiCall({url: url + 'v3/company/' + companyID +'/query?query=select * from Invoice Where id IN '+itemListFromWebhook})
+                             .then(function(invoiceData){
+                                 console.log("The response for API call is :"+JSON.stringify(invoiceData));
+                                 done();
+                                 handleResponse.sendSuccess(res,'Quickbook data fetched successfully',{invoiceArray:invoiceData.json.QueryResponse.Item});
+                             })
+                             .catch(function(e) {
+                                 console.error(e);
+                                 handleResponse.handleError(res, e, ' Error in getting item info'+e);
+                             });
+                          }
+                     })
+                 })
+                 .catch(function(e) {
+                     console.error("The error message for refreshing token  is :"+e.originalMessage);
+                     console.error(e.intuit_tid);
+                     handleResponse.handleError(res, e, ' Error in refreshing token'+e);
+                 });
+
+            }else{
+              handleResponse.handleError(res, 'Error in fetching quickbook settings', 'Error in fetching quickbook settings');
+            }
+        }
+      });
+  });
   // itemListFromWebhook.forEach(invoiceItem => {
   //   pool.connect((err, client, done) => {
   //     client.query('UPDATE SETTING set stripe_customer_id=$1,stripe_subscription_id=$2 where stripe_subscription_id=$3',[null,null,req.body.data.object.id], function(err, stripeSetting) {
