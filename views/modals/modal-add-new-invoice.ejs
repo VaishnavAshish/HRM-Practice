@@ -1,4 +1,4 @@
-<!-- modal add new invoice start-->        
+<!-- modal add new invoice start-->
 <div id="modalAddNewInvoice">
     <section role="dialog" tabindex="-1" class="slds-modal">
         <div class="slds-modal__container">
@@ -20,7 +20,7 @@
                         </label>
                         <div class="slds-form-element__control">
                             <div class="slds-select_container">
-                                <select class="slds-select" id="invoice-account" onchange="getAccountProject(this)" reset='value'>
+                                <select class="slds-select" id="invoice-account" reset='value'>
                                     <% if(accounts.length >0) {%>
                                         <option value=""> </option>
                                         <% accounts.forEach(function(account) { %>
@@ -28,11 +28,11 @@
                                         <% }); %>
                                     <% } else { %>
                                         <option value=""> </option>
-                                    <% } %>                                    
-                                </select> 
+                                    <% } %>
+                                </select>
                             </div>
                             <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" id="err-msg-account" reset='errmsg'>
-                                
+
                             </div>
                         </div>
                     </div>
@@ -45,15 +45,15 @@
                                 <div class="slds-select_container">
                                     <select class="slds-select" id="invoice-project">
                                         <option value=""> </option>
-                                                                           
-                                    </select> 
+
+                                    </select>
                                 </div>
                                 <div class="slds-text-color_error text-size-12 slds-p-top_xx-small"  id="err-msg-project">
-                                    
+
                                 </div>
                             </div>
                         </div> -->
-                            
+
                 </div>
             </div>
             <footer class="slds-modal__footer">
@@ -64,4 +64,4 @@
     </section>
     <div class="slds-backdrop"></div>
 </div>
-<!-- modal add new invoice end-->   
+<!-- modal add new invoice end-->
