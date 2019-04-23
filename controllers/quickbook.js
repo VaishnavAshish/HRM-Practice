@@ -158,7 +158,7 @@ exports.postInvoiceToQuickbook = (req,res) => {
                                           handleResponse.shouldAbort(err, client, done);
                                           handleResponse.handleError(res, err, ' Error in fetching account data');
                                         } else {
-                                          client.query('SELECT il.id ,il.type ,il.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,il.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,il.item_date at time zone \''+companyDefaultTimezone+'\' as item_date ,il.archived ,il.hours ,il.unit_price ,il.cost_rate ,il.note ,il.amount ,il.tax ,il.total_amount ,il.timesheet_id ,il.expense_id ,il.project_id ,il.account_id ,il.invoice_id ,il.company_id ,il.user_id ,il.user_role ,il.quantity ,il.record_id ,il.currency ,il.timesheet_row_id FROM invoice_line_item il WHERE  invoice_id=$1',[req.body.invoiceId], function (err, invoiceLineItems) {
+                                          client.query('SELECT il.id ,il.type ,il.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,il.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,il.item_date at time zone \''+companyDefaultTimezone+'\' as item_date ,il.archived ,il.hours ,il.unit_price ,il.cost_rate ,il.note ,il.amount ,il.tax ,il.total_amount ,il.timesheet_id ,il.expense_id ,il.project_id ,il.account_id ,il.invoice_id ,il.company_id ,il.user_id ,il.user_role ,il.quantity ,il.record_id ,il.currency ,il.timesheet_row_id ,il.quickbook_invoice_line_id FROM invoice_line_item il WHERE  invoice_id=$1',[req.body.invoiceId], function (err, invoiceLineItems) {
                                             if (err){
                                               handleResponse.shouldAbort(err, client, done);
                                               handleResponse.handleError(res, err, ' Error in fetching invoice line item data');
@@ -200,6 +200,9 @@ exports.postInvoiceToQuickbook = (req,res) => {
                                                         "Qty":invoiceLineItems.rows[key].quantity,
                                                       }
                                                     }
+                                                    if(invoiceLineItems.rows[key].quickbook_invoice_line_id){
+                                                      lineItemObj.Id = invoiceLineItems.rows[key].quickbook_invoice_line_id;
+                                                    }
                                                     lineItemArray.push(lineItemObj);
                                                   }
 
@@ -225,15 +228,31 @@ exports.postInvoiceToQuickbook = (req,res) => {
                                                   oauthClient.postApiCall({url: url + 'v3/company/' + companyID +'/invoice',body:invoiceData})
                                                   .then(function(invoiceResponse){
                                                     console.log("The response for API call is for posting account:"+JSON.stringify(invoiceResponse));
-                                                    client.query('UPDATE INVOICE set quickbook_invoice_id=$1 where id=$2',[invoiceResponse.Id,req.body.invoiceId], function(err, updatedInvoiceInfo) {
-                                                      if (err){
-                                                        handleResponse.shouldAbort(err, client, done);
-                                                        handleResponse.handleError(res, err, ' Error in updating invoice');
-                                                      } else {
-                                                          done();
-                                                          handleResponse.sendSuccess(res,'Quickbook invoice created successfully',{});
-                                                      }
-                                                    });
+                                                    invoiceLineItems.rows.forEach((lineItem,index) => {
+                                                      client.query('UPDATE INVOICE_LINE_ITEM set quickbook_invoice_line_id=$1 where id=$2',[invoiceResponse.Line[index].Id,lineItem.id], function(err, updatedInvoiceLineInfo) {
+                                                        if (err){
+                                                          handleResponse.shouldAbort(err, client, done);
+                                                          handleResponse.handleError(res, err, ' Error in updating invoice line item');
+                                                        } else {
+
+                                                            if(index == (invoiceLineItems.rows.length-1)){
+                                                              console.log(index+' '+invoiceLineItems.rows.length);
+                                                              client.query('UPDATE INVOICE set quickbook_invoice_id=$1 where id=$2',[invoiceResponse.Id,req.body.invoiceId], function(err, updatedInvoiceInfo) {
+                                                                if (err){
+                                                                  handleResponse.shouldAbort(err, client, done);
+                                                                  handleResponse.handleError(res, err, ' Error in updating invoice');
+                                                                } else {
+                                                                    done();
+                                                                    handleResponse.sendSuccess(res,'Quickbook invoice created successfully',{});
+                                                                }
+                                                              });
+                                                            }
+                                                            // done();
+                                                            // handleResponse.sendSuccess(res,'Quickbook invoice created successfully',{});
+                                                        }
+                                                      });
+                                                    })
+
                                                   })
                                                   .catch(function(e) {
                                                     console.error(e);
