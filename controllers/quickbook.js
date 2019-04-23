@@ -276,7 +276,7 @@ exports.postInvoiceToQuickbook = (req,res) => {
 
 exports.quickbookInvoiceUpdate = (req,res) => {
   console.log('quickbookInvoiceUpdate');
-  console.log(req.body.eventNotifications[0]);
+  console.log(req.body.eventNotifications[0].dataChangeEvent.entities);
   let itemListFromWebhook = req.body.eventNotifications[0].dataChangeEvent.entities;
   itemListFromWebhook = itemListFromWebhook.filter(item => item.operation == 'Update').map(invoice => invoice.id );
   console.log('itemListFromWebhook')
@@ -422,7 +422,7 @@ exports.getQuickbookData = (req,res) => {
                                         "PrimaryEmailAddr": {
                                           "Address": accountInfo.rows[0].email
                                         },
-                                        "DisplayName": req.user.company_info.name+'-'+accountInfo.rows[0].name,
+                                        "DisplayName": req.user.company_info.name+'_'+accountInfo.rows[0].name,
                                         "FamilyName": accountInfo.rows[0].first_name?accountInfo.rows[0].first_name:''+' '+accountInfo.rows[0].last_name?accountInfo.rows[0].last_name:'',
                                         "CompanyName": accountInfo.rows[0].name,
                                         "BillAddr": {
