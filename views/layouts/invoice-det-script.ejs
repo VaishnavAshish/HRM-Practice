@@ -776,6 +776,7 @@
           },
           error: function(response){
             console.log(response);
+            closeModal(modalId);
             hideLoader('#globalLoader');
             showGlobalToast('#globalToast', 'error', response.responseText.message, 4000);
           }
