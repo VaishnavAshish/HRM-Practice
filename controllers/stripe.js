@@ -24,7 +24,7 @@ function addStripeToken(req,res,customer){
       }else{
         stripe.subscriptions.create({
               customer: customer.id,
-              billing :"send_invoice",
+              billing :"charge_automatically",
               days_until_due : 1,
               items: [
                 {
