@@ -380,7 +380,7 @@ exports.quickbookInvoiceUpdate = (req,res) => {
             }
           }
         });
-      }
+      })
     }else{
         handleResponse.sendSuccess(res,'No invoice to update',{});
     }
