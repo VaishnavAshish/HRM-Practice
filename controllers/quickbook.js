@@ -147,7 +147,7 @@ exports.postInvoiceToQuickbook = (req,res) => {
                              handleResponse.handleError(res, err, ' Error in fetching company data');
                            } else {
                               let companyDefaultTimezone = companySetting.rows[0].timezone;
-                               client.query('SELECT i.id ,i.status ,i.account_id ,i.company_id ,i.created_by ,i.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,i.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,i.archived ,i.account_name ,i.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,i.due_date at time zone \''+companyDefaultTimezone+'\' as due_date ,i.description ,i.project_id ,i.project_name ,i.total_amount ,i.record_id ,i.currency ,i.tax,i.final_amount,i.quickbook_invoice_id  FROM invoice i WHERE id=$1',[req.body.invoiceId], function (err, invoiceDetails) {
+                               client.query('SELECT i.id ,i.status ,i.account_id ,i.company_id ,i.created_by ,i.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,i.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,i.archived ,i.account_name ,i.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,i.due_date at time zone \''+companyDefaultTimezone+'\' as due_date ,i.description ,i.project_id ,i.project_name ,i.total_amount ,i.record_id ,i.currency ,i.tax,i.final_amount,i.quickbook_invoice_id,i.quickbook_sync_token  FROM invoice i WHERE id=$1',[req.body.invoiceId], function (err, invoiceDetails) {
                                  if (err){
                                    handleResponse.shouldAbort(err, client, done);
                                    handleResponse.handleError(res, err, ' Error in fetching invoice data');
@@ -224,10 +224,14 @@ exports.postInvoiceToQuickbook = (req,res) => {
                                                   }
                                                   if(invoiceDetails.rows[0].quickbook_invoice_id){
                                                       invoiceData.Id = invoiceDetails.rows[0].quickbook_invoice_id;
+                                                      invoiceData.sparse =  true;
+                                                      invoiceData.SyncToken = parseInt(invoiceDetails.rows[0].quickbook_sync_token);
                                                   }
                                                   oauthClient.postApiCall({url: url + 'v3/company/' + companyID +'/invoice',body:invoiceData})
                                                   .then(function(invoiceResponse){
                                                     console.log("The response for API call is for posting account:"+JSON.stringify(invoiceResponse));
+                                                    invoiceResponse = invoiceResponse.json.Invoice;
+                                                    console.log(invoiceResponse.invoiceResponse)
                                                     invoiceLineItems.rows.forEach((lineItem,index) => {
                                                       client.query('UPDATE INVOICE_LINE_ITEM set quickbook_invoice_line_id=$1 where id=$2',[invoiceResponse.Line[index].Id,lineItem.id], function(err, updatedInvoiceLineInfo) {
                                                         if (err){
@@ -236,8 +240,7 @@ exports.postInvoiceToQuickbook = (req,res) => {
                                                         } else {
 
                                                             if(index == (invoiceLineItems.rows.length-1)){
-                                                              console.log(index+' '+invoiceLineItems.rows.length);
-                                                              client.query('UPDATE INVOICE set quickbook_invoice_id=$1 where id=$2',[invoiceResponse.Id,req.body.invoiceId], function(err, updatedInvoiceInfo) {
+                                                              client.query('UPDATE INVOICE set quickbook_invoice_id=$1,quickbook_sync_token=$2 where id=$3',[invoiceResponse.Id,invoiceResponse.SyncToken,req.body.invoiceId], function(err, updatedInvoiceInfo) {
                                                                 if (err){
                                                                   handleResponse.shouldAbort(err, client, done);
                                                                   handleResponse.handleError(res, err, ' Error in updating invoice');
@@ -300,60 +303,88 @@ exports.quickbookInvoiceUpdate = (req,res) => {
   itemListFromWebhook = itemListFromWebhook.filter(item => item.operation == 'Update').map(invoice => invoice.id );
   console.log('itemListFromWebhook')
   console.log(itemListFromWebhook)
-  // pool.connect((err, client, done) => {
-  //     client.query('SELECT quickbook_token FROM SETTING where company_id=$1',[req.user.company_id], function(err, companySetting) {
-  //       if (err){
-  //         handleResponse.shouldAbort(err, client, done);
-  //         handleResponse.handleError(res, err, ' Error in fetching settings');
-  //       } else {
-  //           if(companySetting.rows[0].quickbook_token!=null){
-  //             let quickbook_token = JSON.parse(companySetting.rows[0].quickbook_token);
-  //             oauthClient = new OAuthClient({
-  //                 clientId: quickbook_token.clientId,
-  //                 clientSecret: quickbook_token.clientSecret,
-  //                 environment: quickbook_token.environment,
-  //                 redirectUri: quickbook_token.redirectUri,
-  //                 logging:true,
-  //                 token:quickbook_token.token
-  //             });
-  //
-  //             oauthClient.refresh()
-  //                .then(function(authResponse) {
-  //                   //  console.log('Tokens refreshed : ' + JSON.stringify(authResponse));
-  //                    quickbook_token.token =authResponse.token;
-  //                    client.query('UPDATE SETTING set quickbook_token=$1 where company_id=$2 RETURNING *',[quickbook_token,req.user.company_id], function(err, updatedCompSetting) {
-  //                      if (err){
-  //                        handleResponse.shouldAbort(err, client, done);
-  //                        handleResponse.handleError(res, err, ' Error in updating settings');
-  //                      } else {
-  //                        var companyID = oauthClient.getToken().realmId;
-  //                        var url = oauthClient.environment == 'Sandbox' ? OAuthClient.environment.sandbox : OAuthClient.environment.production ;
-  //                        console.log(companyID+' companyID');
-  //                        oauthClient.makeApiCall({url: url + 'v3/company/' + companyID +'/query?query=select * from Invoice Where id IN '+itemListFromWebhook})
-  //                            .then(function(invoiceData){
-  //                                console.log("The response for API call is :"+JSON.stringify(invoiceData));
-  //                                done();
-  //                                handleResponse.sendSuccess(res,'Quickbook data fetched successfully',{invoiceArray:invoiceData.json.QueryResponse.Item});
-  //                            })
-  //                            .catch(function(e) {
-  //                                console.error(e);
-  //                                handleResponse.handleError(res, e, ' Error in getting item info'+e);
-  //                            });
-  //                         }
-  //                    })
-  //                })
-  //                .catch(function(e) {
-  //                    console.error("The error message for refreshing token  is :"+e.originalMessage);
-  //                    console.error(e.intuit_tid);
-  //                    handleResponse.handleError(res, e, ' Error in refreshing token'+e);
-  //                });
-  //
-  //           }else{
-  //             handleResponse.handleError(res, 'Error in fetching quickbook settings', 'Error in fetching quickbook settings');
-  //           }
-  //       }
-  //     });
-  // });
+  pool.connect((err, client, done) => {
+    if(itemListFromWebhook.length>0){
+      itemListFromWebhook.forEach((invoiceItem,index) => {
+        client.query('SELECT company_id FROM INVOICE where quickbook_invoice_id=$1',[invoiceItem.id], function(err, invoiceDetail) {
+          if (err){
+            handleResponse.shouldAbort(err, client, done);
+            handleResponse.handleError(res, err, ' Error in fetching invoice company_id');
+          } else {
+            if(invoiceDetail.rows.length>0){
+              client.query('SELECT quickbook_token FROM SETTING where company_id=$1',[invoiceDetail.rows[0].company_id], function(err, companySetting) {
+                if (err){
+                  handleResponse.shouldAbort(err, client, done);
+                  handleResponse.handleError(res, err, ' Error in fetching settings');
+                } else {
+                  if(companySetting.rows[0].quickbook_token!=null){
+                    let quickbook_token = JSON.parse(companySetting.rows[0].quickbook_token);
+                    oauthClient = new OAuthClient({
+                      clientId: quickbook_token.clientId,
+                      clientSecret: quickbook_token.clientSecret,
+                      environment: quickbook_token.environment,
+                      redirectUri: quickbook_token.redirectUri,
+                      logging:true,
+                      token:quickbook_token.token
+                    });
+
+                    oauthClient.refresh()
+                    .then(function(authResponse) {
+                      //  console.log('Tokens refreshed : ' + JSON.stringify(authResponse));
+                      quickbook_token.token =authResponse.token;
+                      client.query('UPDATE SETTING set quickbook_token=$1 where company_id=$2 RETURNING *',[quickbook_token,invoiceDetail.rows[0].company_id], function(err, updatedCompSetting) {
+                        if (err){
+                          handleResponse.shouldAbort(err, client, done);
+                          handleResponse.handleError(res, err, ' Error in updating settings');
+                        } else {
+                          var companyID = oauthClient.getToken().realmId;
+                          var url = oauthClient.environment == 'Sandbox' ? OAuthClient.environment.sandbox : OAuthClient.environment.production ;
+                          console.log(companyID+' companyID');
+                          oauthClient.makeApiCall({url: url + 'v3/company/' + companyID +'/query?query=select status from Invoice Where id = \''+invoiceItem.id+'\''})
+                          .then(function(invoiceData){
+                            console.log("The response for API call is :"+JSON.stringify(invoiceData));
+                            if(invoiceData.json.QueryResponse.Invoice[0].LinkedTxn.length>0){
+                              client.query('UPDATE INVOICE set status=$1 where quickbook_invoice_id=$2',['PAID',invoiceItem.id], function(err, updatedInvoice) {
+                                if (err){
+                                  handleResponse.shouldAbort(err, client, done);
+                                  handleResponse.handleError(res, err, ' Error in updating invoice');
+                                } else {
+
+                                }
+                              });
+                            }
+                            if(index == itemListFromWebhook.length-1){
+                              done();
+                              handleResponse.sendSuccess(res,'Invoices updated successfully',{});
+                            }
+                          })
+                          .catch(function(e) {
+                            console.error(e);
+                            handleResponse.handleError(res, e, ' Error in getting item info'+e);
+                          });
+                        }
+                      })
+                    })
+                    .catch(function(e) {
+                      console.error("The error message for refreshing token  is :"+e.originalMessage);
+                      console.error(e.intuit_tid);
+                      handleResponse.handleError(res, e, ' Error in refreshing token'+e);
+                    });
+
+                  }else{
+                    handleResponse.handleError(res, 'Error in fetching quickbook settings', 'Error in fetching quickbook settings');
+                  }
+                }
+              });
+
+            }
+          }
+        });
+      }
+    }else{
+        handleResponse.sendSuccess(res,'No invoice to update',{});
+    }
+  });
   // itemListFromWebhook.forEach(invoiceItem => {
   //   pool.connect((err, client, done) => {
   //     client.query('UPDATE SETTING set stripe_customer_id=$1,stripe_subscription_id=$2 where stripe_subscription_id=$3',[null,null,req.body.data.object.id], function(err, stripeSetting) {
@@ -367,7 +398,7 @@ exports.quickbookInvoiceUpdate = (req,res) => {
   //       });
   //   });
   // })
-  res.send(200);
+  // res.send(200);
   // pool.connect((err, client, done) => {
   //   client.query('UPDATE INVOICE set status=$1 where quickbook_invoice_id=$2',['PAID',req.body.data.object.id], function(err, invoiceUpdated) {
   //       if (err){
