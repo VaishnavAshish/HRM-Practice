@@ -25,7 +25,6 @@ function addStripeToken(req,res,customer){
         stripe.subscriptions.create({
               customer: customer.id,
               billing :"charge_automatically",
-              days_until_due : 1,
               items: [
                 {
                   plan: "plan_ErfnIcSqBtHxtY",
@@ -118,7 +117,7 @@ exports.disableStripe = (req, res) => {
                   handleResponse.handleError(res, err, ' Error in finding settings');
                 } else {
                   // asynchronously called
-                  client.query('UPDATE SETTING set stripe_customer_id=$1,stripe_subscription_id=$2,quickbook_token=$3 where company_id=$3',[null,null,null,req.user.company_id], function(err, stripeSetting) {
+                  client.query('UPDATE SETTING set stripe_customer_id=$1,stripe_subscription_id=$2,quickbook_token=$3 where company_id=$4',[null,null,null,req.user.company_id], function(err, stripeSetting) {
                     if (err){
                       handleResponse.shouldAbort(err, client, done);
                       handleResponse.handleError(res, err, ' Error in updating settings');

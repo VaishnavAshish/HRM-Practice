@@ -344,7 +344,7 @@ exports.quickbookInvoiceUpdate = (req,res) => {
   console.log('quickbookInvoiceUpdate');
   console.log(req.body.eventNotifications[0].dataChangeEvent.entities);
   let itemListFromWebhook = req.body.eventNotifications[0].dataChangeEvent.entities;
-  itemListFromWebhook = itemListFromWebhook.filter(item => item.operation == 'Update').map(invoice => invoice.id );
+  itemListFromWebhook = itemListFromWebhook.filter(item => item.operation == 'Create').map(payment => payment.id );
   console.log('itemListFromWebhook')
   console.log(itemListFromWebhook)
   pool.connect((err, client, done) => {
