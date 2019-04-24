@@ -344,7 +344,7 @@ exports.postInvoiceToQuickbook = (req,res) => {
 
 exports.quickbookInvoiceUpdate = (req,res) => {
   console.log('quickbookInvoiceUpdate');
-  console.log(req.params.companyId);
+  console.log(req.body);
   console.log(req.body.eventNotifications[0].dataChangeEvent.entities);
   let itemListFromWebhook = req.body.eventNotifications[0].dataChangeEvent.entities;
   itemListFromWebhook = itemListFromWebhook.filter(item => item.operation == 'Create').map(payment => payment.id );
@@ -373,7 +373,7 @@ exports.quickbookInvoiceUpdate = (req,res) => {
                 .then(function(authResponse) {
                   //  console.log('Tokens refreshed : ' + JSON.stringify(authResponse));
                   quickbook_token.token =authResponse.token;
-                  client.query('UPDATE SETTING set quickbook_token=$1 where company_id=$2 RETURNING *',[quickbook_token,invoiceDetail.rows[0].company_id], function(err, updatedCompSetting) {
+                  client.query('UPDATE SETTING set quickbook_token=$1 where company_id=$2 RETURNING *',[quickbook_token,req.params.companyId], function(err, updatedCompSetting) {
                     if (err){
                       handleResponse.shouldAbort(err, client, done);
                       handleResponse.handleError(res, err, ' Error in updating settings');
@@ -381,16 +381,17 @@ exports.quickbookInvoiceUpdate = (req,res) => {
                       var companyID = oauthClient.getToken().realmId;
                       var url = oauthClient.environment == 'Sandbox' ? OAuthClient.environment.sandbox : OAuthClient.environment.production ;
                       console.log(companyID+' companyID');
-                      oauthClient.makeApiCall({url: url + 'v3/company/' + companyID +'/query?query=elect Line from Payment Where id= \''+paymentItem.id+'\''})
-                      .then(function(invoiceData){
+                      console.log(paymentItem);
+                      oauthClient.makeApiCall({url: url + 'v3/company/' + companyID +'/query?query=select Line from Payment Where Id= \''+paymentItem+'\''})
+                      .then(function(paymentData){
                         console.log("The response for API call is :"+JSON.stringify(paymentData));
                         let paymentLineItem = paymentData.json.QueryResponse.Payment[0].Line;
 
                         console.log('----------paymentLineItem-------');
                         console.log(paymentLineItem);
 
-                        if(paymentLineItem.LinkedTxn.length>0){
-                          let linkedTxnForInvoice = paymentLineItem.LinkedTxn.filter(transaction =>  transaction.TxnType == 'Invoice');
+                        if(paymentLineItem[0].LinkedTxn.length>0){
+                          let linkedTxnForInvoice = paymentLineItem[0].LinkedTxn.filter(transaction =>  transaction.TxnType == 'Invoice');
 
                           console.log('--------------linkedTxnForInvoice-------------');
                           console.log(linkedTxnForInvoice);
