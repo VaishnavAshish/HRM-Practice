@@ -27,6 +27,13 @@ function disconnectFromQuickbook(modalId){
 
 }
 
+function copyTextToClipboard() {
+	var copyText = document.getElementById("webhook_url");
+	copyText.select();
+	document.execCommand("copy");
+	$("#copiedURL").text('Text copied to clipboard : '+copyText.value);
+	// showGlobalToast('#globalToast', 'success', 'Text copied to clipboard : '+copyText.value, 4000);
+}
 
 
 </script>

@@ -1,6 +1,6 @@
 <div id="modalQuickbookSetting">
     <section role="dialog" tabindex="-1" class="slds-modal">
-      <!-- modal add invoice Expenses start-->
+      <!-- modal quickbook setting start-->
               <div class="slds-modal__container">
                   <header class="slds-modal__header">
                       <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="closeModal('#modalQuickbookSetting');">
@@ -48,6 +48,24 @@
                             </footer>
                         </form>
                     <% } else { %>
+                      <div class=" slds-p-around_small">
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_12-of-12">
+                                <div class="slds-form-element slds-m-bottom_medium">
+                                    <label class="slds-form-element__label" for="client_id" >Webhook URL </label>
+                                    <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
+                                        <input type="text" id="webhook_url" name="webhook_url" class="slds-input" disabled value='<%= user.company_info.quickbook_webhook_url %>'>
+                                        <div class="slds-input__icon-group slds-input__icon-group_right">
+                                            <button class="slds-input__icon slds-input__icon_right slds-button slds-button_icon" title="Copy URL" onclick="copyTextToClipboard();">
+                                                <i class="fa fa-copy"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="slds-text-color_success text-size-12 slds-p-top_xx-small" id="copiedURL">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                       <footer class="slds-modal__footer">
                         <button class="slds-button slds-button_neutral" onclick="disconnectFromQuickbook('#modalQuickbookSetting');">Disconnect To Quickbook</button>
                       </footer/>
@@ -57,4 +75,4 @@
           </section>
           <div class="slds-backdrop"></div>
       </div>
-      <!-- modal add card detail end-->
+      <!-- modal quickbook setting end-->

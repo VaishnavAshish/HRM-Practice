@@ -218,9 +218,9 @@ comparePassword=(candidatePassword, actualPassword, cb)=> {
 }));*/
 passport.use('user', new LocalStrategy({ usernameField: 'email',passReqToCallback: true}, (req, email, password, done) => {
   let domain=req.body.domain;
-//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
   pool.connect((err, client, poolDone) => {
-    client.query("select * from company INNER JOIN (SELECT company_id,stripe_customer_id,stripe_subscription_id,quickbook_token FROM setting) setting ON company.id = setting.company_id AND company.domain=$1 AND company.archived=$2", [domain,false], function(err, company) {
+    client.query("select * from company INNER JOIN (SELECT company_id,stripe_customer_id,stripe_subscription_id,quickbook_token,quickbook_webhook_url FROM setting) setting ON company.id = setting.company_id AND company.domain=$1 AND company.archived=$2", [domain,false], function(err, company) {
     // client.query("select * from company where domain=$1 AND archived=$2", [domain,false], function(err, company) {
       if (err) {
         // console.log('err-----------' + JSON.stringify(err));
@@ -867,8 +867,9 @@ exports.isAuthenticated = (req, res, next) => {
     // console.log('matchUser');
     // console.log(matchUser);
     // if(matchUser!=undefined){
+    //
         pool.connect((err, client, done) => {
-          client.query("select * from company INNER JOIN (SELECT company_id,stripe_customer_id,stripe_subscription_id,quickbook_token FROM setting) setting ON company.id = setting.company_id AND company.id=$1 AND company.archived=$2", [req.user.company_id,false], function(err, company) {
+          client.query("select * from company INNER JOIN (SELECT company_id,stripe_customer_id,stripe_subscription_id,quickbook_token,quickbook_webhook_url FROM setting) setting ON company.id = setting.company_id AND company.id=$1 AND company.archived=$2", [req.user.company_id,false], function(err, company) {
             if (err) {
               handleResponse.shouldAbort(err, client, done);
               // handleResponse.handleError(res, err, ' Error in finding company data');
