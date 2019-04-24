@@ -683,7 +683,7 @@ exports.disconnectQuickbook = (req,res) =>{
                      oauthClient.revoke({token:quickbook_token.token.refresh_token})
                      .then(function(authResponse) {
                        console.log('Tokens revoked : ' + JSON.stringify(authResponse));
-                       client.query('UPDATE SETTING set quickbook_token=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedSetting) {
+                       client.query('UPDATE SETTING set quickbook_token=$1, invoice_timesheet_item_id=$1 ,invoice_expense_item_id=$1 ,invoice_fixedfee_item_id=$1 ,invoice_other_item_id=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedSetting) {
                          if (err){
                            handleResponse.shouldAbort(err, client, done);
                            handleResponse.handleError(res, err, ' Error in updating settings');
