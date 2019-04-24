@@ -149,7 +149,7 @@ exports.postInvoiceToQuickbook = (req,res) => {
                              handleResponse.handleError(res, err, ' Error in fetching company data');
                            } else {
                               let companyDefaultTimezone = companySetting.rows[0].timezone;
-                               client.query('SELECT i.id ,i.status ,i.account_id ,i.company_id ,i.created_by ,i.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,i.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,i.archived ,i.account_name ,i.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,i.due_date at time zone \''+companyDefaultTimezone+'\' as due_date ,i.description ,i.project_id ,i.project_name ,i.total_amount ,i.record_id ,i.currency ,i.tax,i.final_amount,i.quickbook_invoice_id,i.quickbook_sync_token  FROM invoice i WHERE id=$1',[req.body.invoiceId], function (err, invoiceDetails) {
+                               client.query('SELECT i.id ,i.status ,i.account_id ,i.company_id ,i.created_by ,i.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,i.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,i.archived ,i.account_name ,i.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,i.due_date at time zone \''+companyDefaultTimezone+'\' as due_date ,i.description ,i.project_id ,i.project_name ,i.total_amount ,i.record_id ,i.currency ,i.tax,i.final_amount,i.quickbook_invoice_id  FROM invoice i WHERE id=$1',[req.body.invoiceId], function (err, invoiceDetails) {
                                  if (err){
                                    handleResponse.shouldAbort(err, client, done);
                                    handleResponse.handleError(res, err, ' Error in fetching invoice data');
@@ -244,7 +244,7 @@ exports.postInvoiceToQuickbook = (req,res) => {
                                                               } else {
 
                                                                   if(index == (invoiceLineItems.rows.length-1)){
-                                                                    client.query('UPDATE INVOICE set quickbook_invoice_id=$1,quickbook_sync_token=$2 where id=$3',[invoiceResponse.Id,invoiceResponse.SyncToken,req.body.invoiceId], function(err, updatedInvoiceInfo) {
+                                                                    client.query('UPDATE INVOICE set quickbook_invoice_id=$1 where id=$2',[invoiceResponse.Id,req.body.invoiceId], function(err, updatedInvoiceInfo) {
                                                                       if (err){
                                                                         handleResponse.shouldAbort(err, client, done);
                                                                         handleResponse.handleError(res, err, ' Error in updating invoice');
@@ -284,7 +284,7 @@ exports.postInvoiceToQuickbook = (req,res) => {
                                                           } else {
 
                                                             if(index == (invoiceLineItems.rows.length-1)){
-                                                              client.query('UPDATE INVOICE set quickbook_invoice_id=$1,quickbook_sync_token=$2 where id=$3',[invoiceResponse.Id,invoiceResponse.SyncToken,req.body.invoiceId], function(err, updatedInvoiceInfo) {
+                                                              client.query('UPDATE INVOICE set quickbook_invoice_id=$1 where id=$2',[invoiceResponse.Id,req.body.invoiceId], function(err, updatedInvoiceInfo) {
                                                                 if (err){
                                                                   handleResponse.shouldAbort(err, client, done);
                                                                   handleResponse.handleError(res, err, ' Error in updating invoice');
