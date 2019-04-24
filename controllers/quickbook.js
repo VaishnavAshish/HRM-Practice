@@ -37,8 +37,7 @@ exports.getAuthCode = (req,res) => {
              console.log(oauth2_token_json);
              pool.connect((err, client, done) => {
                let webhook_url = process.env.BASE_URL+'/quickbookInvoiceUpdate/'+req.user.company_id;
-               console.log('webhook_url');
-               console.log(webhook_url);
+               
                  client.query('UPDATE SETTING set quickbook_token=$1,quickbook_webhook_url=$2 where company_id=$3 RETURNING id',[oauthClient,webhook_url ,req.user.company_id], function(err, updatedSetting) {
                    if (err){
                      handleResponse.shouldAbort(err, client, done);

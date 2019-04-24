@@ -106,7 +106,7 @@
     "webpack-livereload-plugin": "2.1.1"
   },
   "engines": {
-    "node": "10.15.3",
+    "node": "11.14.0",
     "npm": "6.4.1"
   }
 }
