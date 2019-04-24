@@ -703,8 +703,8 @@ exports.disconnectQuickbook = (req,res) =>{
                      });
                  })
                  .catch(function(e) {
-                     console.error("The error message for refreshing token  is :"+e.originalMessage);
-                     console.error(e.intuit_tid);
+                     console.error("The error message for refreshing token  is :");
+                     console.error(e);
                      handleResponse.handleError(res, e, ' Error in refreshing token'+e);
                  });
 
