@@ -28,6 +28,7 @@
     "connect-mongo": "^2.0.1",
     "connect-pg-simple": "5.0.0",
     "cookie-parser": "1.4.3",
+    "cryptr": "^4.0.2",
     "dotenv": "^6.1.0",
     "dynamic-html-pdf": "0.0.4",
     "ejs": "2.6.1",

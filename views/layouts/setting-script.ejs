@@ -88,6 +88,7 @@ function checkPaymentAndAdd(){
 	stripe.createToken(card).then(function(result) {
     if (result.error) {
       // Inform the user if there was an error.
+			hideLoader('#globalLoader');
       var errorElement = document.getElementById('card-errors');
       errorElement.textContent = result.error.message;
     } else {
@@ -119,7 +120,7 @@ function checkPaymentAndAdd(){
 					});
     }
   });
-	
+
 }
 
 function enableIntegration(){
