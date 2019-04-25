@@ -50,7 +50,7 @@ exports.getAuthCode = (req,res) => {
                      done();
                      res.redirect('/integration-dashboard');
                      // handleResponse.sendSuccess(res,'settings updated successfully',{});
-                    //  handleResponse.sendSuccess(res,'Stripes data updated successfully',{customer:customer,subscription:subscription});
+                    //  handleResponse.sendSuccess(res,'Quickbook connection established successfully',{});
 
                    }
                  });
@@ -62,6 +62,7 @@ exports.getAuthCode = (req,res) => {
          })
         .catch(function(e) {
              console.error(e);
+             handleResponse.handleError(res, e, ' Error in connecting to quickbook');
          });
     //  res.send(200);
 

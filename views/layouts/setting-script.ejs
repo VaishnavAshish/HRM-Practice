@@ -85,6 +85,7 @@ function disableIntegration(){
 
 function checkPaymentAndAdd(){
 	showLoader('#globalLoader');
+	$("#card-errors").text('');
 	stripe.createToken(card).then(function(result) {
     if (result.error) {
       // Inform the user if there was an error.
