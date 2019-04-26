@@ -31,6 +31,7 @@ function connectToQuickbook(modalId,formId){
 	showLoader('#globalLoader');
 	let client_id = $("#client_id").val();
 	let client_secret = $("#client_secret").val();
+	let quickbook_environment = $("#quickbook_environment").val();
 	checkFormValidation(formId);
 	if(!$(formId).hasClass('has-error')){
 		$(formId).submit();

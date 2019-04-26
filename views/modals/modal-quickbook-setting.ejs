@@ -25,7 +25,7 @@
                                             <div class="slds-form-element__control slds-input-has-fixed-addon">
                                                 <input type="text" id="client_id" getFormData name="client_id" required="" class="slds-input" reset='value'>
                                             </div>
-                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset='errmsg'>
 
                                             </div>
                                         </div>
@@ -39,10 +39,29 @@
                                             <div class="slds-form-element__control slds-input-has-fixed-addon">
                                                 <input type="text" id="client_secret" getFormData name="client_secret" required="" class="slds-input" reset='value'>
                                             </div>
-                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset='errmsg'>
 
                                             </div>
                                         </div>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_12-of-12">
+                                      <div class="slds-form-element slds-m-bottom_medium" reset='errorclass'>
+                                          <label class="slds-form-element__label">
+                                              Quickbook Environment
+                                              <abbr class="slds-required" title="required">*</abbr>
+                                          </label>
+                                          <div class="slds-form-element__control">
+                                              <div class="slds-select_container">
+                                                  <select class="slds-select" id="quickbook_environment" getFormData name="quickbook_environment" required="">
+                                                            <option value="Sandbox">Sandbox</option>
+                                                            <option value="Production">Production</option>
+                                                  </select>
+                                              </div>
+                                              <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset='errmsg'>
+
+                                              </div>
+                                          </div>
+                                      </div>
                                     </div>
                                 <!-- </div> -->
                               </div>

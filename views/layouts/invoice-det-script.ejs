@@ -189,7 +189,7 @@
       error: function(response) {
         console.log(response);
         hideLoader('#globalLoader');
-        showGlobalToast('#globalToast', 'error', response.responseText, 4000);
+        showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
 
       }
     });
@@ -758,7 +758,7 @@
         error: function(response){
             console.log(response);
             hideLoader('#globalLoader');
-            showGlobalToast('#globalToast', 'error', response.responseText.message, 4000);
+            showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
         }
     });
 

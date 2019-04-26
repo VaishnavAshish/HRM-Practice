@@ -17,14 +17,14 @@ exports.initiateQuickbook = (req, res) => {
     oauthClient = new OAuthClient({
         clientId: req.query.client_id,
         clientSecret: req.query.client_secret,
-        environment: process.env.QUICKBOOK_ENV,
+        environment: req.query.quickbook_environment,
         redirectUri: process.env.QUICKBOOK_REDIRECTURL
     });
     // console.log('oauthClient');
     // console.log(oauthClient);
 
     // AuthorizationUri
-    var authUri = oauthClient.authorizeUri({scope:[OAuthClient.scopes.Accounting,OAuthClient.scopes.OpenId],state:'testState'});  // can be an array of multiple scopes ex : {scope:[OAuthClient.scopes.Accounting,OAuthClient.scopes.OpenId]}
+    var authUri = oauthClient.authorizeUri({scope:[OAuthClient.scopes.Accounting,OAuthClient.scopes.OpenId]});  // can be an array of multiple scopes ex : {scope:[OAuthClient.scopes.Accounting,OAuthClient.scopes.OpenId]}
     // console.log('authUri')
     // console.log(authUri)
     res.redirect(authUri);
