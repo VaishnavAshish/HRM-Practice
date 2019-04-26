@@ -27,7 +27,7 @@ function addStripeToken(req,res,customer){
               billing :"charge_automatically",
               items: [
                 {
-                  plan: "plan_ErfnIcSqBtHxtY",
+                  plan: process.env.STRIPE_PLAN_ID,
                 },
               ]
             }, function(err, subscription) {
