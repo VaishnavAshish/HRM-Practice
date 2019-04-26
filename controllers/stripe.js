@@ -11,7 +11,7 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 // See your keys here: https://dashboard.stripe.com/account/apikeys
 
 function addStripeToken(req,res,customer){
-  stripe.customers.createSource(
+  stripe.customers.update(
     customer.id,
     {
       source: req.body.stripeToken,
@@ -75,9 +75,9 @@ exports.initiateStripe = (req, res) => {
           limit: 1,
           email: req.user.email,
         }, function(err, customers) {
-          // console.log('customer data');
-          // console.log(customers.data.length);
-          // console.log(customers.data);
+          console.log('customer data');
+          console.log(customers.data.length);
+          console.log(customers.data);
           if(customers.data.length>0){
             addStripeToken(req,res,customers.data[0]);
           }else{
@@ -141,7 +141,7 @@ exports.invoicePaymentDeclined = (req, res) => {
   console.log(JSON.stringify(req.body));
   // handleResponse.sendSuccess(res,'webhook found successfully',{});
   pool.connect((err, client, done) => {
-    client.query('UPDATE SETTING set stripe_customer_id=$1,stripe_subscription_id=$2 where stripe_subscription_id=$3',[null,null,req.body.data.object.id], function(err, stripeSetting) {
+    client.query('UPDATE SETTING set stripe_customer_id=$1,stripe_subscription_id=$2,quickbook_token=$3,invoice_timesheet_item_id=$3 ,invoice_expense_item_id=$3 ,invoice_fixedfee_item_id=$3 ,invoice_other_item_id=$3 where stripe_subscription_id=$4',[null,null,null,req.body.data.object.id], function(err, stripeSetting) {
         if (err){
           handleResponse.shouldAbort(err, client, done);
           handleResponse.handleError(res, err, ' Error in updating settings');
