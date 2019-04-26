@@ -4,7 +4,7 @@ const handleResponse = require('./page-error-handle');
 const moment = require('moment-timezone');
 const setting = require('./company-setting');
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-stripe.setApiVersion(process.env.STRIPE_VERSION);
+// stripe.setApiVersion(process.env.STRIPE_VERSION);
 
 
 // Set your secret key: remember to change this to your live secret key in production
