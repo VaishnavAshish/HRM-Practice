@@ -75,9 +75,9 @@ exports.initiateStripe = (req, res) => {
           limit: 1,
           email: req.user.email,
         }, function(err, customers) {
-          console.log('customer data');
-          console.log(customers.data.length);
-          console.log(customers.data);
+          // console.log('customer data');
+          // console.log(customers.data.length);
+          // console.log(customers.data);
           if(customers.data.length>0){
             addStripeToken(req,res,customers.data[0]);
           }else{
