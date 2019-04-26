@@ -10,9 +10,10 @@
                       </button>
                       <h2  class="slds-text-heading_medium slds-hyphenate">Integration With Quickbook</h2>
                   </header>
-                  <div class="slds-modal__content" modal-body>
+
                       <!-- <div> -->
                       <% if(!user.company_info.quickbook_token){ %>
+                        <div class="slds-modal__content" modal-body>
                           <form id="connect-to-quickbook" method="get" action="/initiateQuickbook">
                               <div class=" slds-p-around_small">
                                 <!-- <div class="slds-grid slds-wrap slds-gutters"> -->
@@ -65,6 +66,7 @@
                                     </div>
                                 <!-- </div> -->
                               </div>
+                            </div>
                             <footer class="slds-modal__footer">
                                 <button class="slds-button slds-button_neutral" onclick="closeModal('#modalQuickbookSetting');">Cancel</button>
                                 <button class="slds-button" onclick="connectToQuickbook('#modalQuickbookSetting','#connect-to-quickbook');">
@@ -73,29 +75,30 @@
                             </footer>
                         </form>
                     <% } else { %>
-                      <div class=" slds-p-around_small">
-                            <div class="slds-col slds-size_1-of-1 slds-medium-size_12-of-12">
-                                <div class="slds-form-element slds-m-bottom_medium">
-                                    <label class="slds-form-element__label" for="client_id" >Webhook URL </label>
-                                    <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
-                                        <input type="text" id="webhook_url" name="webhook_url" class="slds-input" disabled value='<%= user.company_info.quickbook_webhook_url %>'>
-                                        <div class="slds-input__icon-group slds-input__icon-group_right">
-                                            <button class="slds-input__icon slds-input__icon_right slds-button slds-button_icon" title="Copy URL" onclick="copyTextToClipboard();">
-                                                <i class="fa fa-copy"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="text-size-12 slds-p-top_xx-small" id="copiedURL">
+                      <div class="slds-modal__content" modal-body>
+                        <div class=" slds-p-around_small">
+                              <div class="slds-col slds-size_1-of-1 slds-medium-size_12-of-12">
+                                  <div class="slds-form-element slds-m-bottom_medium">
+                                      <label class="slds-form-element__label" for="client_id" >Webhook URL </label>
+                                      <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
+                                          <input type="text" id="webhook_url" name="webhook_url" class="slds-input" disabled value='<%= user.company_info.quickbook_webhook_url %>'>
+                                          <div class="slds-input__icon-group slds-input__icon-group_right">
+                                              <button class="slds-input__icon slds-input__icon_right slds-button slds-button_icon" title="Copy URL" onclick="copyTextToClipboard();">
+                                                  <i class="fa fa-copy"></i>
+                                              </button>
+                                          </div>
+                                      </div>
+                                      <div class="text-size-12 slds-p-top_xx-small" id="copiedURL">
 
-                                    </div>
-                                </div>
-                            </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
                         </div>
-                      <footer class="slds-modal__footer">
-                        <button class="slds-button slds-button_neutral" onclick="disconnectFromQuickbook('#modalQuickbookSetting');">Disconnect To Quickbook</button>
-                      </footer/>
+                        <footer class="slds-modal__footer">
+                          <button class="slds-button slds-button_neutral" onclick="disconnectFromQuickbook('#modalQuickbookSetting');">Disconnect To Quickbook</button>
+                        </footer/>
                     <% } %>
-                  </div>
               </div>
           </section>
           <div class="slds-backdrop"></div>
