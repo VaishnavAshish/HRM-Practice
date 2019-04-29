@@ -41,17 +41,31 @@ function addStripeToken(req,res,customer){
                   function(err, invoices) {
                     // asynchronously called
                     pool.connect((err, client, done) => {
-                  			client.query('UPDATE SETTING set stripe_customer_id=$1,stripe_subscription_id=$2 where company_id=$3 RETURNING id',[customer.id, subscription.id, req.user.company_id], function(err, updatedSetting) {
-          			          if (err){
-          			            handleResponse.shouldAbort(err, client, done);
-          			            handleResponse.handleError(res, err, ' Error in updating settings');
-          			          } else {
-          			            done();
-          			            // handleResponse.sendSuccess(res,'settings updated successfully',{});
-                            handleResponse.sendSuccess(res,'Stripes data updated successfully',{customer:customer,subscription:subscription});
-
-          			          }
-        		            });
+                      client.query('BEGIN', (err) => {
+                        if (err){
+                          handleResponse.shouldAbort(err, client, done);
+                          handleResponse.handleError(res, err, ' error in connecting to database');
+                        } else {
+                      			client.query('UPDATE SETTING set stripe_customer_id=$1,stripe_subscription_id=$2 where company_id=$3 RETURNING id',[customer.id, subscription.id, req.user.company_id], function(err, updatedSetting) {
+              			          if (err){
+              			            handleResponse.shouldAbort(err, client, done);
+              			            handleResponse.handleError(res, err, ' Error in updating settings');
+              			          } else {
+                                client.query('COMMIT', (err) => {
+                                  if (err) {
+                                    // console.log('Error committing transaction', err.stack)
+                                    handleResponse.shouldAbort(err, client, done);
+                                    handleResponse.handleError(res, err, ' Error in committing transaction');
+                                  } else {
+                  			            done();
+                  			            // handleResponse.sendSuccess(res,'settings updated successfully',{});
+                                    handleResponse.sendSuccess(res,'Stripes data updated successfully',{customer:customer,subscription:subscription});
+                                  }
+                                })
+              			          }
+            		            });
+                          }
+                        })
 
                     });
                   }
@@ -102,36 +116,49 @@ exports.initiateStripe = (req, res) => {
 
 exports.disableStripe = (req, res) => {
   pool.connect((err, client, done) => {
-    console.log('SELECT stripe_customer_id,stripe_subscription_id FROM SETTING WHERE company_id=$1'+req.user.company_id);
-      client.query('SELECT stripe_customer_id,stripe_subscription_id FROM SETTING WHERE company_id=$1',[req.user.company_id], function(err, stripeSetting) {
-        if (err){
-          handleResponse.shouldAbort(err, client, done);
-          handleResponse.handleError(res, err, ' Error in finding settings');
-        } else {
-          // done();
-          stripe.subscriptions.del(
-              stripeSetting.rows[0].stripe_subscription_id,
-              function(err, confirmation) {
-                if (err){
-                  handleResponse.shouldAbort(err, client, done);
-                  handleResponse.handleError(res, err, ' Error in finding settings');
-                } else {
-                  // asynchronously called
-                  client.query('UPDATE SETTING set stripe_customer_id=$1,stripe_subscription_id=$2,quickbook_token=$3 ,invoice_timesheet_item_id=$3 ,invoice_expense_item_id=$3 ,invoice_fixedfee_item_id=$3 ,invoice_other_item_id=$3  where company_id=$4',[null,null,null,req.user.company_id], function(err, stripeSetting) {
-                    if (err){
-                      handleResponse.shouldAbort(err, client, done);
-                      handleResponse.handleError(res, err, ' Error in updating settings');
-                    } else {
-                        done();
-                        handleResponse.sendSuccess(res,'Stripes subscription data deleted successfully',{});
-                    }
-                  });
-                }
-              });
-
-
+    client.query('BEGIN', (err) => {
+      if (err){
+        handleResponse.shouldAbort(err, client, done);
+        handleResponse.handleError(res, err, ' error in connecting to database');
+      } else {
+        console.log('SELECT stripe_customer_id,stripe_subscription_id FROM SETTING WHERE company_id=$1'+req.user.company_id);
+        client.query('SELECT stripe_customer_id,stripe_subscription_id FROM SETTING WHERE company_id=$1',[req.user.company_id], function(err, stripeSetting) {
+          if (err){
+            handleResponse.shouldAbort(err, client, done);
+            handleResponse.handleError(res, err, ' Error in finding settings');
+          } else {
+            // done();
+            stripe.subscriptions.del(
+                stripeSetting.rows[0].stripe_subscription_id,
+                function(err, confirmation) {
+                  if (err){
+                    handleResponse.shouldAbort(err, client, done);
+                    handleResponse.handleError(res, err, ' Error in finding settings');
+                  } else {
+                    // asynchronously called
+                    client.query('UPDATE SETTING set stripe_customer_id=$1,stripe_subscription_id=$2,quickbook_token=$3 ,invoice_timesheet_item_id=$3 ,invoice_expense_item_id=$3 ,invoice_fixedfee_item_id=$3 ,invoice_other_item_id=$3  where company_id=$4',[null,null,null,req.user.company_id], function(err, stripeSetting) {
+                      if (err){
+                        handleResponse.shouldAbort(err, client, done);
+                        handleResponse.handleError(res, err, ' Error in updating settings');
+                      } else {
+                        client.query('COMMIT', (err) => {
+                          if (err) {
+                            // console.log('Error committing transaction', err.stack)
+                            handleResponse.shouldAbort(err, client, done);
+                            handleResponse.handleError(res, err, ' Error in committing transaction');
+                          } else {
+                            done();
+                            handleResponse.sendSuccess(res,'Stripes subscription data deleted successfully',{});
+                          }
+                        })
+                      }
+                    });
+                  }
+                });
+            }
+          });
         }
-      });
+      })
 
   });
 }
@@ -141,15 +168,30 @@ exports.invoicePaymentDeclined = (req, res) => {
   console.log(JSON.stringify(req.body));
   // handleResponse.sendSuccess(res,'webhook found successfully',{});
   pool.connect((err, client, done) => {
-    client.query('UPDATE SETTING set stripe_customer_id=$1,stripe_subscription_id=$2,quickbook_token=$3,invoice_timesheet_item_id=$3 ,invoice_expense_item_id=$3 ,invoice_fixedfee_item_id=$3 ,invoice_other_item_id=$3 where stripe_subscription_id=$4',[null,null,null,req.body.data.object.id], function(err, stripeSetting) {
-        if (err){
-          handleResponse.shouldAbort(err, client, done);
-          handleResponse.handleError(res, err, ' Error in updating settings');
-        } else {
-          done();
-          handleResponse.sendSuccess(res,'Stripes subscription data deleted successfully',{});
-        }
-      });
+    client.query('BEGIN', (err) => {
+      if (err){
+        handleResponse.shouldAbort(err, client, done);
+        handleResponse.handleError(res, err, ' error in connecting to database');
+      } else {
+        client.query('UPDATE SETTING set stripe_customer_id=$1,stripe_subscription_id=$2,quickbook_token=$3,invoice_timesheet_item_id=$3 ,invoice_expense_item_id=$3 ,invoice_fixedfee_item_id=$3 ,invoice_other_item_id=$3 where stripe_subscription_id=$4',[null,null,null,req.body.data.object.id], function(err, stripeSetting) {
+          if (err){
+            handleResponse.shouldAbort(err, client, done);
+            handleResponse.handleError(res, err, ' Error in updating settings');
+          } else {
+            client.query('COMMIT', (err) => {
+              if (err) {
+                // console.log('Error committing transaction', err.stack)
+                handleResponse.shouldAbort(err, client, done);
+                handleResponse.handleError(res, err, ' Error in committing transaction');
+              } else {
+                done();
+                handleResponse.sendSuccess(res,'Stripes subscription data deleted successfully',{});
+              }
+            })
+          }
+        });
+      }
+    })
   });
 }
 

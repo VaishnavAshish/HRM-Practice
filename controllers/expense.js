@@ -479,23 +479,37 @@ exports.getExpenseDetail = (req, res) => {
 exports.submitExpense = (req, res) => {
 
   pool.connect((err, client, done) => {
-      client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id FROM EXPENSE e where id=$1 AND company_id=$2', [req.body.expenseId, req.user.company_id], function(err, expense) {
-          if (err) {
-              console.error(err);
-              handleResponse.shouldAbort(err, client, done);
-              handleResponse.handleError(res, err, ' Error in finding expense data');
-          } else {
-              client.query('UPDATE EXPENSE SET submitted=$1 WHERE id=$2', [true,req.body.expenseId], function(err, updatedData) {
-                  if (err) {
-                      console.error(err);
-                      handleResponse.shouldAbort(err, client, done);
-                      handleResponse.handleError(res, err, ' Error in submitting expense data');
-                  } else {
-                      done();
-                      handleResponse.sendSuccess(res, 'Expense submitted successfully', {});
-                  }
-              });
-          }
+    client.query('BEGIN', (err) => {
+      if(err) {
+        handleResponse.shouldAbort(err, client, done);
+        handleResponse.handleError(res, err, ' Error in connecting to the database');
+      } else {
+          client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id FROM EXPENSE e where id=$1 AND company_id=$2', [req.body.expenseId, req.user.company_id], function(err, expense) {
+              if (err) {
+                  console.error(err);
+                  handleResponse.shouldAbort(err, client, done);
+                  handleResponse.handleError(res, err, ' Error in finding expense data');
+              } else {
+                  client.query('UPDATE EXPENSE SET submitted=$1 WHERE id=$2', [true,req.body.expenseId], function(err, updatedData) {
+                      if (err) {
+                          console.error(err);
+                          handleResponse.shouldAbort(err, client, done);
+                          handleResponse.handleError(res, err, ' Error in submitting expense data');
+                      } else {
+                        client.query('COMMIT', (err) => {
+                          if (err) {
+                            handleResponse.shouldAbort(err, client, done);
+                            handleResponse.handleError(res, err, ' Error in committing transaction');
+                          } else {
+                              done();
+                              handleResponse.sendSuccess(res, 'Expense submitted successfully', {});
+                          }
+                        })
+                      }
+                  });
+              }
+          })
+        }
       })
   });
 
@@ -526,31 +540,45 @@ exports.postEditExpense = (req, res) => {
             // let modified_date = moment.tz(new Date(), companyDefaultTimezone).format();
             // console.log('modified_date  ' + modified_date);
             pool.connect((err, client, done) => {
-                client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id FROM EXPENSE e where id=$1 AND company_id=$2', [req.body.expenseId, req.user.company_id], function(err, expense) {
-                    if (err) {
-                        console.error(err);
-                        handleResponse.shouldAbort(err, client, done);
-                        handleResponse.handleError(res, err, ' Error in finding expense data');
-                    } else {
-                        // console.log('getExpense>>>>>>>>>>>>>');
-                        // console.log(expense.rows[0]);
-                        let total_expense_amount = parseFloat(req.body.tax_no) + parseFloat(req.body.amount);
-                        client.query('UPDATE EXPENSE SET tax=$1,tax_amount=$2,note=$3, category =$4,amount=$5,billable=$6,modified_date=$7,expense_date=$8,project_id=$9,account_id=$10,currency=$11,total_amount=$12 WHERE id=$13 AND company_id=$14', [req.body.tax, req.body.tax_no, req.body.note, req.body.category, req.body.amount, req.body.billable,'now()', moment.tz(req.body.expense_date.split('T')[0], companyDefaultTimezone).format(), req.body.project_id, req.body.account_id, req.body.currency,total_expense_amount, req.body.expenseId, req.user.company_id], function(err, updatedData) {
-                            // console.log('Error >>>>>>>>>>>>>');
-                            // console.log(err);
-                            if (err) {
-                                console.error(err);
-                                handleResponse.shouldAbort(err, client, done);
-                                handleResponse.handleError(res, err, ' Error in updating expense data');
-                            } else {
-                                done();
-                                // console.log('Updated expense >>>>>>>>>>>>>');
-                                // console.log(updatedData);
-                                handleResponse.sendSuccess(res, 'Expense updated successfully', {});
-                                /*res.status(200).json({ "success": true ,"message":"success"});*/
-                            }
-                        });
-                    }
+              client.query('BEGIN', (err) => {
+                if(err) {
+                  handleResponse.shouldAbort(err, client, done);
+                  handleResponse.handleError(res, err, ' Error in connecting to the database');
+                } else {
+                    client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id FROM EXPENSE e where id=$1 AND company_id=$2', [req.body.expenseId, req.user.company_id], function(err, expense) {
+                        if (err) {
+                            console.error(err);
+                            handleResponse.shouldAbort(err, client, done);
+                            handleResponse.handleError(res, err, ' Error in finding expense data');
+                        } else {
+                            // console.log('getExpense>>>>>>>>>>>>>');
+                            // console.log(expense.rows[0]);
+                            let total_expense_amount = parseFloat(req.body.tax_no) + parseFloat(req.body.amount);
+                            client.query('UPDATE EXPENSE SET tax=$1,tax_amount=$2,note=$3, category =$4,amount=$5,billable=$6,modified_date=$7,expense_date=$8,project_id=$9,account_id=$10,currency=$11,total_amount=$12 WHERE id=$13 AND company_id=$14', [req.body.tax, req.body.tax_no, req.body.note, req.body.category, req.body.amount, req.body.billable,'now()', moment.tz(req.body.expense_date.split('T')[0], companyDefaultTimezone).format(), req.body.project_id, req.body.account_id, req.body.currency,total_expense_amount, req.body.expenseId, req.user.company_id], function(err, updatedData) {
+                                // console.log('Error >>>>>>>>>>>>>');
+                                // console.log(err);
+                                if (err) {
+                                    console.error(err);
+                                    handleResponse.shouldAbort(err, client, done);
+                                    handleResponse.handleError(res, err, ' Error in updating expense data');
+                                } else {
+                                  client.query('COMMIT', (err) => {
+                                    if (err) {
+                                      handleResponse.shouldAbort(err, client, done);
+                                      handleResponse.handleError(res, err, ' Error in committing transaction');
+                                    } else {
+                                      done();
+                                      // console.log('Updated expense >>>>>>>>>>>>>');
+                                      // console.log(updatedData);
+                                      handleResponse.sendSuccess(res, 'Expense updated successfully', {});
+                                      /*res.status(200).json({ "success": true ,"message":"success"});*/
+                                    }
+                                  })
+                                }
+                            });
+                        }
+                    })
+                  }
                 })
             });
         }
@@ -582,23 +610,35 @@ exports.postAddExpense = (req, res) => {
             // let createdDate = moment.tz(new Date(), companyDefaultTimezone).format();
             // console.log('createdDate ' + createdDate);
             pool.connect((err, client, done) => {
-                let total_expense_amount = parseFloat(req.body.tax_no) + parseFloat(req.body.amount);
-                client.query('Insert INTO EXPENSE (tax,tax_amount,note,status,category,amount,billable,created_date,modified_date,expense_date,project_id,account_id,company_id,currency,user_id, total_amount) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING id', [ req.body.tax, req.body.tax_no, req.body.note, "Draft", req.body.category, req.body.amount, req.body.billable, 'now()', 'now()', moment.tz(req.body.expense_date.split('T')[0], companyDefaultTimezone).format(), req.body.project_id, req.body.account_id, req.user.company_id, req.body.currency, req.user.id, total_expense_amount], function(err, insertedExpense) {
-                    if (err) {
-                        handleResponse.shouldAbort(err, client, done);
-                        handleResponse.handleError(res, err, ' Error in adding expense data to the database');
-                        /*// console.log(err);*/
-                    } else {
-                        // console.log('insertedExpense' + JSON.stringify(insertedExpense));
-                        done();
-                        handleResponse.sendSuccess(res, 'Expense added successfully', {
-                            "expense": insertedExpense.rows[0]
-                        });
-                        /*res.status(200).json({ "success": true, "expense": insertedExpense.rows[0] ,"message":"success"});*/
-                    }
-
-                });
-
+              client.query('BEGIN', (err) => {
+                if(err) {
+                  handleResponse.shouldAbort(err, client, done);
+                  handleResponse.handleError(res, err, ' Error in connecting to the database');
+                } else {
+                    let total_expense_amount = parseFloat(req.body.tax_no) + parseFloat(req.body.amount);
+                    client.query('Insert INTO EXPENSE (tax,tax_amount,note,status,category,amount,billable,created_date,modified_date,expense_date,project_id,account_id,company_id,currency,user_id, total_amount) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING id', [ req.body.tax, req.body.tax_no, req.body.note, "Draft", req.body.category, req.body.amount, req.body.billable, 'now()', 'now()', moment.tz(req.body.expense_date.split('T')[0], companyDefaultTimezone).format(), req.body.project_id, req.body.account_id, req.user.company_id, req.body.currency, req.user.id, total_expense_amount], function(err, insertedExpense) {
+                        if (err) {
+                            handleResponse.shouldAbort(err, client, done);
+                            handleResponse.handleError(res, err, ' Error in adding expense data to the database');
+                            /*// console.log(err);*/
+                        } else {
+                          client.query('COMMIT', (err) => {
+                            if (err) {
+                              handleResponse.shouldAbort(err, client, done);
+                              handleResponse.handleError(res, err, ' Error in committing transaction');
+                            } else {
+                              // console.log('insertedExpense' + JSON.stringify(insertedExpense));
+                              done();
+                              handleResponse.sendSuccess(res, 'Expense added successfully', {
+                                  "expense": insertedExpense.rows[0]
+                              });
+                              /*res.status(200).json({ "success": true, "expense": insertedExpense.rows[0] ,"message":"success"});*/
+                            }
+                          })
+                        }
+                    });
+                  }
+                })
             });
         }
     } else {
@@ -616,10 +656,18 @@ function deleteExpenseNotInvoiced(req,res,client,done){
             handleResponse.shouldAbort(err, client, done);
             handleResponse.handleError(res, err, ' Error in deleting expense.');
         } else {
-            console.error('Affected ID>>>>>>>>>>>>>');
-            // console.log(archivedExpense.rows[0]);
-            done();
-            handleResponse.sendSuccess(res, 'Expense deleted successfully', {});
+          client.query('COMMIT', (err) => {
+            if (err) {
+              // console.log('Error committing transaction', err.stack)
+              handleResponse.shouldAbort(err, client, done);
+              handleResponse.handleError(res, err, ' Error in committing transaction');
+            } else {
+                console.error('Affected ID>>>>>>>>>>>>>');
+                // console.log(archivedExpense.rows[0]);
+                done();
+                handleResponse.sendSuccess(res, 'Expense deleted successfully', {});
+            }
+          })
         }
     })
 }
@@ -632,28 +680,35 @@ exports.deleteExpense = (req, res) => {
         handleResponse.handleError(res, 'incorrect expense id', ' Expense id is not correct');
     } else {
         pool.connect((err, client, done) => {
-            client.query('SELECT * FROM EXPENSE WHERE id=$1', [req.body.expenseId], function(err, expenseDetail) {
-                if (err) {
-                    console.error(err);
-                    handleResponse.shouldAbort(err, client, done);
-                    handleResponse.handleError(res, err, ' Error in getting expense detail.');
-                } else {
-                    // console.log('expenseDetail.rows '+expenseDetail.rows.length);
-                    if(expenseDetail.rows.length>0){
-                        // console.log('expenseDetail.rows[0]');
-                        // console.log(expenseDetail.rows[0]);
-                        if(expenseDetail.rows[0].invoiced==true&&expenseDetail.rows[0].invoice_id!=null){
-                            handleResponse.shouldAbort(err, client, done);
-                            handleResponse.handleError(res, err, 'This expense is invoiced, therefore cannot be deleted');
+          client.query('BEGIN', (err) => {
+            if (err) {
+              handleResponse.shouldAbort(err, client, done);
+              handleResponse.handleError(res, err, ' Error in connecting to database.');
+            } else {
+                client.query('SELECT * FROM EXPENSE WHERE id=$1', [req.body.expenseId], function(err, expenseDetail) {
+                    if (err) {
+                        console.error(err);
+                        handleResponse.shouldAbort(err, client, done);
+                        handleResponse.handleError(res, err, ' Error in getting expense detail.');
+                    } else {
+                        // console.log('expenseDetail.rows '+expenseDetail.rows.length);
+                        if(expenseDetail.rows.length>0){
+                            // console.log('expenseDetail.rows[0]');
+                            // console.log(expenseDetail.rows[0]);
+                            if(expenseDetail.rows[0].invoiced==true&&expenseDetail.rows[0].invoice_id!=null){
+                                handleResponse.shouldAbort(err, client, done);
+                                handleResponse.handleError(res, err, 'This expense is invoiced, therefore cannot be deleted');
+                            }else{
+                                // console.log('Inside not invoiced');
+                                deleteExpenseNotInvoiced(req,res,client,done);
+                            }
                         }else{
-                            // console.log('Inside not invoiced');
+                            // console.log('Inside no expense');
                             deleteExpenseNotInvoiced(req,res,client,done);
                         }
-                    }else{
-                        // console.log('Inside no expense');
-                        deleteExpenseNotInvoiced(req,res,client,done);
                     }
-                }
+                })
+              }
             })
         });
     }
@@ -803,34 +858,62 @@ exports.expenseDocUpload = (req,res) => {
       return res.status(500).redirect('/expense-details?expenseId='+req.body.expenseId);
     }else{
       pool.connect((err, client, done) => {
-          client.query('UPDATE EXPENSE set content_type=$1,document=$2,doc_file_name=$3 where id=$4 RETURNING *',[req.files.expenseDocument.mimetype,req.files.expenseDocument.data,req.files.expenseDocument.name,req.body.expenseId], function(err, updatedExpense) {
-              if (err){
-                handleResponse.shouldAbort(err, client, done);
-                return res.status(500).redirect('/expense-details?expenseId='+req.body.expenseId);
-              } else {
-                done();
-                res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
-                res.header('Expires', '-1');
-                res.header('Pragma', 'no-cache');
-                return res.status(200).redirect('/expense-details?expenseId='+req.body.expenseId);
-
-              }
-          });
+        client.query('BEGIN', (err) => {
+          if (err) {
+            handleResponse.shouldAbort(err, client, done);
+            handleResponse.handleError(res, err, ' Error in connecting to database.');
+          } else {
+            client.query('UPDATE EXPENSE set content_type=$1,document=$2,doc_file_name=$3 where id=$4 RETURNING *',[req.files.expenseDocument.mimetype,req.files.expenseDocument.data,req.files.expenseDocument.name,req.body.expenseId], function(err, updatedExpense) {
+                if (err){
+                  handleResponse.shouldAbort(err, client, done);
+                  return res.status(500).redirect('/expense-details?expenseId='+req.body.expenseId);
+                } else {
+                  client.query('COMMIT', (err) => {
+                    if (err) {
+                      handleResponse.shouldAbort(err, client, done);
+                      handleResponse.handleError(res, err, ' Error in committing transaction');
+                    } else {
+                      done();
+                      res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+                      res.header('Expires', '-1');
+                      res.header('Pragma', 'no-cache');
+                      return res.status(200).redirect('/expense-details?expenseId='+req.body.expenseId);
+                    }
+                  })
+                }
+            });
+          }
+        })
       });
     }
 }
 
 exports.deleteExpenseDoc = (req,res) => {
   pool.connect((err, client, done) => {
-      client.query('UPDATE EXPENSE set content_type=$1,document=$2,doc_file_name=$3 where id=$4 RETURNING *',[null,null,null,req.body.expenseId], function(err, updatedExpense) {
-          if (err){
-            handleResponse.shouldAbort(err, client, done);
-            handleResponse.handleError(res, err, ' Error in deleting expense document');
-          } else {
-            done();
-            handleResponse.sendSuccess(res, 'Expense document deleted successfully', {});
-          }
-      });
+    client.query('BEGIN', (err) => {
+      if (err) {
+        handleResponse.shouldAbort(err, client, done);
+        handleResponse.handleError(res, err, ' Error in connecting to database.');
+      } else {
+        client.query('UPDATE EXPENSE set content_type=$1,document=$2,doc_file_name=$3 where id=$4 RETURNING *',[null,null,null,req.body.expenseId], function(err, updatedExpense) {
+            if (err){
+              handleResponse.shouldAbort(err, client, done);
+              handleResponse.handleError(res, err, ' Error in deleting expense document');
+            } else {
+              client.query('COMMIT', (err) => {
+                if (err) {
+                  // console.log('Error committing transaction', err.stack)
+                  handleResponse.shouldAbort(err, client, done);
+                  handleResponse.handleError(res, err, ' Error in committing transaction');
+                } else {
+                  done();
+                  handleResponse.sendSuccess(res, 'Expense document deleted successfully', {});
+                }
+              })
+            }
+        });
+      }
+    })
   });
 }
 

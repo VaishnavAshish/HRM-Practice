@@ -8,6 +8,7 @@ exports.responseToPage=(res,redirectURL,objectToSend,messageType,message) =>{
 exports.handleError=(res, reason, message, code) =>{
   // console.log("ERROR: " + reason);
   res.status(code || 500).json({"success":false,"message": message});
+  res.end();
 }
 
 exports.shouldAbort = (err, client, done) => {
@@ -29,4 +30,5 @@ exports.sendSuccess = (res, message, obj,code) =>{
   obj.success=true;
   obj.message=message;
   res.status(code || 200).json(obj);
+  res.end();
 }

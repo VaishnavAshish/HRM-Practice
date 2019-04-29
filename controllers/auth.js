@@ -662,25 +662,41 @@ exports.postReset = (req, res, next) => {
   else {
 
     pool.connect((err, client, done) => {
-      // console.log(req.body.password);
-      // console.log(req.body.id);
-        client.query('UPDATE users set password=$1,password_reset_token=$2,add_status=$3 where id=$4 RETURNING *',[req.body.password,null,"Approved",req.body.id], function (err, resource) {
-          if (err) {
-            handleResponse.shouldAbort(err, client, done);
-            handleResponse.handleError(res, err, ' Failed to update user information');
-          } else {
-            client.query('SELECT domain FROM company WHERE id=$1',[resource.rows[0].company_id], function (err, companyDomain) {
-            if (err) {
-              handleResponse.shouldAbort(err, client, done);
-              handleResponse.handleError(res, err, ' Failed to update user information');
-            } else {
-                // console.log('------updated user after password reset  is --------');
-                // console.log(resource.rows);
-                // console.log(companyDomain);
-                done();
-                handleResponse.sendSuccess(res,'password reset successfully',{domain:companyDomain.rows[0].domain});
-                /*res.status(200).json({ "success": true ,"message":"success"});*/
-               }
+      client.query('BEGIN', (err) => {
+        if(err) {
+          handleResponse.shouldAbort(err, client, done);
+          // handleResponse.responseToPage(res,'pages/login',{domain: req.query.domain,isAuthenticate : false},"error"," Error in connecting to the database");
+          handleResponse.handleError(res, err, ' Error in connecting to the database');
+        } else {
+          // console.log(req.body.password);
+          // console.log(req.body.id);
+            client.query('UPDATE users set password=$1,password_reset_token=$2,add_status=$3 where id=$4 RETURNING *',[req.body.password,null,"Approved",req.body.id], function (err, resource) {
+              if (err) {
+                handleResponse.shouldAbort(err, client, done);
+                handleResponse.handleError(res, err, ' Failed to update user information');
+              } else {
+                client.query('SELECT domain FROM company WHERE id=$1',[resource.rows[0].company_id], function (err, companyDomain) {
+                if (err) {
+                  handleResponse.shouldAbort(err, client, done);
+                  handleResponse.handleError(res, err, ' Failed to update user information');
+                } else {
+                  client.query('COMMIT', (err) => {
+                    if (err) {
+                      handleResponse.shouldAbort(err, client, done);
+                      // handleResponse.responseToPage(res,'pages/login',{domain: req.query.domain,isAuthenticate : false},"error"," Error in committing transaction");
+                      handleResponse.handleError(res, err, ' Error in committing transaction');
+                    } else {
+                      // console.log('------updated user after password reset  is --------');
+                      // console.log(resource.rows);
+                      // console.log(companyDomain);
+                        done();
+                        handleResponse.sendSuccess(res,'password reset successfully',{domain:companyDomain.rows[0].domain});
+                        /*res.status(200).json({ "success": true ,"message":"success"});*/
+                      }
+                    })
+                   }
+                });
+              }
             });
           }
         });
@@ -855,41 +871,57 @@ exports.fileUserImage = (req, res) => {
     /*handleResponse.handleError(res, 'No files were uploaded', ' No files were uploaded');*/
   }else{
     pool.connect((err, client, done) => {
-      client.query('SELECT * FROM USERS where id=$1',[req.user.id], function(err, selectedUser) {
-            if (err){
-              handleResponse.shouldAbort(err, client, done);
-              return res.status(500).redirect('/user-profile');
-            } else {
-                if(selectedUser.rows.length>0){
-                  sharp(req.files.userpicture.data).resize(200,200).toBuffer()
-                        .then( data =>{
-                            // console.log('company_logo after resizing :')
-                            // console.log(data);
-                            client.query('UPDATE USERS set contenttype=$1,user_img=$2 where id=$3 RETURNING *',[req.files.userpicture.mimetype,data,req.user.id], function(err, updatedUser) {
-                                if (err){
-                                  handleResponse.shouldAbort(err, client, done);
-                                  return res.status(500).redirect('/user-profile');
-                                } else {
-                                  done();
-                                  res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
-                                  res.header('Expires', '-1');
-                                  res.header('Pragma', 'no-cache');
-                                  return res.status(200).redirect('/user-profile');
+      client.query('BEGIN', (err) => {
+        if(err) {
+          handleResponse.shouldAbort(err, client, done);
+          // handleResponse.responseToPage(res,'pages/login',{domain: req.query.domain,isAuthenticate : false},"error"," Error in connecting to the database");
+          handleResponse.handleError(res, err, ' Error in connecting to the database');
+        } else {
+            client.query('SELECT * FROM USERS where id=$1',[req.user.id], function(err, selectedUser) {
+                  if (err){
+                    handleResponse.shouldAbort(err, client, done);
+                    return res.status(500).redirect('/user-profile');
+                  } else {
+                      if(selectedUser.rows.length>0){
+                        sharp(req.files.userpicture.data).resize(200,200).toBuffer()
+                              .then( data =>{
+                                  // console.log('company_logo after resizing :')
+                                  // console.log(data);
+                                  client.query('UPDATE USERS set contenttype=$1,user_img=$2 where id=$3 RETURNING *',[req.files.userpicture.mimetype,data,req.user.id], function(err, updatedUser) {
+                                      if (err){
+                                        handleResponse.shouldAbort(err, client, done);
+                                        return res.status(500).redirect('/user-profile');
+                                      } else {
+                                        client.query('COMMIT', (err) => {
+                                          if (err) {
+                                            handleResponse.shouldAbort(err, client, done);
+                                            return res.status(500).redirect('/user-profile');
+                                            // handleResponse.responseToPage(res,'pages/login',{domain: req.query.domain,isAuthenticate : false},"error"," Error in committing transaction");
+                                            // handleResponse.handleError(res, err, ' Error in committing transaction');
+                                          } else {
+                                            done();
+                                            res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+                                            res.header('Expires', '-1');
+                                            res.header('Pragma', 'no-cache');
+                                            return res.status(200).redirect('/user-profile');
+                                          }
+                                        });
+                                      }
+                                  });
+                              })
+                              .catch( err => {
+                                // console.log('err');
+                                // console.log(err);
+                              });
+                      }else{
+                        done();
+                        return res.status(500).redirect('/user-profile');
+                      }
 
-                                }
-                            });
-                        })
-                        .catch( err => {
-                          // console.log('err');
-                          // console.log(err);
-                        });
-                }else{
-                  done();
-                  return res.status(500).redirect('/user-profile');
-                }
-
-             }
-        });
+                   }
+              });
+            }
+          });
     });
   }
 

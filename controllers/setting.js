@@ -18,16 +18,31 @@ exports.postEditSetting = (req, res) => {
             handleResponse.handleError(res, err, ' Error in getting settings');
           } else {
           		if(selectedSetting.rows.length>0){
-          			client.query('UPDATE SETTING set street=$1,city=$2,state=$3,country=$4,zip_code=$5,currency=$6,timezone=$7,weekstartday=$8 where company_id=$9 RETURNING id',[req.body.companyStreet, req.body.companyCity, req.body.companyState, req.body.companyCountry, req.body.companyZip,req.body.companyCurrency,req.body.timezone,req.body.weekstartday ,req.user.company_id], function(err, updatedSetting) {
-  			          if (err){
-  			            handleResponse.shouldAbort(err, client, done);
-  			            handleResponse.handleError(res, err, ' Error in updating settings');
-  			          } else {
-  			            done();
-  			            handleResponse.sendSuccess(res,'settings updated successfully',{});
+                client.query('BEGIN', (err) => {
+                  if (err){
+                    handleResponse.shouldAbort(err, client, done);
+                    handleResponse.handleError(res, err, ' error in connecting to database');
+                  } else {
+              			client.query('UPDATE SETTING set street=$1,city=$2,state=$3,country=$4,zip_code=$5,currency=$6,timezone=$7,weekstartday=$8 where company_id=$9 RETURNING id',[req.body.companyStreet, req.body.companyCity, req.body.companyState, req.body.companyCountry, req.body.companyZip,req.body.companyCurrency,req.body.timezone,req.body.weekstartday ,req.user.company_id], function(err, updatedSetting) {
+      			          if (err){
+      			            handleResponse.shouldAbort(err, client, done);
+      			            handleResponse.handleError(res, err, ' Error in updating settings');
+      			          } else {
+                        client.query('COMMIT', (err) => {
+                          if (err) {
+                            // console.log('Error committing transaction', err.stack)
+                            handleResponse.shouldAbort(err, client, done);
+                            handleResponse.handleError(res, err, ' Error in committing transaction');
+                          } else {
+          			            done();
+          			            handleResponse.sendSuccess(res,'settings updated successfully',{});
+                          }
+                        })
 
-  			          }
-		            });
+      			          }
+    		            });
+                  }
+                })
           		}else{
                 done();
                 handleResponse.handleError(res, err, ' Error in finding company setting');
@@ -64,16 +79,30 @@ exports.postEditSettingUserRole = (req, res) => {
       				req.body.userRole=['Manager'];
       			}
           		if(selectedSetting.rows.length>0){
-          			client.query('UPDATE SETTING set user_role=$1 where company_id=$2 RETURNING id',[req.body.userRole, req.user.company_id], function(err, updatedSetting) {
-    			          if (err){
-    			            handleResponse.shouldAbort(err, client, done);
-    			            handleResponse.handleError(res, err, ' Error in updating settings');
-    			          } else {
-    			            done();
-    			            handleResponse.sendSuccess(res,'settings updated successfully',{});
-
-    			          }
-    			      });
+                client.query('BEGIN', (err) => {
+                  if (err){
+                    handleResponse.shouldAbort(err, client, done);
+                    handleResponse.handleError(res, err, ' error in connecting to database');
+                  } else {
+              			client.query('UPDATE SETTING set user_role=$1 where company_id=$2 RETURNING id',[req.body.userRole, req.user.company_id], function(err, updatedSetting) {
+        			          if (err){
+        			            handleResponse.shouldAbort(err, client, done);
+        			            handleResponse.handleError(res, err, ' Error in updating settings');
+        			          } else {
+                          client.query('COMMIT', (err) => {
+                            if (err) {
+                              // console.log('Error committing transaction', err.stack)
+                              handleResponse.shouldAbort(err, client, done);
+                              handleResponse.handleError(res, err, ' Error in committing transaction');
+                            } else {
+            			            done();
+            			            handleResponse.sendSuccess(res,'settings updated successfully',{});
+                            }
+                          })
+        			          }
+        			      });
+                  }
+                })
           		}else{
                 done();
                 handleResponse.handleError(res, err, ' Error in finding company setting');
@@ -104,16 +133,31 @@ exports.postEditSettingInvoice = (req, res) => {
             handleResponse.handleError(res, err, ' Error in getting settings');
           } else {
               if(selectedSetting.rows.length>0){
-          			client.query('UPDATE SETTING set invoice_note=$1 where company_id=$2 RETURNING id',[req.body.defaultInvoiceNote,req.user.company_id], function(err, updatedSetting) {
-    			          if (err){
-    			            handleResponse.shouldAbort(err, client, done);
-    			            handleResponse.handleError(res, err, ' Error in updating settings');
-    			          } else {
-    			            done();
-    			            handleResponse.sendSuccess(res,'settings updated successfully',{});
+                client.query('BEGIN', (err) => {
+                  if (err){
+                    handleResponse.shouldAbort(err, client, done);
+                    handleResponse.handleError(res, err, ' error in connecting to database');
+                  } else {
+              			client.query('UPDATE SETTING set invoice_note=$1 where company_id=$2 RETURNING id',[req.body.defaultInvoiceNote,req.user.company_id], function(err, updatedSetting) {
+        			          if (err){
+        			            handleResponse.shouldAbort(err, client, done);
+        			            handleResponse.handleError(res, err, ' Error in updating settings');
+        			          } else {
+                          client.query('COMMIT', (err) => {
+                            if (err) {
+                              // console.log('Error committing transaction', err.stack)
+                              handleResponse.shouldAbort(err, client, done);
+                              handleResponse.handleError(res, err, ' Error in committing transaction');
+                            } else {
+            			            done();
+            			            handleResponse.sendSuccess(res,'settings updated successfully',{});
+                            }
+                          })
 
-    			          }
-    			      });
+        			          }
+        			      });
+                  }
+                })
           		}else{
                 done();
                 handleResponse.handleError(res, err, ' Error in finding company setting');
@@ -145,43 +189,59 @@ exports.fileupload = (req, res) => {
     /*handleResponse.handleError(res, 'No files were uploaded', ' No files were uploaded');*/
   }else{
     pool.connect((err, client, done) => {
-      client.query('SELECT * FROM SETTING where company_id=$1',[req.user.company_id], function(err, selectedSetting) {
-            if (err){
-              handleResponse.shouldAbort(err, client, done);
-              return res.status(500).redirect('/org-settings-invoice');
-            } else {
-                if(selectedSetting.rows.length>0){
-
-                  sharp(req.files.uploadedImageFile.data).resize(200,200).toBuffer()
-                        .then( data =>{
-                            // console.log('company_logo after resizing :')
-                            // console.log(data);
-                            client.query('UPDATE SETTING set contenttype=$1,company_logo=$2 where company_id=$3 RETURNING *',[req.files.uploadedImageFile.mimetype,data,req.user.company_id], function(err, updatedSetting) {
-                                if (err){
-                                  handleResponse.shouldAbort(err, client, done);
-                                  return res.status(500).redirect('/org-settings-invoice');
-                                } else {
-                                  done();
-                                  res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
-                                  res.header('Expires', '-1');
-                                  res.header('Pragma', 'no-cache');
-                                  return res.status(200).redirect('/org-settings-invoice');
-
-                                }
-                            });
-                        })
-                        .catch( err => {
-                          // console.log('err');
-                          // console.log(err);
-                        });
-
-                }else{
-                  done();
+      client.query('BEGIN', (err) => {
+        if (err){
+          handleResponse.shouldAbort(err, client, done);
+          // handleResponse.handleError(res, err, ' error in connecting to database');
+          return res.status(500).redirect('/org-settings-invoice');
+        } else {
+          client.query('SELECT * FROM SETTING where company_id=$1',[req.user.company_id], function(err, selectedSetting) {
+                if (err){
+                  handleResponse.shouldAbort(err, client, done);
                   return res.status(500).redirect('/org-settings-invoice');
-                }
+                } else {
+                    if(selectedSetting.rows.length>0){
 
-             }
-        });
+                      sharp(req.files.uploadedImageFile.data).resize(200,200).toBuffer()
+                            .then( data =>{
+                                // console.log('company_logo after resizing :')
+                                // console.log(data);
+                                client.query('UPDATE SETTING set contenttype=$1,company_logo=$2 where company_id=$3 RETURNING *',[req.files.uploadedImageFile.mimetype,data,req.user.company_id], function(err, updatedSetting) {
+                                    if (err){
+                                      handleResponse.shouldAbort(err, client, done);
+                                      return res.status(500).redirect('/org-settings-invoice');
+                                    } else {
+                                      client.query('COMMIT', (err) => {
+                                        if (err) {
+                                          // console.log('Error committing transaction', err.stack)
+                                          handleResponse.shouldAbort(err, client, done);
+                                          // handleResponse.handleError(res, err, ' Error in committing transaction');
+                                          return res.status(500).redirect('/org-settings-invoice');
+                                        } else {
+                                            done();
+                                            res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+                                            res.header('Expires', '-1');
+                                            res.header('Pragma', 'no-cache');
+                                            return res.status(200).redirect('/org-settings-invoice');
+                                        }
+                                      })
+                                    }
+                                });
+                            })
+                            .catch( err => {
+                              // console.log('err');
+                              // console.log(err);
+                            });
+
+                    }else{
+                      done();
+                      return res.status(500).redirect('/org-settings-invoice');
+                    }
+
+                 }
+            });
+          }
+        })
     });
   }
 
@@ -201,16 +261,31 @@ exports.postEditSettingExpense = (req, res) => {
 	  				req.body.expCategory=['Food'];
 	  			}
           		if(selectedSetting.rows.length>0){
-              			client.query('UPDATE SETTING set expense_category=$1 where company_id=$2 RETURNING id',[req.body.expCategory,req.user.company_id], function(err, updatedSetting) {
-    			          if (err){
-    			            handleResponse.shouldAbort(err, client, done);
-    			            handleResponse.handleError(res, err, ' Error in updating settings');
-    			          } else {
-    			            done();
-    			            handleResponse.sendSuccess(res,'settings updated successfully',{});
+                client.query('BEGIN', (err) => {
+                  if (err){
+                    handleResponse.shouldAbort(err, client, done);
+                    handleResponse.handleError(res, err, ' error in connecting to database');
+                  } else {
+                  			client.query('UPDATE SETTING set expense_category=$1 where company_id=$2 RETURNING id',[req.body.expCategory,req.user.company_id], function(err, updatedSetting) {
+        			          if (err){
+        			            handleResponse.shouldAbort(err, client, done);
+        			            handleResponse.handleError(res, err, ' Error in updating settings');
+        			          } else {
+                          client.query('COMMIT', (err) => {
+                            if (err) {
+                              // console.log('Error committing transaction', err.stack)
+                              handleResponse.shouldAbort(err, client, done);
+                              handleResponse.handleError(res, err, ' Error in committing transaction');
+                            } else {
+            			            done();
+            			            handleResponse.sendSuccess(res,'settings updated successfully',{});
+                            }
+                          })
 
-    			          }
-    			      });
+        			          }
+        			      });
+                  }
+                })
           		}else{
                 done();
                 handleResponse.handleError(res, err, ' Error in finding company setting');

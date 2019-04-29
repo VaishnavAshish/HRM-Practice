@@ -114,49 +114,65 @@ exports.postResetPassword = (req, res) => {
           }else{
             req.companyId=companyId;
             pool.connect((err, client, done) => {
-                client.query('SELECT * FROM users where email = $1 AND company_id=$2', [req.body.email,companyId], function (err, existingUser) {
-                if (err) {
+              client.query('BEGIN', (err) => {
+                if (err){
                   handleResponse.shouldAbort(err, client, done);
-                  handleResponse.handleError(res, err, ' Error in finding user data');
+                  handleResponse.handleError(res, err, ' error in connecting to database');
                 } else {
-                  // console.log("existingUser-----------");
-                  // console.log(existingUser.rows);
-                  if (existingUser.rows.length > 0) {
-                    let createRandomToken = randomBytesAsync(16)
-                            .then(buf => buf.toString('hex'));
-                      createRandomToken.then( token =>{
-                          // console.log(token);
-                          client.query('UPDATE users set password_reset_token=$1 where email=$2 AND company_id=$3 RETURNING *',[token,req.body.email,companyId], function (err, user) {
-                            if (err) {
-                              // console.log(err);
-                              handleResponse.shouldAbort(err, client, done);
-                              handleResponse.handleError(res, err, ' Error in updating user data');
-                            } else {
-                                // console.log('--------user after update is--------');
-                                // console.log(user.rows[0].email);
-                                // console.log(user.rows[0].password_reset_token);
-                                req.token=token;
-                                sendResetEmail(req,res);
-                                /*  // console.log('callback');
-                                  if(error){
+                    client.query('SELECT * FROM users where email = $1 AND company_id=$2', [req.body.email,companyId], function (err, existingUser) {
+                    if (err) {
+                      handleResponse.shouldAbort(err, client, done);
+                      handleResponse.handleError(res, err, ' Error in finding user data');
+                    } else {
+                      // console.log("existingUser-----------");
+                      // console.log(existingUser.rows);
+                      if (existingUser.rows.length > 0) {
+                        let createRandomToken = randomBytesAsync(16)
+                                .then(buf => buf.toString('hex'));
+                          createRandomToken.then( token =>{
+                              // console.log(token);
+                              client.query('UPDATE users set password_reset_token=$1 where email=$2 AND company_id=$3 RETURNING *',[token,req.body.email,companyId], function (err, user) {
+                                if (err) {
+                                  // console.log(err);
+                                  handleResponse.shouldAbort(err, client, done);
+                                  handleResponse.handleError(res, err, ' Error in updating user data');
+                                } else {
+                                  client.query('COMMIT', (err) => {
+                                    if (err) {
+                                      // console.log('Error committing transaction', err.stack)
                                       handleResponse.shouldAbort(err, client, done);
-                                      handleResponse.handleError(res, error, ' Error in sending email to user');
-                                  }else{
-                                */      handleResponse.sendSuccess(res,'Password reset email send successfully',{});
-                                      /*res.status(200).json({ "success": true,"message":"success" });*/
-                                /*  }*/
+                                      handleResponse.handleError(res, err, ' Error in committing transaction');
+                                    } else {
+                                      // console.log('--------user after update is--------');
+                                      // console.log(user.rows[0].email);
+                                      // console.log(user.rows[0].password_reset_token);
+                                      req.token=token;
+                                      sendResetEmail(req,res,function(error,response){
+                                        // console.log('callback');
+                                        if(error){
+                                          handleResponse.shouldAbort(err, client, done);
+                                          handleResponse.handleError(res, error, ' Error in sending email to user');
+                                        }else{
+                                          handleResponse.sendSuccess(res,'Password reset email send successfully',{});
+                                          /*res.status(200).json({ "success": true,"message":"success" });*/
+                                        }
+                                      });
+                                    }
+                                  })
 
-                            }
+                                }
 
+                              })
                           })
-                      })
 
-                  } else {
-                    done();
-                    handleResponse.handleError(res, 'incorrect email id', 'User with this email does not exists.');
+                      } else {
+                        done();
+                        handleResponse.handleError(res, 'incorrect email id', 'User with this email does not exists.');
+                      }
                   }
+                });
               }
-            });
+            })
         });
     }
   })
@@ -375,7 +391,7 @@ sendInvitationEmail = (req, res, next) => {
         }
     });
 };
-sendResetEmail = (req,res)=>{
+sendResetEmail = (req,res,next)=>{
   let mailOptions = {
       to: req.body.email,
       from: 'krowtesting@athenalogics.com',
@@ -469,11 +485,11 @@ sendResetEmail = (req,res)=>{
     email.sendMail(req,res,function(error,info){
        // console.log('transpoter');
         if(error){
-            // console.log(error);
-            /*next(error,null);*/
+            console.log(error);
+            next(error,null);
         }else{
-            // console.log('Message sent: ' + info.response);
-            /*next(null,info);*/
+            console.log('Message sent: ' + info.response);
+            next(null,info);
             /*res.status(200).json({"success": true,"message":"success" });*/
         }
     });
@@ -498,29 +514,44 @@ exports.deleteResource = (req, res) => {
           handleResponse.handleError(res, "incorrect resource id", " Resource id is not correct");
         }else{
             pool.connect((err, client, done) => {
-              // console.log(req.body.resourceId);
-              client.query('SELECT * FROM users WHERE id=$1', [req.body.resourceId], function (err, userDetails) {
-                if (err) {
+              client.query('BEGIN', (err) => {
+                if (err){
                   handleResponse.shouldAbort(err, client, done);
-                  handleResponse.handleError(res, err, ' Error in deleting resource.');
-                }else{
-                  console.log('user details are '+JSON.stringify(userDetails.rows[0]));
-                  if(userDetails.rows[0].user_role.includes('ADMIN') || parseInt(req.body.resourceId) == parseInt(req.user.id)) {
-                    handleResponse.shouldAbort(err, client, done);
-                    handleResponse.handleError(res, err, 'You can not delete this user.');
-                  } else {
-                    client.query('UPDATE users SET archived=true where id =$1', [req.body.resourceId], function (err, resource) {
-                      if (err) {
+                  handleResponse.handleError(res, err, ' error in connecting to database');
+                } else {
+                  // console.log(req.body.resourceId);
+                  client.query('SELECT * FROM users WHERE id=$1', [req.body.resourceId], function (err, userDetails) {
+                    if (err) {
+                      handleResponse.shouldAbort(err, client, done);
+                      handleResponse.handleError(res, err, ' Error in deleting resource.');
+                    }else{
+                      console.log('user details are '+JSON.stringify(userDetails.rows[0]));
+                      if(userDetails.rows[0].user_role.includes('ADMIN') || parseInt(req.body.resourceId) == parseInt(req.user.id)) {
                         handleResponse.shouldAbort(err, client, done);
-                        handleResponse.handleError(res, err, ' Error in deleting resource.');
-                      }else{
-                        done();
-                        handleResponse.sendSuccess(res,'Resource deleted successfully',{});
-                        res.end();
-                      }
+                        handleResponse.handleError(res, err, 'You can not delete this user.');
+                      } else {
+                        client.query('UPDATE users SET archived=true where id =$1', [req.body.resourceId], function (err, resource) {
+                          if (err) {
+                            handleResponse.shouldAbort(err, client, done);
+                            handleResponse.handleError(res, err, ' Error in deleting resource.');
+                          }else{
+                            client.query('COMMIT', (err) => {
+                              if (err) {
+                                // console.log('Error committing transaction', err.stack)
+                                handleResponse.shouldAbort(err, client, done);
+                                handleResponse.handleError(res, err, ' Error in committing transaction');
+                              } else {
+                                done();
+                                handleResponse.sendSuccess(res,'Resource deleted successfully',{});
+                                res.end();
+                              }
+                            })
+                          }
 
-                    });
-                  }
+                        });
+                      }
+                    }
+                  })
                 }
               })
             })

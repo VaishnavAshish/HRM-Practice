@@ -96,7 +96,7 @@ module.exports = function(app) {
     app.get('/getAuthCode', quickbookController.getAuthCode);
     app.post('/disconnectQuickbook', passportConfig.isAuthenticated, quickbookController.disconnectQuickbook);
 
-    app.get('/getCompanyInfo',passportConfig.isAuthenticated, quickbookController.getCompanyInfo);
+    // app.get('/getCompanyInfo',passportConfig.isAuthenticated, quickbookController.getCompanyInfo);
 
     app.post('/getQuickbookData', passportConfig.isAuthenticated, quickbookController.getQuickbookData);
     app.post('/postInvoiceToQuickbook', passportConfig.isAuthenticated, quickbookController.postInvoiceToQuickbook);

@@ -56,7 +56,7 @@
                 formData[fieldName] = $('option:selected', this).val();
             } else if (eleType == 'INPUT') {
                 var fieldType = $(this).prop('type');
-                if (fieldType == 'text' || fieldType == 'email' || fieldType == 'password' || fieldType == 'hidden') {
+                if (fieldType == 'text' || fieldType == 'number' || fieldType == 'email' || fieldType == 'password' || fieldType == 'hidden') {
                     formData[fieldName] = $(this).val();
                 } else if (fieldType == 'checkbox' || fieldType == 'radio') {
                     formData[fieldName] = $(this).prop('checked');

@@ -820,51 +820,66 @@ exports.postEditProject = (req, res) => {
   }
   if (req.user) {
     pool.connect((err, client, done) => {
-      client.query('SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id FROM PROJECT p where id=$1 AND company_id=$2', [req.body.projectId, req.user.company_id], function (err, project) {
-        if (err) {
-          console.error(err);
+      client.query('BEGIN', (err) => {
+        if (err){
           handleResponse.shouldAbort(err, client, done);
-          handleResponse.handleError(res, err, ' Error in finding project data');
+          handleResponse.handleError(res, err, ' error in connecting to database');
         } else {
-          // console.log('getProject>>>>>>>>>>>>>');
-          // console.log(project.rows[0]);
-          var projectStatus = req.body.projectData.project_status;
-          var projectPer = req.body.projectData.project_complete_per?req.body.projectData.project_complete_per:0;
-          if('Completed' === projectStatus){
-            projectPer = 100;
-          } else if(projectPer >= 100) {
-            projectPer = 100;
-            projectStatus = 'Completed';
-          }
-          let start_date = null;
-          let end_date = null;
-          if(req.body.projectData.start_date) {
-            console.log(req.body.projectData.start_date);
-            start_date = moment.tz(req.body.projectData.start_date, companyDefaultTimezone).format();
-            // start_date = dateFormat(req.body.projectData.start_date);
-          }
-          if(req.body.projectData.end_date) {
-            console.log(req.body.projectData.end_date);
-            end_date = moment.tz(req.body.projectData.end_date, companyDefaultTimezone).format();
-            // end_date = dateFormat(req.body.projectData.start_date);
-          }
-
-          // console.log(start_date +' ************* '+ end_date);
-          client.query('UPDATE PROJECT SET name=$1, start_date=$2, end_date=$3, billable=$4, status=$5, description=$6, global_project=$7, percent_completed=$8, account_id=$11, type=$12, project_cost=$13 WHERE id=$9 AND company_id=$10', [req.body.projectData.project_title, start_date, end_date, req.body.projectData.billable, projectStatus, req.body.projectData.project_desc, req.body.projectData.global_project, projectPer, req.body.projectId, req.user.company_id, req.body.projectData.account, req.body.projectData.project_type, project_cost], function (err, updatedData) {
-            // console.log('Error >>>>>>>>>>>>>');
-            // console.log(err);
+          client.query('SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id FROM PROJECT p where id=$1 AND company_id=$2', [req.body.projectId, req.user.company_id], function (err, project) {
             if (err) {
               console.error(err);
               handleResponse.shouldAbort(err, client, done);
-              handleResponse.handleError(res, err, ' Error in updating project data');
+              handleResponse.handleError(res, err, ' Error in finding project data');
             } else {
-              done();
-              // console.log('Updated project >>>>>>>>>>>>>');
-              // console.log(updatedData);
-              handleResponse.sendSuccess(res,'Project updated successfully.',{});
-              /*res.status(200).json({ "success": true, "message": "success" });*/
+              // console.log('getProject>>>>>>>>>>>>>');
+              // console.log(project.rows[0]);
+              var projectStatus = req.body.projectData.project_status;
+              var projectPer = req.body.projectData.project_complete_per?req.body.projectData.project_complete_per:0;
+              if('Completed' === projectStatus){
+                projectPer = 100;
+              } else if(projectPer >= 100) {
+                projectPer = 100;
+                projectStatus = 'Completed';
+              }
+              let start_date = null;
+              let end_date = null;
+              if(req.body.projectData.start_date) {
+                console.log(req.body.projectData.start_date);
+                start_date = moment.tz(req.body.projectData.start_date, companyDefaultTimezone).format();
+                // start_date = dateFormat(req.body.projectData.start_date);
+              }
+              if(req.body.projectData.end_date) {
+                console.log(req.body.projectData.end_date);
+                end_date = moment.tz(req.body.projectData.end_date, companyDefaultTimezone).format();
+                // end_date = dateFormat(req.body.projectData.start_date);
+              }
+
+              // console.log(start_date +' ************* '+ end_date);
+              client.query('UPDATE PROJECT SET name=$1, start_date=$2, end_date=$3, billable=$4, status=$5, description=$6, global_project=$7, percent_completed=$8, account_id=$11, type=$12, project_cost=$13 WHERE id=$9 AND company_id=$10', [req.body.projectData.project_title, start_date, end_date, req.body.projectData.billable, projectStatus, req.body.projectData.project_desc, req.body.projectData.global_project, projectPer, req.body.projectId, req.user.company_id, req.body.projectData.account, req.body.projectData.project_type, project_cost], function (err, updatedData) {
+                // console.log('Error >>>>>>>>>>>>>');
+                // console.log(err);
+                if (err) {
+                  console.error(err);
+                  handleResponse.shouldAbort(err, client, done);
+                  handleResponse.handleError(res, err, ' Error in updating project data');
+                } else {
+                  client.query('COMMIT', (err) => {
+                    if (err) {
+                      // console.log('Error committing transaction', err.stack)
+                      handleResponse.shouldAbort(err, client, done);
+                      handleResponse.handleError(res, err, ' Error in committing transaction');
+                    } else {
+                      done();
+                      // console.log('Updated project >>>>>>>>>>>>>');
+                      // console.log(updatedData);
+                      handleResponse.sendSuccess(res,'Project updated successfully.',{});
+                      /*res.status(200).json({ "success": true, "message": "success" });*/
+                    }
+                  })
+                }
+              });
             }
-          });
+          })
         }
       })
     });
@@ -982,19 +997,34 @@ exports.deleteProject = (req, res) => {
       handleResponse.handleError(res, "incorrect project id", " Project id is not correct");
     } else {
       pool.connect((err, client, done) => {
-        // console.log("req.body.projectId");
-        // console.log(req.body.projectId);
-        client.query('UPDATE PROJECT SET archived = $1 WHERE id=$2', [true, req.body.projectId], function (err, archivedProject) {
-          if (err) {
-            console.error(err);
+        client.query('BEGIN', (err) => {
+          if (err){
             handleResponse.shouldAbort(err, client, done);
-            handleResponse.handleError(res, err, ' Error in deleting project.');
+            handleResponse.handleError(res, err, ' error in connecting to database');
           } else {
-            console.error('Affected ID>>>>>>>>>>>>>');
-            // console.log(archivedProject.rows[0]);
-            done();
-            handleResponse.sendSuccess(res,'Project deleted successfully.',{});
-            /*res.status(200).json({ "success": true, "message": "success" });*/
+            // console.log("req.body.projectId");
+            // console.log(req.body.projectId);
+            client.query('UPDATE PROJECT SET archived = $1 WHERE id=$2', [true, req.body.projectId], function (err, archivedProject) {
+              if (err) {
+                console.error(err);
+                handleResponse.shouldAbort(err, client, done);
+                handleResponse.handleError(res, err, ' Error in deleting project.');
+              } else {
+                client.query('COMMIT', (err) => {
+                  if (err) {
+                    // console.log('Error committing transaction', err.stack)
+                    handleResponse.shouldAbort(err, client, done);
+                    handleResponse.handleError(res, err, ' Error in committing transaction');
+                  } else {
+                    console.error('Affected ID>>>>>>>>>>>>>');
+                    // console.log(archivedProject.rows[0]);
+                    done();
+                    handleResponse.sendSuccess(res,'Project deleted successfully.',{});
+                    /*res.status(200).json({ "success": true, "message": "success" });*/
+                  }
+                })
+              }
+            })
           }
         })
       });
@@ -1008,45 +1038,73 @@ exports.deleteProject = (req, res) => {
 
 exports.checkAndCreateProjectAssignment = (req, res) => {
   pool.connect((err, client, done) => {
-    let extraParams = {};
-    extraParams.project_id = req.body.project_id;
-    extraParams.assigned_user = req.user.id;
-    extraParams.user_role = req.body.user_role;
-    commonController.checkProjectAssignment(req, client, err, done, extraParams, res, function (response) {
-      if(!response) {
-        client.query('SELECT account_id FROM PROJECT where id=$1 AND company_id=$2', [req.body.project_id, req.user.company_id], function (err, projectDetail) {
-          if (err) {
-            console.error(err);
-            handleResponse.shouldAbort(err, client, done);
-            handleResponse.handleError(res, err, ' Error in adding timesheet row.');
-          } else {
-            extraParams.account_id = projectDetail.rows[0].account_id;
-            commonController.createProjectAssignment(req, client, err, done, extraParams, req.user.bill_rate, req.user.cost_rate, res, function (response2) {
-              let userData = {};
-              userData.userEmail = req.user.email;
-              req.body.userData = userData;
-              commonController.createTaskAssignment(req, client, err, done, req.body.task_id, req.user.bill_rate, req.user.cost_rate, extraParams, res, function (response3) {
-                done();
-                handleResponse.sendSuccess(res,'Assignment created successfully.',{});
-              });
-            })
-          }
-        });
+    client.query('BEGIN', (err) => {
+      if (err){
+        handleResponse.shouldAbort(err, client, done);
+        handleResponse.handleError(res, err, ' error in connecting to database');
       } else {
-        extraParams.task_id = req.body.task_id;
-        commonController.checkTaskAssignment(req, client, err, done, extraParams, res, function (response) {
+        let extraParams = {};
+        extraParams.project_id = req.body.project_id;
+        extraParams.assigned_user = req.user.id;
+        extraParams.user_role = req.body.user_role;
+        commonController.checkProjectAssignment(req, client, err, done, extraParams, res, function (response) {
           if(!response) {
-            let userData = {};
-            userData.userEmail = req.user.email;
-            req.body.userData = userData;
-            commonController.createTaskAssignment(req, client, err, done, req.body.task_id, req.user.bill_rate, req.user.cost_rate, extraParams, res, function (response3) {
+            client.query('SELECT account_id FROM PROJECT where id=$1 AND company_id=$2', [req.body.project_id, req.user.company_id], function (err, projectDetail) {
+              if (err) {
+                console.error(err);
+                handleResponse.shouldAbort(err, client, done);
+                handleResponse.handleError(res, err, ' Error in adding timesheet row.');
+              } else {
+                extraParams.account_id = projectDetail.rows[0].account_id;
+                commonController.createProjectAssignment(req, client, err, done, extraParams, req.user.bill_rate, req.user.cost_rate, res, function (response2) {
+                  let userData = {};
+                  // userData.userEmail = req.user.email;
+                  // req.body.userData = userData;
+                  // commonController.createTaskAssignment(req, client, err, done, req.body.task_id, req.user.bill_rate, req.user.cost_rate, extraParams, res, function (response3) {
+                    client.query('COMMIT', (err) => {
+                      if (err) {
+                        // console.log('Error committing transaction', err.stack)
+                        handleResponse.shouldAbort(err, client, done);
+                        handleResponse.handleError(res, err, ' Error in committing transaction');
+                      } else {
+                        done();
+                        handleResponse.sendSuccess(res,'Assignment created successfully.',{});
+                      }
+                    })
+                  // });
+                })
+              }
+            });
+           } else {
               done();
               handleResponse.sendSuccess(res,'Assignment created successfully.',{});
-            });
-          } else {
-            done();
-            handleResponse.sendSuccess(res,'Assignment created successfully.',{});
-          }
+            }
+
+          // } else {
+          //   extraParams.task_id = req.body.task_id;
+          //   commonController.checkTaskAssignment(req, client, err, done, extraParams, res, function (response) {
+          //     if(!response) {
+          //       let userData = {};
+          //       userData.userEmail = req.user.email;
+          //       req.body.userData = userData;
+          //       commonController.createTaskAssignment(req, client, err, done, req.body.task_id, req.user.bill_rate, req.user.cost_rate, extraParams, res, function (response3) {
+          //         client.query('COMMIT', (err) => {
+          //           if (err) {
+          //             // console.log('Error committing transaction', err.stack)
+          //             handleResponse.shouldAbort(err, client, done);
+          //             handleResponse.handleError(res, err, ' Error in committing transaction');
+          //           } else {
+          //             done();
+          //             handleResponse.sendSuccess(res,'Assignment created successfully.',{});
+          //           }
+          //         })
+          //       });
+          //     } else {
+          //       done();
+          //       handleResponse.sendSuccess(res,'Assignment created successfully.',{});
+          //     }
+          //   });
+          // }
         });
       }
     });

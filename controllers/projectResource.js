@@ -68,38 +68,53 @@ exports.postAddProjectRes = (req, res) => {
               }
           }else{
             pool.connect((err, client, done) => {
-                client.query('SELECT pa.id ,pa.company_id ,pa.account_id ,pa.user_id ,pa.project_id ,pa.created_by ,pa.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,pa.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,pa.bill_rate ,pa.cost_rate ,pa.user_role ,pa.record_id FROM PROJECT_ASSIGNMENT pa WHERE company_id=$1 AND project_id=$2 AND user_id=$3 AND user_role=$4',[req.user.company_id, req.body.projectId, req.body.project_user,req.body.user_role], function(err, projectRes) {
-                    if (err) {
-                        console.error(err);
-                        handleResponse.shouldAbort(err, client, done);
-                        handleResponse.handleError(res, err, ' Error in finding project assigment');
-                    } else {
-                        // console.log('projectRes >>>>>>>>>>>>>');
-                        // console.log(projectRes.rows.length);
-                        // console.log(req.body);
-                        if(projectRes.rows.length === 0) {
-                          // let newDate=moment.tz(new Date(), companyDefaultTimezone).format();
-                            client.query('INSERT INTO PROJECT_ASSIGNMENT (company_id, account_id, user_id, user_role, project_id, created_by, created_date, updated_date, bill_rate, cost_rate) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)',[req.user.company_id, req.body.accountId, req.body.project_user, req.body.user_role, req.body.projectId, req.user.id, 'now()', 'now()', req.body.res_bill_rate, req.body.res_cost_rate], function(err, insertedRecord) {
-                                // console.log('Error >>>>>>>>>>>>>');
-                                // console.log(err);
-                                if (err) {
-                                  console.error(err);
-                                  handleResponse.shouldAbort(err, client, done);
-                                  handleResponse.handleError(res, err, ' Error in adding project assigned to user in the database');
-                                } else {
-                                    done();
-                                    console.log('insertedRecord  >>>>>>>>>>>>>');
-                                    console.log(insertedRecord.rows);
-                                    handleResponse.sendSuccess(res,'Project has successfully assigned to resource',{});
-                                    /*res.status(200).json({"success": true ,"message":"success"});*/
-                                }
-                            });
+              client.query('BEGIN', (err) => {
+                if (err){
+                  handleResponse.shouldAbort(err, client, done);
+                  handleResponse.handleError(res, err, ' error in connecting to database');
+                } else {
+                    client.query('SELECT pa.id ,pa.company_id ,pa.account_id ,pa.user_id ,pa.project_id ,pa.created_by ,pa.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,pa.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,pa.bill_rate ,pa.cost_rate ,pa.user_role ,pa.record_id FROM PROJECT_ASSIGNMENT pa WHERE company_id=$1 AND project_id=$2 AND user_id=$3 AND user_role=$4',[req.user.company_id, req.body.projectId, req.body.project_user,req.body.user_role], function(err, projectRes) {
+                        if (err) {
+                            console.error(err);
+                            handleResponse.shouldAbort(err, client, done);
+                            handleResponse.handleError(res, err, ' Error in finding project assigment');
                         } else {
-                            done();
-                            handleResponse.sendSuccess(res,'This project is already assigned to this user.',{'msg': 'This project is already assigned to this user.'});
-                            /*res.status(200).json({"success": false, 'msg': 'This project is already assigned to this user.' ,"message":"This project is already assigned to this user."});*/
+                            // console.log('projectRes >>>>>>>>>>>>>');
+                            // console.log(projectRes.rows.length);
+                            // console.log(req.body);
+                            if(projectRes.rows.length === 0) {
+                              // let newDate=moment.tz(new Date(), companyDefaultTimezone).format();
+                                client.query('INSERT INTO PROJECT_ASSIGNMENT (company_id, account_id, user_id, user_role, project_id, created_by, created_date, updated_date, bill_rate, cost_rate) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)',[req.user.company_id, req.body.accountId, req.body.project_user, req.body.user_role, req.body.projectId, req.user.id, 'now()', 'now()', req.body.res_bill_rate, req.body.res_cost_rate], function(err, insertedRecord) {
+                                    // console.log('Error >>>>>>>>>>>>>');
+                                    // console.log(err);
+                                    if (err) {
+                                      console.error(err);
+                                      handleResponse.shouldAbort(err, client, done);
+                                      handleResponse.handleError(res, err, ' Error in adding project assigned to user in the database');
+                                    } else {
+                                      client.query('COMMIT', (err) => {
+                                        if (err) {
+                                          // console.log('Error committing transaction', err.stack)
+                                          handleResponse.shouldAbort(err, client, done);
+                                          handleResponse.handleError(res, err, ' Error in committing transaction');
+                                        } else {
+                                            done();
+                                            console.log('insertedRecord  >>>>>>>>>>>>>');
+                                            console.log(insertedRecord.rows);
+                                            handleResponse.sendSuccess(res,'Project has successfully assigned to resource',{});
+                                            /*res.status(200).json({"success": true ,"message":"success"});*/
+                                        }
+                                      })
+                                    }
+                                });
+                            } else {
+                                done();
+                                handleResponse.sendSuccess(res,'This project is already assigned to this user.',{'msg': 'This project is already assigned to this user.'});
+                                /*res.status(200).json({"success": false, 'msg': 'This project is already assigned to this user.' ,"message":"This project is already assigned to this user."});*/
+                            }
                         }
-                    }
+                    })
+                  }
                 })
             });
           }
@@ -107,17 +122,22 @@ exports.postAddProjectRes = (req, res) => {
       });
 };
 
-    exports.deleteProjectRes = (req, res) => {
+exports.deleteProjectRes = (req, res) => {
 
-    let projectId = req.body.projectId;
-    let userId = req.body.userId;
-    let user_role = req.body.user_role;
-    if(projectId==''||projectId==null||projectId==undefined) {
-      handleResponse.handleError(res, "incorrect project id", " Project id is not correct");
-    } else if(userId==''||userId==null||userId==undefined) {
-      handleResponse.handleError(res, "incorrect user id", "user id is not correct");
-    } else {
-            pool.connect((err, client, done) => {
+let projectId = req.body.projectId;
+let userId = req.body.userId;
+let user_role = req.body.user_role;
+if(projectId==''||projectId==null||projectId==undefined) {
+  handleResponse.handleError(res, "incorrect project id", " Project id is not correct");
+} else if(userId==''||userId==null||userId==undefined) {
+  handleResponse.handleError(res, "incorrect user id", "user id is not correct");
+} else {
+        pool.connect((err, client, done) => {
+          client.query('BEGIN', (err) => {
+            if (err){
+              handleResponse.shouldAbort(err, client, done);
+              handleResponse.handleError(res, err, ' error in connecting to database');
+            } else {
                 client.query('SELECT * FROM PROJECT_ASSIGNMENT WHERE id=$1',[req.body.assignment_id], function(err, projectRes) {
                     if (err) {
                         console.error(err);
@@ -137,9 +157,17 @@ exports.postAddProjectRes = (req, res) => {
                                     handleResponse.shouldAbort(err, client, done);
                                     handleResponse.handleError(res, err, ' Error in deleting project assigned to user');
                                 } else {
-                                    done();
-                                    handleResponse.sendSuccess(res,'User removed from the project successfully',{});
-                                    /*res.status(200).json({"success": true ,"message":"success"});*/
+                                  client.query('COMMIT', (err) => {
+                                    if (err) {
+                                      // console.log('Error committing transaction', err.stack)
+                                      handleResponse.shouldAbort(err, client, done);
+                                      handleResponse.handleError(res, err, ' Error in committing transaction');
+                                    } else {
+                                      done();
+                                      handleResponse.sendSuccess(res,'User removed from the project successfully',{});
+                                      /*res.status(200).json({"success": true ,"message":"success"});*/
+                                    }
+                                  })
                                 }
                             });
                         } else {
@@ -148,6 +176,8 @@ exports.postAddProjectRes = (req, res) => {
                         }
                     }
                 })
-            });
-        }
-    };
+              }
+            })
+        });
+    }
+};

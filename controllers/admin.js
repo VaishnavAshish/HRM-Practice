@@ -478,7 +478,7 @@ exports.getAllCompanyResources = (req, res) => {
 
 
 exports.postAddCompany = (req, res) => {
-  // console.log('inside post company ' + req.body);
+
   // if(req.user){
   req.assert('orgName', 'Orgnization name cannot be blank').notEmpty();
   req.assert('domain', 'Domain name cannot be blank').notEmpty();
@@ -508,10 +508,10 @@ exports.postAddCompany = (req, res) => {
 
   // }
   else {
-
     pool.connect((err, client, done) => {
       client.query('BEGIN', (err) => {
         if (err) {
+          cpons
           handleResponse.shouldAbort(err, client, done);
           handleResponse.handleError(res, err, ' Error in connecting to database.');
         } else {
@@ -581,10 +581,12 @@ exports.postAddCompany = (req, res) => {
                                             if (req.body.isSignup) {
                                               req.body.user_id = addedUser.rows[0].id;
                                               req.body.token = token;
-                                              sendEmail(req, res, function(error, info) {
-                                                // console.log('callback');
-                                                if (error) {
-                                                  handleResponse.handleError(res, error, ' Error in sending email');
+                                              sendEmailToUser(req, res, function(err, info) {
+                                                console.log('callback');
+                                                if (err) {
+                                                  console.log(err)
+                                                  handleResponse.shouldAbort(err, client, done);
+                                                  handleResponse.handleError(res, err, ' Error in sending email');
                                                 } else {
                                                   handleResponse.sendSuccess(res, 'mail sent', {});
                                                   /*res.status(200).json({ "success": true, "message": "mail sent" });*/
@@ -620,11 +622,12 @@ exports.postAddCompany = (req, res) => {
   }
 };
 
-sendEmail = (req, res, next) => {
+sendEmailToUser = (req, res, next) => {
+  console.log("redirectUrl for email");
+
   let serverName = process.env.BASE_URL;
   let redirectUrl = serverName + '/login?domain=' + req.body.domain + '&token=' + req.body.token;
-  // console.log("redirectUrl");
-  // console.log(redirectUrl);
+  console.log(redirectUrl);
   let html = '<html>' +
     '<body>' +
     '<div style="background-color: #f7f8f9;">' +
@@ -736,14 +739,15 @@ sendEmail = (req, res, next) => {
   };
 
   req.mailOptions = mailOptions;
-  // console.log('transpoter');
+  console.log('transpoter1');
   email.sendMail(req, res, function(error, info) {
-    // console.log('transpoter');
+    console.log('transpoter2');
     if (error) {
+      console.log('error in sending email');
       console.log(error);
       next(error, null);
     } else {
-      // console.log('Message sent: ' + info.response);
+      console.log('Message sent: ' + info.response);
       next(null, info);
       /*res.status(200).json({"success": true,"message":"success" });*/
     }
