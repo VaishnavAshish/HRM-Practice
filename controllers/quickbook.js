@@ -267,10 +267,12 @@ exports.postInvoiceToQuickbook = (req,res) => {
                                                         })
                                                         .catch(function(e) {
                                                           console.error(e);
+                                                          handleResponse.shouldAbort(e, client, done);
                                                           handleResponse.handleError(res, e, ' Error in posting customer info'+e);
                                                         });
                                                       })
                                                       .catch(function(e) {
+                                                        handleResponse.shouldAbort(e, client, done);
                                                         console.error(e);
                                                         handleResponse.handleError(res, e, ' Error in getting item info'+e);
                                                       });
@@ -307,12 +309,14 @@ exports.postInvoiceToQuickbook = (req,res) => {
                                                     })
                                                     .catch(function(e) {
                                                       console.error(e);
+                                                      handleResponse.shouldAbort(e, client, done);
                                                       handleResponse.handleError(res, e, ' Error in posting customer info'+e);
                                                     });
 
                                                   }
 
                                                 } else {
+                                                    handleResponse.shouldAbort(e, client, done);
                                                     handleResponse.handleError(res, 'Invoice line item for this invoice does not exist.', 'Invoice line item for this invoice does not exist.');
                                                 }
                                             }
@@ -321,6 +325,7 @@ exports.postInvoiceToQuickbook = (req,res) => {
                                       });
 
                                     } else {
+                                      handleResponse.shouldAbort(e, client, done);
                                       handleResponse.handleError(res, 'Error in getting invoice information', 'Error in getting invoice information');
                                     }
                                   }
@@ -334,10 +339,12 @@ exports.postInvoiceToQuickbook = (req,res) => {
                  .catch(function(e) {
                      console.error("The error message for refreshing token  is :");
                      console.error(e);
+                     handleResponse.shouldAbort(e, client, done);
                      handleResponse.handleError(res, e, ' Error in refreshing token'+e);
                  });
 
             }else{
+              handleResponse.shouldAbort('Error in fetching quickbook settings', client, done);
               handleResponse.handleError(res, 'Error in fetching quickbook settings', 'Error in fetching quickbook settings');
             }
         }
@@ -423,6 +430,7 @@ exports.quickbookInvoiceUpdate = (req,res) => {
                       })
                       .catch(function(e) {
                         console.error(e);
+                        handleResponse.shouldAbort(e, client, done);
                         handleResponse.handleError(res, e, ' Error in getting item info'+e);
                       });
                     }
@@ -431,11 +439,13 @@ exports.quickbookInvoiceUpdate = (req,res) => {
                 .catch(function(e) {
                   console.error("The error message for refreshing token  is :"+e.originalMessage);
                   console.error(e.intuit_tid);
+                  handleResponse.shouldAbort(e, client, done);
                   handleResponse.handleError(res, e, ' Error in refreshing token'+e);
                 });
 
               }else{
                 if(index == itemListFromWebhook.length-1){
+                  handleResponse.shouldAbort('Error in fetching quickbook settings', client, done);
                   handleResponse.handleError(res, 'Error in fetching quickbook settings', 'Error in fetching quickbook settings');
                 }
               }
@@ -526,6 +536,7 @@ exports.getQuickbookData = (req,res) => {
                                })
                                .catch(function(e) {
                                    console.error(e);
+                                   handleResponse.shouldAbort(e, client, done);
                                    handleResponse.handleError(res, e, ' Error in getting item info'+e);
                                });
                          }else{
@@ -570,6 +581,7 @@ exports.getQuickbookData = (req,res) => {
                                                   })
                                                   .catch(function(e) {
                                                       console.error(e);
+                                                      handleResponse.shouldAbort(e, client, done);
                                                       handleResponse.handleError(res, e, ' Error in getting item info'+e);
                                                   });
                                             }
@@ -577,10 +589,12 @@ exports.getQuickbookData = (req,res) => {
                                       })
                                       .catch(function(e) {
                                         console.error(e);
+                                        handleResponse.shouldAbort(e, client, done);
                                         handleResponse.handleError(res, e, ' Error in posting customer info'+e);
                                       });
 
                                     }else{
+                                      handleResponse.shouldAbort('Error in getting account information', client, done);
                                       handleResponse.handleError(res, 'Error in getting account information', 'Error in getting account information');
                                     }
                                   }
@@ -593,10 +607,12 @@ exports.getQuickbookData = (req,res) => {
                  .catch(function(e) {
                      console.error("The error message for refreshing token  is :"+e.originalMessage);
                      console.error(e.intuit_tid);
+                     handleResponse.shouldAbort(e, client, done);
                      handleResponse.handleError(res, e, ' Error in refreshing token'+e);
                  });
 
             }else{
+              done();
               handleResponse.handleError(res, 'Error in fetching quickbook settings', 'Error in fetching quickbook settings');
             }
         }
@@ -644,6 +660,7 @@ exports.getCompanyInfo = (req,res) => {
                              })
                              .catch(function(e) {
                                  console.error(e);
+                                 handleResponse.shouldAbort(e, client, done);
                                  handleResponse.handleError(res, e, ' Error in getting company info'+e);
                              });
                        }
@@ -652,10 +669,12 @@ exports.getCompanyInfo = (req,res) => {
                  .catch(function(e) {
                      console.error("The error message for refreshing token  is :"+e.originalMessage);
                      console.error(e.intuit_tid);
+                     handleResponse.shouldAbort(e, client, done);
                      handleResponse.handleError(res, e, ' Error in refreshing token'+e);
                  });
 
             }else{
+              done();
               handleResponse.handleError(res, 'Error in fetching quickbook settings', 'Error in fetching quickbook settings');
             }
         }
@@ -702,16 +721,19 @@ exports.disconnectQuickbook = (req,res) =>{
                      .catch(function(e) {
                        console.error("The error message for revoking token is :"+e.originalMessage);
                        console.error(e.intuit_tid);
+                       handleResponse.shouldAbort(e, client, done);
                        handleResponse.handleError(res, e, ' Error in revoking token'+e);
                      });
                  })
                  .catch(function(e) {
                      console.error("The error message for refreshing token  is :");
                      console.error(e);
+                     handleResponse.shouldAbort(e, client, done);
                      handleResponse.handleError(res, e, ' Error in refreshing token'+e);
                  });
 
             }else{
+              done();
               handleResponse.handleError(res, 'Error in fetching quickbook settings', 'Error in fetching quickbook settings');
             }
         }

@@ -146,8 +146,8 @@ exports.invoicePaymentDeclined = (req, res) => {
           handleResponse.shouldAbort(err, client, done);
           handleResponse.handleError(res, err, ' Error in updating settings');
         } else {
-            done();
-            handleResponse.sendSuccess(res,'Stripes subscription data deleted successfully',{});
+          done();
+          handleResponse.sendSuccess(res,'Stripes subscription data deleted successfully',{});
         }
       });
   });
