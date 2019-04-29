@@ -341,7 +341,7 @@ exports.postInvoiceToQuickbook = (req,res) => {
                                                         .catch(function(e) {
                                                           console.error(e);
                                                           handleResponse.shouldAbort(e, client, done);
-                                                          handleResponse.handleError(res, e, ' Error in posting customer info'+e);
+                                                          handleResponse.handleError(res, e, ' Error in posting invoice info'+e);
                                                         });
 
                                                       }
@@ -610,7 +610,7 @@ exports.getQuickbookData = (req,res) => {
                                     if(accountInfo.rows.length>0){
                                           console.log(accountInfo.rows[0].email);
                                           let accountData={
-                                            "FullyQualifiedName": accountInfo.rows[0].name,
+                                            "FullyQualifiedName": req.user.company_info.name+'_'+accountInfo.rows[0].name,
                                             "PrimaryEmailAddr": {
                                               "Address": accountInfo.rows[0].email
                                             },
