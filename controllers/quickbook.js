@@ -411,14 +411,14 @@ exports.postInvoiceToQuickbook = (req,res) => {
 
 exports.quickbookInvoiceUpdate = (req,res) => {
   console.log('quickbookInvoiceUpdate');
-  console.log(cryptr.decrypt(req.params.companyId));
+  // console.log(cryptr.decrypt(req.params.companyId));
   console.log(req.body.eventNotifications[0].dataChangeEvent.entities);
   let itemListFromWebhook = req.body.eventNotifications[0].dataChangeEvent.entities;
   itemListFromWebhook = itemListFromWebhook.filter(item => item.operation == 'Create').map(payment => payment.id );
   console.log('itemListFromWebhook')
   console.log(itemListFromWebhook)
-  req.params.companyId= cryptr.decrypt(req.params.companyId);
-  console.log(req.params.companyId);
+  // req.params.companyId= cryptr.decrypt(req.params.companyId);
+  // console.log(req.params.companyId);
   pool.connect((err, client, done) => {
     client.query('BEGIN', (err) => {
       if (err){
@@ -428,12 +428,12 @@ exports.quickbookInvoiceUpdate = (req,res) => {
         console.log('transaction begins');
         if(itemListFromWebhook.length>0){
           itemListFromWebhook.forEach((paymentItem,index) => {
-              client.query('SELECT quickbook_token FROM SETTING where company_id=$1',[req.params.companyId], function(err, companySetting) {
+              client.query('SELECT quickbook_token FROM SETTING WHERE quickbook_token IS NOT NULL',function(err, companySetting) {
                 if (err){
                   handleResponse.shouldAbort(err, client, done);
                   handleResponse.handleError(res, err, ' Error in fetching settings');
                 } else {
-                  if(companySetting.rows[0].quickbook_token!=null){
+                  if(companySetting.rows.length>0){
                     let quickbook_token = JSON.parse(companySetting.rows[0].quickbook_token);
                     oauthClient = new OAuthClient({
                       clientId: quickbook_token.clientId,
@@ -448,7 +448,7 @@ exports.quickbookInvoiceUpdate = (req,res) => {
                     .then(function(authResponse) {
                       //  console.log('Tokens refreshed : ' + JSON.stringify(authResponse));
                       quickbook_token.token =authResponse.token;
-                      client.query('UPDATE SETTING set quickbook_token=$1 where company_id=$2 RETURNING *',[quickbook_token,req.params.companyId], function(err, updatedCompSetting) {
+                      client.query('UPDATE SETTING set quickbook_token=$1 where company_id=$2 RETURNING *',[quickbook_token,companySetting.rows[0].id], function(err, updatedCompSetting) {
                         if (err){
                           handleResponse.shouldAbort(err, client, done);
                           handleResponse.handleError(res, err, ' Error in updating settings');

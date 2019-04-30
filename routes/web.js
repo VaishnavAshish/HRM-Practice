@@ -100,7 +100,7 @@ module.exports = function(app) {
 
     app.post('/getQuickbookData', passportConfig.isAuthenticated, quickbookController.getQuickbookData);
     app.post('/postInvoiceToQuickbook', passportConfig.isAuthenticated, quickbookController.postInvoiceToQuickbook);
-    app.post('/quickbookInvoiceUpdate/:companyId',  quickbookController.quickbookInvoiceUpdate);
+    app.post('/quickbookInvoiceUpdate',  quickbookController.quickbookInvoiceUpdate);
 
 
     app.post('/invoicePaymentDeclined',stripeController.invoicePaymentDeclined);
