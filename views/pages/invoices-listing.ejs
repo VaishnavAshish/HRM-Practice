@@ -220,7 +220,7 @@
                                                 <% invoiceList.forEach(function(invoice) {%>
                                                     <!-- row start -->
                                                     <tr class="">
-                                                        <!-- <td role="gridcell">
+                                                        <td role="gridcell">
                                                             <div class="slds-truncate" title="">
                                                                 <span class="text-uppercase">
                                                                     <% if(invoice.status == "DRAFT") { %>
@@ -234,7 +234,7 @@
                                                                     </span>
                                                                 </span>
                                                             </div>
-                                                        </td> -->
+                                                        </td>
                                                         <th scope="row" tabindex="0">
                                                             <div class="slds-truncate" title="">
                                                                 <a href="/invoice-details?invoiceId=<%= invoice.id %>" tabindex="-1">
