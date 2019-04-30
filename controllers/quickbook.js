@@ -423,7 +423,9 @@ exports.postInvoiceToQuickbook = (req,res) => {
 exports.quickbookInvoiceUpdate = (req,res) => {
   console.log('quickbookInvoiceUpdate');
   // console.log(cryptr.decrypt(req.params.companyId));
-  console.log(req.body.eventNotifications[0].dataChangeEvent.entities);
+  console.log(req.body);
+  console.log(req.headers);
+
   let itemListFromWebhook = req.body.eventNotifications[0].dataChangeEvent.entities;
   itemListFromWebhook = itemListFromWebhook.filter(item => item.operation == 'Create').map(payment => payment.id );
   console.log('itemListFromWebhook')
