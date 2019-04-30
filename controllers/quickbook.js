@@ -304,8 +304,25 @@ exports.postInvoiceToQuickbook = (req,res) => {
                                                                 });
 
                                                             } else{
-                                                              handleResponse.shouldAbort('Error in finding invoice on quickbook', client, done);
-                                                              handleResponse.handleError(res, 'Error in finding invoice on quickbook', 'Error in finding invoice on quickbook');
+                                                              // handleResponse.shouldAbort('Error in finding invoice on quickbook', client, done);
+                                                              // handleResponse.handleError(res, 'Error in finding invoice on quickbook', 'Error in finding invoice on quickbook');
+                                                              client.query('UPDATE INVOICE set quickbook_invoice_id=$1 where id=$2',[null,req.body.invoiceId], function(err, updatedInvoiceInfo) {
+                                                                if (err){
+                                                                  handleResponse.shouldAbort(err, client, done);
+                                                                  handleResponse.handleError(res, err, ' Error in updating invoice');
+                                                                } else {
+                                                                  client.query('COMMIT', (err) => {
+                                                                    if (err) {
+                                                                      // console.log('Error committing transaction', err.stack)
+                                                                      handleResponse.shouldAbort(err, client, done);
+                                                                      handleResponse.handleError(res, err, ' Error in committing transaction');
+                                                                    } else {
+                                                                      done();
+                                                                      handleResponse.handleError(res, 'Error in finding invoice on quickbook.Please refresh', 'Error in finding invoice on quickbook.Please refresh');
+                                                                    }
+                                                                  })
+                                                                }
+                                                              });
                                                             }
                                                           })
                                                           .catch(function(e) {
