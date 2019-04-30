@@ -869,6 +869,8 @@ exports.isAuthenticated = (req, res, next) => {
     // if(matchUser!=undefined){
     //
         pool.connect((err, client, done) => {
+          console.log('company id inside isauthenticated');
+          console.log(req.user.company_id);
           client.query("select * from company INNER JOIN (SELECT company_id,stripe_customer_id,stripe_subscription_id,quickbook_token FROM setting) setting ON company.id = setting.company_id AND company.id=$1 AND company.archived=$2", [req.user.company_id,false], function(err, company) {
             if (err) {
               handleResponse.shouldAbort(err, client, done);
