@@ -270,8 +270,8 @@ exports.postInvoiceToQuickbook = (req,res) => {
                                                                         handleResponse.shouldAbort(err, client, done);
                                                                         handleResponse.handleError(res, err, ' Error in updating invoice line item');
                                                                       } else {
-                                                                        console.log('updatedInvoiceLineInfo')
-                                                                        console.log(updatedInvoiceLineInfo);
+                                                                        // console.log('updatedInvoiceLineInfo')
+                                                                        // console.log(updatedInvoiceLineInfo);
                                                                         if(index == (invoiceLineItems.rows.length-1)){
                                                                           client.query('UPDATE INVOICE set quickbook_invoice_id=$1 where id=$2',[invoiceResponse.Id,req.body.invoiceId], function(err, updatedInvoiceInfo) {
                                                                             if (err){
