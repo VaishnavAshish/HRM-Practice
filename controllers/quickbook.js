@@ -257,50 +257,56 @@ exports.postInvoiceToQuickbook = (req,res) => {
                                                           oauthClient.makeApiCall({url: url + 'v3/company/' + companyID +'/query?query=select SyncToken from Invoice Where id = \''+invoiceData.Id +'\''})
                                                           .then(function(invoiceDetailData){
                                                             console.log("The response for API call is :"+JSON.stringify(invoiceDetailData));
-                                                            invoiceData.SyncToken = invoiceDetailData.json.QueryResponse.Invoice[0].SyncToken;
-                                                            oauthClient.postApiCall({url: url + 'v3/company/' + companyID +'/invoice',body:invoiceData})
-                                                            .then(function(invoiceResponse){
-                                                              console.log("The response for API call is for posting account:"+JSON.stringify(invoiceResponse));
-                                                              invoiceResponse = invoiceResponse.json.Invoice;
+                                                            if(invoiceDetailData.json.QueryResponse.Invoice){
+                                                                invoiceData.SyncToken = invoiceDetailData.json.QueryResponse.Invoice[0].SyncToken;
+                                                                oauthClient.postApiCall({url: url + 'v3/company/' + companyID +'/invoice',body:invoiceData})
+                                                                .then(function(invoiceResponse){
+                                                                  console.log("The response for API call is for posting account:"+JSON.stringify(invoiceResponse));
+                                                                  invoiceResponse = invoiceResponse.json.Invoice;
 
-                                                              invoiceLineItems.rows.forEach((lineItem,index) => {
-                                                                client.query('UPDATE INVOICE_LINE_ITEM set quickbook_invoice_line_id=$1 where id=$2',[invoiceResponse.Line[index].Id,lineItem.id], function(err, updatedInvoiceLineInfo) {
-                                                                  if (err){
-                                                                    handleResponse.shouldAbort(err, client, done);
-                                                                    handleResponse.handleError(res, err, ' Error in updating invoice line item');
-                                                                  } else {
+                                                                  invoiceLineItems.rows.forEach((lineItem,index) => {
+                                                                    client.query('UPDATE INVOICE_LINE_ITEM set quickbook_invoice_line_id=$1 where id=$2',[invoiceResponse.Line[index].Id,lineItem.id], function(err, updatedInvoiceLineInfo) {
+                                                                      if (err){
+                                                                        handleResponse.shouldAbort(err, client, done);
+                                                                        handleResponse.handleError(res, err, ' Error in updating invoice line item');
+                                                                      } else {
 
-                                                                      if(index == (invoiceLineItems.rows.length-1)){
-                                                                        client.query('UPDATE INVOICE set quickbook_invoice_id=$1 where id=$2',[invoiceResponse.Id,req.body.invoiceId], function(err, updatedInvoiceInfo) {
-                                                                          if (err){
-                                                                            handleResponse.shouldAbort(err, client, done);
-                                                                            handleResponse.handleError(res, err, ' Error in updating invoice');
-                                                                          } else {
-                                                                            client.query('COMMIT', (err) => {
-                                                                              if (err) {
-                                                                                // console.log('Error committing transaction', err.stack)
-                                                                                handleResponse.shouldAbort(err, client, done);
-                                                                                handleResponse.handleError(res, err, ' Error in committing transaction');
-                                                                              } else {
-                                                                                done();
-                                                                                handleResponse.sendSuccess(res,'Quickbook invoice updated successfully',{});
-                                                                              }
-                                                                            })
-                                                                          }
-                                                                        });
+                                                                        if(index == (invoiceLineItems.rows.length-1)){
+                                                                          client.query('UPDATE INVOICE set quickbook_invoice_id=$1 where id=$2',[invoiceResponse.Id,req.body.invoiceId], function(err, updatedInvoiceInfo) {
+                                                                            if (err){
+                                                                              handleResponse.shouldAbort(err, client, done);
+                                                                              handleResponse.handleError(res, err, ' Error in updating invoice');
+                                                                            } else {
+                                                                              client.query('COMMIT', (err) => {
+                                                                                if (err) {
+                                                                                  // console.log('Error committing transaction', err.stack)
+                                                                                  handleResponse.shouldAbort(err, client, done);
+                                                                                  handleResponse.handleError(res, err, ' Error in committing transaction');
+                                                                                } else {
+                                                                                  done();
+                                                                                  handleResponse.sendSuccess(res,'Quickbook invoice updated successfully',{});
+                                                                                }
+                                                                              })
+                                                                            }
+                                                                          });
+                                                                        }
+                                                                        // done();
+                                                                        // handleResponse.sendSuccess(res,'Quickbook invoice created successfully',{});
                                                                       }
-                                                                      // done();
-                                                                      // handleResponse.sendSuccess(res,'Quickbook invoice created successfully',{});
-                                                                  }
-                                                                });
-                                                              })
+                                                                    });
+                                                                  })
 
-                                                            })
-                                                            .catch(function(e) {
-                                                              console.error(e);
-                                                              handleResponse.shouldAbort(e, client, done);
-                                                              handleResponse.handleError(res, e, ' Error in posting customer info'+e);
-                                                            });
+                                                                })
+                                                                .catch(function(e) {
+                                                                  console.error(e);
+                                                                  handleResponse.shouldAbort(e, client, done);
+                                                                  handleResponse.handleError(res, e, ' Error in posting customer info'+e);
+                                                                });
+
+                                                            } else{
+                                                              handleResponse.shouldAbort('Error in finding invoice on quickbook', client, done);
+                                                              handleResponse.handleError(res, 'Error in finding invoice on quickbook', 'Error in finding invoice on quickbook');
+                                                            }
                                                           })
                                                           .catch(function(e) {
                                                             handleResponse.shouldAbort(e, client, done);
@@ -437,30 +443,32 @@ exports.quickbookInvoiceUpdate = (req,res) => {
                           oauthClient.makeApiCall({url: url + 'v3/company/' + companyID +'/query?query=select Line from Payment Where Id= \''+paymentItem+'\''})
                           .then(function(paymentData){
                             console.log("The response for API call is :"+JSON.stringify(paymentData));
-                            let paymentLineItem = paymentData.json.QueryResponse.Payment[0].Line;
+                            if(paymentData.json.QueryResponse.Payment){
+                              let paymentLineItem = paymentData.json.QueryResponse.Payment[0].Line;
 
-                            console.log('----------paymentLineItem-------');
-                            console.log(paymentLineItem);
+                              console.log('----------paymentLineItem-------');
+                              console.log(paymentLineItem);
 
-                            if(paymentLineItem[0].LinkedTxn.length>0){
-                              let linkedTxnForInvoice = paymentLineItem[0].LinkedTxn.filter(transaction =>  transaction.TxnType == 'Invoice');
+                              if(paymentLineItem[0].LinkedTxn.length>0){
+                                let linkedTxnForInvoice = paymentLineItem[0].LinkedTxn.filter(transaction =>  transaction.TxnType == 'Invoice');
 
-                              console.log('--------------linkedTxnForInvoice-------------');
-                              console.log(linkedTxnForInvoice);
+                                console.log('--------------linkedTxnForInvoice-------------');
+                                console.log(linkedTxnForInvoice);
 
-                              linkedTxnForInvoice.forEach(linkedInvoiceData => {
-                                console.log('------linkedInvoiceData-----');
-                                console.log(linkedInvoiceData);
-                                client.query('UPDATE INVOICE set status=$1 where quickbook_invoice_id=$2',['PAID',linkedInvoiceData.TxnId], function(err, updatedInvoice) {
-                                  if (err){
-                                    handleResponse.shouldAbort(err, client, done);
-                                    handleResponse.handleError(res, err, ' Error in updating invoice');
-                                  } else {
+                                linkedTxnForInvoice.forEach(linkedInvoiceData => {
+                                  console.log('------linkedInvoiceData-----');
+                                  console.log(linkedInvoiceData);
+                                  client.query('UPDATE INVOICE set status=$1 where quickbook_invoice_id=$2',['PAID',linkedInvoiceData.TxnId], function(err, updatedInvoice) {
+                                    if (err){
+                                      handleResponse.shouldAbort(err, client, done);
+                                      handleResponse.handleError(res, err, ' Error in updating invoice');
+                                    } else {
 
-                                  }
-                                });
+                                    }
+                                  });
 
-                              })
+                                })
+                              }
                             }
                             if(index == itemListFromWebhook.length-1){
                               client.query('COMMIT', (err) => {
