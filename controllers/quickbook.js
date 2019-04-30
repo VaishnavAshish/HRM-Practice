@@ -663,7 +663,13 @@ exports.getQuickbookData = (req,res) => {
                                                           } else {
                                                               // console.log("The response for API call is :"+JSON.stringify(itemData));
                                                               done();
-                                                              handleResponse.sendSuccess(res,'Quickbook data fetched successfully',{itemArray:itemData.json.QueryResponse.Item});
+                                                              let companyInfoObj = {
+                                                                "invoice_timesheet_item_id":companySetting.rows[0].invoice_timesheet_item_id,
+                                                                "invoice_other_item_id":companySetting.rows[0].invoice_other_item_id,
+                                                                "invoice_fixedfee_item_id":companySetting.rows[0].invoice_fixedfee_item_id,
+                                                                "invoice_expense_item_id":companySetting.rows[0].invoice_expense_item_id
+                                                              }
+                                                              handleResponse.sendSuccess(res,'Quickbook data fetched successfully',{itemArray:itemData.json.QueryResponse.Item,company_info:companyInfoObj});
                                                           }
                                                         })
                                                       })
