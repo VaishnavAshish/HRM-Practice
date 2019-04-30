@@ -745,11 +745,13 @@
               options+=`<option value="${itemList[key].Id}" >${itemList[key].Name}</option>`;
             }
             $(".slds-select[name=quickbookItemList]").html(options);
-            if(company_info.invoice_timesheet_item_id){
-              $("#timesheet_qb_item").val(company_info.invoice_timesheet_item_id);
-              $("#fixed_fee_qb_item").val(company_info.invoice_fixedfee_item_id);
-              $("#expense_qb_item").val(company_info.invoice_expense_item_id);
-              $("#other_qb_item").val(company_info.invoice_other_item_id);
+            if(company_info){
+              if(company_info.invoice_timesheet_item_id){
+                $("#timesheet_qb_item").val(company_info.invoice_timesheet_item_id);
+                $("#fixed_fee_qb_item").val(company_info.invoice_fixedfee_item_id);
+                $("#expense_qb_item").val(company_info.invoice_expense_item_id);
+                $("#other_qb_item").val(company_info.invoice_other_item_id);
+              }
             }
 
             openModal(modalId);

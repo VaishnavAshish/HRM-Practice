@@ -40,7 +40,7 @@ exports.setupPagePermissions = (userData, user) => {
 		pages.push({ label: 'Invoices', url: '/invoices-listing' });
 	  }
 	  pages.push({ label: 'Settings', url: '/org-settings'});
-		pages.push({ label: 'Integration Dashboard', url:'/integration-dashboard'});
+		pages.push({ label: 'Integrations', url:'/integration-dashboard'});
 	} else {
 	  if(userData.permissions.includes('projectManager')){
 		  pages.push({ label: 'Projects', url: '/projects-listing' });

@@ -13,7 +13,7 @@ exports.handleError=(res, reason, message, code) =>{
 
 exports.shouldAbort = (err, client, done) => {
   if (err) {
-    console.error('Error in transaction', err.stack)
+    console.error('Error in transaction', err)
     client.query('ROLLBACK', (err) => {
       if (err) {
         console.error('Error rolling back client', err.stack)

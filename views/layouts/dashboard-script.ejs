@@ -27,19 +27,19 @@ function disconnectFromQuickbook(modalId){
 
 }
 
-function connectToQuickbook(modalId,formId){
-	showLoader('#globalLoader');
-	let client_id = $("#client_id").val();
-	let client_secret = $("#client_secret").val();
-	let quickbook_environment = $("#quickbook_environment").val();
-	checkFormValidation(formId);
-	if(!$(formId).hasClass('has-error')){
-		$(formId).submit();
-	}else{
-		hideLoader('#globalLoader');
-	}
-
-}
+// function connectToQuickbook(modalId,formId){
+// 	showLoader('#globalLoader');
+// 	let client_id = $("#client_id").val();
+// 	let client_secret = $("#client_secret").val();
+// 	let quickbook_environment = $("#quickbook_environment").val();
+// 	checkFormValidation(formId);
+// 	if(!$(formId).hasClass('has-error')){
+// 		$(formId).submit();
+// 	}else{
+// 		hideLoader('#globalLoader');
+// 	}
+//
+// }
 
 // function copyTextToClipboard() {
 // 	var copyText = document.getElementById("webhook_url");
@@ -48,28 +48,28 @@ function connectToQuickbook(modalId,formId){
 // 	document.execCommand("copy");
 // 	// showGlobalToast('#globalToast', 'success', 'Text copied to clipboard : '+copyText.value, 4000);
 // }
-function copyTextToClipboard() {
-	 let text = $("#webhook_url").val();
-   let textArea = document.createElement( "textarea" );
-   textArea.value = text;
-   document.body.appendChild( textArea );
-
-   textArea.select();
-
-   try {
-      let successful = document.execCommand( 'copy' );
-      let msg = successful ? 'successful' : 'unsuccessful';
-			$("#copiedURL").addClass('slds-text-color_success ');
-			$("#copiedURL").text('Text copied to clipboard : '+text);
-      console.log('Copying text command was ' + msg);
-   } catch (err) {
-      console.log('Oops, unable to copy');
-			$("#copiedURL").addClass('slds-text-color_error ');
-			$("#copiedURL").text('Oops, unable to copy');
-   }
-
-   document.body.removeChild( textArea );
-}
+// function copyTextToClipboard() {
+// 	 let text = $("#webhook_url").val();
+//    let textArea = document.createElement( "textarea" );
+//    textArea.value = text;
+//    document.body.appendChild( textArea );
+//
+//    textArea.select();
+//
+//    try {
+//       let successful = document.execCommand( 'copy' );
+//       let msg = successful ? 'successful' : 'unsuccessful';
+// 			$("#copiedURL").addClass('slds-text-color_success ');
+// 			$("#copiedURL").text('Text copied to clipboard : '+text);
+//       console.log('Copying text command was ' + msg);
+//    } catch (err) {
+//       console.log('Oops, unable to copy');
+// 			$("#copiedURL").addClass('slds-text-color_error ');
+// 			$("#copiedURL").text('Oops, unable to copy');
+//    }
+//
+//    document.body.removeChild( textArea );
+// }
 
 
 </script>
