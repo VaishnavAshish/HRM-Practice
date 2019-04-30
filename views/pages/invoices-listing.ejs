@@ -198,6 +198,9 @@
                                                 <th class="slds-is-sortable " scope="col" width="175px">
                                                     <span class="slds-truncate" title="Record Id">#</span>
                                                 </th>
+                                                <th class="slds-is-sortable " scope="col" width="175px">
+                                                  <span class="slds-truncate" title="Status">STATUS</span>
+                                                </th>
                                                 <th class="slds-is-sortable " scope="col">
                                                     <span class="slds-truncate" title="Clients/Accounts">Accounts</span>
                                                 </th>
@@ -220,6 +223,14 @@
                                                 <% invoiceList.forEach(function(invoice) {%>
                                                     <!-- row start -->
                                                     <tr class="">
+
+                                                        <th scope="row" tabindex="0">
+                                                            <div class="slds-truncate" title="">
+                                                                <a href="/invoice-details?invoiceId=<%= invoice.id %>" tabindex="-1">
+                                                                    <%= invoice.record_id %>
+                                                                </a>
+                                                            </div>
+                                                        </th>
                                                         <td role="gridcell">
                                                             <div class="slds-truncate" title="">
                                                                 <span class="text-uppercase">
@@ -235,13 +246,6 @@
                                                                 </span>
                                                             </div>
                                                         </td>
-                                                        <th scope="row" tabindex="0">
-                                                            <div class="slds-truncate" title="">
-                                                                <a href="/invoice-details?invoiceId=<%= invoice.id %>" tabindex="-1">
-                                                                    <%= invoice.record_id %>
-                                                                </a>
-                                                            </div>
-                                                        </th>
                                                         <td role="gridcell">
                                                             <div class="slds-truncate" title="">
                                                                 <%= invoice.account_name %>
