@@ -423,9 +423,9 @@ exports.postInvoiceToQuickbook = (req,res) => {
 exports.quickbookInvoiceUpdate = (req,res) => {
   console.log('quickbookInvoiceUpdate');
   // console.log(cryptr.decrypt(req.params.companyId));
-  console.log(req.body);
-  console.log(req.headers);
-
+  // console.log(req.body);
+  // console.log(req.headers);
+  console.log(req.body.eventNotifications[0].dataChangeEvent.entities);
   let itemListFromWebhook = req.body.eventNotifications[0].dataChangeEvent.entities;
   itemListFromWebhook = itemListFromWebhook.filter(item => item.operation == 'Create').map(payment => payment.id );
   console.log('itemListFromWebhook')
@@ -448,8 +448,8 @@ exports.quickbookInvoiceUpdate = (req,res) => {
                 } else {
                   if(companySetting.rows.length>0){
                     let selectedCompSet = companySetting.rows.filter(setting => return JSON.parse(setting.quickbook_token).token.realmId == req.body.eventNotifications[0].realmId);
-                    console.log('selectedCompSet');
-                    console.log(selectedCompSet);
+                    // console.log('selectedCompSet');
+                    // console.log(selectedCompSet);
                     if(selectedCompSet.length>0){
                       let quickbook_token = JSON.parse(selectedCompSet[0].quickbook_token);
                       oauthClient = new OAuthClient({
