@@ -447,7 +447,14 @@ exports.quickbookInvoiceUpdate = (req,res) => {
                   handleResponse.handleError(res, err, ' Error in fetching settings');
                 } else {
                   if(companySetting.rows.length>0){
-                    let selectedCompSet = companySetting.rows.filter(setting => setting.quickbook_token.token.realmId == req.body.eventNotifications[0].realmId);
+                    let selectedCompSet = companySetting.rows.filter(setting => {
+                      console.log('setting.quickbook_token.token')
+                      console.log(setting.quickbook_token.token)
+                      console.log('typeof setting.quickbook_token.token');
+                      console.log(typeof setting.quickbook_token.token);
+                      console.log(typeof setting.quickbook_token.token.realmId);
+                      return setting.quickbook_token.token.realmId == req.body.eventNotifications[0].realmId
+                    });
                     console.log('selectedCompSet');
                     console.log(selectedCompSet);
                     if(selectedCompSet.length>0){
