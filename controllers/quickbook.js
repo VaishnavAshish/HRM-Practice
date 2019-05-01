@@ -547,9 +547,6 @@ exports.quickbookInvoiceUpdate = (req,res) => {
                     }
                   }
                 });
-
-
-
             })
           }
         })
