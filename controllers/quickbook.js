@@ -404,8 +404,25 @@ exports.postInvoiceToQuickbook = (req,res) => {
                      .catch(function(e) {
                          console.error("The error message for refreshing token  is :");
                          console.error(e);
-                         handleResponse.shouldAbort(e, client, done);
-                         handleResponse.handleError(res, e, ' Error in refreshing token'+e);
+                         client.query('UPDATE SETTING set quickbook_token=$1 where company_id=$2 RETURNING *',[null,req.user.company_id], function(err, updatedCompSetting) {
+                           if (err){
+                             handleResponse.shouldAbort(err, client, done);
+                             handleResponse.handleError(res, err, ' Error in updating settings');
+                           } else {
+                             client.query('COMMIT', (err) => {
+                               if (err) {
+                                 // console.log('Error committing transaction', err.stack)
+                                 handleResponse.shouldAbort(err, client, done);
+                                 handleResponse.handleError(res, err, ' Error in committing transaction');
+                               } else {
+                                 handleResponse.shouldAbort(e, client, done);
+                                 handleResponse.handleError(res, e, ' Error in refreshing token '+e+' Please connect again.');
+                               }
+                             })
+                           }
+                         })
+                        //  handleResponse.shouldAbort(e, client, done);
+                        //  handleResponse.handleError(res, e, ' Error in refreshing token'+e);
                      });
 
                 }else{
@@ -736,8 +753,24 @@ exports.getQuickbookData = (req,res) => {
                      .catch(function(e) {
                          console.error("The error message for refreshing token  is :"+e.originalMessage);
                          console.error(e.intuit_tid);
-                         handleResponse.shouldAbort(e, client, done);
-                         handleResponse.handleError(res, e, ' Error in refreshing token'+e);
+
+                         client.query('UPDATE SETTING set quickbook_token=$1 where company_id=$2 RETURNING *',[null,req.user.company_id], function(err, updatedCompSetting) {
+                           if (err){
+                             handleResponse.shouldAbort(err, client, done);
+                             handleResponse.handleError(res, err, ' Error in updating settings');
+                           } else {
+                             client.query('COMMIT', (err) => {
+                               if (err) {
+                                 // console.log('Error committing transaction', err.stack)
+                                 handleResponse.shouldAbort(err, client, done);
+                                 handleResponse.handleError(res, err, ' Error in committing transaction');
+                               } else {
+                                 handleResponse.shouldAbort(e, client, done);
+                                 handleResponse.handleError(res, e, ' Error in refreshing token '+e+' Please connect again.');
+                               }
+                             })
+                           }
+                         })
                      });
 
                 }else{
@@ -893,8 +926,25 @@ exports.disconnectQuickbook = (req,res) =>{
                      .catch(function(e) {
                          console.error("The error message for refreshing token  is :");
                          console.error(e);
-                         handleResponse.shouldAbort(e, client, done);
-                         handleResponse.handleError(res, e, ' Error in refreshing token'+e);
+                         client.query('UPDATE SETTING set quickbook_token=$1 where company_id=$2 RETURNING *',[null,req.user.company_id], function(err, updatedCompSetting) {
+                           if (err){
+                             handleResponse.shouldAbort(err, client, done);
+                             handleResponse.handleError(res, err, ' Error in updating settings');
+                           } else {
+                             client.query('COMMIT', (err) => {
+                               if (err) {
+                                 // console.log('Error committing transaction', err.stack)
+                                 handleResponse.shouldAbort(err, client, done);
+                                 handleResponse.handleError(res, err, ' Error in committing transaction');
+                               } else {
+                                 handleResponse.shouldAbort(e, client, done);
+                                 handleResponse.handleError(res, e, ' Error in refreshing token '+e+' Please connect again.');
+                               }
+                             })
+                           }
+                         })
+                        //  handleResponse.shouldAbort(e, client, done);
+                        //  handleResponse.handleError(res, e, ' Error in refreshing token'+e);
                      });
 
                 }else{
