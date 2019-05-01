@@ -482,7 +482,7 @@ exports.quickbookInvoiceUpdate = (req,res) => {
                         .then(function(authResponse) {
                           //  console.log('Tokens refreshed : ' + JSON.stringify(authResponse));
                           quickbook_token.token =authResponse.token;
-                          client.query('UPDATE SETTING set quickbook_token=$1 where company_id=$2 RETURNING *',[quickbook_token,companySetting.rows[0].id], function(err, updatedCompSetting) {
+                          client.query('UPDATE SETTING set quickbook_token=$1 where company_id=$2 RETURNING *',[quickbook_token,selectedCompSet[0].id], function(err, updatedCompSetting) {
                             if (err){
                               handleResponse.shouldAbort(err, client, done);
                               handleResponse.handleError(res, err, ' Error in updating settings');
