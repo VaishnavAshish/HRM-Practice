@@ -449,7 +449,9 @@ exports.quickbookInvoiceUpdate = (req,res) => {
                   if(companySetting.rows.length>0){
                     let selectedCompSet = companySetting.rows.filter(setting => {
                       console.log('setting')
-                      console.log(setting.quickbook_token)
+                      console.log(JSON.parse(setting.quickbook_token).token)
+                      console.log(JSON.parse(setting.quickbook_token).token.realmId);
+                      console.log(JSON.parse(JSON.parse(setting.quickbook_token).token).realmId);
                       console.log('typeof setting');
                       console.log(typeof setting.quickbook_token);
                       console.log(typeof setting.quickbook_token.token.realmId);
