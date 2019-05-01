@@ -584,15 +584,15 @@ exports.quickbookInvoiceUpdate = (req,res) => {
   // });
 }
 
-function makeid(length) {
-   var result           = '';
-   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-   var charactersLength = characters.length;
-   for ( var i = 0; i < length; i++ ) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-   }
-   return result;
-}
+// function makeid(length) {
+//    var result           = '';
+//    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+//    var charactersLength = characters.length;
+//    for ( var i = 0; i < length; i++ ) {
+//       result += characters.charAt(Math.floor(Math.random() * charactersLength));
+//    }
+//    return result;
+// }
 
 exports.getQuickbookData = (req,res) => {
   console.log('getQuickbookData');
@@ -633,8 +633,7 @@ exports.getQuickbookData = (req,res) => {
                              console.log(companyID+' companyID');
                              console.log(req.body.client_qb_id);
                              if(req.body.client_qb_id!=''&&req.body.client_qb_id!=null&&req.body.client_qb_id!=undefined){
-
-                               oauthClient.makeApiCall({url: url + 'v3/company/' + companyID +'/query?query=select * from Item &minorversion=4'})
+                               oauthClient.makeApiCall({url: url + 'v3/company/' + companyID +'/query?query=select * from Item '})
                                    .then(function(itemData){
                                      client.query('COMMIT', (err) => {
                                        if (err) {
@@ -660,7 +659,6 @@ exports.getQuickbookData = (req,res) => {
                                        handleResponse.handleError(res, e, ' Error in getting item info'+e);
                                    });
                              }else{
-
                                client.query('SELECT * FROM ACCOUNT where name=$1 and company_id=$2',[req.body.client_name,req.user.company_id], function(err, accountInfo) {
                                  if (err){
                                    handleResponse.shouldAbort(err, client, done);
@@ -673,7 +671,7 @@ exports.getQuickbookData = (req,res) => {
                                             "PrimaryEmailAddr": {
                                               "Address": accountInfo.rows[0].email
                                             },
-                                            "DisplayName": req.user.company_info.name+'_'+accountInfo.rows[0].name+'_'+makeid(5),
+                                            "DisplayName": req.user.company_info.name+'_'+accountInfo.rows[0].name,
                                             "FamilyName": accountInfo.rows[0].first_name?accountInfo.rows[0].first_name:''+' '+accountInfo.rows[0].last_name?accountInfo.rows[0].last_name:'',
                                             "CompanyName": accountInfo.rows[0].name,
                                             "BillAddr": {
@@ -693,7 +691,7 @@ exports.getQuickbookData = (req,res) => {
                                                 handleResponse.shouldAbort(err, client, done);
                                                 handleResponse.handleError(res, err, ' Error in updating account');
                                               } else {
-                                                  oauthClient.makeApiCall({url: url + 'v3/company/' + companyID +'/query?query=select * from Item &minorversion=4'})
+                                                  oauthClient.makeApiCall({url: url + 'v3/company/' + companyID +'/query?query=select * from Item '})
                                                       .then(function(itemData){
                                                         client.query('COMMIT', (err) => {
                                                           if (err) {
