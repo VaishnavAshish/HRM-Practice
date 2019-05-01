@@ -448,10 +448,10 @@ exports.quickbookInvoiceUpdate = (req,res) => {
                 } else {
                   if(companySetting.rows.length>0){
                     let selectedCompSet = companySetting.rows.filter(setting => {
-                      console.log('setting.quickbook_token.token')
-                      console.log(setting.quickbook_token.token)
-                      console.log('typeof setting.quickbook_token.token');
-                      console.log(typeof setting.quickbook_token.token);
+                      console.log('setting')
+                      console.log(setting)
+                      console.log('typeof setting');
+                      console.log(typeof setting);
                       console.log(typeof setting.quickbook_token.token.realmId);
                       return setting.quickbook_token.token.realmId == req.body.eventNotifications[0].realmId
                     });
