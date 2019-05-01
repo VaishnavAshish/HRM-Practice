@@ -453,7 +453,7 @@ exports.quickbookInvoiceUpdate = (req,res) => {
                       console.log(JSON.parse(setting.quickbook_token).token.realmId);
                       console.log('typeof setting');
                       console.log(typeof setting.quickbook_token);
-                      console.log(typeof setting.quickbook_token.token.realmId);
+                      console.log(typeof JSON.parse(setting.quickbook_token).token.realmId);
                       return JSON.parse(setting.quickbook_token).token.realmId == req.body.eventNotifications[0].realmId
                     });
                     console.log('selectedCompSet');
