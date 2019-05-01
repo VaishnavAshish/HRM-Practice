@@ -91,6 +91,7 @@ module.exports = function(app) {
 
     app.post('/initiateStripe', passportConfig.isAuthenticated,stripeController.initiateStripe);
     app.post('/disableStripe', passportConfig.isAuthenticated, stripeController.disableStripe);
+    app.post('/invoicePaymentDeclined',stripeController.invoicePaymentDeclined);
 
     app.get('/initiateQuickbook', passportConfig.isAuthenticated, quickbookController.initiateQuickbook);
     app.get('/getAuthCode', quickbookController.getAuthCode);
@@ -103,7 +104,6 @@ module.exports = function(app) {
     app.post('/quickbookInvoiceUpdate',  quickbookController.quickbookInvoiceUpdate);
 
 
-    app.post('/invoicePaymentDeclined',stripeController.invoicePaymentDeclined);
 
 
     app.post('/activate', passportConfig.isAuthenticated,adminController.postActivate);

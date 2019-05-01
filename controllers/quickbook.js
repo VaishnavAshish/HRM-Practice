@@ -447,88 +447,98 @@ exports.quickbookInvoiceUpdate = (req,res) => {
                   handleResponse.handleError(res, err, ' Error in fetching settings');
                 } else {
                   if(companySetting.rows.length>0){
-                    let quickbook_token = JSON.parse(companySetting.rows[0].quickbook_token);
-                    oauthClient = new OAuthClient({
-                      clientId: quickbook_token.clientId,
-                      clientSecret: quickbook_token.clientSecret,
-                      environment: quickbook_token.environment,
-                      redirectUri: quickbook_token.redirectUri,
-                      logging:true,
-                      token:quickbook_token.token
-                    });
+                    let selectedCompSet = companySetting.rows.filter(setting => setting.quickbook_token.token.realmId == req.body.eventNotifications[0].realmId);
+                    console.log('selectedCompSet');
+                    console.log(selectedCompSet);
+                    if(selectedCompSet.length>0){
+                      let quickbook_token = JSON.parse(selectedCompSet[0].quickbook_token);
+                      oauthClient = new OAuthClient({
+                        clientId: quickbook_token.clientId,
+                        clientSecret: quickbook_token.clientSecret,
+                        environment: quickbook_token.environment,
+                        redirectUri: quickbook_token.redirectUri,
+                        logging:true,
+                        token:quickbook_token.token
+                      });
 
-                    oauthClient.refresh()
-                    .then(function(authResponse) {
-                      //  console.log('Tokens refreshed : ' + JSON.stringify(authResponse));
-                      quickbook_token.token =authResponse.token;
-                      client.query('UPDATE SETTING set quickbook_token=$1 where company_id=$2 RETURNING *',[quickbook_token,companySetting.rows[0].id], function(err, updatedCompSetting) {
-                        if (err){
-                          handleResponse.shouldAbort(err, client, done);
-                          handleResponse.handleError(res, err, ' Error in updating settings');
-                        } else {
-                          var companyID = oauthClient.getToken().realmId;
-                          var url = oauthClient.environment == 'Sandbox' ? OAuthClient.environment.sandbox : OAuthClient.environment.production ;
-                          console.log(companyID+' companyID');
-                          console.log(paymentItem);
-                          oauthClient.makeApiCall({url: url + 'v3/company/' + companyID +'/query?query=select Line from Payment Where Id= \''+paymentItem+'\''})
-                          .then(function(paymentData){
-                            console.log("The response for API call is :"+JSON.stringify(paymentData));
-                            if(paymentData.json.QueryResponse.Payment){
-                              let paymentLineItem = paymentData.json.QueryResponse.Payment[0].Line;
+                      oauthClient.refresh()
+                      .then(function(authResponse) {
+                        //  console.log('Tokens refreshed : ' + JSON.stringify(authResponse));
+                        quickbook_token.token =authResponse.token;
+                        client.query('UPDATE SETTING set quickbook_token=$1 where company_id=$2 RETURNING *',[quickbook_token,companySetting.rows[0].id], function(err, updatedCompSetting) {
+                          if (err){
+                            handleResponse.shouldAbort(err, client, done);
+                            handleResponse.handleError(res, err, ' Error in updating settings');
+                          } else {
+                            var companyID = oauthClient.getToken().realmId;
+                            var url = oauthClient.environment == 'Sandbox' ? OAuthClient.environment.sandbox : OAuthClient.environment.production ;
+                            console.log(companyID+' companyID');
+                            console.log(paymentItem);
+                            oauthClient.makeApiCall({url: url + 'v3/company/' + companyID +'/query?query=select Line from Payment Where Id= \''+paymentItem+'\''})
+                            .then(function(paymentData){
+                              console.log("The response for API call is :"+JSON.stringify(paymentData));
+                              if(paymentData.json.QueryResponse.Payment){
+                                let paymentLineItem = paymentData.json.QueryResponse.Payment[0].Line;
 
-                              console.log('----------paymentLineItem-------');
-                              console.log(paymentLineItem);
+                                console.log('----------paymentLineItem-------');
+                                console.log(paymentLineItem);
 
-                              if(paymentLineItem[0].LinkedTxn.length>0){
-                                let linkedTxnForInvoice = paymentLineItem[0].LinkedTxn.filter(transaction =>  transaction.TxnType == 'Invoice');
+                                if(paymentLineItem[0].LinkedTxn.length>0){
+                                  let linkedTxnForInvoice = paymentLineItem[0].LinkedTxn.filter(transaction =>  transaction.TxnType == 'Invoice');
 
-                                console.log('--------------linkedTxnForInvoice-------------');
-                                console.log(linkedTxnForInvoice);
+                                  console.log('--------------linkedTxnForInvoice-------------');
+                                  console.log(linkedTxnForInvoice);
 
-                                linkedTxnForInvoice.forEach(linkedInvoiceData => {
-                                  console.log('------linkedInvoiceData-----');
-                                  console.log(linkedInvoiceData);
-                                  client.query('UPDATE INVOICE set status=$1 where quickbook_invoice_id=$2',['PAID',linkedInvoiceData.TxnId], function(err, updatedInvoice) {
-                                    if (err){
-                                      handleResponse.shouldAbort(err, client, done);
-                                      handleResponse.handleError(res, err, ' Error in updating invoice');
-                                    } else {
+                                  linkedTxnForInvoice.forEach(linkedInvoiceData => {
+                                    console.log('------linkedInvoiceData-----');
+                                    console.log(linkedInvoiceData);
+                                    client.query('UPDATE INVOICE set status=$1 where quickbook_invoice_id=$2',['PAID',linkedInvoiceData.TxnId], function(err, updatedInvoice) {
+                                      if (err){
+                                        handleResponse.shouldAbort(err, client, done);
+                                        handleResponse.handleError(res, err, ' Error in updating invoice');
+                                      } else {
 
-                                    }
-                                  });
+                                      }
+                                    });
 
+                                  })
+                                }
+                              }
+                              if(index == itemListFromWebhook.length-1){
+                                client.query('COMMIT', (err) => {
+                                  if (err) {
+                                    console.log('Error committing transaction', err);
+                                    handleResponse.shouldAbort(err, client, done);
+                                    handleResponse.handleError(res, err, ' Error in committing transaction');
+                                  } else {
+                                    console.log('transaction ends');
+                                    done();
+                                    handleResponse.sendSuccess(res,'Invoices updated successfully',{});
+                                  }
                                 })
                               }
-                            }
-                            if(index == itemListFromWebhook.length-1){
-                              client.query('COMMIT', (err) => {
-                                if (err) {
-                                  console.log('Error committing transaction', err);
-                                  handleResponse.shouldAbort(err, client, done);
-                                  handleResponse.handleError(res, err, ' Error in committing transaction');
-                                } else {
-                                  console.log('transaction ends');
-                                  done();
-                                  handleResponse.sendSuccess(res,'Invoices updated successfully',{});
-                                }
-                              })
-                            }
-                          })
-                          .catch(function(e) {
-                            console.error(e);
-                            handleResponse.shouldAbort(e, client, done);
-                            handleResponse.handleError(res, e, ' Error in getting item info'+e);
-                          });
-                        }
+                            })
+                            .catch(function(e) {
+                              console.error(e);
+                              handleResponse.shouldAbort(e, client, done);
+                              handleResponse.handleError(res, e, ' Error in getting item info'+e);
+                            });
+                          }
+                        })
                       })
-                    })
-                    .catch(function(e) {
-                      console.error("The error message for refreshing token  is :"+e.originalMessage);
-                      console.error(e.intuit_tid);
-                      handleResponse.shouldAbort(e, client, done);
-                      handleResponse.handleError(res, e, ' Error in refreshing token'+e);
-                    });
+                      .catch(function(e) {
+                        console.error("The error message for refreshing token  is :"+e.originalMessage);
+                        console.error(e.intuit_tid);
+                        handleResponse.shouldAbort(e, client, done);
+                        handleResponse.handleError(res, e, ' Error in refreshing token'+e);
+                      });
 
+                    } else {
+                      if(index == itemListFromWebhook.length-1){
+                        handleResponse.shouldAbort('Error in fetching quickbook settings', client, done);
+                        handleResponse.handleError(res, 'Error in fetching quickbook settings.Please reconnect to quickbook.', 'Error in fetching quickbook settings.Please reconnect to quickbook.');
+                      }
+                    }
                   }else{
                     if(index == itemListFromWebhook.length-1){
                       handleResponse.shouldAbort('Error in fetching quickbook settings', client, done);
@@ -839,21 +849,21 @@ exports.disconnectQuickbook = (req,res) =>{
                          oauthClient.revoke({token:quickbook_token.token.refresh_token})
                          .then(function(authResponse) {
                            console.log('Tokens revoked : ' + JSON.stringify(authResponse));
-                           client.query('UPDATE INVOICE_LINE_ITEM set quickbook_invoice_line_id=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedInvoice) {
-                             if (err){
-                               handleResponse.shouldAbort(err, client, done);
-                               handleResponse.handleError(res, err, ' Error in updating settings');
-                             } else {
-                               client.query('UPDATE INVOICE set quickbook_invoice_id=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedInvoice) {
-                                 if (err){
-                                   handleResponse.shouldAbort(err, client, done);
-                                   handleResponse.handleError(res, err, ' Error in updating settings');
-                                 } else {
-                                   client.query('UPDATE ACCOUNT set quickbook_customer_id=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedInvoice) {
-                                     if (err){
-                                       handleResponse.shouldAbort(err, client, done);
-                                       handleResponse.handleError(res, err, ' Error in updating settings');
-                                     } else {
+                          //  client.query('UPDATE INVOICE_LINE_ITEM set quickbook_invoice_line_id=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedInvoice) {
+                          //    if (err){
+                          //      handleResponse.shouldAbort(err, client, done);
+                          //      handleResponse.handleError(res, err, ' Error in updating settings');
+                          //    } else {
+                          //      client.query('UPDATE INVOICE set quickbook_invoice_id=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedInvoice) {
+                          //        if (err){
+                          //          handleResponse.shouldAbort(err, client, done);
+                          //          handleResponse.handleError(res, err, ' Error in updating settings');
+                          //        } else {
+                          //          client.query('UPDATE ACCOUNT set quickbook_customer_id=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedInvoice) {
+                          //            if (err){
+                          //              handleResponse.shouldAbort(err, client, done);
+                          //              handleResponse.handleError(res, err, ' Error in updating settings');
+                          //            } else {
                                        client.query('UPDATE SETTING set quickbook_token=$1, invoice_timesheet_item_id=$1 ,invoice_expense_item_id=$1 ,invoice_fixedfee_item_id=$1 ,invoice_other_item_id=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedSetting) {
                                          if (err){
                                            handleResponse.shouldAbort(err, client, done);
@@ -871,12 +881,12 @@ exports.disconnectQuickbook = (req,res) =>{
                                            })
                                          }
                                        });
-                                     }
-                                   })
-                                 }
-                               })
-                             }
-                           })
+                          //            }
+                          //          })
+                          //        }
+                          //      })
+                          //    }
+                          //  })
                          })
                          .catch(function(e) {
                            console.error("The error message for revoking token is :"+e.originalMessage);
