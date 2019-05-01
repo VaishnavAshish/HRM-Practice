@@ -451,7 +451,6 @@ exports.quickbookInvoiceUpdate = (req,res) => {
                       console.log('setting')
                       console.log(JSON.parse(setting.quickbook_token).token)
                       console.log(JSON.parse(setting.quickbook_token).token.realmId);
-                      console.log(JSON.parse(JSON.parse(setting.quickbook_token).token).realmId);
                       console.log('typeof setting');
                       console.log(typeof setting.quickbook_token);
                       console.log(typeof setting.quickbook_token.token.realmId);
