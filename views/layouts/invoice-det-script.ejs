@@ -794,6 +794,8 @@
             showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
           }
       });
+    }else{
+      hideLoader('#globalLoader');
     }
   }
 
