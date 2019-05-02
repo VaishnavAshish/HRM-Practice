@@ -9,25 +9,26 @@
                       </button>
                       <h2  class="slds-text-heading_medium slds-hyphenate">Quickbook company confirmation</h2>
                   </header>
-                      <form id="change-quickbook-company" method="post" action="/changeQuickbookAccount">
-                        <div class="slds-modal__content slds-p-around_medium" modal-body>
-                          <div>
-                            <input type="hidden" value="<%= JSON.stringify(companyData) %>" name="companyData">
-                            <input type="hidden" value="<%= JSON.stringify(newCompanyData) %>" name="newCompanyData">
-                            <div class="slds-has-flexi-truncate">
-                                <div class="text-size-16 text-height-1">
-                                    This company already has a quickbook instance associated with it.The quickbook account signed in is different from previous quickbook instance. If you continue with the current signed in instance then the previously saved data will be removed and will not available in future.If you still wants to continue press continue button else sign in with the previous quickbook instance.
-                                </div>
-                            </div>
+                    <div class="slds-modal__content slds-p-around_medium" modal-body>
+                      <div>
+                        <div class="slds-has-flexi-truncate">
+                          <div class="text-size-16 text-height-1">
+                            This company already has a quickbook instance associated with it.The quickbook account signed in is different from previous quickbook instance. If you continue with the current signed in instance then the previously quickbook saved data will be removed and will not available in future.If you still wants to continue press continue button else sign in with the previous quickbook instance.
                           </div>
                         </div>
-                        <footer class="slds-modal__footer">
-                            <!-- <button class="slds-button slds-button_neutral" onclick="cancelAccountSwitch();">Cancel</button> -->
+                      </div>
+                    </div>
+                        <footer class="slds-modal__footer" style="display:inherit;">
+                          <form id="change-quickbook-company" method="post" action="/changeQuickbookAccount" class="slds-p-right_xx-small">
+                            <input type="hidden" value="<%= JSON.stringify(companyData) %>" name="companyData">
+                            <input type="hidden" value="<%= JSON.stringify(newCompanyData) %>" name="newCompanyData">
                             <button class="slds-button slds-button_brand" type="submit">
                               Continue
                             </button>
+                          </form>
+                          <button class="slds-button slds-button_neutral" onclick="cancelAccountSwitch();">Cancel</button>
+
                         </footer>
-                    </form>
               </div>
           </section>
           <div class="slds-backdrop"></div>
