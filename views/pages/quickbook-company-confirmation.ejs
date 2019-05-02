@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="en">
+
+<% include ../layouts/head %>
+
+<body class="kw">
+
+    <main class="main-body-space tpd-60 bpd-100">
+        <div>
+            <div class="slds-p-around_small">
+
+                <div class="">
+
+                </div>
+            </div>
+        </div>
+        <% include ../layouts/footer %>
+        <% include ../modals/modal-quickbook-company-data %>
+    </main>
+
+    <% include ../layouts/scripts %>
+    <script>
+    $(document).ready(function(){
+      openModal('#modalQuickbookCompanyData');
+
+    })
+    function cancelAccountSwitch(){
+      window.location.href='/integration-dashboard';
+    }
+    
+
+    </script>
+
+</body>
+
+</html>

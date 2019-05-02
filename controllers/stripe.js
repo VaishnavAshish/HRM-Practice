@@ -136,22 +136,22 @@ exports.disableStripe = (req, res) => {
                     handleResponse.handleError(res, err, ' Error in finding settings');
                   } else {
                     // asynchronously called
-                    client.query('UPDATE INVOICE_LINE_ITEM set quickbook_invoice_line_id=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedInvoice) {
-                      if (err){
-                        handleResponse.shouldAbort(err, client, done);
-                        handleResponse.handleError(res, err, ' Error in updating settings');
-                      } else {
-                        client.query('UPDATE INVOICE set quickbook_invoice_id=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedInvoice) {
-                          if (err){
-                            handleResponse.shouldAbort(err, client, done);
-                            handleResponse.handleError(res, err, ' Error in updating settings');
-                          } else {
-                            client.query('UPDATE ACCOUNT set quickbook_customer_id=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedInvoice) {
-                              if (err){
-                                handleResponse.shouldAbort(err, client, done);
-                                handleResponse.handleError(res, err, ' Error in updating settings');
-                              } else {
-                                  client.query('UPDATE SETTING set stripe_customer_id=$1,stripe_subscription_id=$2,quickbook_token=$3 ,invoice_timesheet_item_id=$3 ,invoice_expense_item_id=$3 ,invoice_fixedfee_item_id=$3 ,invoice_other_item_id=$3  where company_id=$4',[null,null,null,req.user.company_id], function(err, stripeSetting) {
+                    // client.query('UPDATE INVOICE_LINE_ITEM set quickbook_invoice_line_id=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedInvoice) {
+                    //   if (err){
+                    //     handleResponse.shouldAbort(err, client, done);
+                    //     handleResponse.handleError(res, err, ' Error in updating settings');
+                    //   } else {
+                    //     client.query('UPDATE INVOICE set quickbook_invoice_id=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedInvoice) {
+                    //       if (err){
+                    //         handleResponse.shouldAbort(err, client, done);
+                    //         handleResponse.handleError(res, err, ' Error in updating settings');
+                    //       } else {
+                    //         client.query('UPDATE ACCOUNT set quickbook_customer_id=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedInvoice) {
+                    //           if (err){
+                    //             handleResponse.shouldAbort(err, client, done);
+                    //             handleResponse.handleError(res, err, ' Error in updating settings');
+                    //           } else {
+                                  client.query('UPDATE SETTING set stripe_customer_id=$1,stripe_subscription_id=$2,quickbook_enabled=$3 where company_id=$4',[null,null,false,req.user.company_id], function(err, stripeSetting) {
                                     if (err){
                                       handleResponse.shouldAbort(err, client, done);
                                       handleResponse.handleError(res, err, ' Error in updating settings');
@@ -168,12 +168,12 @@ exports.disableStripe = (req, res) => {
                                       })
                                     }
                                   });
-                                }
-                              })
-                            }
-                          })
-                        }
-                      })
+                      //           }
+                      //         })
+                      //       }
+                      //     })
+                      //   }
+                      // })
                   }
                 });
             }
@@ -194,27 +194,27 @@ exports.invoicePaymentDeclined = (req, res) => {
         handleResponse.shouldAbort(err, client, done);
         handleResponse.handleError(res, err, ' error in connecting to database');
       } else {
-        client.query('UPDATE SETTING set stripe_customer_id=$1,stripe_subscription_id=$2,quickbook_token=$3,invoice_timesheet_item_id=$3 ,invoice_expense_item_id=$3 ,invoice_fixedfee_item_id=$3 ,invoice_other_item_id=$3 where stripe_subscription_id=$4 RETURNING *',[null,null,null,req.body.data.object.id], function(err, stripeCompanySetting) {
+        client.query('UPDATE SETTING set stripe_customer_id=$1,stripe_subscription_id=$2,quickbook_enabled=$3 where stripe_subscription_id=$4 RETURNING *',[null,null,false,req.body.data.object.id], function(err, stripeCompanySetting) {
           if (err){
             handleResponse.shouldAbort(err, client, done);
             handleResponse.handleError(res, err, ' Error in updating settings');
           } else {
-            if(stripeCompanySetting.rows.length>0){
-              client.query('UPDATE INVOICE_LINE_ITEM set quickbook_invoice_line_id=$1 where company_id=$2 RETURNING id',[null, stripeCompanySetting.rows[0].id], function(err, updatedInvoiceLineItem) {
-                if (err){
-                  handleResponse.shouldAbort(err, client, done);
-                  handleResponse.handleError(res, err, ' Error in updating settings');
-                } else {
-                  client.query('UPDATE INVOICE set quickbook_invoice_id=$1 where company_id=$2 RETURNING id',[null, stripeCompanySetting.rows[0].id], function(err, updatedInvoice) {
-                    if (err){
-                      handleResponse.shouldAbort(err, client, done);
-                      handleResponse.handleError(res, err, ' Error in updating settings');
-                    } else {
-                      client.query('UPDATE ACCOUNT set quickbook_customer_id=$1 where company_id=$2 RETURNING id',[null, stripeCompanySetting.rows[0].id], function(err, updatedAccount) {
-                        if (err){
-                          handleResponse.shouldAbort(err, client, done);
-                          handleResponse.handleError(res, err, ' Error in updating settings');
-                        } else {
+            // if(stripeCompanySetting.rows.length>0){
+            //   client.query('UPDATE INVOICE_LINE_ITEM set quickbook_invoice_line_id=$1 where company_id=$2 RETURNING id',[null, stripeCompanySetting.rows[0].id], function(err, updatedInvoiceLineItem) {
+            //     if (err){
+            //       handleResponse.shouldAbort(err, client, done);
+            //       handleResponse.handleError(res, err, ' Error in updating settings');
+            //     } else {
+            //       client.query('UPDATE INVOICE set quickbook_invoice_id=$1 where company_id=$2 RETURNING id',[null, stripeCompanySetting.rows[0].id], function(err, updatedInvoice) {
+            //         if (err){
+            //           handleResponse.shouldAbort(err, client, done);
+            //           handleResponse.handleError(res, err, ' Error in updating settings');
+            //         } else {
+            //           client.query('UPDATE ACCOUNT set quickbook_customer_id=$1 where company_id=$2 RETURNING id',[null, stripeCompanySetting.rows[0].id], function(err, updatedAccount) {
+            //             if (err){
+            //               handleResponse.shouldAbort(err, client, done);
+            //               handleResponse.handleError(res, err, ' Error in updating settings');
+            //             } else {
 
                             client.query('COMMIT', (err) => {
                               if (err) {
@@ -226,24 +226,24 @@ exports.invoicePaymentDeclined = (req, res) => {
                                 handleResponse.sendSuccess(res,'Stripes subscription data deleted successfully',{});
                               }
                             })
-                          }
-                        });
-                      }
-                    })
-                  }
-                })
-              }else{
-                client.query('COMMIT', (err) => {
-                  if (err) {
-                    // console.log('Error committing transaction', err.stack)
-                    handleResponse.shouldAbort(err, client, done);
-                    handleResponse.handleError(res, err, ' Error in committing transaction');
-                  } else {
-                    done();
-                    handleResponse.sendSuccess(res,'Stripes subscription data deleted successfully',{});
-                  }
-                })
-              }
+              //             }
+              //           });
+              //         }
+              //       })
+              //     }
+              //   })
+              // }else{
+              //   client.query('COMMIT', (err) => {
+              //     if (err) {
+              //       // console.log('Error committing transaction', err.stack)
+              //       handleResponse.shouldAbort(err, client, done);
+              //       handleResponse.handleError(res, err, ' Error in committing transaction');
+              //     } else {
+              //       done();
+              //       handleResponse.sendSuccess(res,'Stripes subscription data deleted successfully',{});
+              //     }
+              //   })
+              // }
             }
           })
       }

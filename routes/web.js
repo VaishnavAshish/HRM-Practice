@@ -102,8 +102,11 @@ module.exports = function(app) {
     app.post('/getQuickbookData', passportConfig.isAuthenticated, quickbookController.getQuickbookData);
     app.post('/postInvoiceToQuickbook', passportConfig.isAuthenticated, quickbookController.postInvoiceToQuickbook);
     app.post('/quickbookInvoiceUpdate',  quickbookController.quickbookInvoiceUpdate);
+    app.post('/changeQuickbookAccount', passportConfig.isAuthenticated, quickbookController.changeQuickbookAccount);
 
-
+    app.get('/quickbook-company-confirmation', function(req, res) {
+        quickbookController.getQuickbookConfirmation(req, res);
+    });
 
 
     app.post('/activate', passportConfig.isAuthenticated,adminController.postActivate);
