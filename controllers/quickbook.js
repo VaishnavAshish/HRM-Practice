@@ -783,7 +783,7 @@ exports.getQuickbookData = (req,res) => {
                                             "PrimaryEmailAddr": {
                                               "Address": accountInfo.rows[0].email
                                             },
-                                            "DisplayName": req.user.company_info.name+'_'+accountInfo.rows[0].name,
+                                            "DisplayName": accountInfo.rows[0].name,
                                             "FamilyName": accountInfo.rows[0].first_name?accountInfo.rows[0].first_name:''+' '+accountInfo.rows[0].last_name?accountInfo.rows[0].last_name:'',
                                             "CompanyName": accountInfo.rows[0].name,
                                             "BillAddr": {
