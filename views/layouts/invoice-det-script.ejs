@@ -739,18 +739,25 @@
             hideLoader('#globalLoader');
             // showGlobalToast('#globalToast', 'success', response.message, 4000);
             let itemList = response.itemArray;
+            let termList = response.termArray;
             let company_info = response.company_info;
             let options = '<option value="">Please select</option>';
             for(let key in itemList){
               options+=`<option value="${itemList[key].Id}" >${itemList[key].Name}</option>`;
             }
+            let termOptions = '<option value="">Please select</option>';
+            for(let keyData in termList){
+              termOptions+=`<option value="${termList[keyData].Id}" >${termList[keyData].Name}</option>`;
+            }
             $(".slds-select[name=quickbookItemList]").html(options);
+            $(".slds-select[name=quickbookTerms]").html(termOptions);
             if(company_info){
               if(company_info.invoice_timesheet_item_id){
                 $("#timesheet_qb_item").val(company_info.invoice_timesheet_item_id);
                 $("#fixed_fee_qb_item").val(company_info.invoice_fixedfee_item_id);
                 $("#expense_qb_item").val(company_info.invoice_expense_item_id);
                 $("#other_qb_item").val(company_info.invoice_other_item_id);
+                $("#qb_terms").val(company_info.invoice_terms);
               }
             }
 
@@ -773,6 +780,7 @@
     let fixed_fee_item = $("#fixed_fee_qb_item option:selected").val();
     let expense_item = $("#expense_qb_item option:selected").val();
     let other_item = $("#other_qb_item option:selected").val();
+    let terms = $("#qb_terms").val();
     checkFormValidation("#quickbookMapping");
     if(!$("#quickbookMapping").hasClass('has-error')) {
       $.ajax({
@@ -780,7 +788,7 @@
           url : '/postInvoiceToQuickbook',
           contentType: 'application/json',
           dataType: 'json',
-          data : JSON.stringify({"invoiceId":<%= invoiceDetails.id %>,"timesheet_item":timesheet_item,"fixed_fee_item":fixed_fee_item,"expense_item":expense_item,"other_item":other_item}),
+          data : JSON.stringify({"invoiceId":<%= invoiceDetails.id %>,"timesheet_item":timesheet_item,"fixed_fee_item":fixed_fee_item,"expense_item":expense_item,"other_item":other_item,"terms":terms}),
           success : function(response){
             console.log(response);
             closeModal(modalId);

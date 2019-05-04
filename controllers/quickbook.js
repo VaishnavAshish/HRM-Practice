@@ -258,7 +258,7 @@ exports.postInvoiceToQuickbook = (req,res) => {
                      .then(function(authResponse) {
                         //  console.log('Tokens refreshed : ' + JSON.stringify(authResponse));
                          quickbook_token.token =authResponse.token;
-                         client.query('UPDATE SETTING set quickbook_token=$1,invoice_timesheet_item_id=$2,invoice_expense_item_id=$3,invoice_fixedfee_item_id=$4,invoice_other_item_id=$5 where company_id=$6 RETURNING *',[quickbook_token,req.body.timesheet_item,req.body.expense_item,req.body.fixed_fee_item,req.body.other_item,req.user.company_id], function(err, updatedCompSetting) {
+                         client.query('UPDATE SETTING set quickbook_token=$1,invoice_timesheet_item_id=$2,invoice_expense_item_id=$3,invoice_fixedfee_item_id=$4,invoice_other_item_id=$5,invoice_terms=$6 where company_id=$7 RETURNING *',[quickbook_token,req.body.timesheet_item,req.body.expense_item,req.body.fixed_fee_item,req.body.other_item,req.body.terms,req.user.company_id], function(err, updatedCompSetting) {
                            if (err){
                              handleResponse.shouldAbort(err, client, done);
                              handleResponse.handleError(res, err, ' Error in updating settings');
@@ -333,9 +333,12 @@ exports.postInvoiceToQuickbook = (req,res) => {
 
                                                       let invoiceData={
                                                         "Line": lineItemArray,
-                                                        "TxnDate":invoiceDetails.rows[0].due_date,
+                                                        // "TxnDate":invoiceDetails.rows[0].due_date,
                                                         "ApplyTaxAfterDiscount":false,
                                                         "AllowOnlinePayment":true,
+                                                        "SalesTermRef": {
+                                                          "value": req.body.terms,
+                                                        },
                                                         "TxnTaxDetail": {
                                                             "TxnTaxCodeRef": {
                                                                "value": "3",
@@ -730,7 +733,7 @@ exports.getQuickbookData = (req,res) => {
         handleResponse.shouldAbort(err, client, done);
         handleResponse.handleError(res, err, ' error in connecting to database');
       } else {
-          client.query('SELECT quickbook_enabled,quickbook_token,invoice_timesheet_item_id,invoice_other_item_id,invoice_fixedfee_item_id,invoice_expense_item_id FROM SETTING where company_id=$1',[req.user.company_id], function(err, companySetting) {
+          client.query('SELECT quickbook_enabled,quickbook_token,invoice_timesheet_item_id,invoice_other_item_id,invoice_fixedfee_item_id,invoice_expense_item_id,invoice_terms FROM SETTING where company_id=$1',[req.user.company_id], function(err, companySetting) {
             if (err){
               handleResponse.shouldAbort(err, client, done);
               handleResponse.handleError(res, err, ' Error in fetching settings');
@@ -763,23 +766,50 @@ exports.getQuickbookData = (req,res) => {
                              if(req.body.client_qb_id!=''&&req.body.client_qb_id!=null&&req.body.client_qb_id!=undefined){
                                oauthClient.makeApiCall({url: url + 'v3/company/' + companyID +'/query?query=select * from Item '})
                                    .then(function(itemData){
-                                     client.query('COMMIT', (err) => {
-                                       if (err) {
-                                         // console.log('Error committing transaction', err.stack)
-                                         handleResponse.shouldAbort(err, client, done);
-                                         handleResponse.handleError(res, err, ' Error in committing transaction');
-                                       } else {
-                                           console.log("The response for API call is :"+JSON.stringify(itemData));
-                                           done();
-                                           let companyInfoObj = {
-                                             "invoice_timesheet_item_id":companySetting.rows[0].invoice_timesheet_item_id,
-                                             "invoice_other_item_id":companySetting.rows[0].invoice_other_item_id,
-                                             "invoice_fixedfee_item_id":companySetting.rows[0].invoice_fixedfee_item_id,
-                                             "invoice_expense_item_id":companySetting.rows[0].invoice_expense_item_id
-                                           }
-                                           handleResponse.sendSuccess(res,'Quickbook data fetched successfully',{itemArray:itemData.json.QueryResponse.Item,company_info:companyInfoObj});
-                                         }
-                                       })
+                                     console.log("The response for API call is :"+JSON.stringify(itemData));
+                                     oauthClient.makeApiCall({url: url + 'v3/company/' + companyID +'/query?query=select * from term '})
+                                         .then(function(termData){
+                                           client.query('COMMIT', (err) => {
+                                             if (err) {
+                                               // console.log('Error committing transaction', err.stack)
+                                               handleResponse.shouldAbort(err, client, done);
+                                               handleResponse.handleError(res, err, ' Error in committing transaction');
+                                             } else {
+                                                console.log("The response for API call is :"+JSON.stringify(termData));
+                                                 done();
+                                                 let companyInfoObj = {
+                                                   "invoice_timesheet_item_id":companySetting.rows[0].invoice_timesheet_item_id,
+                                                   "invoice_other_item_id":companySetting.rows[0].invoice_other_item_id,
+                                                   "invoice_fixedfee_item_id":companySetting.rows[0].invoice_fixedfee_item_id,
+                                                   "invoice_expense_item_id":companySetting.rows[0].invoice_expense_item_id,
+                                                   "invoice_terms":companySetting.rows[0].invoice_terms
+                                                 }
+                                                 handleResponse.sendSuccess(res,'Quickbook data fetched successfully',{itemArray:itemData.json.QueryResponse.Item,termArray:termData.json.QueryResponse.Term,company_info:companyInfoObj});
+                                               }
+                                             })
+                                         })
+                                         .catch(function(e) {
+                                             console.error(e);
+                                             handleResponse.shouldAbort(e, client, done);
+                                             handleResponse.handleError(res, e, ' Error in getting term info '+e);
+                                         });
+                                    //  client.query('COMMIT', (err) => {
+                                    //    if (err) {
+                                    //      // console.log('Error committing transaction', err.stack)
+                                    //      handleResponse.shouldAbort(err, client, done);
+                                    //      handleResponse.handleError(res, err, ' Error in committing transaction');
+                                    //    } else {
+                                    //        console.log("The response for API call is :"+JSON.stringify(itemData));
+                                    //        done();
+                                    //        let companyInfoObj = {
+                                    //          "invoice_timesheet_item_id":companySetting.rows[0].invoice_timesheet_item_id,
+                                    //          "invoice_other_item_id":companySetting.rows[0].invoice_other_item_id,
+                                    //          "invoice_fixedfee_item_id":companySetting.rows[0].invoice_fixedfee_item_id,
+                                    //          "invoice_expense_item_id":companySetting.rows[0].invoice_expense_item_id
+                                    //        }
+                                    //        handleResponse.sendSuccess(res,'Quickbook data fetched successfully',{itemArray:itemData.json.QueryResponse.Item,company_info:companyInfoObj});
+                                    //      }
+                                    //    })
                                    })
                                    .catch(function(e) {
                                        console.error(e);
@@ -833,23 +863,50 @@ exports.getQuickbookData = (req,res) => {
                                                     } else {
                                                       oauthClient.makeApiCall({url: url + 'v3/company/' + companyID +'/query?query=select * from Item '})
                                                       .then(function(itemData){
-                                                        client.query('COMMIT', (err) => {
-                                                          if (err) {
-                                                            // console.log('Error committing transaction', err.stack)
-                                                            handleResponse.shouldAbort(err, client, done);
-                                                            handleResponse.handleError(res, err, ' Error in committing transaction');
-                                                          } else {
-                                                            // console.log("The response for API call is :"+JSON.stringify(itemData));
-                                                            done();
-                                                            let companyInfoObj = {
-                                                              "invoice_timesheet_item_id":companySetting.rows[0].invoice_timesheet_item_id,
-                                                              "invoice_other_item_id":companySetting.rows[0].invoice_other_item_id,
-                                                              "invoice_fixedfee_item_id":companySetting.rows[0].invoice_fixedfee_item_id,
-                                                              "invoice_expense_item_id":companySetting.rows[0].invoice_expense_item_id
-                                                            }
-                                                            handleResponse.sendSuccess(res,'Quickbook data fetched successfully',{itemArray:itemData.json.QueryResponse.Item,company_info:companyInfoObj});
-                                                          }
-                                                        })
+                                                        console.log('The response for API call is :'+JSON.stringify(itemData));
+                                                        oauthClient.makeApiCall({url: url + 'v3/company/' + companyID +'/query?query=select * from term '})
+                                                            .then(function(termData){
+                                                              client.query('COMMIT', (err) => {
+                                                                if (err) {
+                                                                  // console.log('Error committing transaction', err.stack)
+                                                                  handleResponse.shouldAbort(err, client, done);
+                                                                  handleResponse.handleError(res, err, ' Error in committing transaction');
+                                                                } else {
+                                                                   console.log("The response for API call is :"+JSON.stringify(termData));
+                                                                    done();
+                                                                    let companyInfoObj = {
+                                                                      "invoice_timesheet_item_id":companySetting.rows[0].invoice_timesheet_item_id,
+                                                                      "invoice_other_item_id":companySetting.rows[0].invoice_other_item_id,
+                                                                      "invoice_fixedfee_item_id":companySetting.rows[0].invoice_fixedfee_item_id,
+                                                                      "invoice_expense_item_id":companySetting.rows[0].invoice_expense_item_id,
+                                                                      "invoice_terms":companySetting.rows[0].invoice_terms
+                                                                    }
+                                                                    handleResponse.sendSuccess(res,'Quickbook data fetched successfully',{itemArray:itemData.json.QueryResponse.Item,termArray:termData.json.QueryResponse.Term,company_info:companyInfoObj});
+                                                                  }
+                                                                })
+                                                            })
+                                                            .catch(function(e) {
+                                                                console.error(e);
+                                                                handleResponse.shouldAbort(e, client, done);
+                                                                handleResponse.handleError(res, e, ' Error in getting term info '+e);
+                                                            });
+                                                        // client.query('COMMIT', (err) => {
+                                                        //   if (err) {
+                                                        //     // console.log('Error committing transaction', err.stack)
+                                                        //     handleResponse.shouldAbort(err, client, done);
+                                                        //     handleResponse.handleError(res, err, ' Error in committing transaction');
+                                                        //   } else {
+                                                        //     // console.log("The response for API call is :"+JSON.stringify(itemData));
+                                                        //     done();
+                                                        //     let companyInfoObj = {
+                                                        //       "invoice_timesheet_item_id":companySetting.rows[0].invoice_timesheet_item_id,
+                                                        //       "invoice_other_item_id":companySetting.rows[0].invoice_other_item_id,
+                                                        //       "invoice_fixedfee_item_id":companySetting.rows[0].invoice_fixedfee_item_id,
+                                                        //       "invoice_expense_item_id":companySetting.rows[0].invoice_expense_item_id
+                                                        //     }
+                                                        //     handleResponse.sendSuccess(res,'Quickbook data fetched successfully',{itemArray:itemData.json.QueryResponse.Item,company_info:companyInfoObj});
+                                                        //   }
+                                                        // })
                                                       })
                                                       .catch(function(e) {
                                                         console.error(e);
@@ -872,23 +929,50 @@ exports.getQuickbookData = (req,res) => {
                                                       } else {
                                                           oauthClient.makeApiCall({url: url + 'v3/company/' + companyID +'/query?query=select * from Item '})
                                                               .then(function(itemData){
-                                                                client.query('COMMIT', (err) => {
-                                                                  if (err) {
-                                                                    // console.log('Error committing transaction', err.stack)
-                                                                    handleResponse.shouldAbort(err, client, done);
-                                                                    handleResponse.handleError(res, err, ' Error in committing transaction');
-                                                                  } else {
-                                                                      // console.log("The response for API call is :"+JSON.stringify(itemData));
-                                                                      done();
-                                                                      let companyInfoObj = {
-                                                                        "invoice_timesheet_item_id":companySetting.rows[0].invoice_timesheet_item_id,
-                                                                        "invoice_other_item_id":companySetting.rows[0].invoice_other_item_id,
-                                                                        "invoice_fixedfee_item_id":companySetting.rows[0].invoice_fixedfee_item_id,
-                                                                        "invoice_expense_item_id":companySetting.rows[0].invoice_expense_item_id
-                                                                      }
-                                                                      handleResponse.sendSuccess(res,'Quickbook data fetched successfully',{itemArray:itemData.json.QueryResponse.Item,company_info:companyInfoObj});
-                                                                  }
-                                                                })
+                                                                console.log("The response for API call is :"+JSON.stringify(itemData));
+                                                                oauthClient.makeApiCall({url: url + 'v3/company/' + companyID +'/query?query=select * from term '})
+                                                                    .then(function(termData){
+                                                                      client.query('COMMIT', (err) => {
+                                                                        if (err) {
+                                                                          // console.log('Error committing transaction', err.stack)
+                                                                          handleResponse.shouldAbort(err, client, done);
+                                                                          handleResponse.handleError(res, err, ' Error in committing transaction');
+                                                                        } else {
+                                                                           console.log("The response for API call is :"+JSON.stringify(termData));
+                                                                            done();
+                                                                            let companyInfoObj = {
+                                                                              "invoice_timesheet_item_id":companySetting.rows[0].invoice_timesheet_item_id,
+                                                                              "invoice_other_item_id":companySetting.rows[0].invoice_other_item_id,
+                                                                              "invoice_fixedfee_item_id":companySetting.rows[0].invoice_fixedfee_item_id,
+                                                                              "invoice_expense_item_id":companySetting.rows[0].invoice_expense_item_id,
+                                                                              "invoice_terms":companySetting.rows[0].invoice_terms
+                                                                            }
+                                                                            handleResponse.sendSuccess(res,'Quickbook data fetched successfully',{itemArray:itemData.json.QueryResponse.Item,termArray:termData.json.QueryResponse.Term,company_info:companyInfoObj});
+                                                                          }
+                                                                        })
+                                                                    })
+                                                                    .catch(function(e) {
+                                                                        console.error(e);
+                                                                        handleResponse.shouldAbort(e, client, done);
+                                                                        handleResponse.handleError(res, e, ' Error in getting term info '+e);
+                                                                    });
+                                                                // client.query('COMMIT', (err) => {
+                                                                //   if (err) {
+                                                                //     // console.log('Error committing transaction', err.stack)
+                                                                //     handleResponse.shouldAbort(err, client, done);
+                                                                //     handleResponse.handleError(res, err, ' Error in committing transaction');
+                                                                //   } else {
+                                                                //       // console.log("The response for API call is :"+JSON.stringify(itemData));
+                                                                //       done();
+                                                                //       let companyInfoObj = {
+                                                                //         "invoice_timesheet_item_id":companySetting.rows[0].invoice_timesheet_item_id,
+                                                                //         "invoice_other_item_id":companySetting.rows[0].invoice_other_item_id,
+                                                                //         "invoice_fixedfee_item_id":companySetting.rows[0].invoice_fixedfee_item_id,
+                                                                //         "invoice_expense_item_id":companySetting.rows[0].invoice_expense_item_id
+                                                                //       }
+                                                                //       handleResponse.sendSuccess(res,'Quickbook data fetched successfully',{itemArray:itemData.json.QueryResponse.Item,company_info:companyInfoObj});
+                                                                //   }
+                                                                // })
                                                               })
                                                               .catch(function(e) {
                                                                   console.error(e);
