@@ -125,9 +125,17 @@
 
                         <!-- details start -->
 
-                        <!-- <div class="slds-p-bottom_small">
-                            <div class="slds-badge slds-badge_inverse text-size-13 slds-p-around_x-small max-w-250 text-center">Status: Draft</div>
-                        </div> -->
+                        <div class="slds-p-bottom_small">
+                          <% if(invoiceDetails.status == "DRAFT") { %>
+                              <div class="slds-badge slds-badge_inverse text-size-13 slds-p-around_x-small max-w-250 text-center">Status: <%= invoiceDetails.status %></div>
+                          <% } else if(invoiceDetails.status == "OVERDUE") { %>
+                              <div class="slds-badge slds-badge_inverse text-size-13 slds-p-around_x-small max-w-250 text-center bg-red">Status: <%= invoiceDetails.status %></div>
+                          <% } else if(invoiceDetails.status == "PAID") { %>
+                              <div class="slds-badge slds-badge_inverse text-size-13 slds-p-around_x-small max-w-250 text-center bg-green">Status: <%= invoiceDetails.status %></div>
+                          <% } else if(invoiceDetails.status == "POSTED") { %>
+                              <div class="slds-badge slds-badge_inverse text-size-13 slds-p-around_x-small max-w-250 text-center bg-orange">Status: <%= invoiceDetails.status %></div>
+                          <% } %>
+                        </div>
                         <div class=" slds-card slds-p-around_large sm-pd-10 slds-m-bottom_large" >
                             <div id="invoice-details-form" data-modified>
                                 <div class="slds-grid slds-wrap slds-gutters">
