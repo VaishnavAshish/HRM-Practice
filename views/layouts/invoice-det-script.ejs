@@ -794,6 +794,9 @@
             closeModal(modalId);
             hideLoader('#globalLoader');
             showGlobalToast('#globalToast', 'success', response.message, 4000);
+            setTimeout(function(){
+              location.reload();
+            },2000)
           },
           error: function(response){
             console.log(response);
