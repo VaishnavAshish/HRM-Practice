@@ -341,8 +341,7 @@ exports.postInvoiceToQuickbook = (req,res) => {
                                                         },
                                                         "TxnTaxDetail": {
                                                             "TxnTaxCodeRef": {
-                                                               "value": "3",
-                                                               "name": "Tucson"
+                                                               "value": "1"
                                                             },
                                                             "TotalTax": invoiceDetails.rows[0].final_amount - invoiceDetails.rows[0].total_amount
                                                          },
