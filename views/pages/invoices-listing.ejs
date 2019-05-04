@@ -340,8 +340,21 @@
                                                 <div class=" slds-m-bottom_medium slds-p-around_small slds-card">
                                                     <div class="slds-m-bottom_small">
                                                         <div class="slds-grid">
-                                                            <div class="slds-has-flexi-truncate">
+                                                            <!-- <div class="slds-has-flexi-truncate">
                                                                 <a href="/invoice-details?invoiceId=<%= invoice.id %>" class="text-size-16"><%= invoice.record_id %></a>
+                                                            </div> -->
+                                                            <div class="slds-has-flexi-truncate">
+                                                                <% if(invoice.status == "DRAFT") { %>
+                                                                  <div class="slds-badge slds-badge_inverse view-inline ">
+                                                                <% } else if(invoice.status == "OVERDUE") { %>
+                                                                  <div class="slds-badge slds-badge_inverse view-inline  bg-red">
+                                                                <% } else if(invoice.status == "PAID") { %>
+                                                                  <div class="slds-badge slds-badge_inverse view-inline  bg-green">
+                                                                <% } else if(invoice.status == "POSTED") { %>
+                                                                  <div class="slds-badge slds-badge_inverse view-inline  bg-orange">
+                                                                <% } %>
+                                                                  Status: <%= invoice.status %>
+                                                              </div>
                                                             </div>
                                                             <div class="slds-col--bump-left">
                                                                 <div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">
@@ -378,6 +391,9 @@
                                                     </div>
                                                     <div>
                                                         <div class="">
+                                                            <div class="slds-truncate">
+                                                                <a href="/invoice-details?invoiceId=<%= invoice.id %>" class="text-size-16">#<%= invoice.record_id %></a>
+                                                            </div>
                                                             <div class="slds-grid" title="Account">
                                                                 <div class="slds-no-flex slds-p-right_x-small">
                                                                     <i class="fa fa-user-tie"></i>

@@ -345,14 +345,24 @@ function setDataToCard(invoice){
     let currency_symbols = currencyWithSymbolArray.filter(function(currency){
         return currency.name == invoice.currency;
     })
+    let invoiceStatus;
+    if(invoice.status == "DRAFT") {
+        invoiceStatus='<div class="slds-badge slds-badge_inverse view-inline ">';
+    } else if(invoice.status == "OVERDUE") {
+        invoiceStatus='<div class="slds-badge slds-badge_inverse view-inline  bg-red">';
+    } else if(invoice.status == "PAID") {
+        invoiceStatus='<div class="slds-badge slds-badge_inverse view-inline  bg-green">';
+    } else if(invoice.status == "POSTED") {
+        invoiceStatus='<div class="slds-badge slds-badge_inverse view-inline  bg-orange">';
+    }
     let invoiceCard='<div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_3-of-12 slds-p-horizontal_small">'+
                         '<div class=" slds-m-bottom_medium slds-p-around_small slds-card">'+
                             '<div class="slds-m-bottom_small">'+
                                 '<div class="slds-grid">'+
                                     '<div class="slds-has-flexi-truncate">'+
-                                        '<div class="slds-truncate">'+
-                                            '<a href="/invoice-details?invoiceId='+ invoice.id +'" class="text-size-16">'+invoice.record_id +'</a>'+
-                                        '</div>'+
+                                          invoiceStatus+
+                                          'Status: '+invoice.id+
+                                        '</div>'
                                     '</div>'+
                                     '<div class="slds-col--bump-left">'+
                                         '<div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">'+
@@ -389,6 +399,9 @@ function setDataToCard(invoice){
                             '</div>'+
                             '<div>'+
                                 '<div class="">'+
+                                    '<div class="slds-truncate">'+
+                                        '<a href="/invoice-details?invoiceId='+ invoice.id +'" class="text-size-16"># '+invoice.record_id +'</a>'+
+                                    '</div>'+
                                     '<div class="slds-grid">'+
                                         '<div class="slds-no-flex slds-p-right_x-small">'+
                                             '<i class="fa fa-user-tie"></i>'+
@@ -448,7 +461,7 @@ function setDataToTable(invoice){
                         '<div class="slds-truncate" title="">'+
                             '<span class="text-uppercase">'+
                                     invoiceStatus+
-                                     invoice.status
+                                     invoice.status+
                                 '</span>'+
                             '</span>'+
                         '</div>'+
