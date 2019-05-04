@@ -331,9 +331,9 @@ exports.postInvoiceToQuickbook = (req,res) => {
                                                         lineItemArray.push(lineItemObj);
                                                       }
 
+                                                      // "TxnDate":invoiceDetails.rows[0].due_date,
                                                       let invoiceData={
                                                         "Line": lineItemArray,
-                                                        // "TxnDate":invoiceDetails.rows[0].due_date,
                                                         "ApplyTaxAfterDiscount":false,
                                                         "AllowOnlinePayment":true,
                                                         "SalesTermRef": {
