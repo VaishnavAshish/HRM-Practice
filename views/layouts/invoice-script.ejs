@@ -429,6 +429,8 @@ function setDataToTable(invoice){
         invoiceStatus='<span class="text-uppercase text-red">';
     } else if(invoice.status == "PAID") {
         invoiceStatus='<span class="text-uppercase text-green">';
+    } else if(invoice.status == "POSTED") {
+        invoiceStatus='<span class="text-uppercase text-orange">';
     }
     let currencyWithSymbolArray= <%- JSON.stringify(currencyWithSymbolArray) %>
     let currency_symbols = currencyWithSymbolArray.filter(function(currency){
@@ -440,6 +442,15 @@ function setDataToTable(invoice){
                             '<a href="/invoice-details?invoiceId='+invoice.id+'" tabindex="-1">'+
                                 invoice.record_id+
                             '</a>'+
+                        '</div>'+
+                    '</td>'+
+                    '<td role="gridcell">'+
+                        '<div class="slds-truncate" title="">'+
+                            '<span class="text-uppercase">'+
+                                    invoiceStatus+
+                                     invoice.status
+                                '</span>'+
+                            '</span>'+
                         '</div>'+
                     '</td>'+
                     '<td role="gridcell">'+

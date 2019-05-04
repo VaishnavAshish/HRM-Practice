@@ -446,8 +446,8 @@ exports.insertNewInvoiceItem = (req, res) => {
                          let invoiceLineData = {};
                          invoiceLineData.amount = parseFloat(req.body.invoice_unit_price)*parseFloat(req.body.invoice_quantity);
                          invoiceLineData.user_id = req.user.id;
-                         invoiceLineData.quantity = parseFloat(req.body.invoice_unit_price);
-                         invoiceLineData.unit_price = parseFloat(req.body.invoice_quantity);
+                         invoiceLineData.quantity = parseFloat(req.body.invoice_quantity);
+                         invoiceLineData.unit_price = parseFloat(req.body.invoice_unit_price);
                          invoiceLineData.note = req.body.description;
                          invoiceLineData.id = null;
                          invoiceLineData.user_role = '';

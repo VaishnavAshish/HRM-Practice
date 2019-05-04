@@ -443,7 +443,7 @@ exports.postInvoiceToQuickbook = (req,res) => {
                                                                 if(index == (invoiceLineItems.rows.length-1)){
                                                                   console.log('invoiceResponse.Id')
                                                                   console.log(invoiceResponse.Id)
-                                                                  client.query('UPDATE INVOICE set quickbook_invoice_id=$1 where id=$2',[invoiceResponse.Id,req.body.invoiceId], function(err, updatedInvoiceInfo) {
+                                                                  client.query('UPDATE INVOICE set quickbook_invoice_id=$1,status=$2 where id=$3',[invoiceResponse.Id,'POSTED',req.body.invoiceId], function(err, updatedInvoiceInfo) {
                                                                     if (err){
                                                                       handleResponse.shouldAbort(err, client, done);
                                                                       handleResponse.handleError(res, err, ' Error in updating invoice');
