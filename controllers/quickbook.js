@@ -60,7 +60,7 @@ exports.changeQuickbookAccount = (req,res) => {
                handleResponse.shouldAbort(err, client, done);
                handleResponse.handleError(res, err, ' Error in updating settings');
              } else {
-               client.query('UPDATE INVOICE set quickbook_invoice_id=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedInvoice) {
+               client.query('UPDATE INVOICE set quickbook_invoice_id=$1,status=$2 where company_id=$3 AND status=$4 RETURNING id',[null,'DRAFT', req.user.company_id,'POSTED'], function(err, updatedInvoice) {
                  if (err){
                    handleResponse.shouldAbort(err, client, done);
                    handleResponse.handleError(res, err, ' Error in updating settings');
