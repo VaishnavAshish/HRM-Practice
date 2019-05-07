@@ -525,6 +525,8 @@ exports.getTimesheet = (req, res) => {
                                   let timesheetNotSubmitted = timesheetListByDate.rows.filter(timesheetRecord => timesheetRecord.submitted == false);
                                   if(timesheetNotSubmitted.length>0){
                                     timesheetSubmitFlag = false;
+                                  }else if(timesheetListByDate.rows.length<=0){
+                                    timesheetSubmitFlag = false;
                                   }
                                   if(req.user.permissions.includes('timesheetApprover')) {
                                       getAllCompanyUsers(req, client, err, done, res, function (users) {
