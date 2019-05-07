@@ -1023,7 +1023,7 @@ exports.insertExpenseInvoiceItem = (req, res) => {
                                               // console.log("Step 4");
                                               if(result) {
                                                   count++;
-                                                  done();
+                                                  // done();
                                                   if(expenseList.rows.length===count){
                                                     client.query('COMMIT', (err) => {
                                                       if (err) {
@@ -1031,6 +1031,7 @@ exports.insertExpenseInvoiceItem = (req, res) => {
                                                         handleResponse.shouldAbort(err, client, done);
                                                         handleResponse.handleError(res, err, ' Error in committing transaction');
                                                       } else {
+                                                        done();
                                                         handleResponse.sendSuccess(res,'Invoice line item for expense data added successfully',{});
                                                         /*res.status(200).json({ "success": true, "message":"success" });*/
                                                       }
@@ -2260,7 +2261,7 @@ let account_address = `<strong>${accountDetails.name}</strong><BR />
                                                                 </td>
                                                                 <td>
                                                                     <div class="">
-                                                                        ${invoiceDetails.record_id}
+                                                                        Invoice-${invoiceDetails.id}
                                                                     </div>
                                                                 </td>
                                                             </tr>
@@ -2497,7 +2498,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
                                                                             Invoice
                                                                         </td>
                                                                         <td align="right" style=" font-size:14px;font-family: arial,sans-serif; padding:10px; border-bottom: 1px solid #eee; ">
-                                                                            ${invoiceDetails.record_id}
+                                                                            Invoice-${invoiceDetails.id}
                                                                         </td>
                                                                     </tr>
                                                                     <tr>
