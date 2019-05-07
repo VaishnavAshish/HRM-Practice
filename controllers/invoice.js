@@ -1079,7 +1079,11 @@ exports.insertExpenseInvoiceItem = (req, res) => {
                                               updateExpenseRecord(req, res, client, err, done, expense, function (result) {
                                                   if(result) {
                                                       count++;
-                                                      done();
+                                                      // done();
+                                                      console.log('expense added to invoice are');
+                                                      console.log(expense);
+                                                      console.log(count);
+
                                                       if(expenseList.rows.length===count){
                                                         client.query('COMMIT', (err) => {
                                                           if (err) {
@@ -1087,13 +1091,14 @@ exports.insertExpenseInvoiceItem = (req, res) => {
                                                             handleResponse.shouldAbort(err, client, done);
                                                             handleResponse.handleError(res, err, ' Error in committing transaction');
                                                           } else {
+                                                            done();
                                                             handleResponse.sendSuccess(res,'Invoice line item for expense data added successfully',{});
                                                           }
                                                         })
                                                           /*res.status(200).json({ "success": true, "message":"success" });*/
                                                       } else{
-                                                        handleResponse.shouldAbort(' Error in creating invoice line item for expense data', client, done);
-                                                        handleResponse.handleError(res, ' Error in creating invoice line item for expense data', ' Error in creating invoice line item for expense data');
+                                                        // handleResponse.shouldAbort(' Error in creating invoice line item for expense data', client, done);
+                                                        // handleResponse.handleError(res, ' Error in creating invoice line item for expense data', ' Error in creating invoice line item for expense data');
                                                           // console.log('count is '+count+' and length is '+expenseList.rows.length);
                                                       }
                                                   }
