@@ -1164,3 +1164,28 @@ AFTER UPDATE
 ON invoice
 FOR EACH ROW
 EXECUTE PROCEDURE calculate_invoice_tax_amount();
+
+--date-07-05-2019
+
+CREATE OR REPLACE FUNCTION change_invoice_sequence_number()
+  RETURNS trigger LANGUAGE plpgsql AS
+$BODY$
+DECLARE
+  	invoice_start_number INT;
+BEGIN
+	IF NEW.invoice_starting_number <> 1 THEN
+		RAISE NOTICE 'invoice_starting_number(%)', NEW.invoice_starting_number;
+		SELECT INTO invoice_start_number setval('invoice_id_seq', NEW.invoice_starting_number, TRUE);
+
+
+  	END IF;
+ RETURN NEW;
+END;
+$BODY$
+
+
+CREATE TRIGGER update_invoice_seq_number
+AFTER UPDATE
+ON setting
+FOR EACH ROW
+EXECUTE PROCEDURE change_invoice_sequence_number();
