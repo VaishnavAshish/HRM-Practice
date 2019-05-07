@@ -95,6 +95,10 @@
                                                 <div class="slds-text-heading_medium slds-truncate">
                                                     <strong id="current-display-week-date"></strong>
                                                     <small class="text-dull">[Week]</small>
+                                                    <% if(timesheetSubmitFlag){ %>
+                                                      <strong class="slds-m-left_medium text-green">Submitted</strong>
+                                                    <% } %>
+
                                                 </div>
                                             </div>
                                             <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
@@ -128,7 +132,8 @@
                                                     <i class=" fa fa-plus" aria-hidden="true"></i>
                                                     Add Row
                                                     </button>
-                                                    <button class="slds-button slds-button_brand" onclick="saveWeeklyTimesheet(this, 'Day');">Save</button>
+                                                    <button class="slds-button slds-button_success" onclick="submitWeeklyTimesheet(this);">Submit</button>
+                                                    <!-- <button class="slds-button slds-button_brand" onclick="saveWeeklyTimesheet(this, 'Day');">Save</button> -->
                                                 </div>
                                             </div>
                                         </div>
@@ -360,7 +365,8 @@
                                                     <!-- <button class="slds-button slds-button_neutral" onclick="exportTimesheetCsv()">
                                                       Export Timesheet
                                                     </button> -->
-                                                    <button class="slds-button slds-button_brand" onclick="submitWeeklyTimesheet(this);">Submit</button>
+                                                    <button class="slds-button slds-button_brand" onclick="saveWeeklyTimesheet(this, 'Day');">Save</button>
+                                                    <!-- <button class="slds-button slds-button_brand bg-green" onclick="submitWeeklyTimesheet(this);">Submit</button> -->
                                                 </div>
                                             </div>
                                         </div>
@@ -391,7 +397,7 @@
                                                         <i class=" fa fa-plus" aria-hidden="true"></i>
                                                         Add
                                                     </button>
-                                                    <button class="slds-button slds-button_brand" onclick="submitDayTimesheet(this)">Submit</button>
+                                                    <button class="slds-button slds-button_success" onclick="submitDayTimesheet(this)">Submit</button>
                                                     <!-- submitDayTimesheet(this) -->
                                                 </div>
                                             </div>

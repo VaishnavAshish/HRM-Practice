@@ -436,46 +436,64 @@ exports.insertNewInvoiceItem = (req, res) => {
                handleResponse.shouldAbort(err, client, done);
                handleResponse.handleError(res, err, ' Error in connecting to database.');
              } else {
-               client.query('SELECT currency FROM invoice WHERE id=$1', [req.body.invoiceId], function (err, invoiceDetail) {
-                   if (err) {
-                       console.error(err);
-                       handleResponse.shouldAbort(err, client, done);
-                       handleResponse.handleError(res, err, ' Error in finding invoice data for inserting new line item. ');
-                   } else {
-                       if(invoiceDetail.rowCount>0){
-                         let invoiceLineData = {};
-                         invoiceLineData.amount = parseFloat(req.body.invoice_unit_price)*parseFloat(req.body.invoice_quantity);
-                         invoiceLineData.user_id = req.user.id;
-                         invoiceLineData.quantity = parseFloat(req.body.invoice_quantity);
-                         invoiceLineData.unit_price = parseFloat(req.body.invoice_unit_price);
-                         invoiceLineData.note = req.body.description;
-                         invoiceLineData.id = null;
-                         invoiceLineData.user_role = '';
-                         invoiceLineData.type = req.body.invoice_line_type;
-                         invoiceLineData.currency = invoiceDetail.rows[0].currency;
-                         // ['Expense', new Date(), req.body.projectId, req.body.accountId, req.body.invoiceId, req.user.company_id, new Date(), new Date(), data.amount, data.user_id, data.quantity, data.amount, data.note, data.id, data.user_role]
-                         addInvoiceLineItem(req, res, client, err, done, invoiceLineData, function (result) {
-                             if(result) {
-                               client.query('COMMIT', (err) => {
-                                 if (err) {
-                                   console.error('Error committing transaction', err.stack)
-                                   handleResponse.shouldAbort(err, client, done);
-                                   handleResponse.handleError(res, err, ' Error in committing transaction');
-                                 } else {
-                                    handleResponse.sendSuccess(res,'New invoice line item added successfully',{});
+               client.query('SELECT invoice_timesheet_note,invoice_fixedfee_note,invoice_expense_note,invoice_other_note FROM setting WHERE company_id=$1', [req.user.company_id], function (err, companySetting) {
+                 if (err) {
+                     console.error(err);
+                     handleResponse.shouldAbort(err, client, done);
+                     handleResponse.handleError(res, err, ' Error in finding company setting ');
+                 } else {
+                   client.query('SELECT currency FROM invoice WHERE id=$1', [req.body.invoiceId], function (err, invoiceDetail) {
+                       if (err) {
+                           console.error(err);
+                           handleResponse.shouldAbort(err, client, done);
+                           handleResponse.handleError(res, err, ' Error in finding invoice data for inserting new line item. ');
+                       } else {
+                           if(invoiceDetail.rowCount>0){
+                             let invoiceLineData = {};
+                             invoiceLineData.amount = parseFloat(req.body.invoice_unit_price)*parseFloat(req.body.invoice_quantity);
+                             invoiceLineData.user_id = req.user.id;
+                             invoiceLineData.quantity = parseFloat(req.body.invoice_quantity);
+                             invoiceLineData.unit_price = parseFloat(req.body.invoice_unit_price);
+                             if(req.body.description){
+                               invoiceLineData.note = req.body.description;
+                             }else{
+                               if(req.body.invoice_line_type == 'Timesheet'){
+                                  invoiceLineData.note = companySetting.rows[0].invoice_timesheet_note;
+                               }else if(req.body.invoice_line_type == 'Expense'){
+                                 invoiceLineData.note = companySetting.rows[0].invoice_expense_note;
+                               }else if(req.body.invoice_line_type == 'Other'){
+                                 invoiceLineData.note = companySetting.rows[0].invoice_other_note;
+                               }
+                             }
+                             invoiceLineData.id = null;
+                             invoiceLineData.user_role = '';
+                             invoiceLineData.type = req.body.invoice_line_type;
+                             invoiceLineData.currency = invoiceDetail.rows[0].currency;
+                             // ['Expense', new Date(), req.body.projectId, req.body.accountId, req.body.invoiceId, req.user.company_id, new Date(), new Date(), data.amount, data.user_id, data.quantity, data.amount, data.note, data.id, data.user_role]
+                             addInvoiceLineItem(req, res, client, err, done, invoiceLineData, function (result) {
+                                 if(result) {
+                                   client.query('COMMIT', (err) => {
+                                     if (err) {
+                                       console.error('Error committing transaction', err.stack)
+                                       handleResponse.shouldAbort(err, client, done);
+                                       handleResponse.handleError(res, err, ' Error in committing transaction');
+                                     } else {
+                                        handleResponse.sendSuccess(res,'New invoice line item added successfully',{});
+                                    }
+                                  })
+                                } else{
+                                  handleResponse.shouldAbort('Error in creating invoice data', client, done);
+                                  handleResponse.handleError(res, 'Error in creating invoice data', 'Error in creating invoice data.');
                                 }
-                              })
-                            } else{
-                              handleResponse.shouldAbort('Error in creating invoice data', client, done);
-                              handleResponse.handleError(res, 'Error in creating invoice data', 'Error in creating invoice data.');
-                            }
-                         });
-                       }else{
-                         handleResponse.shouldAbort('Error in finding invoice data', client, done);
-                         handleResponse.handleError(res, 'Error in finding invoice data', 'Error in finding invoice data.');
-                       }
-                     }
-                 });           // INSERT INTO INVOICE_LINE_ITEM (type,item_date,project_id,account_id,invoice_id,company_id,created_date, updated_date, total_amount, user_id, quantity, unit_price, note, expense_id, user_role)
+                             });
+                           }else{
+                             handleResponse.shouldAbort('Error in finding invoice data', client, done);
+                             handleResponse.handleError(res, 'Error in finding invoice data', 'Error in finding invoice data.');
+                           }
+                         }
+                     });
+                   }
+                 })
                }
              })
          });
@@ -530,36 +548,46 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
                                           handleResponse.shouldAbort(err, client, done);
                                           handleResponse.handleError(res, err, ' Error in finding currency from project for timesheet data');
                                       } else {
-                                          if(projectDetails.rowCount > 0) {
-                                              let projectData = {};
-                                              projectData.amount = projectDetails.rows[0].project_cost != null ? parseInt(projectDetails.rows[0].project_cost) : 0;
-                                              projectData.user_id = req.user.id;
-                                              projectData.quantity = 1;
-                                              projectData.unit_price = projectDetails.rows[0].project_cost != null ? parseInt(projectDetails.rows[0].project_cost) : 0;
-                                              projectData.note = 'Fixed Fee';
-                                              projectData.id = null;
-                                              projectData.user_role = '';
-                                              projectData.type = 'Fixed Fee Project';
-                                              projectData.currency = projectDetails.rows[0].currency;
-                                              // ['Expense', new Date(), req.body.projectId, req.body.accountId, req.body.invoiceId, req.user.company_id, new Date(), new Date(), data.amount, data.user_id, data.quantity, data.amount, data.note, data.id, data.user_role]
-                                              addInvoiceLineItem(req, res, client, err, done, projectData, function (result) {
-                                                  if(result) {
-                                                    client.query('COMMIT', (err) => {
-                                                      if (err) {
-                                                        console.error('Error committing transaction', err.stack)
-                                                        handleResponse.shouldAbort(err, client, done);
-                                                        handleResponse.handleError(res, err, ' Error in committing transaction');
+                                        client.query('SELECT invoice_fixedfee_note FROM setting WHERE company_id=$1', [req.user.company_id], function (err, companySetting) {
+                                            if (err) {
+                                                console.error(err);
+                                                handleResponse.shouldAbort(err, client, done);
+                                                handleResponse.handleError(res, err, ' Error in finding company setting ');
+                                            } else {
+
+                                              if(projectDetails.rowCount > 0) {
+                                                  let projectData = {};
+                                                  projectData.amount = projectDetails.rows[0].project_cost != null ? parseInt(projectDetails.rows[0].project_cost) : 0;
+                                                  projectData.user_id = req.user.id;
+                                                  projectData.quantity = 1;
+                                                  projectData.unit_price = projectDetails.rows[0].project_cost != null ? parseInt(projectDetails.rows[0].project_cost) : 0;
+                                                  projectData.note = companySetting.rows[0].invoice_fixedfee_note;
+                                                  projectData.id = null;
+                                                  projectData.user_role = '';
+                                                  projectData.type = 'Fixed Fee Project';
+                                                  projectData.currency = projectDetails.rows[0].currency;
+                                                  // ['Expense', new Date(), req.body.projectId, req.body.accountId, req.body.invoiceId, req.user.company_id, new Date(), new Date(), data.amount, data.user_id, data.quantity, data.amount, data.note, data.id, data.user_role]
+                                                  addInvoiceLineItem(req, res, client, err, done, projectData, function (result) {
+                                                      if(result) {
+                                                        client.query('COMMIT', (err) => {
+                                                          if (err) {
+                                                            console.error('Error committing transaction', err.stack)
+                                                            handleResponse.shouldAbort(err, client, done);
+                                                            handleResponse.handleError(res, err, ' Error in committing transaction');
+                                                          } else {
+                                                              handleResponse.sendSuccess(res,'Invoice line item for timesheet data added successfully',{});
+                                                          }
+                                                        })
                                                       } else {
-                                                          handleResponse.sendSuccess(res,'Invoice line item for timesheet data added successfully',{});
+                                                        handleResponse.shouldAbort('Error in creating invoice data', client, done);
+                                                        handleResponse.handleError(res, 'Error in creating invoice data', 'Error in creating invoice data');
                                                       }
-                                                    })
-                                                  } else {
-                                                    handleResponse.shouldAbort('Error in creating invoice data', client, done);
-                                                    handleResponse.handleError(res, 'Error in creating invoice data', 'Error in creating invoice data');
-                                                  }
-                                              });
-                                              // INSERT INTO INVOICE_LINE_ITEM (type,item_date,project_id,account_id,invoice_id,company_id,created_date, updated_date, total_amount, user_id, quantity, unit_price, note, expense_id, user_role)
-                                          }
+                                                  });
+                                                  // INSERT INTO INVOICE_LINE_ITEM (type,item_date,project_id,account_id,invoice_id,company_id,created_date, updated_date, total_amount, user_id, quantity, unit_price, note, expense_id, user_role)
+                                              }
+                                            }
+                                          })
+
                                         }
                                     });
                                 }
@@ -581,71 +609,79 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
                               handleResponse.shouldAbort(err, client, done);
                               handleResponse.handleError(res, err, ' Error in connecting to database.');
                             } else {
-                              // select resource_id, project_id, task_id, user_role, SUM(total_work_hours) as TWH from timesheet_line_item where project_id=7 AND invoiced=false AND created_date>= '2018-09-01' AND created_date<='2018-09-20' AND submitted=true GROUP BY resource_id, project_id, task_id, user_role
-                                client.query('select tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category ,tl.week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime  ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id from timesheet_line_item tl where submitted=$1 and invoiced=$2 and billable=$3 and project_id=$4 AND created_date>= $5 AND created_date<=$6 order by project_id, resource_id, user_role', [true, false, true, req.body.projectId, moment.tz(req.body.start_date.split('T')[0], companyDefaultTimezone).format(),moment.tz(req.body.end_date.split('T')[0], companyDefaultTimezone).format()], function (err, lineItems) {
-                                    if (err) {
-                                        console.error(err);
-                                        handleResponse.shouldAbort(err, client, done);
-                                        handleResponse.handleError(res, err, ' Error in finding timesheet data with start_date');
-                                    }  else {
-                                        if(lineItems.rows.length>0) {
-                                          createGroupedObjWithProject(lineItems.rows, function (concatData) {
-                                              // console.log("response get");
-                                              // console.log(concatData);
-                                              client.query('SELECT pa.id ,pa.company_id ,pa.account_id ,pa.user_id ,pa.project_id ,pa.created_by ,pa.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,pa.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,pa.bill_rate ,pa.cost_rate ,pa.user_role ,pa.record_id FROM PROJECT_ASSIGNMENT pa WHERE project_id=$1 AND company_id=$2', [req.body.projectId, req.user.company_id], function (err, projectAssignments) {
-                                                  if (err) {
-                                                      handleResponse.shouldAbort(err, client, done);
-                                                      handleResponse.handleError(res, err, ' Error in finding project assginment for timesheet data');
-                                                  } else {
-                                                      calculateBR_CR_andGrouped(req, res, client, err, done, concatData, projectAssignments.rows, function(projectRows) {
-                                                          console.log("Grouped and calculate data");
-                                                          console.log(JSON.stringify(projectRows));
-                                                          projectRows.forEach(function (projectRow, index) {
-                                                              client.query('INSERT INTO INVOICE_LINE_ITEM (type,item_date,project_id,account_id,invoice_id,company_id,created_date, updated_date, amount, total_amount, quantity, currency, timesheet_row_id, user_id, user_role, unit_price,timesheet_id,note) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18) RETURNING id', ['Timesheet', 'now()', req.body.projectId, req.body.accountId, req.body.invoiceId, req.user.company_id, 'now()', 'now()', projectRow.totalProjectCost, projectRow.totalProjectCost, parseInt(projectRow.totalHours), companyDefaultCurrency, projectRow.lineItemIds, projectRow.resource_id, projectRow.user_role, parseInt(projectRow.unit_price), projectRow.timesheet_id,"Hours"], function (err, invoiceLineItem) {
-                                                                  if (err) {
-                                                                      console.error(err);
-                                                                      handleResponse.shouldAbort(err, client, done);
-                                                                      handleResponse.handleError(res, err, ' Error in adding invoice line item data to the database');
-                                                                  } else {
-                                                                      // console.log("Line Item inserted");
-                                                                      createRecordArr(projectRow.lineItemIds, function (lineItemIds) {
-                                                                          // console.log(lineItemIds);
-                                                                          client.query('UPDATE TIMESHEET_LINE_ITEM SET invoiced=$1,invoice_id=$2 WHERE id IN '+lineItemIds, [true,req.body.invoiceId], function (err, timesheetUpdatedItem) {
-                                                                              if (err) {
-                                                                                  console.error(err);
-                                                                                  handleResponse.shouldAbort(err, client, done);
-                                                                                  handleResponse.handleError(res, err, ' Error in updating timesheet data');
-                                                                              } else {
-                                                                                  if(projectRows.length == (index+1)) {
-                                                                                    client.query('COMMIT', (err) => {
-                                                                                      if (err) {
-                                                                                        console.error('Error committing transaction', err.stack)
-                                                                                        handleResponse.shouldAbort(err, client, done);
-                                                                                        handleResponse.handleError(res, err, ' Error in committing transaction');
-                                                                                      } else {
-                                                                                        done();
-                                                                                        handleResponse.sendSuccess(res,'Invoice line item for timesheet data added successfully',{});
+                              client.query('SELECT invoice_timesheet_note FROM setting WHERE company_id=$1', [req.user.company_id], function (err, companySetting) {
+                                  if (err) {
+                                      console.error(err);
+                                      handleResponse.shouldAbort(err, client, done);
+                                      handleResponse.handleError(res, err, ' Error in finding company setting ');
+                                  } else {
+                                  // select resource_id, project_id, task_id, user_role, SUM(total_work_hours) as TWH from timesheet_line_item where project_id=7 AND invoiced=false AND created_date>= '2018-09-01' AND created_date<='2018-09-20' AND submitted=true GROUP BY resource_id, project_id, task_id, user_role
+                                    client.query('select tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category ,tl.week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime  ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id from timesheet_line_item tl where submitted=$1 and invoiced=$2 and billable=$3 and project_id=$4 AND created_date>= $5 AND created_date<=$6 order by project_id, resource_id, user_role', [true, false, true, req.body.projectId, moment.tz(req.body.start_date.split('T')[0], companyDefaultTimezone).format(),moment.tz(req.body.end_date.split('T')[0], companyDefaultTimezone).format()], function (err, lineItems) {
+                                        if (err) {
+                                            console.error(err);
+                                            handleResponse.shouldAbort(err, client, done);
+                                            handleResponse.handleError(res, err, ' Error in finding timesheet data with start_date');
+                                        }  else {
+                                            if(lineItems.rows.length>0) {
+                                              createGroupedObjWithProject(lineItems.rows, function (concatData) {
+                                                  // console.log("response get");
+                                                  // console.log(concatData);
+                                                  client.query('SELECT pa.id ,pa.company_id ,pa.account_id ,pa.user_id ,pa.project_id ,pa.created_by ,pa.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,pa.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,pa.bill_rate ,pa.cost_rate ,pa.user_role ,pa.record_id FROM PROJECT_ASSIGNMENT pa WHERE project_id=$1 AND company_id=$2', [req.body.projectId, req.user.company_id], function (err, projectAssignments) {
+                                                      if (err) {
+                                                          handleResponse.shouldAbort(err, client, done);
+                                                          handleResponse.handleError(res, err, ' Error in finding project assginment for timesheet data');
+                                                      } else {
+                                                          calculateBR_CR_andGrouped(req, res, client, err, done, concatData, projectAssignments.rows, function(projectRows) {
+                                                              console.log("Grouped and calculate data");
+                                                              console.log(JSON.stringify(projectRows));
+                                                              projectRows.forEach(function (projectRow, index) {
+                                                                  client.query('INSERT INTO INVOICE_LINE_ITEM (type,item_date,project_id,account_id,invoice_id,company_id,created_date, updated_date, amount, total_amount, quantity, currency, timesheet_row_id, user_id, user_role, unit_price,timesheet_id,note) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18) RETURNING id', ['Timesheet', 'now()', req.body.projectId, req.body.accountId, req.body.invoiceId, req.user.company_id, 'now()', 'now()', projectRow.totalProjectCost, projectRow.totalProjectCost, parseInt(projectRow.totalHours), companyDefaultCurrency, projectRow.lineItemIds, projectRow.resource_id, projectRow.user_role, parseInt(projectRow.unit_price), projectRow.timesheet_id,companySetting.rows[0].invoice_timesheet_note], function (err, invoiceLineItem) {
+                                                                      if (err) {
+                                                                          console.error(err);
+                                                                          handleResponse.shouldAbort(err, client, done);
+                                                                          handleResponse.handleError(res, err, ' Error in adding invoice line item data to the database');
+                                                                      } else {
+                                                                          // console.log("Line Item inserted");
+                                                                          createRecordArr(projectRow.lineItemIds, function (lineItemIds) {
+                                                                              // console.log(lineItemIds);
+                                                                              client.query('UPDATE TIMESHEET_LINE_ITEM SET invoiced=$1,invoice_id=$2 WHERE id IN '+lineItemIds, [true,req.body.invoiceId], function (err, timesheetUpdatedItem) {
+                                                                                  if (err) {
+                                                                                      console.error(err);
+                                                                                      handleResponse.shouldAbort(err, client, done);
+                                                                                      handleResponse.handleError(res, err, ' Error in updating timesheet data');
+                                                                                  } else {
+                                                                                      if(projectRows.length == (index+1)) {
+                                                                                        client.query('COMMIT', (err) => {
+                                                                                          if (err) {
+                                                                                            console.error('Error committing transaction', err.stack)
+                                                                                            handleResponse.shouldAbort(err, client, done);
+                                                                                            handleResponse.handleError(res, err, ' Error in committing transaction');
+                                                                                          } else {
+                                                                                            done();
+                                                                                            handleResponse.sendSuccess(res,'Invoice line item for timesheet data added successfully',{});
+                                                                                          }
+                                                                                        })
                                                                                       }
-                                                                                    })
                                                                                   }
-                                                                              }
+                                                                              });
                                                                           });
-                                                                      });
-                                                                  }
+                                                                      }
+                                                                  });
                                                               });
                                                           });
-                                                      });
-                                                  }
+                                                      }
+                                                  });
                                               });
-                                          });
 
-                                        } else {
-                                            // console.log("Step 18");
-                                            done();
-                                            handleResponse.handleError(res, 'timesheet not found', ' No timesheet associated with this project is left for invoicing');
+                                            } else {
+                                                // console.log("Step 18");
+                                                done();
+                                                handleResponse.handleError(res, 'timesheet not found', ' No timesheet associated with this project is left for invoicing');
+                                            }
                                         }
-                                    }
-                                });
+                                    });
+                                  }
+                                })
                               }
                             })
                          });
@@ -656,71 +692,79 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
                               handleResponse.shouldAbort(err, client, done);
                               handleResponse.handleError(res, err, ' Error in connecting to database.');
                             } else {
-                                client.query('select tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category ,tl.week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime  ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id from timesheet_line_item tl where submitted=$1 and invoiced=$2 and billable=$3 and project_id=$4 order by project_id, resource_id, user_role', [true, false, true, req.body.projectId], function (err, lineItems) {
-                                    if (err) {
-                                        console.error(err);
-                                        handleResponse.shouldAbort(err, client, done);
-                                        handleResponse.handleError(res, err, ' Error in finding timesheet data');
-                                    }  else {
-                                        if(lineItems.rows.length>0) {
-                                            console.log('lineitem data is')
-                                            console.log(JSON.stringify(lineItems.rows));
-                                            createGroupedObjWithProject(lineItems.rows, function (concatData) {
-                                                console.log("response get");
-                                                console.log("concatdata"+JSON.stringify(concatData));
-                                                client.query('SELECT pa.id ,pa.company_id ,pa.account_id ,pa.user_id ,pa.project_id ,pa.created_by ,pa.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,pa.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,pa.bill_rate ,pa.cost_rate ,pa.user_role ,pa.record_id FROM PROJECT_ASSIGNMENT pa WHERE project_id=$1 AND company_id=$2', [req.body.projectId, req.user.company_id], function (err, projectAssignments) {
-                                                    if (err) {
-                                                        handleResponse.shouldAbort(err, client, done);
-                                                        handleResponse.handleError(res, err, ' Error in finding project assginment for timesheet data');
-                                                    } else {
-                                                        calculateBR_CR_andGrouped(req, res, client, err, done, concatData, projectAssignments.rows, function(projectRows) {
-                                                            console.log("Grouped and calculate data");
-                                                            console.log(JSON.stringify(projectRows));
-                                                            projectRows.forEach(function (projectRow, index) {
-                                                                client.query('INSERT INTO INVOICE_LINE_ITEM (type,item_date,project_id,account_id,invoice_id,company_id,created_date, updated_date, amount, total_amount, quantity, currency, timesheet_row_id, user_id, user_role, unit_price,timesheet_id,note) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18) RETURNING id', ['Timesheet', 'now()', req.body.projectId, req.body.accountId, req.body.invoiceId, req.user.company_id, 'now()', 'now()', projectRow.totalProjectCost, projectRow.totalProjectCost, parseInt(projectRow.totalHours), companyDefaultCurrency, projectRow.lineItemIds, projectRow.resource_id, projectRow.user_role, parseInt(projectRow.unit_price),projectRow.timesheet_id,"Hours"], function (err, invoiceLineItem) {
-                                                                    if (err) {
-                                                                        console.error(err);
-                                                                        handleResponse.shouldAbort(err, client, done);
-                                                                        handleResponse.handleError(res, err, ' Error in adding invoice line item data to the database');
-                                                                    } else {
-                                                                        // console.log("Line Item inserted");
-                                                                        createRecordArr(projectRow.lineItemIds, function (lineItemIds) {
-                                                                            // console.log(lineItemIds);
-                                                                            client.query('UPDATE TIMESHEET_LINE_ITEM SET invoiced=$1,invoice_id=$2 WHERE id IN '+lineItemIds, [true,req.body.invoiceId], function (err, timesheetUpdatedItem) {
-                                                                                if (err) {
-                                                                                    console.error(err);
-                                                                                    handleResponse.shouldAbort(err, client, done);
-                                                                                    handleResponse.handleError(res, err, ' Error in updating timesheet data');
-                                                                                } else {
-                                                                                    if(projectRows.length == (index+1)) {
-                                                                                      client.query('COMMIT', (err) => {
-                                                                                        if (err) {
-                                                                                          console.error('Error committing transaction', err.stack)
-                                                                                          handleResponse.shouldAbort(err, client, done);
-                                                                                          handleResponse.handleError(res, err, ' Error in committing transaction');
-                                                                                        } else {
-                                                                                          done();
-                                                                                          handleResponse.sendSuccess(res,'Invoice line item for timesheet data added successfully',{});
+                              client.query('SELECT invoice_timesheet_note FROM setting WHERE company_id=$1', [req.user.company_id], function (err, companySetting) {
+                                  if (err) {
+                                      console.error(err);
+                                      handleResponse.shouldAbort(err, client, done);
+                                      handleResponse.handleError(res, err, ' Error in finding company setting ');
+                                  } else {
+                                    client.query('select tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category ,tl.week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime  ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id from timesheet_line_item tl where submitted=$1 and invoiced=$2 and billable=$3 and project_id=$4 order by project_id, resource_id, user_role', [true, false, true, req.body.projectId], function (err, lineItems) {
+                                        if (err) {
+                                            console.error(err);
+                                            handleResponse.shouldAbort(err, client, done);
+                                            handleResponse.handleError(res, err, ' Error in finding timesheet data');
+                                        }  else {
+                                            if(lineItems.rows.length>0) {
+                                                console.log('lineitem data is')
+                                                console.log(JSON.stringify(lineItems.rows));
+                                                createGroupedObjWithProject(lineItems.rows, function (concatData) {
+                                                    console.log("response get");
+                                                    console.log("concatdata"+JSON.stringify(concatData));
+                                                    client.query('SELECT pa.id ,pa.company_id ,pa.account_id ,pa.user_id ,pa.project_id ,pa.created_by ,pa.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,pa.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,pa.bill_rate ,pa.cost_rate ,pa.user_role ,pa.record_id FROM PROJECT_ASSIGNMENT pa WHERE project_id=$1 AND company_id=$2', [req.body.projectId, req.user.company_id], function (err, projectAssignments) {
+                                                        if (err) {
+                                                            handleResponse.shouldAbort(err, client, done);
+                                                            handleResponse.handleError(res, err, ' Error in finding project assginment for timesheet data');
+                                                        } else {
+                                                            calculateBR_CR_andGrouped(req, res, client, err, done, concatData, projectAssignments.rows, function(projectRows) {
+                                                                console.log("Grouped and calculate data");
+                                                                console.log(JSON.stringify(projectRows));
+                                                                projectRows.forEach(function (projectRow, index) {
+                                                                    client.query('INSERT INTO INVOICE_LINE_ITEM (type,item_date,project_id,account_id,invoice_id,company_id,created_date, updated_date, amount, total_amount, quantity, currency, timesheet_row_id, user_id, user_role, unit_price,timesheet_id,note) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18) RETURNING id', ['Timesheet', 'now()', req.body.projectId, req.body.accountId, req.body.invoiceId, req.user.company_id, 'now()', 'now()', projectRow.totalProjectCost, projectRow.totalProjectCost, parseInt(projectRow.totalHours), companyDefaultCurrency, projectRow.lineItemIds, projectRow.resource_id, projectRow.user_role, parseInt(projectRow.unit_price),projectRow.timesheet_id,companySetting.rows[0].invoice_timesheet_note], function (err, invoiceLineItem) {
+                                                                        if (err) {
+                                                                            console.error(err);
+                                                                            handleResponse.shouldAbort(err, client, done);
+                                                                            handleResponse.handleError(res, err, ' Error in adding invoice line item data to the database');
+                                                                        } else {
+                                                                            // console.log("Line Item inserted");
+                                                                            createRecordArr(projectRow.lineItemIds, function (lineItemIds) {
+                                                                                // console.log(lineItemIds);
+                                                                                client.query('UPDATE TIMESHEET_LINE_ITEM SET invoiced=$1,invoice_id=$2 WHERE id IN '+lineItemIds, [true,req.body.invoiceId], function (err, timesheetUpdatedItem) {
+                                                                                    if (err) {
+                                                                                        console.error(err);
+                                                                                        handleResponse.shouldAbort(err, client, done);
+                                                                                        handleResponse.handleError(res, err, ' Error in updating timesheet data');
+                                                                                    } else {
+                                                                                        if(projectRows.length == (index+1)) {
+                                                                                          client.query('COMMIT', (err) => {
+                                                                                            if (err) {
+                                                                                              console.error('Error committing transaction', err.stack)
+                                                                                              handleResponse.shouldAbort(err, client, done);
+                                                                                              handleResponse.handleError(res, err, ' Error in committing transaction');
+                                                                                            } else {
+                                                                                              done();
+                                                                                              handleResponse.sendSuccess(res,'Invoice line item for timesheet data added successfully',{});
+                                                                                            }
+                                                                                          })
                                                                                         }
-                                                                                      })
                                                                                     }
-                                                                                }
+                                                                                });
                                                                             });
-                                                                        });
-                                                                    }
+                                                                        }
+                                                                    });
                                                                 });
                                                             });
-                                                        });
-                                                    }
+                                                        }
+                                                    });
                                                 });
-                                            });
-                                        } else {
-                                            // console.log("Step 18");
-                                            done();
-                                            handleResponse.handleError(res, 'timesheet not found', ' No timesheet associated with this project is left for invoicing');
+                                            } else {
+                                                // console.log("Step 18");
+                                                done();
+                                                handleResponse.handleError(res, 'timesheet not found', ' No timesheet associated with this project is left for invoicing');
+                                            }
                                         }
-                                    }
-                                });
+                                    });
+                                  }
+                                })
                               }
                             })
                          });
@@ -998,85 +1042,36 @@ exports.insertExpenseInvoiceItem = (req, res) => {
                   handleResponse.shouldAbort(err, client, done);
                   handleResponse.handleError(res, err, ' error in connecting to database');
                 } else {
-                // console.log("Step 1");
-                  if(req.body.start_date!=null&&req.body.start_date!=undefined&&req.body.start_date!='') {
-                      client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id FROM EXPENSE e WHERE company_id=$1 AND account_id=$2 AND project_id=$3 AND invoiced=$4 AND expense_date>=$5 AND expense_date<=$6 AND billable=$7 AND submitted=$8', [req.user.company_id, req.body.accountId, req.body.projectId,false,moment.tz(req.body.start_date.split('T')[0], companyDefaultTimezone).format(),moment.tz(req.body.end_date.split('T')[0], companyDefaultTimezone).format(),true,true], function (err, expenseList) {
-                          if (err) {
-                              console.error(err);
-                              handleResponse.shouldAbort(err, client, done);
-                              handleResponse.handleError(res, err, ' Error in finding expense data');
-                          }  else {
-                              // console.log("Step 2");
-                              // console.log('expense list to be invoiced is '+JSON.stringify(expenseList));
-                              let count=0;
-                              if(expenseList.rows.length>0){
-                                  expenseList.rows.forEach(function (expense) {
-                                      expense.user_role = '';
-                                      expense.quantity = '1';
-                                      expense.type = 'Expense';
-                                      expense.amount = expense.total_amount;
-                                      expense.unit_price = expense.total_amount;
-                                      addInvoiceLineItem(req, res, client, err, done, expense, function (result) {
-                                          // console.log("Step 3");
-                                          if(result) {
-                                          updateExpenseRecord(req, res, client, err, done, expense, function (result) {
-                                              // console.log("Step 4");
+                  client.query('SELECT invoice_expense_note FROM setting WHERE company_id=$1', [req.user.company_id], function (err, companySetting) {
+                    if (err) {
+                        console.error(err);
+                        handleResponse.shouldAbort(err, client, done);
+                        handleResponse.handleError(res, err, ' Error in finding company setting ');
+                    } else {
+                    // console.log("Step 1");
+                      if(req.body.start_date!=null&&req.body.start_date!=undefined&&req.body.start_date!='') {
+                          client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id FROM EXPENSE e WHERE company_id=$1 AND account_id=$2 AND project_id=$3 AND invoiced=$4 AND expense_date>=$5 AND expense_date<=$6 AND billable=$7 AND submitted=$8', [req.user.company_id, req.body.accountId, req.body.projectId,false,moment.tz(req.body.start_date.split('T')[0], companyDefaultTimezone).format(),moment.tz(req.body.end_date.split('T')[0], companyDefaultTimezone).format(),true,true], function (err, expenseList) {
+                              if (err) {
+                                  console.error(err);
+                                  handleResponse.shouldAbort(err, client, done);
+                                  handleResponse.handleError(res, err, ' Error in finding expense data');
+                              }  else {
+                                  // console.log("Step 2");
+                                  // console.log('expense list to be invoiced is '+JSON.stringify(expenseList));
+                                  let count=0;
+                                  if(expenseList.rows.length>0){
+                                      expenseList.rows.forEach(function (expense) {
+                                          expense.user_role = '';
+                                          expense.quantity = '1';
+                                          expense.note = companySetting.rows[0].invoice_expense_note;
+                                          expense.type = 'Expense';
+                                          expense.amount = expense.total_amount;
+                                          expense.unit_price = expense.total_amount;
+                                          addInvoiceLineItem(req, res, client, err, done, expense, function (result) {
+                                              // console.log("Step 3");
                                               if(result) {
-                                                  count++;
-                                                  // done();
-                                                  console.log('expense added to invoice are');
-                                                  console.log(expense);
-                                                  console.log(count);
-
-                                                  if(expenseList.rows.length===count){
-                                                    client.query('COMMIT', (err) => {
-                                                      if (err) {
-                                                        // console.log('Error committing transaction', err.stack)
-                                                        handleResponse.shouldAbort(err, client, done);
-                                                        handleResponse.handleError(res, err, ' Error in committing transaction');
-                                                      } else {
-                                                        done();
-                                                        handleResponse.sendSuccess(res,'Invoice line item for expense data added successfully',{});
-                                                        /*res.status(200).json({ "success": true, "message":"success" });*/
-                                                      }
-                                                    })
-                                                  } else{
-                                                    // handleResponse.shouldAbort(' Error in creating invoice line item for expense data', client, done);
-                                                    // handleResponse.handleError(res, ' Error in creating invoice line item for expense data', ' Error in creating invoice line item for expense data');
-                                                      // console.log('count is '+count+' and length is '+expenseList.rows.length);
-                                                  }
-                                              }
-                                          });
-                                          }
-                                      });
-                                  });
-                              } else {
-                                  // console.log("Step 5");
-                                  done();
-                                  handleResponse.handleError(res, 'expense not found', ' No expense associated with this project is left for invoicing');
-                              }
-                          }
-                      });
-                  } else {
-                      // pool.connect((err, client, done) => {
-                      client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id FROM EXPENSE e WHERE company_id=$1 AND account_id=$2 AND project_id=$3 AND invoiced=$4 AND billable=$5 AND submitted=$6', [req.user.company_id, req.body.accountId, req.body.projectId,false,true,true], function (err, expenseList) {
-                          if (err) {
-                              console.error(err);
-                              handleResponse.shouldAbort(err, client, done);
-                              handleResponse.handleError(res, err, ' Error in finding expense data');
-                          }  else {
-                              // console.log('expense list to be invoiced is '+JSON.stringify(expenseList));
-                              let count=0;
-                              if(expenseList.rows.length>0){
-                                  expenseList.rows.forEach(function (expense) {
-                                      expense.user_role = '';
-                                      expense.quantity = '1';
-                                      expense.type = 'Expense';
-                                      expense.amount = expense.total_amount;
-                                      expense.unit_price = expense.total_amount;
-                                      addInvoiceLineItem(req, res, client, err, done, expense, function (result) {
-                                          if(result) {
                                               updateExpenseRecord(req, res, client, err, done, expense, function (result) {
+                                                  // console.log("Step 4");
                                                   if(result) {
                                                       count++;
                                                       // done();
@@ -1093,9 +1088,9 @@ exports.insertExpenseInvoiceItem = (req, res) => {
                                                           } else {
                                                             done();
                                                             handleResponse.sendSuccess(res,'Invoice line item for expense data added successfully',{});
+                                                            /*res.status(200).json({ "success": true, "message":"success" });*/
                                                           }
                                                         })
-                                                          /*res.status(200).json({ "success": true, "message":"success" });*/
                                                       } else{
                                                         // handleResponse.shouldAbort(' Error in creating invoice line item for expense data', client, done);
                                                         // handleResponse.handleError(res, ' Error in creating invoice line item for expense data', ' Error in creating invoice line item for expense data');
@@ -1103,16 +1098,75 @@ exports.insertExpenseInvoiceItem = (req, res) => {
                                                       }
                                                   }
                                               });
-                                          }
+                                              }
+                                          });
                                       });
-                                  });
-                              } else {
-                                  done();
-                                  handleResponse.handleError(res, 'expense not found', ' No expense associated with this project is left for invoicing');
+                                  } else {
+                                      // console.log("Step 5");
+                                      done();
+                                      handleResponse.handleError(res, 'expense not found', ' No expense associated with this project is left for invoicing');
+                                  }
                               }
-                          }
-                      });
-                  }
+                          });
+                      } else {
+                          // pool.connect((err, client, done) => {
+                          client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id FROM EXPENSE e WHERE company_id=$1 AND account_id=$2 AND project_id=$3 AND invoiced=$4 AND billable=$5 AND submitted=$6', [req.user.company_id, req.body.accountId, req.body.projectId,false,true,true], function (err, expenseList) {
+                              if (err) {
+                                  console.error(err);
+                                  handleResponse.shouldAbort(err, client, done);
+                                  handleResponse.handleError(res, err, ' Error in finding expense data');
+                              }  else {
+                                  // console.log('expense list to be invoiced is '+JSON.stringify(expenseList));
+                                  let count=0;
+                                  if(expenseList.rows.length>0){
+                                      expenseList.rows.forEach(function (expense) {
+                                          expense.user_role = '';
+                                          expense.quantity = '1';
+                                          expense.note = companySetting.rows[0].invoice_expense_note;
+                                          expense.type = 'Expense';
+                                          expense.amount = expense.total_amount;
+                                          expense.unit_price = expense.total_amount;
+                                          addInvoiceLineItem(req, res, client, err, done, expense, function (result) {
+                                              if(result) {
+                                                  updateExpenseRecord(req, res, client, err, done, expense, function (result) {
+                                                      if(result) {
+                                                          count++;
+                                                          // done();
+                                                          console.log('expense added to invoice are');
+                                                          console.log(expense);
+                                                          console.log(count);
+
+                                                          if(expenseList.rows.length===count){
+                                                            client.query('COMMIT', (err) => {
+                                                              if (err) {
+                                                                // console.log('Error committing transaction', err.stack)
+                                                                handleResponse.shouldAbort(err, client, done);
+                                                                handleResponse.handleError(res, err, ' Error in committing transaction');
+                                                              } else {
+                                                                done();
+                                                                handleResponse.sendSuccess(res,'Invoice line item for expense data added successfully',{});
+                                                              }
+                                                            })
+                                                              /*res.status(200).json({ "success": true, "message":"success" });*/
+                                                          } else{
+                                                            // handleResponse.shouldAbort(' Error in creating invoice line item for expense data', client, done);
+                                                            // handleResponse.handleError(res, ' Error in creating invoice line item for expense data', ' Error in creating invoice line item for expense data');
+                                                              // console.log('count is '+count+' and length is '+expenseList.rows.length);
+                                                          }
+                                                      }
+                                                  });
+                                              }
+                                          });
+                                      });
+                                  } else {
+                                      done();
+                                      handleResponse.handleError(res, 'expense not found', ' No expense associated with this project is left for invoicing');
+                                  }
+                              }
+                          });
+                      }
+                    }
+                  })
                 }
               })
             });
@@ -1135,21 +1189,22 @@ function addInvoiceLineItem(req, res, client, err, done, data, result) {
       if(type == "Expense") {
         expense_id = data.id;
         timesheet_id = null;
-        data.note = 'Expenses';
+        // data.note = 'Expenses';
 
       } else {
         timesheet_id = data.id;
         expense_id = null;
-        data.note = 'Hours';
+        // data.note = 'Hours';
       }
     }
-    if(!data.note) {
-        data.note = ''
-    }
+    // if(!data.note) {
+    //     data.note = ''
+    // }
     // console.log('companyDefaultCurrency');
     // console.log(companyDefaultCurrency);
     // let newDate=moment.tz(new Date(), companyDefaultTimezone).format();
     // client.query('INSERT INTO INVOICE_LINE_ITEM (type,item_date,project_id,account_id,invoice_id,company_id,created_date, updated_date, total_amount, user_id, quantity, unit_price, note, timesheet_id, user_role) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING id', ['Timesheet', new Date(), req.body.projectId, req.body.accountId, req.body.invoiceId, req.user.company_id, new Date(), new Date(), invoicedAmount, timesheet.resource_id, timesheet.user_role,parseInt(response.bill_rate), parseInt(timesheet.total_billable_hours), timesheet.id], function (err, invoiceLineItem) {
+
     client.query('INSERT INTO INVOICE_LINE_ITEM (type,item_date,project_id,account_id,invoice_id,company_id,created_date, updated_date, total_amount, user_id, quantity, unit_price, note, expense_id, timesheet_id, user_role,currency) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) RETURNING id', [type, 'now()', req.body.projectId, req.body.accountId, req.body.invoiceId, req.user.company_id, 'now()', 'now()', data.amount, data.user_id, data.quantity, data.unit_price, data.note, expense_id, timesheet_id, data.user_role, currency], function (err, invoiceLineItem) {
         if (err) {
             console.error(err);

@@ -116,7 +116,7 @@ module.exports = function(app) {
     app.post('/editCompanySetting', passportConfig.isAuthenticated,settingController.postEditSetting);
     app.post('/editCompanySettingExpense', passportConfig.isAuthenticated,settingController.postEditSettingExpense);
     app.post('/editCompanySettingUserRole', passportConfig.isAuthenticated,settingController.postEditSettingUserRole);
-    app.post('/editCompanySettingInvoice', passportConfig.isAuthenticated,upload.single("file"),settingController.postEditSettingInvoice);
+    app.post('/editCompanySettingInvoice', passportConfig.isAuthenticated,settingController.postEditSettingInvoice);
 
     app.post('/checkUserRoleAssignment', passportConfig.isAuthenticated,settingController.checkUserRoleAssignment);
     app.post('/checkExpenseCategoryAssign', passportConfig.isAuthenticated,settingController.checkExpenseCategoryAssign);

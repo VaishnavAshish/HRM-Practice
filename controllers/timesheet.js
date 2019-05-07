@@ -521,15 +521,21 @@ exports.getTimesheet = (req, res) => {
                                   // console.log(req.user.role);
                                   console.log('--------week_start_date------');
                                   console.log(week_start_date+' '+week_end_date);
+                                  let timesheetSubmitFlag = true;
+                                  let timesheetNotSubmitted = timesheetListByDate.rows.filter(timesheetRecord => timesheetRecord.submitted == false);
+                                  if(timesheetNotSubmitted.length>0){
+                                    timesheetSubmitFlag = false;
+                                  }
                                   if(req.user.permissions.includes('timesheetApprover')) {
                                       getAllCompanyUsers(req, client, err, done, res, function (users) {
                                       timeheet_users = users;
                                       let taskListsWeekArr = getTimesheetForWeek(timesheetListByProject.rows, dateFormat(week_start_date));
                                       // console.log("Weekly timesheet rows")
                                       // console.log(JSON.stringify(taskListsWeekArr));
+
                                       var daysEnum = {"0":"Sunday","1":"Monday", "2":"Tuesday", "3":"Wednesday","4":"Thursday","5":"Friday","6":"Saturday"};
                                       done();
-                                      handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : daysEnum, timesheetList : taskListsDayArr,timesheetWeekData : taskListsWeekArr , user:req.user, projectList:projectList.rows, userRoles : userRoles, timeheet_users : timeheet_users, companyDefaultTimezone:companyDefaultTimezone,companyWeekStartDay:companyWeekStartDay , currentTimestamp:currentTimestamp.rows[0].currentdate,stripeCustomerId:result.stripe_customer_id },"success","Successfully rendered");
+                                      handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : daysEnum, timesheetList : taskListsDayArr,timesheetWeekData : taskListsWeekArr , user:req.user, projectList:projectList.rows, userRoles : userRoles, timeheet_users : timeheet_users, companyDefaultTimezone:companyDefaultTimezone,companyWeekStartDay:companyWeekStartDay , currentTimestamp:currentTimestamp.rows[0].currentdate,timesheetSubmitFlag:timesheetSubmitFlag },"success","Successfully rendered");
                                       });
                                   } else {
                                     done()
@@ -537,7 +543,7 @@ exports.getTimesheet = (req, res) => {
                                       // console.log("Weekly timesheet rows")
                                       // console.log(JSON.stringify(taskListsWeekArr));
                                       var daysEnum = {"0":"Sunday","1":"Monday", "2":"Tuesday", "3":"Wednesday","4":"Thursday","5":"Friday","6":"Saturday"};
-                                      handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : daysEnum, timesheetList : taskListsDayArr,timesheetWeekData : taskListsWeekArr , user:req.user, projectList:projectList.rows, userRoles : userRoles, timeheet_users : [],companyDefaultTimezone:companyDefaultTimezone, companyWeekStartDay:companyWeekStartDay, currentTimestamp:currentTimestamp.rows[0].currentdate,stripeCustomerId:result.stripe_customer_id },"success","Successfully rendered");
+                                      handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : daysEnum, timesheetList : taskListsDayArr,timesheetWeekData : taskListsWeekArr , user:req.user, projectList:projectList.rows, userRoles : userRoles, timeheet_users : [],companyDefaultTimezone:companyDefaultTimezone, companyWeekStartDay:companyWeekStartDay, currentTimestamp:currentTimestamp.rows[0].currentdate,timesheetSubmitFlag:timesheetSubmitFlag },"success","Successfully rendered");
                                   }
                                 })
                               }

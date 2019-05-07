@@ -66,7 +66,11 @@ function submitExpense(expenseId){
             hideLoader('#globalLoader');
              /*window.history.back();*/
             showGlobalToast('#globalToast', 'success', response.message, 4000);
-            $("[submitted]").attr('disabled',true);
+            // $("[submitted]").attr('disabled',true);
+            setTimeout(function(){
+              location.reload();
+            },1000)
+
             // window.location.href="/expenses-listing";
              /*window.location.href = document.referrer;*/
 

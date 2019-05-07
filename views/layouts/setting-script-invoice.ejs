@@ -4,6 +4,11 @@
 			let setting=<%- JSON.stringify(setting) %>;
 			console.log(setting.invoice_note);
 			$("#defaultInvoiceNote").val(setting.invoice_note);
+			$("#defaultTimesheetNote").val(setting.invoice_timesheet_note);
+			$("#defaultFixedFeeNote").val(setting.invoice_fixedfee_note);
+			$("#defaultExpenseNote").val(setting.invoice_expense_note);
+			$("#defaultOtherNote").val(setting.invoice_other_note);
+			$("#defaultInvoiceStartNumber").val(setting.invoice_starting_number);
 			/*let companyLogoImg=window.atob(setting.company_logo);*/
 			/*$("#companyLogoImg").attr('src',setting.company_logo);*/
 			/*$("#companyLogoImg").attr('src',`data:image/png;base64,${setting.company_logo}`);*/
@@ -18,15 +23,20 @@
 	function saveInvoiceSetting(){
 		showLoader('#globalLoader');
 		let defaultInvoiceNote=$("#defaultInvoiceNote").val();
+		let defaultTimesheetNote = $("#defaultTimesheetNote").val();
+		let defaultFixedFeeNote = $("#defaultFixedFeeNote").val();
+		let defaultExpenseNote = $("#defaultExpenseNote").val();
+		let defaultOtherNote = $("#defaultOtherNote").val();
+		let defaultInvoiceStartNumber = $("#defaultInvoiceStartNumber").val();
 		/*let companyLogo = $('#companyLogoImg').attr('src');*/
 		/*var formdata = new FormData()
 	    formdata.append('photo',$('#input-image').files[0])
 		let file=$("#uploadedImageFile").val();*/
 		/*let hexString = window.btoa(companyLogo);
 		console.log(hexString);*/
-		if(defaultInvoiceNote.length>5000){
+		if(defaultInvoiceNote.length>5000||defaultTimesheetNote.length>5000||defaultFixedFeeNote.length>5000||defaultExpenseNote.length>5000||defaultOtherNote.length>5000){
 			hideLoader('#globalLoader');
-			showGlobalToast('#globalToast', 'error', 'Invoice note cannot be more than 5000 characters', 4000);
+			showGlobalToast('#globalToast', 'error', 'All Invoice notes cannot be more than 5000 characters', 4000);
 			return false;
 		}
 		console.log(defaultInvoiceNote);
@@ -35,7 +45,14 @@
 		      url : '/editCompanySettingInvoice',
 		      contentType: 'application/json',
 		      dataType: 'json',
-		      data:JSON.stringify({"defaultInvoiceNote":defaultInvoiceNote}),
+		      data:JSON.stringify({
+						"defaultInvoiceNote":defaultInvoiceNote,
+						"defaultTimesheetNote":defaultTimesheetNote,
+						"defaultFixedFeeNote":defaultFixedFeeNote,
+						"defaultExpenseNote":defaultExpenseNote,
+						"defaultOtherNote":defaultOtherNote,
+						"defaultInvoiceStartNumber":defaultInvoiceStartNumber
+					}),
 		       success : function(response){
 				   if(response.success){
 						/*hideLoader('#globalLoader');*/
