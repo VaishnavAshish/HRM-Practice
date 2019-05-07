@@ -1037,8 +1037,8 @@ exports.insertExpenseInvoiceItem = (req, res) => {
                                                       }
                                                     })
                                                   } else{
-                                                    handleResponse.shouldAbort(' Error in creating invoice line item for expense data', client, done);
-                                                    handleResponse.handleError(res, ' Error in creating invoice line item for expense data', ' Error in creating invoice line item for expense data');
+                                                    // handleResponse.shouldAbort(' Error in creating invoice line item for expense data', client, done);
+                                                    // handleResponse.handleError(res, ' Error in creating invoice line item for expense data', ' Error in creating invoice line item for expense data');
                                                       // console.log('count is '+count+' and length is '+expenseList.rows.length);
                                                   }
                                               }
