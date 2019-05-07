@@ -1024,6 +1024,10 @@ exports.insertExpenseInvoiceItem = (req, res) => {
                                               if(result) {
                                                   count++;
                                                   // done();
+                                                  console.log('expense added to invoice are');
+                                                  console.log(expense);
+                                                  console.log(count);
+
                                                   if(expenseList.rows.length===count){
                                                     client.query('COMMIT', (err) => {
                                                       if (err) {
