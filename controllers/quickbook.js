@@ -399,35 +399,35 @@ exports.postInvoiceToQuickbook = (req,res) => {
                                                                 .catch(function(e) {
                                                                   console.error(e);
                                                                   handleResponse.shouldAbort(e, client, done);
-                                                                  handleResponse.handleError(res, e, ' Error in posting customer info'+e);
+                                                                  handleResponse.handleError(res, e, ' Error in posting invoice info'+e);
                                                                 });
 
                                                             } else{
-                                                              // handleResponse.shouldAbort('Error in finding invoice on quickbook', client, done);
-                                                              // handleResponse.handleError(res, 'Error in finding invoice on quickbook', 'Error in finding invoice on quickbook');
-                                                              client.query('UPDATE INVOICE set quickbook_invoice_id=$1 where id=$2',[null,req.body.invoiceId], function(err, updatedInvoiceInfo) {
-                                                                if (err){
-                                                                  handleResponse.shouldAbort(err, client, done);
-                                                                  handleResponse.handleError(res, err, ' Error in updating invoice');
-                                                                } else {
-                                                                  client.query('COMMIT', (err) => {
-                                                                    if (err) {
-                                                                      // console.log('Error committing transaction', err.stack)
-                                                                      handleResponse.shouldAbort(err, client, done);
-                                                                      handleResponse.handleError(res, err, ' Error in committing transaction');
-                                                                    } else {
-                                                                      done();
-                                                                      handleResponse.handleError(res, 'Error in finding invoice on quickbook.Please refresh', 'Error in finding invoice on quickbook.Please refresh');
-                                                                    }
-                                                                  })
-                                                                }
-                                                              });
+                                                              handleResponse.shouldAbort('Error in finding invoice on quickbook', client, done);
+                                                              handleResponse.handleError(res, 'Error in finding invoice on quickbook', 'Error in finding invoice on quickbook');
+                                                              // client.query('UPDATE INVOICE set quickbook_invoice_id=$1 where id=$2',[null,req.body.invoiceId], function(err, updatedInvoiceInfo) {
+                                                              //   if (err){
+                                                              //     handleResponse.shouldAbort(err, client, done);
+                                                              //     handleResponse.handleError(res, err, ' Error in updating invoice');
+                                                              //   } else {
+                                                              //     client.query('COMMIT', (err) => {
+                                                              //       if (err) {
+                                                              //         // console.log('Error committing transaction', err.stack)
+                                                              //         handleResponse.shouldAbort(err, client, done);
+                                                              //         handleResponse.handleError(res, err, ' Error in committing transaction');
+                                                              //       } else {
+                                                              //         done();
+                                                              //         handleResponse.handleError(res, 'Error in finding invoice on quickbook.Please refresh', 'Error in finding invoice on quickbook.Please refresh');
+                                                              //       }
+                                                              //     })
+                                                              //   }
+                                                              // });
                                                             }
                                                           })
                                                           .catch(function(e) {
                                                             handleResponse.shouldAbort(e, client, done);
                                                             console.error(e);
-                                                            handleResponse.handleError(res, e, ' Error in getting item info'+e);
+                                                            handleResponse.handleError(res, e, ' Error in getting invoice info'+e);
                                                           });
                                                       }else{
                                                         oauthClient.postApiCall({url: url + 'v3/company/' + companyID +'/invoice',body:invoiceData})
