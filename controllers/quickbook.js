@@ -253,7 +253,7 @@ exports.postInvoiceToQuickbook = (req,res) => {
                       logging:true,
                       token:quickbook_token.token
                   });
-
+                  // please refer https://help.developer.intuit.com/s/question/0D50f000051WZUGCA4/refresh-token-is-expiring-each-day-instead-of-lasting-100-days
                   oauthClient.refresh()
                      .then(function(authResponse) {
                         //  console.log('Tokens refreshed : ' + JSON.stringify(authResponse));
@@ -576,7 +576,7 @@ exports.quickbookInvoiceUpdate = (req,res) => {
                           token:quickbook_token.token
                         });
 
-                        let selectedCompSetId = selectedCompSet.map(compSet => compSet.company_id);
+                        let selectedCompSetId = selectedCompSet.map(compSet => parse(compSet.company_id));
                         console.log('selectedCompSetId');
                         console.log(selectedCompSetId);
 
