@@ -576,6 +576,10 @@ exports.quickbookInvoiceUpdate = (req,res) => {
                           token:quickbook_token.token
                         });
 
+                        let selectedCompSetId = selectedCompSet.map(compSet => compSet.company_id);
+                        console.log('selectedCompSetId');
+                        console.log(selectedCompSetId);
+
                         oauthClient.refresh()
                         .then(function(authResponse) {
                           //  console.log('Tokens refreshed : ' + JSON.stringify(authResponse));
