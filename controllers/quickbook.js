@@ -254,7 +254,7 @@ exports.postInvoiceToQuickbook = (req,res) => {
                       token:quickbook_token.token
                   });
 
-                  oauthClient.refreshUsingToken(quickbook_token.token.refresh_token)
+                  oauthClient.refresh()
                      .then(function(authResponse) {
                         //  console.log('Tokens refreshed : ' + JSON.stringify(authResponse));
                          quickbook_token.token =authResponse.token;
@@ -576,7 +576,7 @@ exports.quickbookInvoiceUpdate = (req,res) => {
                           token:quickbook_token.token
                         });
 
-                        oauthClient.refreshUsingToken(quickbook_token.token.refresh_token)
+                        oauthClient.refresh()
                         .then(function(authResponse) {
                           //  console.log('Tokens refreshed : ' + JSON.stringify(authResponse));
                           quickbook_token.token =authResponse.token;
@@ -748,7 +748,7 @@ exports.getQuickbookData = (req,res) => {
                       token:quickbook_token.token
                   });
 
-                  oauthClient.refreshUsingToken(quickbook_token.token.refresh_token)
+                  oauthClient.refresh()
                      .then(function(authResponse) {
                         //  console.log('Tokens refreshed : ' + JSON.stringify(authResponse));
                          quickbook_token.token =authResponse.token;
@@ -1127,7 +1127,7 @@ exports.disconnectQuickbook = (req,res) =>{
                       token:quickbook_token.token
                   });
 
-                  oauthClient.refreshUsingToken(quickbook_token.token.refresh_token)
+                  oauthClient.refresh()
                      .then(function(authResponse) {
                          console.log('Tokens refreshed : ' + JSON.stringify(authResponse));
                          quickbook_token.token =authResponse.token;
