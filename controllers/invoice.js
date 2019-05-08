@@ -1297,7 +1297,7 @@ exports.getInvoiceDetails = (req, res) => {
                                     /*handleResponse.handleError(res, err, ' Error in finding invoice data');*/
                                   }  else {
                                       // console.log('account id is '+invoiceDetails.rows[0].account_id)
-                                      client.query('SELECT * FROM PROJECT WHERE company_id=$1 AND account_id=$2 AND archived=$3', [req.user.company_id, invoiceDetails.rows[0].account_id,false], function (err, projects) {
+                                      client.query('SELECT * FROM PROJECT WHERE company_id=$1 AND account_id=$2 AND archived=$3 ORDER BY id', [req.user.company_id, invoiceDetails.rows[0].account_id,false], function (err, projects) {
                                           if (err) {
                                               console.error(err);
                                                   handleResponse.shouldAbort(err, client, done);
