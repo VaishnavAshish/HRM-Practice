@@ -2218,8 +2218,18 @@ let account_address = `<strong>${accountDetails.name}</strong><BR />
     let pdfHTML=`<!DOCTYPE html>
                     <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://ww.w3.org/1999/xlink" lang="en">
 
-                    <body style="padding: 4mm; font-family:Helvetica, Arial, ans-Serif; font-size: 14px;">
+
+                    <body style="padding: 4mm; font-family: 'Salesforce Sans', sans-serif; font-size: 13px; color: #333;">
                         <style>
+                            @font-face {
+                              font-family: 'Salesforce Sans';
+                              src: url('https://cdnjs.cloudflare.com/ajax/libs/design-system/2.9.2/fonts/SalesforceSans-Regular.ttf');
+                            }
+                            @font-face {
+                              font-family: 'Salesforce Sans';
+                              src: url('https://cdnjs.cloudflare.com/ajax/libs/design-system/2.9.2/fonts/SalesforceSans-Bold.ttf');
+                              font-weight: bold;
+                            }
                             table {
                                  width: 100%;
                                 border-collapse: collapse;
@@ -2277,6 +2287,9 @@ let account_address = `<strong>${accountDetails.name}</strong><BR />
                                 color: #999;
                             }
 
+                            .text-size-10 {
+                                font-size: 10px;
+                            }
                             .text-size-12 {
                                 font-size: 12px;
                             }
@@ -2294,6 +2307,23 @@ let account_address = `<strong>${accountDetails.name}</strong><BR />
                             }
                             .text-center {
                                 text-align: center;
+                            }
+                            .text-thin {
+                                font-weight: lighter;
+                            }
+                            .pd-8{
+                              padding:8px;
+                            }
+                            .head-text{
+                              font-size: 0.75rem;
+                              line-height: 1.25;
+                              text-transform: uppercase;
+                              letter-spacing: 0.0625rem;
+                              font-weight: normal
+                            }
+                            html,body {
+                              margin: 0;
+                              padding: 0;
                             }
                         </style>
                         <div>
@@ -2318,7 +2348,7 @@ let account_address = `<strong>${accountDetails.name}</strong><BR />
                                                             </strong>
                                                         </h1>
                                                     </div>
-                                                    <table class="tbl-padded">
+                                                    <table class="tbl-padded-4">
                                                         <tbody>
                                                             <tr>
                                                                 <td class="">
@@ -2369,7 +2399,7 @@ let account_address = `<strong>${accountDetails.name}</strong><BR />
                                                 <table class="">
                                                     <tbody>
                                                         <tr>
-                                                            <td class="" valign="op" width="20%">
+                                                            <td class="" valign="top" width="20%">
                                                                 <strong>To </trong>
                                                             </td>
                                                             <td class="">
@@ -2388,7 +2418,7 @@ let account_address = `<strong>${accountDetails.name}</strong><BR />
                                                 <table class="">
                                                     <tbody>
                                                         <tr>
-                                                            <td class="" valign="op" width="20%">
+                                                            <td class="" valign="top" width="20%">
                                                                 <strong>From</trong>
                                                             </td>
                                                             <td class="">
@@ -2411,16 +2441,16 @@ let account_address = `<strong>${accountDetails.name}</strong><BR />
                                         <tr class="bg-blue text-white">
 
                                             <th scope="
-                                                col" align="left" width="40%">
+                                                col" align="left" width="40%" class="pd-8  head-text">
                                                 Description
                                             </th>
-                                            <th scope="col" align="left">
+                                            <th scope="col" align="left" class="pd-8  head-text">
                                                 Qty / Hr
                                             </th>
-                                            <th scope="col" align="left">
+                                            <th scope="col" align="left" class="pd-8  head-text">
                                                 Unit Price
                                             </th>
-                                            <th scope="col" align="right">
+                                            <th scope="col" align="right" class="pd-8  head-text">
                                                 Amount
                                             </th>
                                         </tr>
@@ -2482,7 +2512,11 @@ let account_address = `<strong>${accountDetails.name}</strong><BR />
     //   res.setHeader('content-type', 'application/pdf');
     //   res.send(body);
     // });
-    var options = { format: 'A4',height: "14.5in",width: "11in"};
+    var options = {
+      format: 'A4',
+      width: '280mm',
+      height: '396mm'
+    };
     // console.log('hmtl is:');
     // console.log(pdfHTML);
     console.log('responseType'+responseType)
@@ -2542,7 +2576,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
                     </tr>
                     <tr>
                         <td valign="top" align="center">
-                            <table border="0" cellpadding="0" cellspacing="0" height="100%" width="600px">
+                            <table border="0" cellpadding="0" cellspacing="0" height="100%" width="50%">
                                 <tbody><tr>
                                     <td valign="top">
                                         <table cellpadding="0" cellspacing="0" width="100%" style="background: #fff; border: 1px solid #eee; margin: 0; padding: 30px; ">
