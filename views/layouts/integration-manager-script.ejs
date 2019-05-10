@@ -1,0 +1,31 @@
+<script>
+  function disconnectIntegrationData(modalId,integrationAppName){
+      let url = '';
+      if(integrationAppName == 'Quickbook'){
+        url = '/disconnectQuickbook';
+      } else if(integrationAppName == 'Xero'){
+        url = '/disconnectXero';
+      }
+      showLoader('#globalLoader');
+    	$.ajax({
+    				type: 'POST',
+    				url : url,
+    				success : function(response){
+              console.log('response is : '+JSON.stringify(response));
+    						hideLoader('#globalLoader');
+    						closeModal(modalId);
+                location.reload();
+    				},
+    				error: function(response){
+    					hideLoader('#globalLoader');
+              closeModal(modalId);
+    					showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+    					setTimeout(function(){
+    						location.reload();
+    					},5000)
+    					console.log('error is : '+JSON.stringify(response));
+
+    				}
+    			});
+  }
+</script>
