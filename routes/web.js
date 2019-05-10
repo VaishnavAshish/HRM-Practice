@@ -21,6 +21,7 @@ const passportConfig = require('./../config/passport');
 
 const stripeController = require('./../controllers/stripe');
 const quickbookController = require('./../controllers/quickbook');
+const xeroController = require('./../controllers/xero');
 
 module.exports = function(app) {
 
@@ -93,6 +94,14 @@ module.exports = function(app) {
     app.post('/disableStripe', passportConfig.isAuthenticated, stripeController.disableStripe);
     app.post('/invoicePaymentDeclined',stripeController.invoicePaymentDeclined);
 
+
+    //xero api
+    app.get('/initiateXero', passportConfig.isAuthenticated, xeroController.initiateXero);
+    app.get('/getAuthCodeXero', xeroController.getAuthCodeXero);
+    app.post('/disconnectXero', passportConfig.isAuthenticated, xeroController.disconnectXero);
+    app.post('/getXeroData', passportConfig.isAuthenticated, xeroController.getXeroData);
+
+    //quickbook api
     app.get('/initiateQuickbook', passportConfig.isAuthenticated, quickbookController.initiateQuickbook);
     app.get('/getAuthCode', quickbookController.getAuthCode);
     app.post('/disconnectQuickbook', passportConfig.isAuthenticated, quickbookController.disconnectQuickbook);

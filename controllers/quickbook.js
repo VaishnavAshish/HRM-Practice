@@ -58,17 +58,20 @@ exports.changeQuickbookAccount = (req,res) => {
            client.query('UPDATE INVOICE_LINE_ITEM set quickbook_invoice_line_id=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedInvoice) {
              if (err){
                handleResponse.shouldAbort(err, client, done);
-               handleResponse.handleError(res, err, ' Error in updating settings');
+              //  handleResponse.handleError(res, err, ' Error in updating invoice line item');
+              res.redirect('/integration-dashboard');
              } else {
                client.query('UPDATE INVOICE set quickbook_invoice_id=$1,status=$2 where company_id=$3 AND status=$4 RETURNING id',[null,'DRAFT', req.user.company_id,'POSTED'], function(err, updatedInvoice) {
                  if (err){
                    handleResponse.shouldAbort(err, client, done);
-                   handleResponse.handleError(res, err, ' Error in updating settings');
+                  //  handleResponse.handleError(res, err, ' Error in updating invoice');
+                  res.redirect('/integration-dashboard');
                  } else {
                    client.query('UPDATE ACCOUNT set quickbook_customer_id=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedInvoice) {
                      if (err){
                        handleResponse.shouldAbort(err, client, done);
-                       handleResponse.handleError(res, err, ' Error in updating settings');
+                      //  handleResponse.handleError(res, err, ' Error in updating account');
+                      res.redirect('/integration-dashboard');
                      } else {
                         client.query('UPDATE SETTING set quickbook_token=$1,quickbook_enabled=$2,invoice_timesheet_item_id=$3,invoice_other_item_id=$3,invoice_fixedfee_item_id=$3,invoice_expense_item_id=$3 where company_id=$4 RETURNING id',[JSON.parse(req.body.newCompanyData) ,true,null,req.user.company_id], function(err, updatedSetting) {
                           if (err){
@@ -1135,10 +1138,10 @@ exports.disconnectQuickbook = (req,res) =>{
                      .then(function(authResponse) {
                          console.log('Tokens refreshed : ' + JSON.stringify(authResponse));
                          quickbook_token.token =authResponse.token;
-                        //  console.log(oauthClient);
-                        //  oauthClient.revoke({token:quickbook_token.token.refresh_token})
-                        //  .then(function(authResponse) {
-                        //    console.log('Tokens revoked : ' + JSON.stringify(authResponse));
+                         console.log(oauthClient);
+                         oauthClient.revoke({token:quickbook_token.token.refresh_token})
+                         .then(function(authResponse) {
+                           console.log('Tokens revoked : ' + JSON.stringify(authResponse));
                           //  client.query('UPDATE INVOICE_LINE_ITEM set quickbook_invoice_line_id=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedInvoice) {
                           //    if (err){
                           //      handleResponse.shouldAbort(err, client, done);
@@ -1177,13 +1180,13 @@ exports.disconnectQuickbook = (req,res) =>{
                           //      })
                           //    }
                           //  })
-                        //  })
-                        //  .catch(function(e) {
-                        //    console.error("The error message for revoking token is :"+e.originalMessage);
-                        //    console.error(e.intuit_tid);
-                        //    handleResponse.shouldAbort(e, client, done);
-                        //    handleResponse.handleError(res, e, ' Error in revoking token'+e);
-                        //  });
+                         })
+                         .catch(function(e) {
+                           console.error("The error message for revoking token is :"+e.originalMessage);
+                           console.error(e.intuit_tid);
+                           handleResponse.shouldAbort(e, client, done);
+                           handleResponse.handleError(res, e, ' Error in revoking token'+e);
+                         });
                      })
                      .catch(function(e) {
                          console.error("The error message for refreshing token  is :");

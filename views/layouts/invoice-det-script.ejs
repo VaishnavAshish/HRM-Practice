@@ -726,42 +726,57 @@
     });
   }
 
-  function openQuickbookMapping(modalId){
+  function openMapping(modalId,integrationType){
+    let url = '';
+    let invoiceIntegrateData = {
+      "invoiceId":<%= invoiceDetails.id %>,
+      "client_name":"<%= account.name %>"
+    }
+    if(integrationType == 'Quickbook'){
+      url = '/getQuickbookData';
+      invoiceIntegrateData.client_qb_id="<%= account.quickbook_customer_id %>";
+    }else if(integrationType == 'Xero'){
+      url = '/getXeroData';
+    }
     showLoader('#globalLoader');
     $.ajax({
         type: 'POST',
-        url : '/getQuickbookData',
+        url : url,
         contentType: 'application/json',
         dataType: 'json',
-        data : JSON.stringify({"invoiceId":<%= invoiceDetails.id %>,"client_name":"<%= account.name %>","client_qb_id":"<%= account.quickbook_customer_id %>"}),
+        data : JSON.stringify(invoiceIntegrateData),
         success : function(response){
           console.log(response);
             hideLoader('#globalLoader');
             // showGlobalToast('#globalToast', 'success', response.message, 4000);
-            let itemList = response.itemArray;
-            let termList = response.termArray;
-            let company_info = response.company_info;
-            let options = '<option value="">Please select</option>';
-            for(let key in itemList){
-              options+=`<option value="${itemList[key].Id}" >${itemList[key].Name}</option>`;
-            }
-            let termOptions = '<option value="">Please select</option>';
-            for(let keyData in termList){
-              termOptions+=`<option value="${termList[keyData].Id}" >${termList[keyData].Name}</option>`;
-            }
-            $(".slds-select[name=quickbookItemList]").html(options);
-            $(".slds-select[name=quickbookTerms]").html(termOptions);
-            if(company_info){
-              if(company_info.invoice_timesheet_item_id){
-                $("#timesheet_qb_item").val(company_info.invoice_timesheet_item_id);
-                $("#fixed_fee_qb_item").val(company_info.invoice_fixedfee_item_id);
-                $("#expense_qb_item").val(company_info.invoice_expense_item_id);
-                $("#other_qb_item").val(company_info.invoice_other_item_id);
-                $("#qb_terms").val(company_info.invoice_terms);
-              }
-            }
+            if(integrationType == 'Quickbook'){
+                let itemList = response.itemArray;
+                let termList = response.termArray;
+                let company_info = response.company_info;
+                let options = '<option value="">Please select</option>';
+                for(let key in itemList){
+                  options+=`<option value="${itemList[key].Id}" >${itemList[key].Name}</option>`;
+                }
+                let termOptions = '<option value="">Please select</option>';
+                for(let keyData in termList){
+                  termOptions+=`<option value="${termList[keyData].Id}" >${termList[keyData].Name}</option>`;
+                }
+                $(".slds-select[name=quickbookItemList]").html(options);
+                $(".slds-select[name=quickbookTerms]").html(termOptions);
+                if(company_info){
+                  if(company_info.invoice_timesheet_item_id){
+                    $("#timesheet_qb_item").val(company_info.invoice_timesheet_item_id);
+                    $("#fixed_fee_qb_item").val(company_info.invoice_fixedfee_item_id);
+                    $("#expense_qb_item").val(company_info.invoice_expense_item_id);
+                    $("#other_qb_item").val(company_info.invoice_other_item_id);
+                    $("#qb_terms").val(company_info.invoice_terms);
+                  }
+                }
 
-            openModal(modalId);
+                openModal(modalId);
+            } else if(integrationType == 'Xero'){
+              console.log(response);
+            }
 
         },
         error: function(response){
