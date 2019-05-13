@@ -1318,24 +1318,24 @@ exports.getInvoiceDetails = (req, res) => {
                                                                   // lineItem["item_date"] = dateFormat(moment.tz(lineItem.item_date, companyDefaultTimezone).format());
                                                                   lineItem["item_date"] = dateFormat(lineItem.item_date);
                                                                   lineItem.inv_qauntity = lineItem.quantity;
-                                                                  console.log('lineItem');
-                                                                  console.log(lineItem);
+                                                                  // console.log('lineItem');
+                                                                  // console.log(lineItem);
                                                                   if(lineItem.type == "Timesheet" && lineItem.timesheet_row_id) {
                                                                       lineItem.inv_qauntity = minuteToHours(lineItem.quantity);
                                                                   }
-                                                                  console.log(lineItem.total_amount+' '+typeof(lineItem.total_amount)+' '+parseFloat(lineItem.total_amount));
+                                                                  // console.log(lineItem.total_amount+' '+typeof(lineItem.total_amount)+' '+parseFloat(lineItem.total_amount));
                                                                   let currentCurrency=currencyWithSymbolArray.filter(function(currency){
                                                                     return currency.name == invoiceDetails.rows[0].currency;
                                                                   })
 
                                                                   currentCurrency=parseFloat(currentCurrency[0].value);
-                                                                  console.log('currentCurrency '+JSON.stringify(currentCurrency));
-
-                                                                  console.log('lineItem.currency' +lineItem.currency);
+                                                                  // console.log('currentCurrency '+JSON.stringify(currentCurrency));
+                                                                  //
+                                                                  // console.log('lineItem.currency' +lineItem.currency);
                                                                   let previousCurrency=currencyWithSymbolArray.filter(function(currency){
                                                                     return currency.name == lineItem.currency;
                                                                   })
-                                                                  console.log('previousCurrency '+JSON.stringify(previousCurrency));
+                                                                  // console.log('previousCurrency '+JSON.stringify(previousCurrency));
                                                                   previousCurrency=parseFloat(previousCurrency[0].value);
                                                                   let line_total_amount=(currentCurrency/previousCurrency*parseFloat(lineItem.total_amount));
                                                                   // console.log('total_amount '+line_total_amount);
@@ -1384,11 +1384,11 @@ exports.getInvoiceDetails = (req, res) => {
                                                                       getUserDetails(req, res, client, err, done, function (response) {
                                                                           // console.log("response");
                                                                           // // console.log(projects.rows);
-                                                                          console.log('invoice detail is ');
-                                                                          console.log(invoiceDetails.rows[0]);
+                                                                          // console.log('invoice detail is ');
+                                                                          // console.log(invoiceDetails.rows[0]);
                                                                           // console.log('invoice_total_amount '+invoice_total_amount);
                                                                           accountData.rows[0].quickbook_customer_id=accountData.rows[0].quickbook_customer_id?accountData.rows[0].quickbook_customer_id:null;
-                                                                          console.log('accountData.rows[0].quickbook_customer_id '+accountData.rows[0].quickbook_customer_id)
+                                                                          // console.log('accountData.rows[0].quickbook_customer_id '+accountData.rows[0].quickbook_customer_id)
                                                                           done();
                                                                           handleResponse.responseToPage(res,'pages/invoice-details',{projects:projects.rows, invoiceDetails: invoiceDetails.rows[0], invoiceItems: invoiceItems.rows, user: req.user,account:accountData.rows[0], userList:response ,companyDefaultTimezone:companyDefaultTimezone,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD') },"success","Successfully rendered");
                                                                       })
@@ -1920,11 +1920,13 @@ exports.findInvoiceForAccount = (req, res) => {
     });
 };
 exports.sendInvoiceEmail = (req,res) =>{
+  console.log('sendInvoiceEmail');
     invoiceHtmlData(req,res,false,'send-email');
 }
 
 
 function invoiceHtmlData (req,res,invoiceHtml,responseType){
+
     let invId = req.params.invoiceId?req.params.invoiceId:req.body.invoiceId;
     console.log("invId");
     console.log(invId);
@@ -2057,12 +2059,13 @@ function invoiceHtmlData (req,res,invoiceHtml,responseType){
                                                                                         companySetting.rows[0].zip_code = (companySetting.rows[0].zip_code==null) ? '' : companySetting.rows[0].zip_code;
 
                                                                                         if(invoiceHtml==true){
+                                                                                            console.log('inside invoiceHTML');
                                                                                             /*// console.log('dates are');
                                                                                             // console.log(invoiceDetails.rows[0].startDateFormatted+' '+invoiceDetails.rows[0].created_date);
                                                                                             // console.log(invoiceDetails.rows[0].dueDateFormatted+' '+invoiceDetails.rows[0].due_date);*/
                                                                                             handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.user, error:err, invoiceDetails : invoiceDetails.rows[0], lineItems : invoiceLineList, accountDetails:accountDetails.rows[0],companySetting:companySetting.rows[0], projects:projects.rows,companyName:companyName.rows[0].name},"success","Successfully rendered");
                                                                                         }else{
-
+                                                                                            console.log('inside generatePDF');
                                                                                             generatePdf(req,res,invoiceDetails.rows[0],invoiceLineList,accountDetails.rows[0],companySetting.rows[0], projects.rows,companyName.rows[0].name,responseType);
                                                                                         }
 
@@ -2134,7 +2137,7 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
                 return parseInt(invLineDetails.project_id) == parseInt(project.id);
             });
             sumOfTotalAmount += parseFloat(invLineDetails.total_amount);
-            if(parseInt(sumOfTotalAmount) > 0) {
+            if(parseFloat(sumOfTotalAmount) > 0) {
                 taxAmount = (sumOfTotalAmount * invoiceDetails.tax) / 100;
                 totalPaidAmount = sumOfTotalAmount + taxAmount;
             }
@@ -2571,7 +2574,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
                 <tbody>
                     <tr>
                         <td valign="top" align="center" style="padding-top: 20px; padding-bottom: 10px;">
-                            <a href="/" target="_blank"><img src="../img/krow-logo.png" alt=""></a>
+                            <a href="javascript:void(0);" target="_blank"><img src="https://krow-timesheet-app.herokuapp.com/img/klient.png" alt="" height="60"></a>
                         </td>
                     </tr>
                     <tr>
@@ -2628,7 +2631,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
                                                             </table>
 
                                                         <p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; line-height: 20px;">
-                                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed accumsan convallis iaculis. Quisque at convallis leo.
+                                                            ${req.body.body_of_email?req.body.body_of_email:''}
                                                         </p>
                                                         <p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; margin-bottom: 5px;">
                                                             Thank you for your business,
@@ -2680,7 +2683,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
     to: req.body.client_email,
     cc: req.body.extra_email.split(','),
     from: 'krowtesting@athenalogics.com',
-    subject: "Invoice from " + companyName + " on krow timesheet app",
+    subject: req.body.subject_line?req.body.subject_line:"Invoice from " + companyName + " on krow timesheet app",
     html: html,
     attachments :[
       {

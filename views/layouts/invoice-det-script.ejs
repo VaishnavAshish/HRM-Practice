@@ -699,31 +699,39 @@
   }
 
   function sendInvoiceEmail(modalId) {
+    // $(formId).removeClass('has-error')
     showLoader('#globalLoader');
     let client_email = "<%= account.email %>"
     let extra_email = $("#extra_email").val();
-    $.ajax({
-        type: 'POST',
-        url : '/sendInvoiceEmail',
-        contentType: 'application/json',
-        dataType: 'json',
-        data : JSON.stringify({"client_email":client_email,"extra_email":extra_email,"invoiceId":<%= invoiceDetails.id %>}),
-        success : function(response){
-            hideLoader('#globalLoader');
-            closeModal(modalId);
-            if(response.success == true) {
-                showGlobalToast('#globalToast', 'success', 'Email send successfully', 4000);
-            } else {
-                showGlobalToast('#globalToast', 'error', 'Something went wrong.', 4000);
-            }
-        },
-        error: function(response){
-            console.log(response);
-            hideLoader('#globalLoader');
-            closeModal(modalId);
-            showGlobalToast('#globalToast', 'error', 'Error in sending email.Please try again', 4000);
-        }
-    });
+    let subject_line = $("#subject_line").val();
+    let body_of_email = $("#body_of_email").val();
+    // checkFormValidation(formId);
+    // if(!$(formId).hasClass('has-error')) {
+      $.ajax({
+          type: 'POST',
+          url : '/sendInvoiceEmail',
+          contentType: 'application/json',
+          dataType: 'json',
+          data : JSON.stringify({"client_email":client_email,"extra_email":extra_email,"subject_line":subject_line,"body_of_email":body_of_email,"invoiceId":<%= invoiceDetails.id %>}),
+          success : function(response){
+              hideLoader('#globalLoader');
+              closeModal(modalId);
+              if(response.success == true) {
+                  showGlobalToast('#globalToast', 'success', 'Email send successfully', 4000);
+              } else {
+                  showGlobalToast('#globalToast', 'error', 'Something went wrong.', 4000);
+              }
+          },
+          error: function(response){
+              console.log(response);
+              hideLoader('#globalLoader');
+              closeModal(modalId);
+              showGlobalToast('#globalToast', 'error', 'Error in sending email.Please try again', 4000);
+          }
+      });
+    // }else{
+    //   hideLoader('#globalLoader');
+    // }
   }
 
   function openMapping(modalId,integrationType){
@@ -775,7 +783,31 @@
 
                 openModal(modalId);
             } else if(integrationType == 'Xero'){
-              console.log(response);
+              let itemList = response.itemArray;
+              let accountList = response.accountArray;
+              let company_info = response.company_info;
+              let options = '<option value="">Please select</option>';
+              for(let key in itemList){
+                options+=`<option value="${itemList[key].Code}" >${itemList[key].Name}</option>`;
+              }
+              let accountOptions = '<option value="">Please select</option>';
+              for(let keyData in accountList){
+                accountOptions+=`<option value="${accountList[keyData].Code}" >${accountList[keyData].Name}</option>`;
+              }
+              $(".slds-select[name=xeroItemList]").html(options);
+              $(".slds-select[name=xeroAccount]").html(accountOptions);
+              if(company_info){
+                if(company_info.invoice_timesheet_item_id){
+                  $("#timesheet_xero_item").val(company_info.invoice_timesheet_item_id);
+                  $("#fixed_fee_xero_item").val(company_info.invoice_fixedfee_item_id);
+                  $("#expense_xero_item").val(company_info.invoice_expense_item_id);
+                  $("#other_xero_item").val(company_info.invoice_other_item_id);
+                  $("#xero_account").val(company_info.xero_account_code);
+                }
+              }
+
+              openModal(modalId);
+              // console.log(response);
             }
 
         },
@@ -788,22 +820,41 @@
 
   }
 
-  function postInvoiceToQuickbook(modalId){
+  function postInvoice(modalId,formId,integrationType){
     showLoader('#globalLoader');
-    $("#quickbookMapping").removeClass('has-error')
-    let timesheet_item = $("#timesheet_qb_item option:selected").val();
-    let fixed_fee_item = $("#fixed_fee_qb_item option:selected").val();
-    let expense_item = $("#expense_qb_item option:selected").val();
-    let other_item = $("#other_qb_item option:selected").val();
-    let terms = $("#qb_terms").val();
-    checkFormValidation("#quickbookMapping");
-    if(!$("#quickbookMapping").hasClass('has-error')) {
+    let url = '';
+    let invoiceData = {
+        "invoiceId":<%= invoiceDetails.id %>
+    }
+    if(integrationType == 'Quickbook') {
+        url = '/postInvoiceToQuickbook';
+        invoiceData.timesheet_item = $("#timesheet_qb_item option:selected").val();
+        invoiceData.fixed_fee_item = $("#fixed_fee_qb_item option:selected").val();
+        invoiceData.expense_item = $("#expense_qb_item option:selected").val();
+        invoiceData.other_item = $("#other_qb_item option:selected").val();
+        invoiceData.terms = $("#qb_terms").val();
+    } else if(integrationType == 'Xero') {
+        url = '/postInvoiceToXero';
+        invoiceData.timesheet_item = $("#timesheet_xero_item option:selected").val();
+        invoiceData.fixed_fee_item = $("#fixed_fee_xero_item option:selected").val();
+        invoiceData.expense_item = $("#expense_xero_item option:selected").val();
+        invoiceData.other_item = $("#other_xero_item option:selected").val();
+        invoiceData.account_code = $("#xero_account").val();
+    }
+    $(formId).removeClass('has-error')
+    // let timesheet_item = $("#timesheet_qb_item option:selected").val();
+    // let fixed_fee_item = $("#fixed_fee_qb_item option:selected").val();
+    // let expense_item = $("#expense_qb_item option:selected").val();
+    // let other_item = $("#other_qb_item option:selected").val();
+    // let terms = $("#qb_terms").val();
+    checkFormValidation(formId);
+    if(!$(formId).hasClass('has-error')) {
       $.ajax({
           type: 'POST',
-          url : '/postInvoiceToQuickbook',
+          url : url,
           contentType: 'application/json',
           dataType: 'json',
-          data : JSON.stringify({"invoiceId":<%= invoiceDetails.id %>,"timesheet_item":timesheet_item,"fixed_fee_item":fixed_fee_item,"expense_item":expense_item,"other_item":other_item,"terms":terms}),
+          data : JSON.stringify(invoiceData),
           success : function(response){
             console.log(response);
             closeModal(modalId);

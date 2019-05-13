@@ -100,6 +100,7 @@ module.exports = function(app) {
     app.get('/getAuthCodeXero', xeroController.getAuthCodeXero);
     app.post('/disconnectXero', passportConfig.isAuthenticated, xeroController.disconnectXero);
     app.post('/getXeroData', passportConfig.isAuthenticated, xeroController.getXeroData);
+    app.post('/postInvoiceToXero', passportConfig.isAuthenticated, xeroController.postInvoiceToXero);
 
     //quickbook api
     app.get('/initiateQuickbook', passportConfig.isAuthenticated, quickbookController.initiateQuickbook);

@@ -421,7 +421,7 @@
                                                          var totalAmount = sumOfTotalAmount + taxAmount;
                                                       %>
                                                          <%= currency_symbols[0].symbol %> <%= taxAmount %> -->
-                                                         <%= invoiceDetails.final_amount - invoiceDetails.total_amount %>
+                                                         <%= (invoiceDetails.final_amount - invoiceDetails.total_amount).toFixed(2) %>
                                                   </td>
                                               </tr>
                                             <% } %>

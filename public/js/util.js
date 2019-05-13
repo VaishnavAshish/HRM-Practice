@@ -3,7 +3,7 @@ $(document).ready(function(){
     initTimeHHMM();
     activePageLink();
     $(".open-date-pik").flatpickr({
-        dateFormat: "Y-m-d"
+        dateFormat: "m-d-Y"
     });
     $(".open-time-pik-24").flatpickr(
         {
@@ -49,7 +49,7 @@ function setDateToFlatpicker(inputId, date) {
     $(date).flatpickr({
         onReady: function (selectedDates, dateStr, instance) {
             $(date).val(
-                instance.formatDate(new Date(date), 'Y-m-d')
+                instance.formatDate(new Date(date), 'm-d-Y')
             )
         },
     });

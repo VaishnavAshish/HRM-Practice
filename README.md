@@ -1143,7 +1143,7 @@ if (MM < 10) {
 console.log(MM + '-' + DD + '-' + YYYY); // 03-30-2016
 ```
 ```MomentJS
-console.log(moment(new Date(), 'MM-DD-YYYY'));
+console.log(moment(new Date(), 'YYYY-MM-DD'));
 ```
 
 ```js

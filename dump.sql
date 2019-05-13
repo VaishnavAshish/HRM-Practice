@@ -1175,15 +1175,13 @@ DECLARE
 BEGIN
 	IF NEW.invoice_starting_number <> OLD.invoice_starting_number THEN
 		RAISE NOTICE 'invoice_starting_number(%)', NEW.invoice_starting_number;
-		SELECT INTO invoice_start_number setval('invoice_id_seq', NEW.invoice_starting_number, TRUE);
-
+		RAISE NOTICE 'company_id(%)', OLD.company_id;
+		SELECT INTO invoice_start_number setval('seq_invoice_'||OLD.company_id, NEW.invoice_starting_number, TRUE);
 
   	END IF;
  RETURN NEW;
 END;
 $BODY$
-
-
 
 CREATE TRIGGER update_invoice_seq_number
 AFTER UPDATE

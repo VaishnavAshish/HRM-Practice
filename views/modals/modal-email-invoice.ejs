@@ -19,19 +19,38 @@
                               <abbr class="slds-required" title="required">*</abbr>
                           </label>
                           <div class="slds-form-element__control">
-                              <input type="text" id="client_email" name="client_email" class="slds-input" value="<%= account.email %>" disabled>
+                              <input type="text" id="client_email" name="client_email" class="slds-input" value="<%= account.email %>" required="" disabled>
                               <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset="errmsg"></div>
                           </div>
                       </div>
-                      <div class="slds-form-element slds-m-bottom_medium" reset="errorclass">
-                            <label class="slds-form-element__label">
-                                CC
-                            </label>
-                            <div class="slds-form-element__control">
-                                <input type="text" id="extra_email" name="extra_email" class="slds-input" reset='value' placeholder="Enter comma seperated email id to send copy of email.">
-                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset="errmsg"></div>
-                            </div>
-                        </div>
+                    <div class="slds-form-element slds-m-bottom_medium" reset="errorclass">
+                          <label class="slds-form-element__label">
+                              CC
+                          </label>
+                          <div class="slds-form-element__control">
+                              <input type="text" id="extra_email" name="extra_email" class="slds-input" reset='value' placeholder="Enter comma seperated email id to send copy of email.">
+                              <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset="errmsg"></div>
+                          </div>
+                      </div>
+                    <div class="slds-form-element slds-m-bottom_medium" reset="errorclass">
+                          <label class="slds-form-element__label">
+                              Subject line
+                              <abbr class="slds-required" title="required">*</abbr>
+                          </label>
+                          <div class="slds-form-element__control">
+                              <input type="text" id="subject_line" name="subject_line" class="slds-input" value="Invoice from <%= user.company_info.name %> on krow timesheet app" placeholder="Enter subject line of the email." required="">
+                              <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset="errmsg"></div>
+                          </div>
+                      </div>
+                    <div class="slds-form-element slds-m-bottom_medium" reset="errorclass">
+                          <label class="slds-form-element__label">
+                              Body
+                          </label>
+                          <div class="slds-form-element__control">
+                              <input type="text" id="body_of_email" name="body_of_email" class="slds-input" reset='value' placeholder="Enter body of the email.">
+                              <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset="errmsg"></div>
+                          </div>
+                      </div>
                 </div>
             </div>
             <footer class="slds-modal__footer">

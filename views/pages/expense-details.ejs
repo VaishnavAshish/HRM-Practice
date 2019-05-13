@@ -53,7 +53,7 @@
                                 <div class="text-right sm-tpd-15">
                                   <% if(user.permissions.indexOf('expenseApprover')==-1) { %>
                                       <% if(!expense.submitted){ %>
-                                        <button class="slds-button slds-button_brand slds-align-top" onclick="submitExpense('<%= expense.id %>')" submitted>
+                                        <button class="slds-button slds-button_dark-green slds-align-top" onclick="submitExpense('<%= expense.id %>')" submitted>
                                             Submit
                                         </button>
                                         <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteExpense(\'<%= expense.id %>\')')" submitted>
@@ -63,7 +63,7 @@
                                         </button>
 
                                       <% } else { %>
-                                        <button class="slds-button slds-button_brand slds-align-top" onclick="submitExpense('<%= expense.id %>')" disabled submitted >
+                                        <button class="slds-button slds-button_dark-green slds-align-top" onclick="submitExpense('<%= expense.id %>')" disabled submitted >
                                             Submit
                                         </button>
                                         <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteExpense(\'<%= expense.id %>\')')" title="Delete" disabled submitted>
@@ -75,11 +75,11 @@
                                   <% } else { %>
                                       <% if(!expense.invoiced){ %>
                                         <% if(!expense.submitted) { %>
-                                            <button class="slds-button slds-button_brand slds-align-top" onclick="submitExpense('<%= expense.id %>')" submitted>
+                                            <button class="slds-button slds-button_dark-green slds-align-top" onclick="submitExpense('<%= expense.id %>')" submitted>
                                                 Submit
                                             </button>
                                         <% } else { %>
-                                          <button class="slds-button slds-button_brand slds-align-top" onclick="submitExpense('<%= expense.id %>')" disabled submitted>
+                                          <button class="slds-button slds-button_dark-green slds-align-top" onclick="submitExpense('<%= expense.id %>')" disabled submitted>
                                               Submit
                                           </button>
                                         <% } %>
@@ -90,7 +90,7 @@
                                         </button>
 
                                       <% } else { %>
-                                        <button class="slds-button slds-button_brand slds-align-top" onclick="submitExpense('<%= expense.id %>')" disabled submitted >
+                                        <button class="slds-button slds-button_dark-green slds-align-top" onclick="submitExpense('<%= expense.id %>')" disabled submitted >
                                             Submit
                                         </button>
                                         <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteExpense(\'<%= expense.id %>\')')" title="Delete" disabled submitted>

@@ -550,7 +550,7 @@ exports.postAddCompany = (req, res) => {
                         let company_id = company.rows[0].id;
                         client.query('Insert into SETTING (expense_category,user_role,company_address,invoice_note,currency,timezone,company_id,weekstartday) values ($1,$2,$3,$4,$5,$6,$7,$8)  RETURNING id', [
                           ['Food'],
-                          ['Consultant', 'Developer'], '', '', 'USD', 'America/Los_Angeles', company_id , 'sunday'
+                          ['Consultant', 'Project Manager'], '', '', 'USD', 'America/Los_Angeles', company_id , 'sunday'
                         ], function(err, companySetting) {
                           if (err) {
                             handleResponse.shouldAbort(err, client, done);
@@ -566,7 +566,7 @@ exports.postAddCompany = (req, res) => {
                                     handleResponse.shouldAbort(err, client, done);
                                     handleResponse.handleError(res, err, ' Error in adding company task to the database');
                                   } else {
-                                    client.query('Insert into USERS( password, email, company_id, user_role,created_date,modified_date,add_status, password_reset_token, role,permissions) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING id', [req.body.adminPass, req.body.adminEmail, company.rows[0].id, '{"ADMIN"}', 'now()', 'now()', 'Invited', token, "Manager", '{"timesheetEntry","expenseManager","projectManager","invoiceManager","timesheetApprover","expenseApprover"}'], function(err, addedUser) {
+                                    client.query('Insert into USERS( password, email, company_id, user_role,created_date,modified_date,add_status, password_reset_token, role,permissions) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING id', [req.body.adminPass, req.body.adminEmail, company.rows[0].id, '{"ADMIN"}', 'now()', 'now()', 'Invited', token, "Project Manager", '{"timesheetEntry","expenseManager","projectManager","invoiceManager","timesheetApprover","expenseApprover"}'], function(err, addedUser) {
                                       if (err) {
                                         handleResponse.shouldAbort(err, client, done);
                                         handleResponse.handleError(res, err, ' Error in adding admin user to the database');
@@ -635,8 +635,8 @@ sendEmailToUser = (req, res, next) => {
     '<tbody>' +
     '<tr>' +
     '<td valign="top" align="center" style="padding-top: 20px; padding-bottom: 10px;">' +
-    '<a href="/" target="_blank">' +
-    '<img src="/img/klient.png" alt=""  width="120">' +
+    '<a href="javascript:void(0);" target="_blank">' +
+    '<img src="https://krow-timesheet-app.herokuapp.com/img/klient.png" alt=""  width="120" height="60">' +
     '</a>' +
     '</td>' +
     '</tr>' +
