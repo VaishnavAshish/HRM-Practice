@@ -10,7 +10,7 @@
                 </button>
                 <h2  class="slds-text-heading_medium slds-hyphenate">Email Invoice</h2>
             </header>
-            <div class="slds-modal__content slds-p-around_medium" modal-body>
+            <div class="slds-modal__content slds-p-around_medium" modal-body id="sendInvoiceEmailForm">
                 <div>
 
                     <div class="slds-form-element slds-m-bottom_medium" reset="errorclass">
@@ -55,7 +55,7 @@
             </div>
             <footer class="slds-modal__footer">
                 <button class="slds-button slds-button_neutral" onclick="closeModal('#modalEmailInvoice');">Cancel</button>
-                <button class="slds-button slds-button_brand" onclick="sendInvoiceEmail('#modalEmailInvoice')">Send Email</button>
+                <button class="slds-button slds-button_brand" onclick="sendInvoiceEmail('#modalEmailInvoice','#sendInvoiceEmailForm')">Send Email</button>
             </footer>
         </div>
     </section>

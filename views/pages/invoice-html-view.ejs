@@ -464,7 +464,11 @@
                             </div> -->
                             <div class="slds-p-vertical_large slds-p-left_large">
                                 <!-- <span class="text-dull slds-p-right_small"> -->
-                                    <%= invoiceDetails.description %>
+                                    <% let description =  invoiceDetails.description.split("\\n") %>
+                                    <% description.forEach(note => { %>
+                                      <span class="slds-wrap"><%= note%></span><BR/>
+                                    <% }) %>
+
                                 <!-- </span> -->
                                 <!-- <img src="../img/klient.png" alt="" width="50"> -->
                             </div>

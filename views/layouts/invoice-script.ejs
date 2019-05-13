@@ -97,13 +97,19 @@ function createInvoice(modalId) {
 function updateInvoiceDetails(invoiceId, formId) {
     /*addInvoiceItem( (err,result) => {
         if(result==true){*/
+        $("#invoice-details-form").removeClass('has-error')
         showLoader('#globalLoader');
         var invoiceData = createJSONForFormData(formId);
         invoiceData.invoiceId = invoiceId;
         invoiceData.total_amount = parseInt($("#invoice_total_amount").text());
         invoiceData.tax_per = parseFloat($("#inv-tax-per").val());
+        invoiceData.description = $("#invoice_note").val().replace(/\r?\n/g,"\\n");
         console.log(invoiceData);
         checkFormValidation("#invoice-details-form");
+        if($("#invoice_note").val().replace(/\r?\n/g,"\\n").length>5000){
+          addError('#invoice_note', "Please enter note data upto 5000 character");
+          $("#invoice-details-form").addClass('has-error');
+        }
         if(!$("#invoice-details-form").hasClass('has-error')) {
             showLoader('#globalLoader');
             $.ajax({
@@ -133,6 +139,8 @@ function updateInvoiceDetails(invoiceId, formId) {
                         showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
                 }
             });
+          }else{
+            hideLoader('#globalLoader');
           }
         /*}
 

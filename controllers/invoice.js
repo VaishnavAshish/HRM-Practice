@@ -1920,7 +1920,6 @@ exports.findInvoiceForAccount = (req, res) => {
     });
 };
 exports.sendInvoiceEmail = (req,res) =>{
-  console.log('sendInvoiceEmail');
     invoiceHtmlData(req,res,false,'send-email');
 }
 
@@ -2042,8 +2041,10 @@ function invoiceHtmlData (req,res,invoiceHtml,responseType){
                                                                                         let startDateFormatted=invoiceDetails.rows[0]['created_date']==null?'':dateFormat(invoiceDetails.rows[0].created_date);
                                                                                         let dueDateFormatted=invoiceDetails.rows[0]['due_date']==null?'':dateFormat(invoiceDetails.rows[0].due_date);
                                                                                         // console.log('start and due dates arre'+startDateFormatted+' '+dueDateFormatted);
+
                                                                                         invoiceDetails.rows[0]['startDateFormatted'] = startDateFormatted;
                                                                                         invoiceDetails.rows[0]['dueDateFormatted'] = dueDateFormatted;
+                                                                                        // invoiceDetails.rows[0]['description'] = invoiceDetails.rows[0]['description'].split("\\n").join("<br />");
                                                                                         done();
                                                                                         if(accountDetails.rows.length>0){
                                                                                             accountDetails.rows[0].street=(accountDetails.rows[0].street==null) ? '' : accountDetails.rows[0].street;
@@ -2181,6 +2182,10 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
 
         });
     }
+    let description = '';
+    invoiceDetails.description.split("\\n").forEach(data => {
+      description += `<span class="">${data}</span><BR/>`;
+    })
 
     if(sumOfTotalAmount==NaN){
         sumOfTotalAmount=0.00;
@@ -2200,7 +2205,7 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
                             ${companySetting.country?companySetting.country:''}${isComma(companySetting.country)}
                             ${companySetting.zip_code?companySetting.zip_code:''} <BR />`;
 
-let account_address = `<strong>${accountDetails.name}</strong><BR />
+    let account_address = `<strong>${accountDetails.name}</strong><BR />
                             ${accountDetails.street?accountDetails.street:''} <BR />
                             ${accountDetails.city?accountDetails.city:''}${isComma(accountDetails.city)}
                             ${accountDetails.state?accountDetails.state:''} <BR />
@@ -2324,10 +2329,7 @@ let account_address = `<strong>${accountDetails.name}</strong><BR />
                               letter-spacing: 0.0625rem;
                               font-weight: normal
                             }
-                            html,body {
-                              margin: 0;
-                              padding: 0;
-                            }
+                            
                         </style>
                         <div>
                             <div class="bpd-50">
@@ -2496,7 +2498,7 @@ let account_address = `<strong>${accountDetails.name}</strong><BR />
 
                             <div class="" id="pageFooter">
                                 <span class="text-dull">
-                                    ${invoiceDetails.description}
+                                    ${description}
                                 </span>
 
                             </div>

@@ -698,15 +698,15 @@
     $("#invoiceLineItem").append(lineItemHtml);
   }
 
-  function sendInvoiceEmail(modalId) {
-    // $(formId).removeClass('has-error')
+  function sendInvoiceEmail(modalId,formId) {
+    $(formId).removeClass('has-error')
     showLoader('#globalLoader');
     let client_email = "<%= account.email %>"
     let extra_email = $("#extra_email").val();
     let subject_line = $("#subject_line").val();
     let body_of_email = $("#body_of_email").val();
-    // checkFormValidation(formId);
-    // if(!$(formId).hasClass('has-error')) {
+    checkFormValidation(formId);
+    if(!$(formId).hasClass('has-error')) {
       $.ajax({
           type: 'POST',
           url : '/sendInvoiceEmail',
@@ -729,9 +729,9 @@
               showGlobalToast('#globalToast', 'error', 'Error in sending email.Please try again', 4000);
           }
       });
-    // }else{
-    //   hideLoader('#globalLoader');
-    // }
+    }else{
+      hideLoader('#globalLoader');
+    }
   }
 
   function openMapping(modalId,integrationType){
