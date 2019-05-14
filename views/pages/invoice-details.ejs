@@ -57,11 +57,11 @@
 
                                 <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
                                     <div class="text-right sm-tpd-15">
-                                      <% if(user.company_info.quickbook_enabled == "true"){ %>
+                                      <% if(user.company_info.quickbook_enabled){ %>
                                           <button class="slds-button slds-button_brand slds-align-top" onclick="openMapping('#modalQuickbookMapping','Quickbook')" disableWhenPaid>
                                               Post To Accounting
                                           </button>
-                                      <% } else if(user.company_info.xero_enabled == "true") { %>
+                                      <% } else if(user.company_info.xero_enabled) { %>
                                         <button class="slds-button slds-button_brand slds-align-top" onclick="openMapping('#modalXeroMapping','Xero')" disableWhenPaid>
                                             Post To Accounting
                                         </button>
