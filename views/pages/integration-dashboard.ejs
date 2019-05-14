@@ -75,10 +75,8 @@
                 <div class="slds-card slds-p-around_small" style="min-height: 70vh">
                     <ul class="slds-grid slds-grid_pull-padded slds-wrap">
                         <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
-                          <% console.log('user.company_info.xero_enabled') %>
-                          <% console.log(typeof user.company_info.xero_enabled) %>
-                          <% console.log(!!(user.company_info.xero_enabled)) %>
-                          <% if(!(user.company_info.xero_enabled)){ %>
+
+                          <% if(user.company_info.xero_enabled == "false"){ %>
                             <a href="javascript:void(0);" class="slds-app-launcher__tile slds-text-link_reset slds-m-vertical_medium " onclick="openModal('#modalQuickbookSetting', true)">
                           <% } else { %>
                             <a href="javascript:void(0);" class="slds-app-launcher__tile slds-text-link_reset slds-m-vertical_medium ">
@@ -94,7 +92,7 @@
                                             </strong>
                                         </div>
                                         <div class="slds-truncate text-dull">Online Invoicing Software for small businesses </div>
-                                        <% if(user.company_info.quickbook_enabled){ %>
+                                        <% if(user.company_info.quickbook_enabled == "true"){ %>
                                           <div>
                                             <span class="slds-badge slds-theme_success">Active</span>
                                           </div>
@@ -104,7 +102,7 @@
                             </a>
                         </li>
                           <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
-                            <% if(!user.company_info.quickbook_enabled){ %>
+                            <% if(user.company_info.quickbook_enabled == "false"){ %>
                               <a href="javascript:void(0);" class="slds-app-launcher__tile slds-text-link_reset slds-m-vertical_medium " onclick="openModal('#modalXeroSetting', true)">
                             <% } else { %>
                               <a href="javascript:void(0);" class="slds-app-launcher__tile slds-text-link_reset slds-m-vertical_medium ">
@@ -120,7 +118,7 @@
                                               </strong>
                                           </div>
                                           <div class="slds-truncate text-dull">Online Accounting Software for small business. </div>
-                                          <% if(user.company_info.xero_enabled){ %>
+                                          <% if(user.company_info.xero_enabled == "true"){ %>
                                             <div>
                                               <span class="slds-badge slds-theme_success">Active</span>
                                             </div>
