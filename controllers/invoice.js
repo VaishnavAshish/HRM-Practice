@@ -2329,7 +2329,7 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
     }
     let description = '';
     invoiceDetails.description.split("\\n").forEach(data => {
-      description += `<p class="slds-hyphenate">${data}</p><BR/>`;
+      description += `<p class="slds-hyphenate">${data}</p>`;
     })
 
     if(sumOfTotalAmount==NaN){
