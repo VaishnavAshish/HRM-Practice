@@ -2633,7 +2633,7 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
                                             </td>
                                             <td align="right" width="20%">
                                                 <strong class="text-size-18">
-                                                    ${currency_symbols[0].symbol} ${(invoiceDetails.final_amount).toFixed(2)}
+                                                    ${currency_symbols[0].symbol} ${parseFloat(invoiceDetails.final_amount).toFixed(2)}
                                                 </strong>
                                             </td>
                                         </tr>
