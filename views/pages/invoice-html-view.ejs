@@ -31,7 +31,7 @@
                                             Amount:
                                         </span>
                                         <strong>
-                                           <%= currency_symbols[0].symbol %>  <%= (invoiceDetails.final_amount).toFixed(2) %>
+                                           <%= currency_symbols[0].symbol %>  <%= parseFloat(invoiceDetails.final_amount).toFixed(2) %>
                                         </strong>
                                     </div>
                                 </div>
@@ -442,7 +442,7 @@
                                                 <td class="slds-cell-wrap slds-text-align_right">
                                                     <div class="text-size-18 slds-p-vertical_x-small">
                                                         <strong>
-                                                            <%= currency_symbols[0].symbol %> <%= (invoiceDetails.final_amount).toFixed(2) %>
+                                                            <%= currency_symbols[0].symbol %> <%= parseFloat(invoiceDetails.final_amount).toFixed(2) %>
                                                         </strong>
                                                     </div>
                                                 </td>
