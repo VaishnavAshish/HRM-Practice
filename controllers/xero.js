@@ -281,6 +281,8 @@ exports.postInvoiceToXero = (req,res) => {
                                                       console.log('invoiceResult')
                                                       console.log(invoiceResult)
                                                       console.log(invoiceResult.Invoices[0].InvoiceNumber);
+                                                      console.log(invoiceResult.Invoices[0].ValidationErrors);
+
                                                       client.query('UPDATE INVOICE set xero_invoice_id=$1,status=$2 where id=$3',[invoiceResult.Invoices[0].InvoiceNumber,'POSTED',req.body.invoiceId], function(err, updatedInvoiceInfo) {
                                                          if (err){
                                                            handleResponse.shouldAbort(err, client, done);
