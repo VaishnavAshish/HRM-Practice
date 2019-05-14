@@ -1337,7 +1337,9 @@ exports.getInvoiceDetails = (req, res) => {
                                                                   })
                                                                   // console.log('previousCurrency '+JSON.stringify(previousCurrency));
                                                                   previousCurrency=parseFloat(previousCurrency[0].value);
-                                                                  let line_total_amount=(currentCurrency/previousCurrency*parseFloat(lineItem.total_amount));
+                                                                  let line_total_amount=(currentCurrency/previousCurrency*parseFloat(lineItem.total_amount)).toFixed(2);
+                                                                  lineItem.total_amount = line_total_amount;
+                                                                  lineItem.unit_price = (currentCurrency/previousCurrency*parseFloat(lineItem.unit_price)).toFixed(2);
                                                                   // console.log('total_amount '+line_total_amount);
                                                                   if(lineItem.expense_id==null){
                                                                     invoice_taxable_amount+=parseFloat(line_total_amount);
@@ -1368,7 +1370,7 @@ exports.getInvoiceDetails = (req, res) => {
                                                           // let invoice_tax=(parseFloat(invoice_total_amount) * parseFloat(invoiceDetails.rows[0].tax)) / 100;
                                                           // invoice_total_amount=(parseFloat(invoice_total_amount)+parseFloat(invoice_tax)).toFixed(2);
                                                           let newDate=moment.tz(new Date(), companyDefaultTimezone).format();
-                                                          client.query('UPDATE INVOICE SET total_amount=$1 ,updated_date=$2 WHERE id=$3 RETURNING *', [invoice_total_amount,'now()',req.query.invoiceId], function (err, invoiceUpdated) {
+                                                          client.query('UPDATE INVOICE SET total_amount=$1,final_amount=$2 ,updated_date=$3 WHERE id=$4 RETURNING *', [invoiceDetails.rows[0].total_amount,invoiceDetails.rows[0].final_amount,'now()',req.query.invoiceId], function (err, invoiceUpdated) {
                                                               if (err) {
                                                                   console.error(err);
                                                                   handleResponse.shouldAbort(err, client, done);
@@ -1671,6 +1673,93 @@ function deleteInvoiceLineItem(done, res, err, client, lineItemId, result) {
     });
 }
 
+function deleteRelatedInvoiceItem(req,res,client,invoiceLineItem,done,error,cb) {
+  console.log(invoiceLineItem);
+  console.log(invoiceLineItem.timesheet_row_id != null);
+  if(invoiceLineItem.timesheet_row_id != null) {
+      client.query('SELECT * FROM invoice_line_item WHERE id=$1', [invoiceLineItem.id], function (err, lineItemDetails) {
+         if (err) {
+          handleResponse.shouldAbort(err, client, done);
+          handleResponse.handleError(res, err, ' Error in getting invoice line item details');
+         } else {
+              let timesheetIds = '';
+              lineItemDetails.rows[0].timesheet_row_id.forEach(function (lineId, index) {
+                let line_item = lineId;
+                if((lineItemDetails.rows[0].timesheet_row_id.length-1) == index) {
+                  timesheetIds = timesheetIds + line_item;
+                } else {
+                  timesheetIds = timesheetIds + line_item + ', ';
+                }
+              });
+              timesheetIds = '(' + timesheetIds + ')';
+
+              unInvoicedTimesheetLineItem(done, res, error, client, timesheetIds, function (result) {
+                 if(result) {
+                     deleteInvoiceLineItem(done, res, error, client, invoiceLineItem.id, function (response) {
+                       cb(true);
+                      //  client.query('COMMIT', (err) => {
+                      //    if (err) {
+                      //      handleResponse.shouldAbort(err, client, done);
+                      //      handleResponse.handleError(res, err, ' Error in committing transaction');
+                      //    } else {
+                      //      done();
+                      //      handleResponse.sendSuccess(res,'Invoice detail data deleted successfully',{});
+                      //    }
+                      //  })
+                     });
+                 } else {
+                   handleResponse.shouldAbort('Error in deleting invoice detail data', client, done);
+                   handleResponse.handleError(res, 'Error in deleting invoice detail data', 'Error in deleting invoice detail data');
+
+                 }
+             });
+         }
+      });
+  } else if (invoiceLineItem.expense_id != null) {
+    console.log(invoiceLineItem.expense_id != null);
+      unInvoicedExpense(done, res, error, client, invoiceLineItem.expense_id, function (result) {
+          if(result) {
+              deleteInvoiceLineItem(done, res, error, client,invoiceLineItem.id, function (response) {
+                cb(true);
+                // client.query('COMMIT', (err) => {
+                //   if (err) {
+                //     handleResponse.shouldAbort(err, client, done);
+                //     handleResponse.handleError(res, err, ' Error in committing transaction');
+                //   } else {
+                //     done();
+                //     handleResponse.sendSuccess(res,'Invoice detail data deleted successfully',{});
+                //   }
+                // })
+              });
+          } else {
+            handleResponse.shouldAbort('Error in deleting invoice detail data', client, done);
+            handleResponse.handleError(res, 'Error in deleting invoice detail data', 'Error in deleting invoice detail data');
+          }
+      });
+  } else {
+      console.log(invoiceLineItem.id)
+      client.query('DELETE FROM invoice_line_item WHERE id=$1', [invoiceLineItem.id], function (err, updatedIRec) {
+          if (err) {
+              console.error(err);
+              handleResponse.shouldAbort(err, client, done);
+              handleResponse.handleError(res, err, ' Error in deleting invoice line item.');
+          } else {
+            cb(true);
+            // client.query('COMMIT', (err) => {
+            //   if (err) {
+            //     handleResponse.shouldAbort(err, client, done);
+            //     handleResponse.handleError(res, err, ' Error in committing transaction');
+            //   } else {
+            //     done();
+            //     handleResponse.sendSuccess(res,'Invoice detail data deleted successfully',{});
+            //   }
+            // })
+          }
+      });
+  }
+
+}
+
 exports.deleteInvoice = (req, res) => {
     if(req.user){
         // console.log('Archived Invoice -------------' + req.body.invoiceId);
@@ -1678,33 +1767,74 @@ exports.deleteInvoice = (req, res) => {
         if(invoiceId==''||invoiceId==null||invoiceId==undefined){
              handleResponse.handleError(res, 'incorrect invoice id', ' Invoice id is not correct');
         }else{
-
-            pool.connect((err, client, done) => {
+            pool.connect((error, client, done) => {
               client.query('BEGIN', (err) => {
                 if (err){
                   handleResponse.shouldAbort(err, client, done);
                   handleResponse.handleError(res, err, ' error in connecting to database');
                 } else {
-                  client.query('UPDATE invoice SET archived = $1 WHERE id=$2', [true, req.body.invoiceId], function (err, archivedInvoice) {
+                  client.query('SELECT * FROM INVOICE_LINE_ITEM WHERE invoice_id=$1', [req.body.invoiceId], function (err, invoiceLineItemData) {
                       if (err) {
                           console.error(err);
                           handleResponse.shouldAbort(err, client, done);
-                          handleResponse.handleError(res, err, ' Error in deleting invoice.');
+                          handleResponse.handleError(res, err, ' Error in finding invoice line item related to the invoice.');
                       } else {
-                        client.query('COMMIT', (err) => {
-                          if (err) {
-                            handleResponse.shouldAbort(err, client, done);
-                            handleResponse.handleError(res, err, ' Error in committing transaction');
-                          } else {
-                            console.error('Affected ID>>>>>>>>>>>>>');
-                            // console.log(archivedInvoice.rows[0]);
-                            done();
-                            handleResponse.sendSuccess(res,'Invoice Deleted successfully',{});
-                            /*res.status(200).json({ "success": true ,"message":"success"});*/
-                          }
-                        })
+                        if(invoiceLineItemData.rows.length>0){
+                          invoiceLineItemData.rows.forEach((invoiceLineItem,index) => {
+                            // console.log('invoiceLineItem');
+                            // console.log(invoiceLineItem);
+                            deleteRelatedInvoiceItem(req,res,client,invoiceLineItem,done,error,function(result){
+                              console.log('result');
+                              console.log(result);
+                            });
+                            console.log(index+' '+(invoiceLineItemData.rows.length-1))
+                            if(index == (invoiceLineItemData.rows.length-1)){
+                              client.query('UPDATE invoice SET archived = $1 WHERE id=$2', [true, req.body.invoiceId], function (err, archivedInvoice) {
+                                if (err) {
+                                  console.error(err);
+                                  handleResponse.shouldAbort(err, client, done);
+                                  handleResponse.handleError(res, err, ' Error in deleting invoice.');
+                                } else {
+                                  client.query('COMMIT', (err) => {
+                                    if (err) {
+                                      handleResponse.shouldAbort(err, client, done);
+                                      handleResponse.handleError(res, err, ' Error in committing transaction');
+                                    } else {
+                                      console.error('Affected ID>>>>>>>>>>>>>');
+                                      // console.log(archivedInvoice.rows[0]);
+                                      done();
+                                      handleResponse.sendSuccess(res,'Invoice Deleted successfully',{});
+                                      /*res.status(200).json({ "success": true ,"message":"success"});*/
+                                    }
+                                  })
+                                }
+                              })
+                            }
+                          })
+                        }else{
+                          client.query('UPDATE invoice SET archived = $1 WHERE id=$2', [true, req.body.invoiceId], function (err, archivedInvoice) {
+                            if (err) {
+                              console.error(err);
+                              handleResponse.shouldAbort(err, client, done);
+                              handleResponse.handleError(res, err, ' Error in deleting invoice.');
+                            } else {
+                              client.query('COMMIT', (err) => {
+                                if (err) {
+                                  handleResponse.shouldAbort(err, client, done);
+                                  handleResponse.handleError(res, err, ' Error in committing transaction');
+                                } else {
+                                  console.error('Affected ID>>>>>>>>>>>>>');
+                                  // console.log(archivedInvoice.rows[0]);
+                                  done();
+                                  handleResponse.sendSuccess(res,'Invoice Deleted successfully',{});
+                                  /*res.status(200).json({ "success": true ,"message":"success"});*/
+                                }
+                              })
+                            }
+                          })
+                        }
                       }
-                  })
+                    })
                 }
               })
             });
@@ -1965,7 +2095,7 @@ function invoiceHtmlData (req,res,invoiceHtml,responseType){
                                     handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.user, error:err,pdfError:true},"error"," Error in fetching invoice details");
                                 }
                             } else {
-                                    client.query('SELECT il.id ,il.type ,il.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,il.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,il.item_date at time zone \''+companyDefaultTimezone+'\' as item_date ,il.archived ,il.hours ,il.unit_price ,il.cost_rate ,il.note ,il.amount ,il.tax ,il.total_amount ,il.timesheet_id ,il.expense_id ,il.project_id ,il.account_id ,il.invoice_id ,il.company_id ,il.user_id ,il.user_role ,il.quantity ,il.record_id ,il.currency ,il.timesheet_row_id FROM invoice_line_item il WHERE  invoice_id=$1',[invId], function (err, invoiceLineItems) {
+                                    client.query('SELECT il.id ,il.type ,il.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,il.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,il.item_date at time zone \''+companyDefaultTimezone+'\' as item_date ,il.archived ,il.hours ,il.unit_price ,il.cost_rate ,il.note ,il.amount ,il.tax ,il.total_amount ,il.timesheet_id ,il.expense_id ,il.project_id ,il.account_id ,il.invoice_id ,il.company_id ,il.user_id ,il.user_role ,il.quantity ,il.record_id ,il.currency ,il.timesheet_row_id FROM invoice_line_item il WHERE  invoice_id=$1 ORDER BY project_id,timesheet_id,expense_id,created_date',[invId], function (err, invoiceLineItems) {
                                         if (err) {
                                             handleResponse.shouldAbort(err, client, done);
                                             if(invoiceHtml==true){
@@ -1998,6 +2128,7 @@ function invoiceHtmlData (req,res,invoiceHtml,responseType){
                                                                     /*// console.log("invoiceLineItems");
                                                                     // console.log(invoiceLineItems);*/
                                                                     let invoiceLineList=[];
+                                                                    let invoice_total_amount=0,invoice_taxable_amount=0;
                                                                     if(invoiceLineItems.rows.length > 0) {
                                                                         invoiceLineItems.rows.forEach(function (lines,index) {
                                                                             let symbolsToSearch="EUR, "+invoiceDetails.rows[0].currency+", "+lines.currency;
@@ -2014,6 +2145,8 @@ function invoiceHtmlData (req,res,invoiceHtml,responseType){
                                                                                 previousCurrency=parseFloat(previousCurrency[0].value)
                                                                                 /*// console.log('previousCurrency '+previousCurrency)
                                                                                 // console.log('line amount is'+lines.total_amount);*/
+
+                                                                                // console.log('total_amount '+line_total_amount);
                                                                                 lines.total_amount=(currentCurrency/previousCurrency*(lines.total_amount)).toFixed(2);
                                                                                 lines.unit_price=(currentCurrency/previousCurrency*(lines.unit_price)).toFixed(2);
                                                                                 /*// console.log('-------latest------');
@@ -2029,6 +2162,10 @@ function invoiceHtmlData (req,res,invoiceHtml,responseType){
                                                                                     }
                                                                                 });
                                                                                 // console.log('amount '+lines.total_amount);
+                                                                                if(lines.expense_id==null){
+                                                                                  invoice_taxable_amount+=parseFloat(lines.total_amount);
+                                                                                }
+                                                                                invoice_total_amount+=parseFloat(lines.total_amount);
                                                                                 invoiceLineList.push(lines);
                                                                                 // console.log(invoiceLineItems.rows.length+' '+(index+1));
                                                                                 if(invoiceLineItems.rows.length==(index+1)){
@@ -2036,11 +2173,19 @@ function invoiceHtmlData (req,res,invoiceHtml,responseType){
                                                                                         // console.log('invoiceLineList');
                                                                                         // console.log(invoiceLineItems.rows.length+' '+(index+1));
                                                                                         /*// console.log(invoiceLineList);*/
-                                                                                        // let startDateFormatted=invoiceDetails.rows[0]['created_date']==null?'':dateFormat(moment.tz(invoiceDetails.rows[0].created_date, companyDefaultTimezone).format());
-                                                                                        // let dueDateFormatted=invoiceDetails.rows[0]['due_date']==null?'':dateFormat(moment.tz(invoiceDetails.rows[0].due_date, companyDefaultTimezone).format());
-                                                                                        let startDateFormatted=invoiceDetails.rows[0]['created_date']==null?'':dateFormat(invoiceDetails.rows[0].created_date);
-                                                                                        let dueDateFormatted=invoiceDetails.rows[0]['due_date']==null?'':dateFormat(invoiceDetails.rows[0].due_date);
+                                                                                        let startDateFormatted=invoiceDetails.rows[0]['created_date']==null?'':moment.tz(invoiceDetails.rows[0].created_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                                                                        let dueDateFormatted=invoiceDetails.rows[0]['due_date']==null?'':moment.tz(invoiceDetails.rows[0].due_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                                                                        // let startDateFormatted=invoiceDetails.rows[0]['created_date']==null?'':dateFormat(invoiceDetails.rows[0].created_date);
+                                                                                        // let dueDateFormatted=invoiceDetails.rows[0]['due_date']==null?'':dateFormat(invoiceDetails.rows[0].due_date);
                                                                                         // console.log('start and due dates arre'+startDateFormatted+' '+dueDateFormatted);
+                                                                                        invoiceDetails.rows[0].total_amount=invoice_total_amount.toFixed(2);
+
+                                                                                        invoiceDetails.rows[0].tax =parseInt(invoiceDetails.rows[0].tax);
+                                                                                        if(invoiceDetails.rows[0].tax&&invoiceDetails.rows[0].tax>0){
+                                                                                          invoiceDetails.rows[0].final_amount=parseFloat(invoice_total_amount.toFixed(2))+parseFloat(invoice_taxable_amount*invoiceDetails.rows[0].tax/100);
+                                                                                        }else{
+                                                                                          invoiceDetails.rows[0].final_amount=invoice_total_amount.toFixed(2);
+                                                                                        }
 
                                                                                         invoiceDetails.rows[0]['startDateFormatted'] = startDateFormatted;
                                                                                         invoiceDetails.rows[0]['dueDateFormatted'] = dueDateFormatted;
@@ -2080,10 +2225,10 @@ function invoiceHtmlData (req,res,invoiceHtml,responseType){
                                                                         /*// console.log("invoiceLineItems");
                                                                         // console.log(JSON.stringify(invoiceLineItems.rows));*/
                                                                     } else {
-                                                                        // let startDateFormatted=invoiceDetails.rows[0]['created_date']==null?'':dateFormat(moment.tz(invoiceDetails.rows[0].created_date, companyDefaultTimezone).format());
-                                                                        // let dueDateFormatted=invoiceDetails.rows[0]['due_date']==null?'':dateFormat(moment.tz(invoiceDetails.rows[0].due_date, companyDefaultTimezone).format());
-                                                                        let startDateFormatted=invoiceDetails.rows[0]['created_date']==null?'':dateFormat(invoiceDetails.rows[0].created_date);
-                                                                        let dueDateFormatted=invoiceDetails.rows[0]['due_date']==null?'':dateFormat(invoiceDetails.rows[0].due_date);
+                                                                        let startDateFormatted=invoiceDetails.rows[0]['created_date']==null?'':moment.tz(invoiceDetails.rows[0].created_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                                                        let dueDateFormatted=invoiceDetails.rows[0]['due_date']==null?'':moment.tz(invoiceDetails.rows[0].due_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                                                        // let startDateFormatted=invoiceDetails.rows[0]['created_date']==null?'':dateFormat(invoiceDetails.rows[0].created_date);
+                                                                        // let dueDateFormatted=invoiceDetails.rows[0]['due_date']==null?'':dateFormat(invoiceDetails.rows[0].due_date);
                                                                         console.log('start and due dates arre'+startDateFormatted+' '+dueDateFormatted);
                                                                         invoiceDetails.rows[0]['startDateFormatted'] = startDateFormatted;
                                                                         invoiceDetails.rows[0]['dueDateFormatted'] = dueDateFormatted;
@@ -2184,7 +2329,7 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
     }
     let description = '';
     invoiceDetails.description.split("\\n").forEach(data => {
-      description += `<span class="">${data}</span><BR/>`;
+      description += `<p class="slds-hyphenate">${data}</p><BR/>`;
     })
 
     if(sumOfTotalAmount==NaN){
@@ -2219,7 +2364,7 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
                         Tax
                     </td>
                     <td align="right" width="20%">
-                        ${currency_symbols[0].symbol} ${invoiceDetails.final_amount-invoiceDetails.total_amount}
+                        ${currency_symbols[0].symbol} ${(invoiceDetails.final_amount-invoiceDetails.total_amount).toFixed(2)}
                     </td>
                 </tr>`;
     }
@@ -2329,7 +2474,7 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
                               letter-spacing: 0.0625rem;
                               font-weight: normal
                             }
-                            
+
                         </style>
                         <div>
                             <div class="bpd-50">
@@ -2474,7 +2619,7 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
                                                 Subtotal
                                             </td>
                                             <td align="right" width="20%">
-                                                ${currency_symbols[0].symbol} ${invoiceDetails.total_amount}
+                                                ${currency_symbols[0].symbol} ${parseFloat(invoiceDetails.total_amount).toFixed(2)}
                                             </td>
                                         </tr>
                                         ${taxHTML}
@@ -2488,7 +2633,7 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
                                             </td>
                                             <td align="right" width="20%">
                                                 <strong class="text-size-18">
-                                                    ${currency_symbols[0].symbol} ${invoiceDetails.final_amount}
+                                                    ${currency_symbols[0].symbol} ${(invoiceDetails.final_amount).toFixed(2)}
                                                 </strong>
                                             </td>
                                         </tr>
@@ -2496,11 +2641,10 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
                                 </table>
                             </div>
 
-                            <div class="" id="pageFooter">
-                                <span class="text-dull">
+                            <div class="">
+                                <div class="text-dull text-size-10">
                                     ${description}
-                                </span>
-
+                                </div>
                             </div>
                         </div>
                     </body>
@@ -2520,7 +2664,13 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
     var options = {
       format: 'A4',
       width: '280mm',
-      height: '396mm'
+      height: '396mm',
+      header: {
+        "height": "28mm",
+      },
+      footer: {
+        "height": "28mm",
+      }
     };
     // console.log('hmtl is:');
     // console.log(pdfHTML);

@@ -32,7 +32,6 @@
                 </div>
                 <!-- breadcrumb end -->
                 <div class="">
-
                         <!-- header start end -->
                         <div class="slds-card slds-m-bottom_medium">
                             <div class="slds-grid slds-wrap slds-p-around_small">
@@ -369,7 +368,7 @@
                                                         Type
                                                     </strong>
                                                 </div>
-                                                <div class="slds-no-flex slds-p-horizontal_small invoice-col" style="width:45%">
+                                                <div class="slds-no-flex slds-p-horizontal_small invoice-col" style="width:43%">
                                                     <strong class="text-uppercase text-size-11">
                                                         Description
                                                     </strong>
@@ -379,7 +378,7 @@
                                                         Qty/hr
                                                     </strong>
                                                 </div>
-                                                <div class="slds-no-flex slds-p-horizontal_small invoice-col">
+                                                <div class="slds-no-flex slds-p-horizontal_small invoice-col" style="width:12%">
                                                     <strong class="text-uppercase text-size-11">
                                                         Unit Price
                                                     </strong>
@@ -553,7 +552,7 @@
                                                                 return parseInt(item.project_id) == parseInt(project.id);
                                                             });
                                                         %>
-                                                        <div class=" slds-no-flex slds-p-horizontal_small invoice-col" style="width:45%">
+                                                        <div class=" slds-no-flex slds-p-horizontal_small invoice-col" style="width:43%">
                                                             <div class="slds-form-element slds-m-bottom_small">
                                                                 <div class="slds-form-element__control">
                                                                   <textarea class="slds-textarea"  rows="1" onchange="enableSaveButton(this)" disableWhenPaid><%= item.note %></textarea>
@@ -579,7 +578,7 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="slds-no-flex slds-p-horizontal_small invoice-col">
+                                                        <div class="slds-no-flex slds-p-horizontal_small invoice-col" style="width:12%">
                                                             <div class="slds-form-element slds-m-bottom_small">
                                                                 <div class="slds-form-element__control">
                                                                     <input type="text" class="slds-input" disabled placeholder="" value="<%= item.unit_price %>">
@@ -625,7 +624,7 @@
                                                         <div class=" slds-no-flex slds-p-horizontal_small invoice-col" style="width:10%">
                                                             <div class="tpd-5">
                                                               <% var currency_symbols = currencyWithSymbolArray.filter(function(currency){
-                                                                  return currency.name == item.currency;
+                                                                  return currency.name == invoiceDetails.currency;
                                                               })%>
                                                                 <%=  currency_symbols[0].symbol %>
 

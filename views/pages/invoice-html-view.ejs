@@ -31,7 +31,7 @@
                                             Amount:
                                         </span>
                                         <strong>
-                                           <%= currency_symbols[0].symbol %>  <%= invoiceDetails.total_amount %>
+                                           <%= currency_symbols[0].symbol %>  <%= (invoiceDetails.final_amount).toFixed(2) %>
                                         </strong>
                                     </div>
                                 </div>
@@ -421,7 +421,7 @@
                                                          var totalAmount = sumOfTotalAmount + taxAmount;
                                                       %>
                                                          <%= currency_symbols[0].symbol %> <%= taxAmount %> -->
-                                                         <%= (invoiceDetails.final_amount - invoiceDetails.total_amount).toFixed(2) %>
+                                                           <%= currency_symbols[0].symbol %> <%= (invoiceDetails.final_amount - invoiceDetails.total_amount).toFixed(2) %>
                                                   </td>
                                               </tr>
                                             <% } %>
@@ -442,7 +442,7 @@
                                                 <td class="slds-cell-wrap slds-text-align_right">
                                                     <div class="text-size-18 slds-p-vertical_x-small">
                                                         <strong>
-                                                            <%= currency_symbols[0].symbol %> <%= invoiceDetails.final_amount %>
+                                                            <%= currency_symbols[0].symbol %> <%= (invoiceDetails.final_amount).toFixed(2) %>
                                                         </strong>
                                                     </div>
                                                 </td>
@@ -466,7 +466,7 @@
                                 <!-- <span class="text-dull slds-p-right_small"> -->
                                     <% let description =  invoiceDetails.description.split("\\n") %>
                                     <% description.forEach(note => { %>
-                                      <span class="slds-wrap"><%= note%></span><BR/>
+                                      <div class="slds-hyphenate"><%= note%></div><BR/>
                                     <% }) %>
 
                                 <!-- </span> -->
