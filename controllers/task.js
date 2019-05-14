@@ -126,10 +126,10 @@ exports.findTaskByName = (req, res) => {
                   let searchCount=0;
                   if (tasks.rows.length > 0) {
                     tasks.rows.forEach(function (data, index) {
-                      // let startDateFormatted = (data.start_date==null)?'':dateFormat(moment.tz(data.start_date, companyDefaultTimezone).format());
-                      // let endDateFormatted = (data.end_date==null)?'':dateFormat(moment.tz(data.end_date, companyDefaultTimezone).format());
-                      let startDateFormatted = (data.start_date==null)?'':dateFormat(data.start_date);
-                      let endDateFormatted = (data.end_date==null)?'':dateFormat(data.end_date);
+                      let startDateFormatted = (data.start_date==null)?'':moment.tz(data.start_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                      let endDateFormatted = (data.end_date==null)?'':moment.tz(data.end_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                      // let startDateFormatted = (data.start_date==null)?'':dateFormat(data.start_date);
+                      // let endDateFormatted = (data.end_date==null)?'':dateFormat(data.end_date);
                       data["startDateFormatted"] = startDateFormatted;
                       data["endDateFormatted"] = endDateFormatted;
                       taskAssList.rows.filter(function (taskAssignment) {

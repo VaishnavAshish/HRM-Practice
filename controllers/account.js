@@ -107,8 +107,8 @@ exports.findAccountByCriteria = (req, res) => {
             // console.log(JSON.stringify(accounts.rows));
             if (accounts.rows.length > 0) {
               accounts.rows.forEach(function (data) {
-                let created_date = dateFormat(moment.tz(data.created_date, companyDefaultTimezone).format());
-                let modified_date = dateFormat(moment.tz(data.modified_date, companyDefaultTimezone).format());
+                let created_date = moment.tz(data.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                let modified_date = moment.tz(data.modified_date, companyDefaultTimezone).format('MM-DD-YYYY');
                 data["created_date"] = created_date;
                 data["modified_date"] = modified_date;
               })
@@ -171,8 +171,8 @@ exports.getAccount = (req, res) => {
                         // console.log(moment.tz(data.modified_date, companyDefaultTimezone).format());
                         // data["created_date"] = dateFormat(moment.tz(data.created_date, companyDefaultTimezone).format());
                         // data["modified_date"] = dateFormat(moment.tz(data.modified_date, companyDefaultTimezone).format());
-                        data["created_date"] = dateFormat(data.created_date);
-                        data["modified_date"] = dateFormat(data.modified_date);
+                        data["created_date"] = moment.tz(data.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                        data["modified_date"] = moment.tz(data.modified_date, companyDefaultTimezone).format('MM-DD-YYYY');
 
                       })
 
@@ -190,6 +190,16 @@ exports.getAccount = (req, res) => {
       });
 
 };
+
+function minuteToHours(min) {
+    var num = min;
+    var hours = (num / 60);
+    var rhours = Math.floor(hours);
+    var minutes = (hours - rhours) * 60;
+    var rminutes = Math.round(minutes);
+    rminutes = rminutes < 10 ? '0'+rminutes : rminutes;
+    return rhours + ":" + rminutes;
+}
 
 exports.getAccountDetail = (req, res) => {
   setting.getCompanySetting(req, res ,(err,result)=>{
@@ -263,15 +273,16 @@ exports.getAccountDetail = (req, res) => {
                                 let startDateFormatted = '';
                                 let endDateFormatted = '';
                                 if(data.start_date != null) {
-                                  // startDateFormatted = dateFormat(moment.tz(data.start_date, companyDefaultTimezone).format());
-                                  startDateFormatted = dateFormat(data.start_date);
+                                  startDateFormatted = moment.tz(data.start_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                  // startDateFormatted = dateFormat(data.start_date);
                                 }
                                 if(data.end_date != null) {
-                                  // endDateFormatted = dateFormat(moment.tz(data.end_date, companyDefaultTimezone).format());
-                                  endDateFormatted = dateFormat(data.end_date);
+                                  endDateFormatted = moment.tz(data.end_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                  // endDateFormatted = dateFormat(data.end_date);
                                 }
                                 data["start_date"] = startDateFormatted;
                                 data["end_date"] = endDateFormatted;
+                                data["total_hours"] = minuteToHours(data["total_hours"]);
                                 /*data["percent_completed"] =data.total_hours/data.estimated_hours*100;*/
                               });
                               projectTotalCount=projectList.rows[0].total;
@@ -281,10 +292,10 @@ exports.getAccountDetail = (req, res) => {
                               invoiceList.rows.forEach(function (invoice) {
                                   // console.log(projectIdArr+'='+invoice.project_id);
                                   if(invoice.project_id==null||projectIdArr.includes(invoice.project_id)){
-                                    // invoice['start_date'] = invoice.start_date == null ? '' : dateFormat(moment.tz(invoice.start_date, companyDefaultTimezone).format());
-                                    // invoice['due_date'] = invoice.due_date == null ? '' : dateFormat(moment.tz(invoice.due_date, companyDefaultTimezone).format());
-                                    invoice['start_date'] = invoice.start_date == null ? '' : dateFormat(invoice.start_date);
-                                    invoice['due_date'] = invoice.due_date == null ? '' : dateFormat(invoice.due_date);
+                                    invoice['start_date'] = invoice.start_date == null ? '' : moment.tz(invoice.start_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                    invoice['due_date'] = invoice.due_date == null ? '' : moment.tz(invoice.due_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                    // invoice['start_date'] = invoice.start_date == null ? '' : dateFormat(invoice.start_date);
+                                    // invoice['due_date'] = invoice.due_date == null ? '' : dateFormat(invoice.due_date);
 
                                     invoiceListArr.push(invoice);
                                   }

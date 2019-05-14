@@ -899,7 +899,7 @@ function stopKwTimerWithLogEntry(lineItemId,ele, id, inputId, modalId,currentDat
               intervalID = NaN;
               let logSubmittedDate=$("[name=kwTimer]").attr("lineItemDate");
               if(typeof logSubmittedDate=="undefined"){
-                logSubmittedDate=dateFormat(moment.tz(currentDate, companyDefaultTimezone).format());
+                logSubmittedDate=moment.tz(currentDate, companyDefaultTimezone).format('MM-DD-YYYY');
               }
               $("#logSubmittedDate").text(logSubmittedDate);
               // $(inputId).val($($(id)[0]).text());

@@ -740,10 +740,10 @@ exports.findResourceByCriteria = (req, res) => {
                                   } else {
                                     userData['user_status'] = "Invited";
                                   }
-                                    // userData.created_date=dateFormat(moment.tz(userData.created_date, companyDefaultTimezone).format());
-                                    // userData.modified_date=dateFormat(moment.tz(userData.modified_date, companyDefaultTimezone).format());
-                                    userData.created_date=dateFormat(userData.created_date);
-                                    userData.modified_date=dateFormat(userData.modified_date);
+                                    userData.created_date=moment.tz(userData.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                    userData.modified_date=moment.tz(userData.modified_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                    // userData.created_date=dateFormat(userData.created_date);
+                                    // userData.modified_date=dateFormat(userData.modified_date);
                                 })
 
                                 searchCount=users.rows[0].searchcount;

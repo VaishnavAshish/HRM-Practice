@@ -214,10 +214,10 @@ exports.getInvoice = (req, res) => {
                                 if(invoiceList.rows.length>0){
                                     invoiceList.rows.forEach(function (invoice) {
                                         if(accountIdArr.includes(invoice.account_id)) {
-                                            // invoice['startDateFormatted'] = invoice.start_date == null ? '' : dateFormat(moment.tz(invoice.start_date, companyDefaultTimezone).format());
-                                            // invoice['dueDateFormatted'] = invoice.due_date == null ? '' : dateFormat(moment.tz(invoice.due_date, companyDefaultTimezone).format());
-                                            invoice['startDateFormatted'] = invoice.start_date == null ? '' : dateFormat(invoice.start_date);
-                                            invoice['dueDateFormatted'] = invoice.due_date == null ? '' : dateFormat(invoice.due_date);
+                                            invoice['startDateFormatted'] = invoice.start_date == null ? '' : moment.tz(invoice.start_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                            invoice['dueDateFormatted'] = invoice.due_date == null ? '' : moment.tz(invoice.due_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                            // invoice['startDateFormatted'] = invoice.start_date == null ? '' : dateFormat(invoice.start_date);
+                                            // invoice['dueDateFormatted'] = invoice.due_date == null ? '' : dateFormat(invoice.due_date);
                                             invoiceListArr.push(invoice);
                                         }
                                     });
@@ -1907,10 +1907,10 @@ exports.findInvoiceByCriteria = (req, res) => {
                               invoiceList.rows.forEach(function (invoice) {
                                   console.log(invoice.account_id);
                                   if(accountIdArr.includes(invoice.account_id)) {
-                                      // invoice['startDateFormatted'] = invoice.start_date == null ? null : dateFormat(moment.tz(invoice.start_date, companyDefaultTimezone).format());
-                                      // invoice['dueDateFormatted'] = invoice.due_date == null ? '' : dateFormat(moment.tz(invoice.due_date, companyDefaultTimezone).format());
-                                      invoice['startDateFormatted'] = invoice.start_date == null ? null : dateFormat(invoice.start_date);
-                                      invoice['dueDateFormatted'] = invoice.due_date == null ? '' : dateFormat(invoice.due_date);
+                                      invoice['startDateFormatted'] = invoice.start_date == null ? null : moment.tz(invoice.start_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                      invoice['dueDateFormatted'] = invoice.due_date == null ? '' : moment.tz(invoice.due_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                      // invoice['startDateFormatted'] = invoice.start_date == null ? null : dateFormat(invoice.start_date);
+                                      // invoice['dueDateFormatted'] = invoice.due_date == null ? '' : dateFormat(invoice.due_date);
                                       invoiceListArr.push(invoice);
                                   }
                               });
@@ -1973,10 +1973,10 @@ exports.findInvoiceForAccount = (req, res) => {
                         else{
                             if(invoices.rows.length>0){
                                 invoices.rows.forEach(function (invoice,index) {
-                                    // invoice['startDateFormatted'] = invoice.start_date == null ? '' : dateFormat(moment.tz(invoice.start_date, companyDefaultTimezone).format());
-                                    // invoice['dueDateFormatted'] = invoice.due_date == null ? '' : dateFormat(moment.tz(invoice.due_date, companyDefaultTimezone).format());
-                                    invoice['startDateFormatted'] = invoice.start_date == null ? '' : dateFormat(invoice.start_date);
-                                    invoice['dueDateFormatted'] = invoice.due_date == null ? '' : dateFormat(invoice.due_date);
+                                    invoice['startDateFormatted'] = invoice.start_date == null ? '' : moment.tz(invoice.start_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                    invoice['dueDateFormatted'] = invoice.due_date == null ? '' : moment.tz(invoice.due_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                    // invoice['startDateFormatted'] = invoice.start_date == null ? '' : dateFormat(invoice.start_date);
+                                    // invoice['dueDateFormatted'] = invoice.due_date == null ? '' : dateFormat(invoice.due_date);
                                     invoiceList.push(invoice);
                                     if(index==(invoices.rows.length-1)){
                                       searchCount=parseInt(invoices.rows[0].searchcount);
@@ -2029,10 +2029,10 @@ exports.findInvoiceForAccount = (req, res) => {
                             if(invoiceList.rows.length>0){
                                 invoiceList.rows.forEach(function (invoice) {
                                     if(accountIdArr.includes(invoice.account_id)) {
-                                        // invoice['startDateFormatted'] = invoice.start_date == null ? '' : dateFormat(moment.tz(invoice.start_date, companyDefaultTimezone).format());
-                                        // invoice['dueDateFormatted'] = invoice.due_date == null ? '' : dateFormat(moment.tz(invoice.due_date, companyDefaultTimezone).format());
-                                        invoice['startDateFormatted'] = invoice.start_date == null ? '' : dateFormat(invoice.start_date);
-                                        invoice['dueDateFormatted'] = invoice.due_date == null ? '' : dateFormat(invoice.due_date);
+                                        invoice['startDateFormatted'] = invoice.start_date == null ? '' : moment.tz(invoice.start_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                        invoice['dueDateFormatted'] = invoice.due_date == null ? '' : moment.tz(invoice.due_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                        // invoice['startDateFormatted'] = invoice.start_date == null ? '' : dateFormat(invoice.start_date);
+                                        // invoice['dueDateFormatted'] = invoice.due_date == null ? '' : dateFormat(invoice.due_date);
                                         invoiceListArr.push(invoice);
                                     }
                                 });

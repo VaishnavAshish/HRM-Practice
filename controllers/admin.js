@@ -227,10 +227,10 @@ exports.getCompanyDetail = (req, res) => {
                           // console.log('created_date'+resourceList.rows[0].created_date+'after conversion '+new Date(resourceList.rows[0].created_date));
                           // console.log('modified_date'+resourceList.rows[0].modified_date);
                           resourceList.rows.forEach(function(data) {
-                            // let created_date = dateFormat(moment.tz(data.created_date, companyDefaultTimezone).format());
-                            // let modified_date = dateFormat(moment.tz(data.modified_date, companyDefaultTimezone).format());
-                            let created_date = dateFormat(data.created_date);
-                            let modified_date = dateFormat(data.modified_date);
+                            let created_date = moment.tz(data.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                            let modified_date = moment.tz(data.modified_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                            // let created_date = dateFormat(data.created_date);
+                            // let modified_date = dateFormat(data.modified_date);
                             data["created_date"] = created_date;
                             data["modified_date"] = modified_date;
                           })
@@ -242,10 +242,10 @@ exports.getCompanyDetail = (req, res) => {
                         }
                         if (companies.rows.length > 0) {
                           companies.rows.forEach(function(data) {
-                            // let created_date = dateFormat(moment.tz(data.created_date, companyDefaultTimezone).format());
-                            // let modified_date = dateFormat(moment.tz(data.modified_date, companyDefaultTimezone).format());
-                            let created_date = dateFormat(data.created_date);
-                            let modified_date = dateFormat(data.modified_date);
+                            let created_date = moment.tz(data.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                            let modified_date = moment.tz(data.modified_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                            // let created_date = dateFormat(data.created_date);
+                            // let modified_date = dateFormat(data.modified_date);
                             data["created_date"] = created_date;
                             data["modified_date"] = modified_date;
                           })
@@ -308,10 +308,10 @@ exports.getUserProfile = (req, res) => {
           }
           if (users.rows.length > 0) {
 
-            // let created_date = dateFormat(moment.tz(users.rows[0].created_date, companyDefaultTimezone).format());
-            // let modified_date = dateFormat(moment.tz(users.rows[0].modified_date, companyDefaultTimezone).format());
-            let created_date = dateFormat(users.rows[0].created_date);
-            let modified_date = dateFormat(users.rows[0].modified_date);
+            let created_date = moment.tz(users.rows[0].created_date, companyDefaultTimezone).format('MM-DD-YYYY');
+            let modified_date = moment.tz(users.rows[0].modified_date, companyDefaultTimezone).format('MM-DD-YYYY');
+            // let created_date = dateFormat(users.rows[0].created_date);
+            // let modified_date = dateFormat(users.rows[0].modified_date);
             users.rows[0].created_date = created_date;
             users.rows[0].modified_date = modified_date;
           }
@@ -355,10 +355,10 @@ exports.getCompanyProfile = (req, res) => {
             }
 
             if (companies.rows.length > 0) {
-              // let created_date = dateFormat(moment.tz(companies.rows[0].created_date, companyDefaultTimezone).format());
-              // let modified_date = dateFormat(moment.tz(companies.rows[0].modified_date, companyDefaultTimezone).format());
-              let created_date = dateFormat(companies.rows[0].created_date);
-              let modified_date = dateFormat(companies.rows[0].modified_date);
+              let created_date = moment.tz(companies.rows[0].created_date, companyDefaultTimezone).format('MM-DD-YYYY');
+              let modified_date = moment.tz(companies.rows[0].modified_date, companyDefaultTimezone).format('MM-DD-YYYY');
+              // let created_date = dateFormat(companies.rows[0].created_date);
+              // let modified_date = dateFormat(companies.rows[0].modified_date);
               companies.rows[0].created_date = created_date;
               companies.rows[0].modified_date = modified_date;
 
@@ -439,10 +439,10 @@ exports.getAllCompanyResources = (req, res) => {
                     } else {
                       data['user_status'] = "Invited";
                     }
-                    // data["created_date"] = dateFormat(moment.tz(data.created_date, companyDefaultTimezone).format());
-                    // data["modified_date"] = dateFormat(moment.tz(data.modified_date, companyDefaultTimezone).format());
-                    data["created_date"] = dateFormat(data.created_date);
-                    data["modified_date"] = dateFormat(data.modified_date);
+                    data["created_date"] = moment.tz(data.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                    data["modified_date"] = moment.tz(data.modified_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                    // data["created_date"] = dateFormat(data.created_date);
+                    // data["modified_date"] = dateFormat(data.modified_date);
                   })
                   totalCount = resourceList.rows[0].totalcount;
                   activeCount = resourceList.rows[0].activecount;
@@ -815,10 +815,10 @@ exports.findCompanyByCriteria = (req, res) => {
         // console.log(JSON.stringify(companies.rows));
         if (companies.rows.length > 0) {
           companies.rows.forEach(function(data) {
-            // let created_date = dateFormat(moment.tz(data.created_date, companyDefaultTimezone).format());
-            // let modified_date = dateFormat(moment.tz(data.modified_date, companyDefaultTimezone).format());
-            let created_date = dateFormat(data.created_date);
-            let modified_date = dateFormat(data.modified_date);
+            let created_date = moment.tz(data.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
+            let modified_date = moment.tz(data.modified_date, companyDefaultTimezone).format('MM-DD-YYYY');
+            // let created_date = dateFormat(data.created_date);
+            // let modified_date = dateFormat(data.modified_date);
             data["created_date"] = created_date;
             data["modified_date"] = modified_date;
           })
@@ -878,10 +878,10 @@ exports.getCompany = (req, res) => {
             /*let activeCompany=[];*/
             if (companies.rows.length > 0) {
               companies.rows.forEach(function(data) {
-                // data["created_date"] =  dateFormat(moment.tz(data.created_date, companyDefaultTimezone).format());
-                // data["modified_date"] = dateFormat(moment.tz(data.modified_date, companyDefaultTimezone).format());
-                data["created_date"] = dateFormat(data.created_date);
-                data["modified_date"] = dateFormat(data.modified_date);
+                data["created_date"] =  moment.tz(data.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                data["modified_date"] = moment.tz(data.modified_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                // data["created_date"] = dateFormat(data.created_date);
+                // data["modified_date"] = dateFormat(data.modified_date);
               })
               totalCount = companies.rows[0].total;
               activeCount = companies.rows[0].active;

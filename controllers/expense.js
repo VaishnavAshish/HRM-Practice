@@ -239,12 +239,12 @@ exports.getExpense = (req, res) => {
                                                     expense.rows.forEach(function(data) {
                                                         if (accountIdArr.includes(data.account_id)) {
                                                             if (projectIdArr.includes(data.project_id)) {
-                                                                // data["created_date"] = dateFormat(moment.tz(data.expense_date, companyDefaultTimezone).format());
-                                                                // data["modified_date"] = dateFormat(moment.tz(data.created_date, companyDefaultTimezone).format());
-                                                                // data["expense_date"] = dateFormat(moment.tz(data.modified_date, companyDefaultTimezone).format());
-                                                                data["created_date"] = dateFormat(data.created_date);
-                                                                data["modified_date"] = dateFormat(data.modified_date);
-                                                                data["expense_date"] = dateFormat(data.expense_date);
+                                                                data["created_date"] = moment.tz(data.expense_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                                                data["modified_date"] = moment.tz(data.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                                                data["expense_date"] = moment.tz(data.modified_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                                                // data["created_date"] = dateFormat(data.created_date);
+                                                                // data["modified_date"] = dateFormat(data.modified_date);
+                                                                // data["expense_date"] = dateFormat(data.expense_date);
                                                                 if (project.rows.length > 0) {
                                                                     project.rows.forEach(function(project) {
                                                                         if (project.id == data.project_id) {
@@ -439,11 +439,11 @@ exports.getExpenseDetail = (req, res) => {
                                                     /*let created_date = dateFormat(expense.rows[0].created_date);
                                                     let modified_date = dateFormat(expense.rows[0].modified_date);
                                                     let expense_date = dateFormat(expense.rows[0].expense_date);*/
-                                                    // created_date = dateFormat(moment.tz(expense.rows[0].expense_date, companyDefaultTimezone).format());
-                                                    // modified_date = dateFormat(moment.tz(expense.rows[0].created_date, companyDefaultTimezone).format());
+                                                    created_date = moment.tz(expense.rows[0].created_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                                    modified_date = moment.tz(expense.rows[0].modified_date, companyDefaultTimezone).format('MM-DD-YYYY');
                                                     // expense_date = dateFormat(moment.tz(expense.rows[0].modified_date, companyDefaultTimezone).format());
-                                                    created_date = dateFormat(expense.rows[0].created_date);
-                                                    modified_date = dateFormat(expense.rows[0].modified_date);
+                                                    // created_date = dateFormat(expense.rows[0].created_date);
+                                                    // modified_date = dateFormat(expense.rows[0].modified_date);
                                                     expense_date = dateFormat(expense.rows[0].expense_date);
                                                     expense.rows[0]["created_date"] = created_date;
                                                     expense.rows[0]["modified_date"] = modified_date;
@@ -786,12 +786,12 @@ exports.findExpenseByCriteria = (req, res) => {
                                             expense.rows.forEach(function(data) {
                                                 if (accountIdArr.includes(data.account_id)) {
                                                     if (projectIdArr.includes(data.project_id)) {
-                                                        // data["created_date"] = dateFormat(moment.tz(data.expense_date, companyDefaultTimezone).format());
-                                                        // data["modified_date"] = dateFormat(moment.tz(data.created_date, companyDefaultTimezone).format());
-                                                        // data["expense_date"] = dateFormat(moment.tz(data.modified_date, companyDefaultTimezone).format());
-                                                        data["created_date"] = dateFormat(data.created_date);
-                                                        data["modified_date"] = dateFormat(data.modified_date);
-                                                        data["expense_date"] = dateFormat(data.expense_date);
+                                                        data["created_date"] = moment.tz(data.expense_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                                        data["modified_date"] = moment.tz(data.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                                        data["expense_date"] = moment.tz(data.modified_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                                        // data["created_date"] = dateFormat(data.created_date);
+                                                        // data["modified_date"] = dateFormat(data.modified_date);
+                                                        // data["expense_date"] = dateFormat(data.expense_date);
                                                         if (project.rows.length > 0) {
                                                             project.rows.forEach(function(project) {
                                                                 if (project.id == data.project_id) {
@@ -1023,12 +1023,12 @@ exports.findExpenseForAccount = (req, res) => {
                                             if (expenses.rows.length > 0) {
                                               expenses.rows.forEach(function(data,index) {
                                                 if (projectIdArr.includes(data.project_id)) {
-                                                  // data["created_date"] = dateFormat(moment.tz(data.expense_date, companyDefaultTimezone).format());
-                                                  // data["modified_date"] = dateFormat(moment.tz(data.created_date, companyDefaultTimezone).format());
-                                                  // data["expense_date"] = dateFormat(moment.tz(data.modified_date, companyDefaultTimezone).format());
-                                                  data["created_date"] = dateFormat(data.created_date);
-                                                  data["modified_date"] = dateFormat(data.modified_date);
-                                                  data["expense_date"] = dateFormat(data.expense_date);
+                                                  data["created_date"] = moment.tz(data.expense_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                                  data["modified_date"] = moment.tz(data.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                                  data["expense_date"] = moment.tz(data.modified_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                                  // data["created_date"] = dateFormat(data.created_date);
+                                                  // data["modified_date"] = dateFormat(data.modified_date);
+                                                  // data["expense_date"] = dateFormat(data.expense_date);
                                                   accounts.rows.forEach(function(account) {
                                                       if (account.id == data.account_id) {
                                                           data["account_name"] = account.name;
@@ -1143,12 +1143,12 @@ exports.findExpenseForAccount = (req, res) => {
                                                 expense.rows.forEach(function(data) {
                                                     if (accountIdArr.includes(data.account_id)) {
                                                         if (projectIdArr.includes(data.project_id)) {
-                                                            // data["created_date"] = dateFormat(moment.tz(data.expense_date, companyDefaultTimezone).format());
-                                                            // data["modified_date"] = dateFormat(moment.tz(data.created_date, companyDefaultTimezone).format());
-                                                            // data["expense_date"] = dateFormat(moment.tz(data.modified_date, companyDefaultTimezone).format());
-                                                            data["created_date"] = dateFormat(data.created_date);
-                                                            data["modified_date"] = dateFormat(data.modified_date);
-                                                            data["expense_date"] = dateFormat(data.expense_date);
+                                                            data["created_date"] = moment.tz(data.expense_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                                            data["modified_date"] = moment.tz(data.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                                            data["expense_date"] = moment.tz(data.modified_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                                            // data["created_date"] = dateFormat(data.created_date);
+                                                            // data["modified_date"] = dateFormat(data.modified_date);
+                                                            // data["expense_date"] = dateFormat(data.expense_date);
                                                             if (project.rows.length > 0) {
                                                                 project.rows.forEach(function(project) {
                                                                     if (project.id == data.project_id) {
