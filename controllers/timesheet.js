@@ -323,6 +323,7 @@ function getTimesheetForDay(timesheetList,currentDateTime) {
       subObjDay.category = tsData[i].category;
       subObjDay.billable = tsData[i].billable;
       subObjDay.task_id = tsData[i].task_id;
+      subObjDay.isrunning = tsData[i].isrunning;
       subObjDay.task_name = tsData[i].task_name;
       subObjDay.submitted = tsData[i].submitted;
       subObjDay.created_date = dateFormat(tsData[i].created_date);
@@ -360,6 +361,7 @@ function getTimesheetForDay(timesheetList,currentDateTime) {
       subObjDay.category = tsData[i].category;
       subObjDay.billable = tsData[i].billable;
       subObjDay.task_id = tsData[i].task_id;
+      subObjDay.isrunning = tsData[i].isrunning;
       subObjDay.task_name = tsData[i].task_name;
       subObjDay.submitted = tsData[i].submitted;
       subObjDay.created_date = dateFormat(tsData[i].created_date);

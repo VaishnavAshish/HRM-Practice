@@ -567,15 +567,19 @@
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
+
                                                                             <% if(user.permissions.indexOf('timesheetApprover')==-1) { %>
                                                                               <% if(!timesheetRow.submitted) { %>
                                                                                   <div class="slds-size_5-of-12  slds-p-horizontal_small">
                                                                                       <div class="text-right" >
-                                                                                          <button class="slds-button slds-button_icon slds-m-right_small" title="edit"  onclick="updateDayTimesheet(`<%= timesheetRow.id %>`);">
+
+                                                                                          <button class="slds-button slds-button_icon slds-m-right_small" title="edit"  onclick="updateDayTimesheet(`<%= timesheetRow.id %>`);" <% if(timesheetRow.isrunning) { %> disabled <% } %> >
                                                                                               <span class="slds-button__icon">
                                                                                                   <i class=" fa fa-pen text-blue" aria-hidden="true"></i>
                                                                                               </span>
                                                                                           </button>
+
+
                                                                                           <button class="slds-button slds-button_icon" title="delete" ts_li_id="<%= timesheetRow.id %>" onclick="deleteDayTimesheet(this);">
                                                                                               <span class="slds-button__icon">
                                                                                                   <i class=" fa fa-trash text-red" aria-hidden="true"></i>
@@ -588,11 +592,13 @@
                                                                               <% if(!timesheetRow.invoiced) { %>
                                                                                 <div class="slds-size_5-of-12  slds-p-horizontal_small">
                                                                                     <div class="text-right" >
-                                                                                        <button class="slds-button slds-button_icon slds-m-right_small" title="edit"  onclick="updateDayTimesheet(`<%= timesheetRow.id %>`);">
+
+                                                                                        <button class="slds-button slds-button_icon slds-m-right_small" title="edit"  onclick="updateDayTimesheet(`<%= timesheetRow.id %>`);" <% if(timesheetRow.isrunning) { %> disabled <% } %> >
                                                                                             <span class="slds-button__icon">
                                                                                                 <i class=" fa fa-pen text-blue" aria-hidden="true"></i>
                                                                                             </span>
                                                                                         </button>
+
                                                                                         <button class="slds-button slds-button_icon" title="delete" ts_li_id="<%= timesheetRow.id %>" onclick="deleteDayTimesheet(this);">
                                                                                             <span class="slds-button__icon">
                                                                                                 <i class=" fa fa-trash text-red" aria-hidden="true"></i>
