@@ -188,6 +188,11 @@
                 $(formId).addClass('has-error');
                 flag=true;
                 return false;
+              }else if($(this).val()<0){
+                addError('#'+$(this).attr('id'), "Please enter positive decimal value");
+                $(formId).addClass('has-error');
+                flag=true;
+                return false;
               }
             }
             clearError('#'+$(this).attr('id'));

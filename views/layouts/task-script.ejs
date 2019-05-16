@@ -14,7 +14,9 @@
         clearError("#task_name");
         if(taskData.task_name) {
           checkFormValidation("#addTaskForm");
-          if(!$("#addTaskForm").hasClass('has-error')) {
+          if (taskData.start_date > taskData.due_date) {
+            addError("#tsk_due_date", "Please enter end date greater than start date");
+          } else if(!$("#addTaskForm").hasClass('has-error')) {
             showLoader('#globalLoader');
             $.ajax({
                 type: 'POST',
@@ -73,7 +75,9 @@
             //    userData.costRate=$("#assigned_user option:selected").attr('costRate');
             //
             // }
-            if(!$(formId).hasClass('has-error')) {
+            if (taskDetailsData.start_date > taskDetailsData.end_date) {
+              addError("#tskDetail_due_date", "Please enter end date greater than start date");
+            } else if(!$(formId).hasClass('has-error')) {
                 showLoader('#globalLoader');
                 $.ajax({
                     type: 'POST',

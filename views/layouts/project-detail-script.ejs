@@ -70,7 +70,9 @@
         if(project_cost.toString().toLowerCase() == "nan") {
             projectData.project_cost = 0;
         }
-        if(!$(formId).hasClass('has-error')) {
+        if (projectData.start_date > projectData.end_date) {
+          addError("#pr_end_date", "Please enter end date greater than start date");
+        } else if(!$(formId).hasClass('has-error')) {
             showLoader('#globalLoader');
             $.ajax({
                 type: 'POST',

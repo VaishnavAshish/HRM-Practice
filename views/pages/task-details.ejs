@@ -135,7 +135,10 @@
                                                                         <span class="slds-input__icon slds-input__icon_right">
                                                                             <i class="fa fa-calendar"></i>
                                                                         </span>
-                                                                        <input name="start_date" getFormData='' value="<%= taskDetails.startDateFormatted %>" type="date" class="slds-input open-date-pik">
+                                                                        <input name="start_date" getFormData='' value="<%= taskDetails.startDateFormatted %>" type="date" class="slds-input open-date-pik" id="tskDetail_start_date">
+                                                                    </div>
+                                                                    <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
                                                                     </div>
                                                                 </div>
 
@@ -150,7 +153,10 @@
                                                                         <span class="slds-input__icon slds-input__icon_right">
                                                                             <i class="fa fa-calendar"></i>
                                                                         </span>
-                                                                        <input name="end_date" getFormData='' value="<%= taskDetails.endDateFormatted %>" type="date" class="slds-input open-date-pik">
+                                                                        <input name="end_date" getFormData='' value="<%= taskDetails.endDateFormatted %>" type="date" class="slds-input open-date-pik" id="tskDetail_due_date">
+                                                                    </div>
+                                                                    <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
                                                                     </div>
                                                                 </div>
 
@@ -166,7 +172,7 @@
                                                                     <span class="slds-input__icon slds-input__icon_right">
                                                                         <i class="far fa-clock"></i>
                                                                     </span>
-                                                                    <input type="number" name="estimated_hours" getFormData='' value="<%= taskDetails.estimated_hours %>" class="slds-input" decimal>
+                                                                    <input type="number" id="tskDetail_estimated_hours" name="estimated_hours" getFormData='' value="<%= taskDetails.estimated_hours %>" class="slds-input" decimal>
                                                                 </div>
                                                                 <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 

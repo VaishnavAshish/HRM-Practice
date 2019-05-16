@@ -186,88 +186,94 @@ exports.generateProjectCsv = (req, res) => {
 
 exports.findProjectByCriteria = (req, res) => {
   // console.log("findProjectByCriteria----------------------------------"+req.body.searchField);
-
-  pool.connect((err, client, done) => {
-      let searchCriteriaVal=[req.user.company_id];
-      let whereClause='WHERE company_id=$1 ';
-      if(req.body.searchField.length>0){
-        let searchField=req.body.searchField;
-        searchField.forEach((search,index)=>{
-            whereClause+='AND '+search.fieldName+' $'+(index+2)+' ';
-            searchCriteriaVal.push(search.fieldValue);
-        });
-        /*let queryToExec='SELECT * FROM account WHERE '+req.body.searchField+' like $1 AND company_id=$2';*/
-      }
-      let offset=0;
-      if(req.body.offset){
-        offset=req.body.offset;
-      }
-      whereClause+=' AND account_id In (SELECT id from ACCOUNT WHERE company_id=$1 AND archived=$'+(searchCriteriaVal.length+1)+') ';
-      searchCriteriaVal.push(false);
-      let queryToExec='SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id ,(SELECT count(*) from PROJECT '+whereClause+') as searchcount FROM PROJECT p '+whereClause+' ORDER BY start_date DESC,name OFFSET '+offset+' LIMIT '+process.env.PAGE_RECORD_NO;
-      // console.log('queryToExec '+queryToExec);
-      client.query(queryToExec,searchCriteriaVal, function (err,project) {
-        if (err) {
-          handleResponse.shouldAbort(err, client, done);
-          handleResponse.handleError(res, err, ' Error in finding project data');
-        }
-        else{
-            client.query('SELECT * FROM ACCOUNT where company_id=$1 AND archived=$2', [req.user.company_id, false], function (err, accountList) {
-              if (err) {
-                handleResponse.shouldAbort(err, client, done);
-                handleResponse.handleError(res, err, ' Error in finding account data');
-              } else {
-                    let accountIdArr=[];
-                      if(accountList.rows.length>0){
-                        accountIdArr = accountList.rows.map(function (ele) {
-                            return ele.id;
-                        });
-                      }
-                    let projectArr=[];
-                    let account={};
-                    let searchCount=0;
-                    if(project.rows.length>0){
-
-                      // console.log("----------project.rows------------- 2");
-                      project.rows.forEach(function (data,index) {
-                        if(accountIdArr.includes(data.account_id)){
-                            data["start_date"] = (data.start_date==null)?'':moment.tz(data.start_date, companyDefaultTimezone).format('MM-DD-YYYY');
-                            data["end_date"] =  (data.end_date==null)?'':moment.tz(data.end_date, companyDefaultTimezone).format('MM-DD-YYYY');
-                            data["total_hours"] = minuteToHours(data["total_hours"]);
-                            // data["start_date"] = (data.start_date==null)?'':dateFormat(data.start_date);
-                            // data["end_date"] =  (data.end_date==null)?'':dateFormat(data.end_date);
-                            if(data.account_id){
-                                if(accountList.rows.length>0){
-                                  account=accountList.rows.filter(acc => acc.id==data.account_id);
-                                  if(account.length>0){
-                                    // // console.log('account '+account);
-                                    data.account_name=account[0].name;
-                                  }
-                                }
-                              }else{
-                                data.account_name='';
+  setting.getCompanySetting(req, res ,(err,result)=>{
+     if(err==true){
+          handleResponse.handleError(res, err, ' error in finding company setting');
+     }else{
+         companyDefaultTimezone=result.timezone;
+          pool.connect((err, client, done) => {
+              let searchCriteriaVal=[req.user.company_id];
+              let whereClause='WHERE company_id=$1 ';
+              if(req.body.searchField.length>0){
+                let searchField=req.body.searchField;
+                searchField.forEach((search,index)=>{
+                    whereClause+='AND '+search.fieldName+' $'+(index+2)+' ';
+                    searchCriteriaVal.push(search.fieldValue);
+                });
+                /*let queryToExec='SELECT * FROM account WHERE '+req.body.searchField+' like $1 AND company_id=$2';*/
+              }
+              let offset=0;
+              if(req.body.offset){
+                offset=req.body.offset;
+              }
+              whereClause+=' AND account_id In (SELECT id from ACCOUNT WHERE company_id=$1 AND archived=$'+(searchCriteriaVal.length+1)+') ';
+              searchCriteriaVal.push(false);
+              let queryToExec='SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id ,(SELECT count(*) from PROJECT '+whereClause+') as searchcount FROM PROJECT p '+whereClause+' ORDER BY start_date DESC,name OFFSET '+offset+' LIMIT '+process.env.PAGE_RECORD_NO;
+              // console.log('queryToExec '+queryToExec);
+              client.query(queryToExec,searchCriteriaVal, function (err,project) {
+                if (err) {
+                  handleResponse.shouldAbort(err, client, done);
+                  handleResponse.handleError(res, err, ' Error in finding project data');
+                }
+                else{
+                    client.query('SELECT * FROM ACCOUNT where company_id=$1 AND archived=$2', [req.user.company_id, false], function (err, accountList) {
+                      if (err) {
+                        handleResponse.shouldAbort(err, client, done);
+                        handleResponse.handleError(res, err, ' Error in finding account data');
+                      } else {
+                            let accountIdArr=[];
+                              if(accountList.rows.length>0){
+                                accountIdArr = accountList.rows.map(function (ele) {
+                                    return ele.id;
+                                });
                               }
-                            projectArr.push(data);
-                            if(project.rows.length == (index+1)) {
-                              searchCount=project.rows[0].searchcount;
-                              // console.log(searchCount);
-                              // console.log('-----------projectArr---------');
-                              // console.log(projectArr);
+                            let projectArr=[];
+                            let account={};
+                            let searchCount=0;
+                            if(project.rows.length>0){
+
+                              // console.log("----------project.rows------------- 2");
+                              project.rows.forEach(function (data,index) {
+                                if(accountIdArr.includes(data.account_id)){
+                                    data["start_date"] = (data.start_date==null)?'':moment.tz(data.start_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                    data["end_date"] =  (data.end_date==null)?'':moment.tz(data.end_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                    data["total_hours"] = minuteToHours(data["total_hours"]);
+                                    // data["start_date"] = (data.start_date==null)?'':dateFormat(data.start_date);
+                                    // data["end_date"] =  (data.end_date==null)?'':dateFormat(data.end_date);
+                                    if(data.account_id){
+                                        if(accountList.rows.length>0){
+                                          account=accountList.rows.filter(acc => acc.id==data.account_id);
+                                          if(account.length>0){
+                                            // // console.log('account '+account);
+                                            data.account_name=account[0].name;
+                                          }
+                                        }
+                                      }else{
+                                        data.account_name='';
+                                      }
+                                    projectArr.push(data);
+                                    if(project.rows.length == (index+1)) {
+                                      searchCount=project.rows[0].searchcount;
+                                      // console.log(searchCount);
+                                      // console.log('-----------projectArr---------');
+                                      // console.log(projectArr);
+                                      done();
+                                      handleResponse.sendSuccess(res,'Projects searched successfully',{projects: projectArr,count:searchCount});
+                                    }
+                                }
+                              });
+                            } else {
                               done();
                               handleResponse.sendSuccess(res,'Projects searched successfully',{projects: projectArr,count:searchCount});
                             }
-                        }
-                      });
-                    } else {
-                      done();
-                      handleResponse.sendSuccess(res,'Projects searched successfully',{projects: projectArr,count:searchCount});
-                    }
-              }
-            });
-        }
-      });
+                      }
+                    });
+                }
+              });
 
-    })
+            })
+          }
+        })
 };
 
 exports.findProjectByName = (req, res) => {
