@@ -215,8 +215,31 @@
             return true;
           });
         }
+        if(!flag){
+          $("[positiveInteger]",formId).each(function(){
+            if($(this).val()!=''){
+              if(!validateInteger($(this).val())) {
+                addError($(this), "Please enter valid positive integer value.");
+                $(formId).addClass('has-error');
+                flag=true;
+                return false;
+              }
+            }
+            clearError($(this));
+            $(formId).removeClass('has-error');
+            return true;
+          });
+        }
     }
 
+    function validateInteger(inputtxt) {
+        var isValid = /^\+?(0|[1-9]\d*)$/;
+
+        if (inputtxt.match(isValid)) {
+          return true;
+        }
+        return false;
+    }
 
     function validateTime(inputtxt) {
         var isValid = /^([0,1][0-9]|2[0-3])(:([0-5][0-9]))?$/;
