@@ -532,7 +532,7 @@ exports.insertTimesheetInvoiceItem = (req, res) => {
                           handleResponse.shouldAbort(err, client, done);
                           handleResponse.handleError(res, err, ' Error in connecting to database.');
                         } else {
-                          client.query('SELECT * FROM invoice_line_item WHERE project_id=$1', [req.body.projectId], function (err, invoiceLineItemDetail) {
+                          client.query('SELECT * FROM invoice_line_item WHERE project_id=$1 AND expense_id is null', [req.body.projectId], function (err, invoiceLineItemDetail) {
                               if (err) {
                                   console.error(err);
                                   handleResponse.shouldAbort(err, client, done);
