@@ -546,6 +546,7 @@ function searchAccount(filter,obj){
 	       success : function(response){
 			   if(response.success){
 					hideLoader('#globalLoader');
+
 					console.log(response.accounts);
 					if(response.accounts.length>0){
 						/*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
@@ -616,6 +617,8 @@ function findAccountByName(){
 					hideLoader('#globalLoader');
 					console.log(response.accounts);
 					if(response.accounts.length>0){
+						$("#accountListTBody").html('');
+						$("#accountCardView").html('');
 						/*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
 						response.accounts.forEach(function(account){
 							setDataToTable(account);
