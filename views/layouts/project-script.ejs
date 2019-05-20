@@ -1,5 +1,5 @@
 <script>
-let currentdate,projectSearchText=''; 
+let currentdate,projectSearchText='';
 function addProject(modalId) {
     let projectData = {};
     projectData.title = $("#new-project-title").val();
@@ -287,7 +287,7 @@ function findProjectByName(){
         $(".slds-button[loadItemId]").show();
         $("#offset").text("0");
 
-        let searchText=$("#searchProjectName").val();
+        let searchText=projectSearchText=$("#searchProjectName").val();
         let filterCriteria=$("#selectedFilter").text().trim();
         let requestbody={"searchText":searchText,"searchField":"name"}
         if(filterCriteria.trim()=="Not Started".trim()){

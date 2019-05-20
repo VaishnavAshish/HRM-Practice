@@ -246,7 +246,7 @@ function findInvoiceForAccount(){
     $(".slds-button[loadItemId]").show();
     $("#offset").text("0");
 
-    let searchText=$("#searchInvoiceForAccount").val();
+    let searchText=invoiceSearchText=$("#searchInvoiceForAccount").val();
 
     let requestBody={"searchText":searchText,"searchField":"account_id"};
     let filterCriteria=$("#selectedFilter").text();

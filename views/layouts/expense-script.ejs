@@ -177,9 +177,7 @@ $(document).ready(function(){
         }
     }*/
 function loadMoreExpense(){
-    if(expenseSearchText == $("#searchExpenseForAccount").val()) {
-      return false;
-    }
+
     showLoader('#globalLoader');
 
     let offset=$("#offset").text();
@@ -306,13 +304,16 @@ function searchExpense(filter,obj){
         });
 }
 function findExpenseForAccount(){
+        if(expenseSearchText == $("#searchExpenseForAccount").val()) {
+          return false;
+        }
         $("div[title=noExpenseFound]").addClass('slds-hide');
         showLoader('#globalLoader');
 
         $(".slds-button[loadItemId]").show();
         $("#offset").text("0");
 
-        let searchText=$("#searchExpenseForAccount").val();
+        let searchText=expenseSearchText=$("#searchExpenseForAccount").val();
         let requestBody={"searchText":searchText,"searchField":"account_id"};
         let filterCriteria=$("#selectedFilter").text();
         if(filterCriteria=="Draft"){
