@@ -1,5 +1,5 @@
 <script>
-let currentdate;
+let currentdate,projectSearchText='';
 function addProject(modalId) {
     let projectData = {};
     projectData.title = $("#new-project-title").val();
@@ -278,6 +278,9 @@ function searchProject(filter,obj){
         });
 }
 function findProjectByName(){
+        if(projectSearchText == $("#searchProjectName").val()) {
+          return false;
+        }
         $("div[title=noProjectFound]").addClass('slds-hide');
         showLoader('#globalLoader');
 

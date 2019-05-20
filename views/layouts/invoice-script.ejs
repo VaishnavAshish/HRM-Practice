@@ -1,4 +1,5 @@
 <script>
+let invoiceSearchText= '';
     /*function getAccountProject(val) {
         if($('option:selected', val).val() != '' && $('option:selected', val).val() != undefined && $('option:selected', val).val() != null) {
 
@@ -236,6 +237,9 @@ function searchInvoice(filter,obj){
         });
 }
 function findInvoiceForAccount(){
+    if(invoiceSearchText == $("#searchInvoiceForAccount").val()) {
+      return false;
+    }
     $("div[title=noInvoiceFound]").addClass('slds-hide');
     showLoader('#globalLoader');
 

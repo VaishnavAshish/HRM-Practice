@@ -1,5 +1,5 @@
 <script>
-let currentdate;
+let currentdate,expenseSearchText ='';
 function deleteExpense(expenseId){
         showLoader('#globalLoader');
         /*console.log('expense id is '+userId);*/
@@ -177,6 +177,9 @@ $(document).ready(function(){
         }
     }*/
 function loadMoreExpense(){
+    if(expenseSearchText == $("#searchExpenseForAccount").val()) {
+      return false;
+    }
     showLoader('#globalLoader');
 
     let offset=$("#offset").text();
