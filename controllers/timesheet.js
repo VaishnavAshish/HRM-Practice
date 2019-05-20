@@ -55,7 +55,7 @@ exports.generateTimesheetCsv = (req, res) => {
             //  let week_start_date = moment.tz(req.params.weekstartdate,companyDefaultTimezone).format();
             //  let week_end_date = calculateWeekEndDate(week_start_date);
 
-             client.query('SELECT tl.id ,tl.created_date at time zone \''+companyDefaultTimezone+'\'  as created_date ,tl.total_work_hours ,tl.project_name ,tl.task_name ,tl.description ,tl.category , EXTRACT(DOW FROM created_date at time zone \''+companyDefaultTimezone+'\') as week_day ,tl.billable ,tl.lastruntime at time zone \''+companyDefaultTimezone+'\'  as lastruntime ,tl.user_role ,tl.invoiced ,tl.record_id  FROM TIMESHEET_LINE_ITEM tl WHERE company_id=$1 AND project_id is not null ORDER BY created_date, task_id, user_role',[req.user.company_id], function(err, timesheet) {
+             client.query('SELECT tl.id ,tl.created_date at time zone \''+companyDefaultTimezone+'\'  as created_date ,tl.total_work_hours ,tl.project_name ,tl.task_name ,tl.description , EXTRACT(DOW FROM created_date at time zone \''+companyDefaultTimezone+'\') as week_day ,tl.billable ,tl.lastruntime at time zone \''+companyDefaultTimezone+'\'  as lastruntime ,tl.user_role ,tl.invoiced ,tl.record_id  FROM TIMESHEET_LINE_ITEM tl WHERE company_id=$1 AND project_id is not null ORDER BY created_date, task_id, user_role',[req.user.company_id], function(err, timesheet) {
              if (err) {
                handleResponse.shouldAbort(err, client, done);
                handleResponse.handleError(res, err, ' Error in finding timesheet data');
@@ -64,6 +64,10 @@ exports.generateTimesheetCsv = (req, res) => {
               //  console.log(timesheet.rows);
                done();
                let timesheetCSV = 'Timesheet Details : \n\n';
+               timesheet.rows.forEach(timesheetData=>{
+                 timesheetData.created_date = timesheetData.created_date?moment.tz(timesheetData.created_date, companyDefaultTimezone).format('MM-DD-YYYY'):'';
+                 timesheetData.total_work_hours=minuteToHours(timesheetData.total_work_hours);
+               })
                jsonexport(timesheet.rows,function(err, csv){
                    if(err) {
                      console.log('err');

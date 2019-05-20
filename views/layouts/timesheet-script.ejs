@@ -201,10 +201,12 @@
         getProjectForCompany((projects,error)=>{
             if(error){
                 showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+                hideLoader('#globalLoader');
             }else{
                 let options='';
                 if(projects.length<=0){
                     options+='<option value="">No Project Found</option>'
+                    hideLoader('#globalLoader');
                     /*addError("#globalProjectForTimesheet","No project found");*/
                 }else{
                     options+='<option value=""> </option>'
@@ -212,10 +214,11 @@
                         options+='<option pr_id="'+project.id+'" value="'+project.name+'">'+project.name+'</option>'
                     });
                     $("#globalProjectForTimesheet").html(options);
+                    hideLoader('#globalLoader');
                 }
             }
         });
-        hideLoader('#globalLoader');
+        // hideLoader('#globalLoader');
 
     });
 

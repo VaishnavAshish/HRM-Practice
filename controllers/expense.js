@@ -73,6 +73,11 @@ exports.generateExpenseCsv = (req, res) => {
               //  console.log(expense.rows);
                done();
                   let expenseCSV = 'Expense Details : \n\n';
+                  expense.rows.forEach(expenseData=>{
+                    expenseData.created_date =expenseData.created_date ?moment.tz(expenseData.created_date, companyDefaultTimezone).format('MM-DD-YYYY'):'';
+                    expenseData.modified_date =expenseData.modified_date?moment.tz(expenseData.modified_date, companyDefaultTimezone).format('MM-DD-YYYY'):'';
+                    expenseData.expense_date =expenseData.expense_date?moment.tz(expenseData.expense_date, companyDefaultTimezone).format('MM-DD-YYYY'):'';
+                  })
                    jsonexport(expense.rows,function(err, csv){
                        if(err) {
                          console.log('err');

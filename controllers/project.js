@@ -160,6 +160,12 @@ exports.generateProjectCsv = (req, res) => {
               //  console.log(project.rows);
                done();
                     let projectCSV = 'Project Details : \n\n';
+                    project.rows.forEach(projectData=>{
+                      projectData.start_date = projectData.start_date?moment.tz(projectData.start_date, companyDefaultTimezone).format('MM-DD-YYYY'):'';
+                      projectData.end_date = projectData.end_date?moment.tz(projectData.end_date, companyDefaultTimezone).format('MM-DD-YYYY'):'';
+                    })
+                    console.log('project.rows');
+                    console.log(project.rows);
                    jsonexport(project.rows,function(err, csv){
                        if(err) {
                          console.log('err');

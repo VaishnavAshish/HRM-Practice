@@ -146,6 +146,12 @@ exports.generateInvoiceCsv = (req, res) => {
               //  console.log(invoice.rows);
                done();
                    let invoiceCSV = 'Invoice Details : \n\n';
+                   invoice.rows.forEach(invoiceData=>{
+                     invoiceData.created_date = invoiceData.created_date?moment.tz(invoiceData.created_date, companyDefaultTimezone).format('MM-DD-YYYY'):'';
+                     invoiceData.updated_date = invoiceData.updated_date?moment.tz(invoiceData.updated_date, companyDefaultTimezone).format('MM-DD-YYYY'):'';
+                     invoiceData.start_date = invoiceData.start_date?moment.tz(invoiceData.start_date, companyDefaultTimezone).format('MM-DD-YYYY'):'';
+                     invoiceData.due_date = invoiceData.due_date?moment.tz(invoiceData.due_date, companyDefaultTimezone).format('MM-DD-YYYY'):'';
+                   })
                    jsonexport(invoice.rows,function(err, csv){
                        if(err) {
                          console.log('err');
