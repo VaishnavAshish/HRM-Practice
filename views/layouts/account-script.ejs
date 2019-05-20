@@ -1,5 +1,5 @@
 <script>
-
+let projectSearchText ='',invoiceSearchText ='',accountSearchText ='';
 function addAccount(modalId){
 		clearError("#name");
 		clearError("#email");
@@ -184,13 +184,16 @@ function setDataToInvoiceTable(invoice){
         $("#invoiceTBody").append(invoiceTr);
     }
 function findInvoiceByNum(){
-	$("#noInvoiceFound").addClass('slds-hide');
+		if(invoiceSearchText == $("#searchInvoiceNum").val()) {
+			return false;
+		}
+		$("#noInvoiceFound").addClass('slds-hide');
     showLoader('#globalLoader');
 
     $("#loadMoreInvoice").show();
-	$("#offsetInvoice").text("0");
+		$("#offsetInvoice").text("0");
 
-    let searchText=$("#searchInvoiceNum").val();
+    let searchText=invoiceSearchText=$("#searchInvoiceNum").val();
     let searchField=[];
     // let url = new URL(window.location.href);
     // let accountId=url.searchParams.get("accountId");
@@ -349,14 +352,17 @@ function loadMoreProject(){
         });
 }
 function findProjectByName(){
-	$("#noProjectFound").addClass('slds-hide');
-    showLoader('#globalLoader');
+		if(projectSearchText == $("#searchProjectName").val()) {
+			return false;
+		}
+		$("#noProjectFound").addClass('slds-hide');
+	  showLoader('#globalLoader');
 
-    $("#loadMoreProject").show();
-	$("#offsetProject").text("0");
+	  $("#loadMoreProject").show();
+		$("#offsetProject").text("0");
 
 		let url = new URL(window.location.href);
-    let searchText=$("#searchProjectName").val();
+    let searchText=projectSearchText=$("#searchProjectName").val();
 		let accountId=url.searchParams.get("accountId");
     // let url = new URL(window.location.href);
     // let accountId=url.searchParams.get("accountId");
@@ -586,6 +592,9 @@ function searchAccount(filter,obj){
 }
 
 function findAccountByName(){
+	if(accountSearchText == $("#searchAccountName").val()) {
+		return false;
+	}
 	$("div[title=noAccountFound]").addClass('slds-hide');
 	showLoader('#globalLoader');
 
@@ -593,7 +602,7 @@ function findAccountByName(){
 	$("#offset").text("0");
 
 	let searchField=[];
-	let searchText=$("#searchAccountName").val();
+	let searchText=accountSearchText=$("#searchAccountName").val();
 	let filterCriteria=$("#selectedFilter").text();
 	if(searchText!=""){
 		let searchCriteria={"fieldName":"name ilike ","fieldValue":'%'+searchText+'%'};
