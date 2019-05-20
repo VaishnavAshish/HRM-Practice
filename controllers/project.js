@@ -163,6 +163,7 @@ exports.generateProjectCsv = (req, res) => {
                     project.rows.forEach(projectData=>{
                       projectData.start_date = projectData.start_date?moment.tz(projectData.start_date, companyDefaultTimezone).format('MM-DD-YYYY'):'';
                       projectData.end_date = projectData.end_date?moment.tz(projectData.end_date, companyDefaultTimezone).format('MM-DD-YYYY'):'';
+                      projectData.total_hours = minuteToHours(projectData.total_hours);
                     })
                     console.log('project.rows');
                     console.log(project.rows);
