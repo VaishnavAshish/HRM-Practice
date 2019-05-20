@@ -308,6 +308,8 @@ function findProjectByName(){
                success : function(response){
                    if(response.success){
                         hideLoader('#globalLoader');
+                        $("#projectListTBody").html('');
+                        $("#projectCardView").html('');
                         console.log(response.projects);
                         if(response.projects.length>0){
                             /*showGlobalToast('#globalToast', 'success',response.message, 4000);*/

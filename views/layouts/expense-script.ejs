@@ -334,6 +334,8 @@ function findExpenseForAccount(){
                         hideLoader('#globalLoader');
                         console.log(response.expenses);
                         if(response.expenses.length>0){
+                          $("#expenseListTBody").html('');
+                          $("#expenseCardView").html('');
                             /*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
                             response.expenses.forEach(function(expense){
                                 setDataToTable(expense);

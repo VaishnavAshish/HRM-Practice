@@ -215,6 +215,7 @@ function findInvoiceByNum(){
                     hideLoader('#globalLoader');
                     console.log(response.accounts);
                     if(response.invoices.length>0){
+												$("#invoiceTBody").html('');
                         /*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
                         response.invoices.forEach(function(invoice){
                             setDataToInvoiceTable(invoice);
