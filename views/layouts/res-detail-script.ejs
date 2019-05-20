@@ -1,4 +1,5 @@
 <script>
+let resourceSearchText ='';
 function addResource(modalId){
 	// let url = new URL(window.location.href);
 	// let companyId=url.searchParams.get("companyid");
@@ -309,13 +310,16 @@ function loadMoreResource(){
     });
 }
 function findUserByEmail(){
+	if(resourceSearchText == $("#searchUserEmail").val()) {
+		return false;
+	}
 	$("div[title=noResourceFound]").addClass('slds-hide');
 	showLoader('#globalLoader');
 	$(".slds-button[loadItemId]").show();
 	$("#offset").text("0");
 
 	let searchField=[];
-	let searchText=$("#searchUserEmail").val();
+	let searchText=resourceSearchText=$("#searchUserEmail").val();
 	companyId=getURLParameter("companyid");
 	// let url = new URL(window.location.href);
   //   let companyId=url.searchParams.get("companyid");
