@@ -197,8 +197,8 @@ function getTimesheetForWeek(timesheetListArray, week_start_date) {
   }
   timesheetObj.totalTime=0;
   // timesheetObj.timesheetObjData=['0.00','0.00','0.00','0.00','0.00','0.00','0.00'];
-  // console.log('timesheetListArray');
-  // console.log(timesheetListArray);
+  console.log('timesheetListArray');
+  console.log(timesheetListArray);
   timesheetListArray.forEach(function(timesheetList,index){
     currentTaskId=timesheetList.task_id;
     currentProjectId=timesheetList.project_id;
@@ -208,18 +208,18 @@ function getTimesheetForWeek(timesheetListArray, week_start_date) {
         // console.log('matching task id '+currentTaskId+' '+previousTaskId);
         if(timesheetList.user_role.trim()==timesheetObj.user_role.trim()){
 
-          // console.log('matching user_role '+timesheetList.user_role+' '+timesheetObj.user_role);
+          console.log('matching user_role '+timesheetList.user_role+' '+timesheetObj.user_role);
           timesheetObj.totalTime+=parseInt(timesheetList.twh);
-          // console.log(timesheetObj.timesheetObjData[timesheetList.week_day]!='0.00');
-          // console.log(timesheetObj);
+          console.log(timesheetObj.timesheetObjData[timesheetList.week_day]!='0.00');
+          console.log(timesheetObj);
           let filteredData = timesheetObj.timesheetObjData.filter(timeArr => timeArr.date == dateFormat(moment.tz(timesheetList.created_date, companyDefaultTimezone).format()))
-          // console.log('filteredData '+JSON.stringify(filteredData));
-          // console.log(filteredData[0].twh)
+          console.log('filteredData '+JSON.stringify(filteredData));
+          console.log(filteredData[0].twh)
           if(filteredData[0].twh !='0:00'){
             let timesheetObjHours = hoursToMinutes(filteredData[0].twh);
-            // console.log('timesheetObjHours');
-            // console.log(timesheetObjHours);
-            // console.log(timesheetList.twh+timesheetObjHours);
+            console.log('timesheetObjHours');
+            console.log(timesheetObjHours);
+            console.log(timesheetList.twh+timesheetObjHours);
             timesheetList.twh=minuteToHours(parseInt(timesheetList.twh)+parseInt(timesheetObjHours));
           }else{
             timesheetList.twh=minuteToHours(timesheetList.twh);
