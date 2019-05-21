@@ -1990,6 +1990,9 @@ exports.findInvoiceForAccount = (req, res) => {
                                       handleResponse.sendSuccess(res,'Invoices searched successfully',{invoices: invoiceList,count:searchCount});
                                     }
                                 });
+                            }else {
+                              handleResponse.shouldAbort(err, client, done);
+                              handleResponse.handleError(res, 'No invoice is associated with this account.', 'No invoice is associated with this account.');
                             }
                         }
                       });

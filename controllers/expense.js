@@ -1065,6 +1065,9 @@ exports.findExpenseForAccount = (req, res) => {
                                                   });
                                                 }
                                               })
+                                            } else {
+                                              handleResponse.shouldAbort(err, client, done);
+                                              handleResponse.handleError(res, 'No expense is associated with this account.', 'No expense is associated with this account.');
                                             }
                                             // // console.log('----------------------expenses.rows-----------------');
                                             // // console.log(expenses.rows);
