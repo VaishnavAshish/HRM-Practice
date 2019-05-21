@@ -482,7 +482,7 @@ exports.getTimesheet = (req, res) => {
                       // week_end_date=dateFormat(week_end_date);
 
                       // console.log('SELECT * FROM TIMESHEET_LINE_ITEM WHERE company_id=$1 AND resource_id=$2 AND created_date BETWEEN $3 AND $4 AND project_id is not null ORDER BY created_date, task_id, user_role');
-                      // console.log(req.user.company_id, userId, week_start_date, week_end_date);
+                      console.log(req.user.company_id, userId, week_start_date, week_end_date);
                       client.query('SELECT tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\'  as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category , EXTRACT(DOW FROM created_date at time zone \''+companyDefaultTimezone+'\') as week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime at time zone \''+companyDefaultTimezone+'\'  as lastruntime ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id FROM TIMESHEET_LINE_ITEM tl WHERE company_id=$1 AND resource_id=$2 AND created_date at time zone \''+companyDefaultTimezone+'\'  BETWEEN $3 AND $4 AND project_id is not null ORDER BY created_date, task_id, user_role',[req.user.company_id, userId, week_start_date, week_end_date], function(err, timesheetListByDate) {
                         if(err) {
                           console.error(err);
