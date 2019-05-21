@@ -508,12 +508,12 @@ exports.getTimesheet = (req, res) => {
                             let queryToExec = `SELECT DISTINCT T1.task_id, T1.resource_id, T1.project_id, T1.company_id, T1.project_name, T1.task_name, T2.twh ,T2.created_date at time zone '${companyDefaultTimezone}' as created_date,T2.user_role , T2.week_day
                                                 FROM timesheet_line_item T1
                                                 JOIN
-                                                (SELECT created_date at time zone '${companyDefaultTimezone}' as created_date,project_id,task_id,task_name, EXTRACT(DOW FROM created_date at time zone '${companyDefaultTimezone}') as week_day,SUM(total_work_hours) as twh, user_role,resource_id
+                                                (SELECT created_date at time zone '${companyDefaultTimezone}' as created_date,project_id,project_name,task_id,task_name, EXTRACT(DOW FROM created_date at time zone '${companyDefaultTimezone}') as week_day,SUM(total_work_hours) as twh, user_role,resource_id
                                                 FROM timesheet_line_item
                                                 WHERE company_id=$1 AND resource_id=$2 AND created_date at time zone '${companyDefaultTimezone}' BETWEEN $3 AND $4 AND project_id is not null AND project_name is not null
-                                                GROUP BY project_id,task_id,task_name,resource_id, user_role,created_date,week_day) T2
-                                                ON T1.project_id = T2.project_id AND T1.task_name = T2.task_name AND T1.resource_id = T2.resource_id AND T1.project_name is not null
-                                                ORDER BY T1.project_id,T1.task_name, T2.user_role,created_date`;
+                                                GROUP BY project_id,project_name,task_id,task_name,resource_id, user_role,created_date,week_day) T2
+                                                ON T1.project_id = T2.project_id AND T1.project_name = T2.project_name AND T1.task_name = T2.task_name AND T1.resource_id = T2.resource_id AND T1.project_name is not null
+                                                ORDER BY T1.project_id,T1.project_name,T1.task_name, T2.user_role,created_date`;
                             console.log(req.user.company_id, userId, week_start_date, week_end_date);
                              client.query(queryToExec,[req.user.company_id, userId, week_start_date, week_end_date], function(err, timesheetListByProject) {
                               if (err) {
