@@ -167,17 +167,17 @@ function createTimesheetWeekObj(timesheetObj,previousTaskId,currentTaskId,previo
       timesheetObj.submitted=timesheetList.submitted;
       timesheetObj.totalTime+=parseInt(timesheetList.twh);
       timesheetList.twh=minuteToHours(timesheetList.twh);
-      // timesheetObj.timesheetObjData[timesheetList.week_day]=timesheetList.twh;
-      // console.log('date of timesheet line item'+dateFormat(moment.tz(timesheetList.created_date, companyDefaultTimezone).format()));
-      // console.log(timesheetObj.timesheetObjData.filter(timeArr => timeArr.date == dateFormat(moment.tz(timesheetList.created_date, companyDefaultTimezone).format())));
+      timesheetObj.timesheetObjData[timesheetList.week_day]=timesheetList.twh;
+      console.log('date of timesheet line item'+dateFormat(moment.tz(timesheetList.created_date, companyDefaultTimezone).format()));
+      console.log(timesheetObj.timesheetObjData.filter(timeArr => timeArr.date == dateFormat(moment.tz(timesheetList.created_date, companyDefaultTimezone).format())));
       timesheetObj.timesheetObjData.filter(timeArr => timeArr.date == dateFormat(moment.tz(timesheetList.created_date, companyDefaultTimezone).format()))
       .map(resultedData => {
-          // console.log(JSON.stringify(resultedData));
+          console.log(JSON.stringify(resultedData));
           resultedData.twh = timesheetList.twh;
-          // console.log(JSON.stringify(resultedData));
+          console.log(JSON.stringify(resultedData));
           return resultedData;
         });
-      // console.log(timesheetObj.timesheetObjData);
+      console.log(timesheetObj.timesheetObjData);
       previousTaskId=currentTaskId;
       previousProjectId = currentProjectId;
       return({
