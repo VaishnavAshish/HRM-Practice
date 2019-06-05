@@ -484,6 +484,7 @@ exports.insertNewInvoiceItem = (req, res) => {
                                        handleResponse.shouldAbort(err, client, done);
                                        handleResponse.handleError(res, err, ' Error in committing transaction');
                                      } else {
+                                        done();
                                         handleResponse.sendSuccess(res,'New invoice line item added successfully',{});
                                     }
                                   })

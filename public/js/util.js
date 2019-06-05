@@ -6,6 +6,7 @@ $(document).ready(function(){
         altInput: true,
         altFormat: "m-d-Y",
         dateFormat: "Y-m-d"
+        // ,allowInput:true
     });
     $(".open-time-pik-24").flatpickr(
         {
