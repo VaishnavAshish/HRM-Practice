@@ -8,8 +8,6 @@
 				addExpenseToList(expCat);
 			});
 		<% } %>
-
-		
 	})
 	function addExpenseToList(expenseCat){
 		let expCatLi='<li class="line-top slds-p-vertical_small" category-name="'+expenseCat.toLowerCase()+'">'+
@@ -22,11 +20,11 @@
 					                '<a href="javascript:void(0);" title="category-name" onclick="getEditData(this)">'+expenseCat+'</a>'+
 					            '</div>'+
 					        '</div>'+
-					        
+
 					        '<div class="slds-size_1-of-1 slds-medium-size_4-of-12 slds-p-horizontal_small">'+
 					            '<div class="slds-grid">'+
 					                '<div class="slds-has-flexi-truncate">'+
-					                    
+
 					                '</div>'+
 					                '<div class="slds-no-flex slds-p-left_small">'+
 					                    '<div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">'+
@@ -38,7 +36,7 @@
 					                        '</button>'+
 					                        '<div class="slds-dropdown slds-dropdown_right slds-dropdown_actions" style="">'+
 					                            '<ul class="slds-dropdown__list" role="menu">'+
-					                                
+
 					                                '<li class="slds-dropdown__item" role="presentation">'+
 					                                    '<a href="javascript:void(0);" role="deleteItem" tabindex="-1" onclick=\'deleteBeforeConfirm("#globalAlert", "deleteExpCat('+`\`${expenseCat.toLowerCase()}\``+')")\'>'+
 					                                        '<span class="slds-truncate text-red" title="">'+
@@ -64,7 +62,7 @@
 	    '</a>'+
 	'</li>'+*/
 	function addNewExpCat(modalId){
-		closeModal(modalId); 
+		closeModal(modalId);
 		let expCatData = createJSONForFormData('#addExpenseCat');
 		if(expCatData.expenseCat.trim()==''){
 			showGlobalToast('#globalToast', 'error', 'Category name cannot be blank', 4000);
@@ -77,21 +75,21 @@
 		}
 		addExpenseToList(expCatData.expenseCat);
 		saveCompanyExpenseSetting();
-		
+
 
 	}
 	function checkForExpenseCatAssginment(expenseCat,cb){
 		showLoader('#globalLoader');
 		$.ajax({
 		      type: 'POST',
-		      url : '/checkExpenseCategoryAssign', 
+		      url : '/checkExpenseCategoryAssign',
 		      contentType: 'application/json',
 		      dataType: 'json',
 		      data:JSON.stringify({"expenseCat":expenseCat}),
 		       success : function(response){
 				   if(response.success){
 						hideLoader('#globalLoader');
-						console.log('response is : '+JSON.stringify(response));	
+						console.log('response is : '+JSON.stringify(response));
 						if(response.result==true){
 							cb(true,response.message);
 						}else{
@@ -118,7 +116,7 @@
 
 	}
 	function editNewExpCat(modalId){
-		closeModal(modalId); 
+		closeModal(modalId);
 		let expCatData = createJSONForFormData('#editExpenseCat');
 		$("#expenseCatList li[category-name='"+expCatData.expenseCatPrev+"']").find('.max-w-200 a').text(expCatData.expenseCat);
 		$("#expenseCatList li[category-name='"+expCatData.expenseCatPrev+"']").attr('category-name',expCatData.expenseCat);
@@ -136,13 +134,13 @@
 				showGlobalToast('#globalToast', 'error', message, 4000);
 			}
 		});
-		
+
 	}
 	/*function deleteExpCatEdit(modalId){
 		let expenseCat=$("#expenseCatPrev").val();
 		checkForExpenseCatAssginment(expenseCat,(result,message)=>{
 			console.log(result);
-			closeModal(modalId); 
+			closeModal(modalId);
 			if(result==true){
 				$("#expenseCatList li[category-name='"+$("#expenseCatPrev").val()+"']").remove();
 				saveCompanyExpenseSetting();
@@ -161,16 +159,20 @@
 		console.log(expCategory);
 		$.ajax({
 		      type: 'POST',
-		      url : '/editCompanySettingExpense', 
+		      url : '/editCompanySettingExpense',
 		      contentType: 'application/json',
 		      dataType: 'json',
 		      data:JSON.stringify({"expCategory":expCategory}),
 		       success : function(response){
 				   if(response.success){
-						setTimeout(function(){
-							hideLoader('#globalLoader');
-							showGlobalToast('#globalToast', 'success', response.message, 4000);
-						},2000); 
+						 $("#expenseCatLength").text(`(${expCategory.length})`);
+							setTimeout(function(){
+								hideLoader('#globalLoader');
+								showGlobalToast('#globalToast', 'success', response.message, 4000);
+							},2000);
+							if(expCategory.length == 0){
+								location.reload();
+							}
 				   }
 		        },
 		       error: function(response){

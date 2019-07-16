@@ -120,7 +120,7 @@
                               </div>
                             </div>
                             <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_6-of-12 slds-p-horizontal_small">
-                                <div class="slds-card slds-p-around_medium sm-pd-10 slds-m-bottom_large" data-modified>
+                                <div class="slds-card slds-p-around_medium sm-pd-10 slds-m-bottom_large" data-modified id="defaultInvoiceSetting">
 
                                     <!-- <div class="slds-p-bottom_x-small">
                                         Default Invoice Notes
@@ -144,9 +144,12 @@
                                         </div>
                                         <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
                                           <div class="slds-form-element slds-m-bottom_medium">
-                                              <label class="slds-form-element__label">Invoice Start Number</label>
+                                              <label class="slds-form-element__label">
+                                                Invoice Start Number
+                                                <abbr class="slds-required" title="required">*</abbr>
+                                              </label>
                                               <div class="slds-form-element__control">
-                                                  <input type="number" class="slds-input" placeholder="Default invoice number" id="defaultInvoiceStartNumber" name="defaultInvoiceStartNumber" getFormData>
+                                                  <input type="number" class="slds-input" placeholder="Default invoice number" id="defaultInvoiceStartNumber" name="defaultInvoiceStartNumber" getFormData required="" positiveInteger>
                                                   <!-- <textarea class="slds-textarea" placeholder="Default Invoice Note" rows="1" id="defaultInvoiceNote" name="defaultInvoiceNote" getFormData></textarea> -->
                                                   <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
@@ -158,9 +161,12 @@
                                     <div class="slds-grid slds-gutters slds-wrap">
                                         <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
                                             <div class="slds-form-element slds-m-bottom_medium">
-                                                <label class="slds-form-element__label">Timesheet Notes</label>
+                                                <label class="slds-form-element__label">
+                                                  Timesheet Notes
+                                                  <abbr class="slds-required" title="required">*</abbr>
+                                                </label>
                                                 <div class="slds-form-element__control">
-                                                    <textarea class="slds-textarea" placeholder="Timesheet Note" rows="1" id="defaultTimesheetNote" name="defaultTimesheetNote" getFormData></textarea>
+                                                    <textarea class="slds-textarea" placeholder="Timesheet Note" rows="1" id="defaultTimesheetNote" name="defaultTimesheetNote" getFormData required=""></textarea>
                                                     <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
                                                     </div>
@@ -169,9 +175,12 @@
                                         </div>
                                         <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
                                             <div class="slds-form-element slds-m-bottom_medium">
-                                                <label class="slds-form-element__label">Fixed Fee Notes</label>
+                                                <label class="slds-form-element__label">
+                                                  Fixed Fee Notes
+                                                  <abbr class="slds-required" title="required">*</abbr>
+                                                </label>
                                                 <div class="slds-form-element__control">
-                                                    <textarea class="slds-textarea" placeholder="Fixed Fee Note" rows="1" id="defaultFixedFeeNote" name="defaultFixedFeeNote" getFormData></textarea>
+                                                    <textarea class="slds-textarea" placeholder="Fixed Fee Note" rows="1" id="defaultFixedFeeNote" name="defaultFixedFeeNote" getFormData required=""></textarea>
                                                     <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
                                                     </div>
@@ -182,9 +191,12 @@
                                     <div class="slds-grid slds-gutters slds-wrap">
                                         <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
                                             <div class="slds-form-element slds-m-bottom_medium">
-                                                <label class="slds-form-element__label">Expense Notes</label>
+                                                <label class="slds-form-element__label">
+                                                  Expense Notes
+                                                  <abbr class="slds-required" title="required">*</abbr>
+                                                </label>
                                                 <div class="slds-form-element__control">
-                                                    <textarea class="slds-textarea" placeholder="Expense Note" rows="1" id="defaultExpenseNote" name="defaultExpenseNote" getFormData></textarea>
+                                                    <textarea class="slds-textarea" placeholder="Expense Note" rows="1" id="defaultExpenseNote" name="defaultExpenseNote" getFormData required=""></textarea>
                                                     <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
                                                     </div>
@@ -193,9 +205,12 @@
                                         </div>
                                         <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
                                             <div class="slds-form-element slds-m-bottom_medium">
-                                                <label class="slds-form-element__label">Other Notes</label>
+                                                <label class="slds-form-element__label">
+                                                  Other Notes
+                                                  <abbr class="slds-required" title="required">*</abbr>
+                                                </label>
                                                 <div class="slds-form-element__control">
-                                                    <textarea class="slds-textarea" placeholder="Other Note" rows="1" id="defaultOtherNote" name="defaultOtherNote" getFormData></textarea>
+                                                    <textarea class="slds-textarea" placeholder="Other Note" rows="1" id="defaultOtherNote" name="defaultOtherNote" getFormData required=""></textarea>
                                                     <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
                                                     </div>

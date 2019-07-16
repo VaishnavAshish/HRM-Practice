@@ -260,6 +260,7 @@ function searchProject(filter,obj){
                         }
 
                     }else{
+                        $(".slds-button[loadItemId]").hide();
                         $("div[title=noProjectFound]").removeClass('slds-hide').text('No project found with this search crieteria');
                         $(obj).closest('div[title="filterDropDown"]').find('#selectedFilter').text(filter);
                         $(obj).closest('div[title="filterDropDown"]').removeClass('slds-is-open');

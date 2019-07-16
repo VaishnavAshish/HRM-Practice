@@ -367,14 +367,14 @@
                                                                     <li class="slds-has-divider_top-space" role="separator"></li>
                                                                     <li class="slds-dropdown__item" role="presentation">
                                                                       <% if(resource.archived==true) { %>
-                                                                          <a href="javascript:void(0);" role="menuitem" tabindex="-1">
+                                                                          <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="activateBeforeConfirm('#globalAlert', 'activate(\'<%=resource.id;%>\',\'users\')')">
                                                                               <span class="slds-truncate sf-text-red" title="">
                                                                                   <i class="fa fa-check-circle text-green"></i> &nbsp;
                                                                                   Activate
                                                                               </span>
                                                                           </a>
                                                                       <% }else { %>
-                                                                          <a href="javascript:void(0);" role="menuitem" tabindex="-1">
+                                                                          <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="activateBeforeConfirm('#globalAlert', 'activate(\'<%=resource.id;%>\',\'users\')')">
                                                                               <span class="slds-truncate sf-text-red" title="">
                                                                                   <i class="fa fa-trash text-red"></i> &nbsp;
                                                                                   Deactivate

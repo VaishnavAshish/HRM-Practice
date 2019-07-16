@@ -126,14 +126,15 @@
                                             <div class="slds-form-element slds-m-bottom_medium">
                                                 <label class="slds-form-element__label">
                                                     Date
+                                                    <abbr class="slds-required" title="required">*</abbr>
                                                 </label>
                                                 <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
                                                     <span class="slds-input__icon slds-input__icon_right">
                                                         <i class="fa fa-calendar"></i>
                                                     </span>
-                                                    <input type="date" id="expense_date" class="slds-input open-date-pik" value="<%= expense.expense_date%>" >
+                                                    <input type="date" id="expense_date" class="slds-input open-date-pik" value="<%= expense.expense_date%>" required="">
                                                 </div>
-                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" id="err-msg-date">
 
                                                 </div>
                                             </div>

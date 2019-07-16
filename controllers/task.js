@@ -310,6 +310,9 @@ function updateTaskRecord(req, client, err, done, res, taskData, callback) {
     console.log(req.body.taskDetails.end_date+' '+end_date);
     // end_date = req.body.taskDetails.end_date;
   }
+  if(req.body.taskDetails.task_complete_per == ''){
+    req.body.taskDetails.task_complete_per = 0;
+  }
   client.query('UPDATE TASK SET name=$1, start_date=$2, end_date=$3, billable=$4, status=$5, description=$6, estimated_hours=$7, priority=$8, updated_date=$9, assigned_user_id=$12 , percent_completed=$13 WHERE id=$10 AND company_id=$11 RETURNING id', [req.body.taskDetails.title, start_date, end_date, req.body.taskDetails.billable, req.body.taskDetails.status, req.body.taskDetails.description, req.body.taskDetails.estimated_hours, req.body.taskDetails.priority, 'now()', req.body.taskDetails.taskId, req.user.company_id, taskData.assigned_user_id, req.body.taskDetails.task_complete_per], function (err, updatedData) {
     if (err) {
       console.error(err);

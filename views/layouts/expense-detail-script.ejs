@@ -83,8 +83,9 @@ function submitExpense(expenseId){
     });
 }
 function updateExpense(expenseId){
-
+        $("#editExpenseForm").removeClass('has-error')
         console.log('expense id is '+expenseId);
+        clearError('#expense_date','#err-msg-date');
         clearError('#account', '#err-msg-account');
         clearError('#project', '#err-msg-project');
         /*if($('#account option:selected').val() != null && $('#account option:selected').val() != undefined && $('#account option:selected').val() != '' && $('#account option:selected').val() != 'none') {
@@ -93,7 +94,6 @@ function updateExpense(expenseId){
               if($('#amount').val()<0){
                   addError($('#amount'),'Please enter correct amount');
               }else{
-
                   clearError('#project', '#err-msg-project')
                     let expenseData={};
                     expenseData.expenseId=expenseId;

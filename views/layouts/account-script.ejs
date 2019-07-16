@@ -574,6 +574,7 @@ function searchAccount(filter,obj){
 						}
 					}else{
 						$("div[title=noAccountFound]").removeClass('slds-hide').text('No account found with this search crieteria');
+						$(".slds-button[loadItemId]").hide();
 						$(obj).closest('div[title="filterDropDown"]').find('#selectedFilter').text(filter);
 						$(obj).closest('div[title="filterDropDown"]').removeClass('slds-is-open');
 						hideLoader('#globalLoader');

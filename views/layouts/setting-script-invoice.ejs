@@ -34,42 +34,47 @@
 		let file=$("#uploadedImageFile").val();*/
 		/*let hexString = window.btoa(companyLogo);
 		console.log(hexString);*/
+		console.log(defaultInvoiceNote);
 		if(defaultInvoiceNote.length>5000||defaultTimesheetNote.length>5000||defaultFixedFeeNote.length>5000||defaultExpenseNote.length>5000||defaultOtherNote.length>5000){
 			hideLoader('#globalLoader');
 			showGlobalToast('#globalToast', 'error', 'All Invoice notes cannot be more than 5000 characters', 4000);
 			return false;
 		}
-		console.log(defaultInvoiceNote);
-		$.ajax({
-		      type: 'POST',
-		      url : '/editCompanySettingInvoice',
-		      contentType: 'application/json',
-		      dataType: 'json',
-		      data:JSON.stringify({
-						"defaultInvoiceNote":defaultInvoiceNote,
-						"defaultTimesheetNote":defaultTimesheetNote,
-						"defaultFixedFeeNote":defaultFixedFeeNote,
-						"defaultExpenseNote":defaultExpenseNote,
-						"defaultOtherNote":defaultOtherNote,
-						"defaultInvoiceStartNumber":defaultInvoiceStartNumber
-					}),
-		       success : function(response){
-				   if(response.success){
-						/*hideLoader('#globalLoader');*/
-						$('[save-btn]').attr('disabled',true);
-						setTimeout(function(){
-							hideLoader('#globalLoader');
-							showGlobalToast('#globalToast', 'success', response.message, 4000);
-						},2000);
-					   	/*location.reload(); */
-				   }
-		        },
-		       error: function(response){
-	                console.log('error is : '+JSON.stringify(response));
-	                hideLoader('#globalLoader');
-	                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
-		        }
-		    });
+		checkFormValidation("#defaultInvoiceSetting");
+		if(!$("#defaultInvoiceSetting").hasClass('has-error')) {
+			$.ajax({
+			      type: 'POST',
+			      url : '/editCompanySettingInvoice',
+			      contentType: 'application/json',
+			      dataType: 'json',
+			      data:JSON.stringify({
+							"defaultInvoiceNote":defaultInvoiceNote,
+							"defaultTimesheetNote":defaultTimesheetNote,
+							"defaultFixedFeeNote":defaultFixedFeeNote,
+							"defaultExpenseNote":defaultExpenseNote,
+							"defaultOtherNote":defaultOtherNote,
+							"defaultInvoiceStartNumber":defaultInvoiceStartNumber
+						}),
+			       success : function(response){
+					   if(response.success){
+							/*hideLoader('#globalLoader');*/
+							$('[save-btn]').attr('disabled',true);
+							setTimeout(function(){
+								hideLoader('#globalLoader');
+								showGlobalToast('#globalToast', 'success', response.message, 4000);
+							},2000);
+						   	/*location.reload(); */
+					   }
+			        },
+			       error: function(response){
+		                console.log('error is : '+JSON.stringify(response));
+		                hideLoader('#globalLoader');
+		                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+			        }
+			    });
+			}else{
+				hideLoader('#globalLoader');
+			}
 
 	}
 	function uploadCompanyLogo(input){

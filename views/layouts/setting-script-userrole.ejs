@@ -9,7 +9,7 @@
 			});
 		<% } %>
 
-		
+
 	})
 	function addUserRoleToList(userRole){
 		let userRoleLi='<li class="line-top slds-p-vertical_small" user-role-li role-name="'+userRole.toLowerCase()+'">'+
@@ -22,11 +22,11 @@
 					                '<a href="javascript:void(0);" title="role-name" onclick="getEditData(this)">'+userRole+'</a>'+
 					            '</div>'+
 					        '</div>'+
-					        
+
 					        '<div class="slds-size_1-of-1 slds-medium-size_4-of-12 slds-p-horizontal_small">'+
 					            '<div class="slds-grid">'+
 					                '<div class="slds-has-flexi-truncate">'+
-					                    
+
 					                '</div>'+
 					                '<div class="slds-no-flex slds-p-left_small">'+
 					                    '<div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">'+
@@ -38,7 +38,7 @@
 					                        '</button>'+
 					                        '<div class="slds-dropdown slds-dropdown_right slds-dropdown_actions" style="">'+
 					                            '<ul class="slds-dropdown__list" role="menu">'+
-					                                
+
 					                                '<li class="slds-dropdown__item" role="presentation">'+
 					                                    '<a href="javascript:void(0);" role="deleteItem" tabindex="-1"  onclick=\'deleteBeforeConfirm("#globalAlert", "deleteUserRole('+`\`${userRole.toLowerCase()}\``+')")\'>'+
 					                                        '<span class="slds-truncate text-red" title="">'+
@@ -52,7 +52,7 @@
 					                '</div>'+
 					            '</div>'+
 					        '</div>'+
-					    '</div>'+ 
+					    '</div>'+
 					'</li>';
 			$("#userRoleList").append(userRoleLi);
 	}
@@ -64,7 +64,7 @@
         '</a>'+
     '</li>'+*/
 	function addNewUserRole(modalId){
-		closeModal(modalId); 
+		closeModal(modalId);
 		let userRoleData = createJSONForFormData('#addUserRole');
 		if(userRoleData.roleName.trim()==''){
 			showGlobalToast('#globalToast', 'error', 'Category name cannot be blank', 4000);
@@ -77,7 +77,7 @@
 		}
 		addUserRoleToList(userRoleData.roleName);
 		saveCompanyUserRole();
-		
+
 
 	}
 	/*function getEditData(obj){
@@ -88,7 +88,7 @@
 
 	}
 	function editNewUserRole(modalId){
-		closeModal(modalId); 
+		closeModal(modalId);
 		let userRoleData = createJSONForFormData('#editUserRole');
 		$("#userRoleList li[role-name='"+userRoleData.userRolePrev+"']").find('.max-w-200 a').text(userRoleData.roleNameEdit);
 		$("#userRoleList li[role-name='"+userRoleData.userRolePrev+"']").attr('role-name',userRoleData.roleNameEdit);
@@ -99,14 +99,14 @@
 		showLoader('#globalLoader');
 		$.ajax({
 		      type: 'POST',
-		      url : '/checkUserRoleAssignment', 
+		      url : '/checkUserRoleAssignment',
 		      contentType: 'application/json',
 		      dataType: 'json',
 		      data:JSON.stringify({"role":roleName}),
 		       success : function(response){
 				   if(response.success){
 						hideLoader('#globalLoader');
-						console.log('response is : '+JSON.stringify(response));	
+						console.log('response is : '+JSON.stringify(response));
 						if(response.result==true){
 							cb(true,response.message);
 						}else{
@@ -141,7 +141,7 @@
 		let roleName=$("#userRolePrev").val();
 		checkForAssignment(roleName,(result,message)=>{
 			console.log(result);
-			closeModal(modalId); 
+			closeModal(modalId);
 			if(result==true){
 				$("#userRoleList li[role-name='"+$("#userRolePrev").val()+"']").remove();
 				saveCompanyUserRole();
@@ -160,16 +160,20 @@
 		console.log(userRole);
 		$.ajax({
 		      type: 'POST',
-		      url : '/editCompanySettingUserRole', 
+		      url : '/editCompanySettingUserRole',
 		      contentType: 'application/json',
 		      dataType: 'json',
 		      data:JSON.stringify({"userRole":userRole}),
 		       success : function(response){
 				   if(response.success){
+						 $("#userRoleLength").text(`(${userRole.length})`);
 					   setTimeout(function(){
 						   hideLoader('#globalLoader');
 						   showGlobalToast('#globalToast', 'success', response.message, 4000);
-							},2000); 
+							},2000);
+							if(userRole.length == 0){
+								location.reload();
+							}
 				   }
 		        },
 		       error: function(response){
