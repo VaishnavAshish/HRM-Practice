@@ -187,12 +187,13 @@
                                                     <div class="slds-form-element slds-m-bottom_medium">
                                                         <label class="slds-form-element__label">
                                                             Due Date
+                                                            <abbr class="slds-required" title="required">*</abbr>
                                                         </label>
                                                         <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
                                                             <span class="slds-input__icon slds-input__icon_right">
                                                                 <i class="fa fa-calendar"></i>
                                                             </span>
-                                                            <input type="date" name="due_date" getFormData value="<%= invoiceDetails.dueDateFormatted %>" class="slds-input open-date-pik" disableWhenPaid>
+                                                            <input type="date" id="invoice_due_date" name="due_date" required="" getFormData value="<%= invoiceDetails.dueDateFormatted %>" class="slds-input open-date-pik" disableWhenPaid>
                                                         </div>
                                                         <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 

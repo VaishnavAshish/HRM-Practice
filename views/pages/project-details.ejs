@@ -516,9 +516,9 @@
                                                                     <label class="slds-form-element__label">Project Cost</label>
                                                                     <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
                                                                         <% if(project.type == "fixed_fee") { %>
-                                                                            <input type="number" class="slds-input" name="project_cost" getFormData id="project-cost" project-cost value="<%= project.project_cost %>" decimal>
+                                                                            <input type="number" class="slds-input" name="project_cost" getFormData id="project-cost" min="0" project-cost value="<%= project.project_cost %>" decimal>
                                                                         <% } else { %>
-                                                                            <input type="number" class="slds-input" name="project_cost" getFormData id="project-cost" project-cost disabled="" value="<%= project.project_cost %>" decimal>
+                                                                            <input type="number" class="slds-input" name="project_cost" getFormData id="project-cost" min="0" project-cost disabled="" value="<%= project.project_cost %>" decimal>
                                                                         <% } %>
                                                                     </div>
                                                                     <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
