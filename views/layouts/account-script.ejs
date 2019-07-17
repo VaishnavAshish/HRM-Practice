@@ -69,7 +69,20 @@ function deleteAccount(accountId){
 
 	       		/* window.location.href = document.referrer;*/
 	       		showGlobalToast('#globalToast', 'success', response.message, 4000);
-	       		window.location.href="/accounts-listing";
+						urlToRedirect = "/accounts-listing";
+						let locationURL = window.location.href.split("#");
+						if(locationURL.length>1){
+							if(locationURL[1] == "cardview"){
+								urlToRedirect += `#${locationURL[1]}`;
+							}else{
+								urlToRedirect += `#default`;
+							}
+						}
+						if(window.location.href.substring(window.location.href.lastIndexOf('/')) == urlToRedirect){
+							location.reload();
+						}else{
+							window.location.href = urlToRedirect;
+						}
 
 	        },
 	       error: function(response){
