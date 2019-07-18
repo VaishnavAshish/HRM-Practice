@@ -61,7 +61,7 @@
                                                 Activate
                                             </button>
                                         <% } else { %>
-                                                <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', '   deleteAccount(\'<%= account.id %>\')')">
+                                                <button class="slds-button slds-button_destructive slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteAccount(\'<%= account.id %>\')','Are you sure you want to delete this account?')">
                                                         Deactivate
                                                 </button>
 

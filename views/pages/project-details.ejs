@@ -119,7 +119,7 @@
                                             <i class="fa fa-file-export"></i>
                                          <span class="sm-hide">Export Project Details</span>
                                        </button> -->
-                                       <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteProject(\'<%= project.id %>\')');" title="Delete">
+                                       <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteProject(\'<%= project.id %>\')','Are you sure you want to delete this project?');" title="Delete">
                                                 <!-- updateProjectDetails('<%= project.id %>', '#edit-project') -->
                                               <span class="slds-button__icon">
                                                 <i class=" fa fa-trash text-red" aria-hidden="true"></i>
@@ -742,7 +742,7 @@
                                                                                             </li> -->
 
                                                                                             <li class="slds-dropdown__item" role="presentation">
-                                                                                                <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteProjectRes(\'<%= resUser.id %>\', \'<%= project.id %>\', \'<%= resUser.role %>\', \'<%= resUser.assinment_id %>\')');">
+                                                                                                <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteProjectRes(\'<%= resUser.id %>\', \'<%= project.id %>\', \'<%= resUser.role %>\', \'<%= resUser.assinment_id %>\')','Are you sure you want to delete this project resource?');">
                                                                                                     <span class="slds-truncate text-red" title="">
                                                                                                         Remove
                                                                                                     </span>

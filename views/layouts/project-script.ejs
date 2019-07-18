@@ -390,7 +390,7 @@ function findProjectByName(){
                                                         </li>
                                                         <li class="slds-has-divider_top-space" role="separator"></li>
                                                         <li class="slds-dropdown__item" role="presentation">
-                                                            <a href="javascript:void(0);" role="menuitem" tabindex="-1"  onclick="deleteBeforeConfirm('#globalAlert', 'deleteProject(\'`+project.id+`\')');">
+                                                            <a href="javascript:void(0);" role="menuitem" tabindex="-1"  onclick="deleteBeforeConfirm('#globalAlert', 'deleteProject(\'`+project.id+`\')','Are you sure you want to delete this project?');">
                                                                 <span class="slds-truncate sf-text-red" title="">
                                                                     <i class="fa fa-trash text-red"></i> &nbsp;
                                                                     Delete
@@ -519,7 +519,7 @@ function findProjectByName(){
                                             '</li>'+
                                             '<li class="slds-has-divider_top-space" role="separator"></li>'+
                                             '<li class="slds-dropdown__item" role="presentation">'+
-                                                '<a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick=\'deleteBeforeConfirm("#globalAlert", "deleteProject('+project.id+')")\'>'+
+                                                '<a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick=\'deleteBeforeConfirm("#globalAlert", "deleteProject('+project.id+')","Are you sure you want to delete this project?")\'>'+
                                                     '<span class="slds-truncate " title="">'+
                                                         '<i class="fa fa-trash text-red"></i> &nbsp; Delete'+
                                                     '</span>'+

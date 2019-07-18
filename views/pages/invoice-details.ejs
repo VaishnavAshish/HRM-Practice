@@ -95,7 +95,7 @@
                                                </div>
                                            </div>
 
-                                           <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteInvoice(\'<%= invoiceDetails.id %>\')')" title="Delete" disableWhenPaid>
+                                           <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteInvoice(\'<%= invoiceDetails.id %>\')','Are you sure you want to delete this invoice?')" title="Delete" disableWhenPaid>
                                              <span class="slds-button__icon">
                                                <i class=" fa fa-trash text-red" aria-hidden="true"></i>
                                              </span>
@@ -638,7 +638,7 @@
                                                                     <i class="fa fa-save text-blue"></i>
                                                                 </button>
                                                                 <span>&nbsp;&nbsp;</span>
-                                                                <button class="slds-button slds-button_icon " title="Remove" onclick="deleteBeforeConfirm('#globalAlert', 'deleteInvoiceItem(this,\'<%= item.id %>\', \'<%= item.timesheet_id %>\', \'<%= item.expense_id %>\', \'<%= item.type %>\')')" disableWhenPaid>
+                                                                <button class="slds-button slds-button_icon " title="Remove" onclick="deleteBeforeConfirm('#globalAlert', 'deleteInvoiceItem(this,\'<%= item.id %>\', \'<%= item.timesheet_id %>\', \'<%= item.expense_id %>\', \'<%= item.type %>\')','Are you sure you want to delete this invoice?')" disableWhenPaid>
                                                                     <i class="fa fa-times text-red"></i>
                                                                 </button>
                                                             </div>
