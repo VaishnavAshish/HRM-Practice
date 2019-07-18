@@ -159,7 +159,20 @@ function deleteInvoice(invoiceId){
        success : function(response){
             console.log(response);
             hideLoader('#globalLoader');
-            window.location.href="/invoices-listing";
+            urlToRedirect = '/invoices-listing';
+            let locationURL = window.location.href.split("#");
+            if(locationURL.length>1){
+              if(locationURL[1] == "cardView"){
+                urlToRedirect += `#${locationURL[1]}`;
+              }else{
+                urlToRedirect += `#default`;
+              }
+            }
+            if(window.location.href.substring(window.location.href.lastIndexOf('/')) == urlToRedirect){
+              location.reload();
+            }else{
+              window.location.href = urlToRedirect;
+            }
 
         },
        error: function(response){

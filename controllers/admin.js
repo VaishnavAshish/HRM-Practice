@@ -636,7 +636,7 @@ sendEmailToUser = (req, res, next) => {
     '<tr>' +
     '<td valign="top" align="center" style="padding-top: 20px; padding-bottom: 10px;">' +
     '<a href="javascript:void(0);" target="_blank">' +
-    '<img src="'+process.env.BASE_URL+'/img/klient.png" alt=""  width="120" height="60">' +
+    '<img src="'+process.env.BASE_URL+'/img/krow-logo.png" alt=""  width="120" height="60">' +
     '</a>' +
     '</td>' +
     '</tr>' +
