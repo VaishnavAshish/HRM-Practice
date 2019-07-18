@@ -678,7 +678,7 @@ function findAccountByName(){
 	    });
 }
 function setDataToCard(account){
-	let accStatus=(account.archived==true)?"Deactive":"Active";
+	let accStatus=(account.archived==true)?'<span class="text-red">Deactive</<span>':'<span class="text-green">Active</<span>';
 	if(account.archived==false){
 			archivedButton='<a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm(\'#globalAlert\', \'deleteAccount('+account.id+')\')">'+
 													'<span class="slds-truncate" title="">'+
@@ -749,9 +749,7 @@ function setDataToCard(account){
 					                    '</div>'+
 					                    '<div class="slds-no-flex slds-p-left_small">'+
 					                        '<span class="text-uppercase text-dull">Status :</span>'+
-					                        '<span class="text-green"> '+
-					                           accStatus
-					                        '</span>'+
+					                           accStatus+
 					                    '</div>'+
 					                '</div>'+
 					            '</div>'+
