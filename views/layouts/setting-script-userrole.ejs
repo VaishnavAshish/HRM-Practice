@@ -12,6 +12,8 @@
 
 	})
 	function addUserRoleToList(userRole){
+
+		//'<a href="javascript:void(0);" title="role-name" onclick="getEditData(this)">'+userRole+'</a>'+
 		let userRoleLi='<li class="line-top slds-p-vertical_small" user-role-li role-name="'+userRole.toLowerCase()+'">'+
 					    '<div class="slds-grid slds-wrap slds-grid_pull-padded">'+
 					        '<div class="slds-size_1-of-1 slds-medium-size_8-of-12 slds-p-horizontal_small sm-bpd-15">'+
@@ -19,7 +21,7 @@
 					                'Role Name'+
 					            '</div>'+
 					            '<div class="max-w-200" >'+
-					                '<a href="javascript:void(0);" title="role-name" onclick="getEditData(this)">'+userRole+'</a>'+
+												userRole+
 					            '</div>'+
 					        '</div>'+
 

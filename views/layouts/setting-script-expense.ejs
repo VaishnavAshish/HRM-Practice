@@ -10,6 +10,8 @@
 		<% } %>
 	})
 	function addExpenseToList(expenseCat){
+
+		//'<a href="javascript:void(0);" title="category-name" onclick="getEditData(this)">'+expenseCat+'</a>'+
 		let expCatLi='<li class="line-top slds-p-vertical_small" category-name="'+expenseCat.toLowerCase()+'">'+
 					    '<div class="slds-grid slds-wrap slds-grid_pull-padded">'+
 					        '<div class="slds-size_1-of-1 slds-medium-size_8-of-12 slds-p-horizontal_small sm-bpd-15">'+
@@ -17,7 +19,7 @@
 					                'Category Name'+
 					            '</div>'+
 					            '<div class="max-w-200" >'+
-					                '<a href="javascript:void(0);" title="category-name" onclick="getEditData(this)">'+expenseCat+'</a>'+
+												expenseCat+
 					            '</div>'+
 					        '</div>'+
 

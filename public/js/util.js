@@ -1007,13 +1007,13 @@ function resetForm(elementID, isModalOpen, isTabOpen) {
 
     $("[reset='errorclass']", modal).removeClass('slds-has-error');
     $("[reset='errmsg']", modal).html('');
-    $("[reset='value']", modal).val(''); 
+    $("[reset='value']", modal).val('');
     $("[reset='number']", modal).val('0');
     $("[reset-disabled='true']", modal).attr('disabled', 'disabled');
     $("[reset-disabled='false']", modal).removeAttr('disabled');
     $("[reset-checked='true']", modal).prop("checked",true);
     $("[reset-unchecked='true']", modal).prop("checked",false);
-    $("[reset='default']", modal).val($("[reset='default']", modal).attr('default-val'));
+    $("[reset='default']", modal).val($("[reset='default']", modal).attr('default-val'));     
 
     if (isModalOpen) {
         console.log("returned to open modal")
