@@ -277,6 +277,7 @@ function searchExpense(filter,obj){
 
 
                     }else{
+                        $(".slds-button[loadItemId]").hide();
                         $(obj).closest('div[title="filterDropDown"]').find('#selectedFilter').text(filter);
                         $(obj).closest('div[title="filterDropDown"]').removeClass('slds-is-open');
                         $("div[title=noExpenseFound]").removeClass('slds-hide').text('No expense found with this search crieteria');
@@ -298,6 +299,7 @@ function searchExpense(filter,obj){
            error: function(response){
                 console.log('error is : '+response);
                 hideLoader('#globalLoader');
+                $(".slds-button[loadItemId]").hide();
                 $("div[title=noExpenseFound]").removeClass('slds-hide').text(response.responseJSON.message);
                 /*showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);*/
             }
@@ -346,6 +348,7 @@ function findExpenseForAccount(){
                                 setDataToCard(expense);
                             })
                         }else{
+                            $(".slds-button[loadItemId]").hide();
                             $("div[title=noExpenseFound]").removeClass('slds-hide').text('No expense found with this search crieteria');
                             /*showGlobalToast('#globalToast', 'error','No expense found with this search crieteria', 4000);*/
                         }
@@ -364,6 +367,7 @@ function findExpenseForAccount(){
                error: function(response){
                     console.log('error is : '+response);
                     hideLoader('#globalLoader');
+                    $(".slds-button[loadItemId]").hide();
                     $("div[title=noExpenseFound]").removeClass('slds-hide').text(response.responseJSON.message);
                     /*showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);*/
                 }
