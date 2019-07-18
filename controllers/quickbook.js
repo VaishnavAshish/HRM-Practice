@@ -744,6 +744,8 @@ exports.getQuickbookData = (req,res) => {
               handleResponse.shouldAbort(err, client, done);
               handleResponse.handleError(res, err, ' Error in fetching settings');
             } else {
+                console.log('companySetting inside getQuickbookData');
+                console.log(companySetting.rows[0])
                 if(companySetting.rows[0].quickbook_token!=null&&companySetting.rows[0].quickbook_enabled){
                   let quickbook_token = JSON.parse(companySetting.rows[0].quickbook_token);
                   oauthClient = new OAuthClient({
