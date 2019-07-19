@@ -24,6 +24,7 @@
     "chalk": "^2.4.1",
     "cheerio": "^1.0.0-rc.2",
     "clockwork": "^0.1.4",
+    "cluster": "^0.7.7",
     "compression": "^1.7.3",
     "connect-mongo": "^2.0.1",
     "connect-pg-simple": "5.0.0",
