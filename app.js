@@ -2,6 +2,8 @@
  * Module dependencies.
  */
 const cluster = require('cluster');
+const ipify = require('ipify');
+
 const express = require('express');
 const compression = require('compression');
 const session = require('express-session');
@@ -72,6 +74,14 @@ if (cluster.isMaster) {
 } else {
 
     console.log('Worker %d running!', cluster.worker.id);
+
+    (async () => {
+        console.log(await ipify());
+        //=> '2001:0db8:85a3:0000:0000:8a2e:0370:7334'
+
+        console.log(await ipify({useIPv6: false}));
+        //=> '82.142.31.236'
+    })();
     app.use(fileUpload());
     app.set('host', process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0');
     app.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080);
