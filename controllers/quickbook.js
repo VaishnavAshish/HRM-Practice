@@ -396,7 +396,7 @@ exports.postInvoiceToQuickbook = (req,res) => {
                       token:quickbook_token.token
                   });
                   // please refer https://help.developer.intuit.com/s/question/0D50f000051WZUGCA4/refresh-token-is-expiring-each-day-instead-of-lasting-100-days
-                  oauthClient.refresh()
+                   oauthClient.refresh()
                      .then(function(authResponse) {
                         //  console.log('Tokens refreshed : ' + JSON.stringify(authResponse));
                          quickbook_token.token =authResponse.token;
