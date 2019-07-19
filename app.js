@@ -51,7 +51,7 @@ const app = express();
 /**
  * Express configuration.
  */
-if (cluster.isMaster) {
+/*if (cluster.isMaster) {
 
    // Count the machine's CPUs
    var cpuCount = require('os').cpus().length;
@@ -73,7 +73,7 @@ if (cluster.isMaster) {
 // Code to run if we're in a worker process
 } else {
 
-    console.log('Worker %d running!', cluster.worker.id);
+    console.log('Worker %d running!', cluster.worker.id);*/
 
     (async () => {
         console.log(await ipify());
@@ -193,7 +193,7 @@ if (cluster.isMaster) {
       console.error(err);
       console.log("Uncaught Exception");
     });
-}
+//}
 
 
 

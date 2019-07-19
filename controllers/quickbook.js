@@ -22,12 +22,42 @@ exports.initiateQuickbook = (req, res) => {
     });
     // console.log('oauthClient');
     // console.log(oauthClient);
-
-    // AuthorizationUri
+    /*pool.connect((err, client, done) => {
+      client.query('BEGIN', (err) => {
+        if (err){
+          handleResponse.shouldAbort(err, client, done);
+          res.redirect('/integration-dashboard');
+        } else {
+          client.query('UPDATE SETTING set quickbook_token=$1 where company_id=$2 RETURNING id',[oauthClient ,req.user.company_id], function(err, updatedSetting) {
+            if (err){
+              handleResponse.shouldAbort(err, client, done);
+              res.redirect('/integration-dashboard');
+            } else {
+              console.log('data inserted')
+              client.query('COMMIT', (err) => {
+                if (err) {
+                  handleResponse.shouldAbort(err, client, done);
+                  res.redirect('/integration-dashboard');
+                } else {
+                  console.log('transaction ends')
+                  done();
+                  // AuthorizationUri
+                  var authUri = oauthClient.authorizeUri({scope:[OAuthClient.scopes.Accounting,OAuthClient.scopes.OpenId]});  // can be an array of multiple scopes ex : {scope:[OAuthClient.scopes.Accounting,OAuthClient.scopes.OpenId]}
+                  // console.log('authUri')
+                  // console.log(authUri)
+                  res.redirect(authUri);
+                }
+              })
+            }
+          });
+        }
+      })
+    })*/
     var authUri = oauthClient.authorizeUri({scope:[OAuthClient.scopes.Accounting,OAuthClient.scopes.OpenId]});  // can be an array of multiple scopes ex : {scope:[OAuthClient.scopes.Accounting,OAuthClient.scopes.OpenId]}
     // console.log('authUri')
     // console.log(authUri)
     res.redirect(authUri);
+
 };
 
 exports.getQuickbookConfirmation =(req,res) => {
@@ -100,90 +130,198 @@ exports.changeQuickbookAccount = (req,res) => {
     })
 }
 
+
 exports.getAuthCode = (req,res) => {
   console.log('req');
-  console.log(req);
-  console.log(res);
+  console.log(req.query.realmId);
+  //console.log(res);
+
   oauthClient.createToken(req.url)
-       .then(function(authResponse) {
-             oauth2_token_json = JSON.stringify(authResponse.getJson(), null,2);
-             console.log('oauth2_token_json');
-             console.log(oauth2_token_json);
-             pool.connect((err, client, done) => {
-               client.query('BEGIN', (err) => {
-                 if (err){
-                   handleResponse.shouldAbort(err, client, done);
-                  res.redirect('/integration-dashboard');
-                 } else {
-                      client.query('SELECT quickbook_token from SETTING where company_id=$1',[req.user.company_id], function(err, companySetting) {
+   .then(function(authResponse) {
+         oauth2_token_json = JSON.stringify(authResponse.getJson(), null,2);
+         console.log('oauth2_token_json');
+         console.log(oauth2_token_json);
+         pool.connect((err, client, done) => {
+           client.query('BEGIN', (err) => {
+             if (err){
+               handleResponse.shouldAbort(err, client, done);
+               handleResponse.handleError(res, err, ' error in connecting to database');
+             } else {
+                 client.query('SELECT quickbook_token from SETTING where company_id=$1',[req.user.company_id], function(err, companySetting) {
+                  if (err){
+                    handleResponse.shouldAbort(err, client, done);
+                    res.redirect('/integration-dashboard');
+                  } else {
+                    if(companySetting.rows[0].quickbook_token!=null){
+                      console.log('Inside company setting quickbook_token found');
+                      console.log(companySetting.rows[0].quickbook_token);
+                      console.log(oauthClient.token.realmId);
+                      console.log(req.user.company_id);
+                      let previousQuickbookCompanyId = JSON.parse(companySetting.rows[0].quickbook_token).token.realmId;
+                      console.log(previousQuickbookCompanyId);
+                      if(previousQuickbookCompanyId == oauthClient.token.realmId){
+                        client.query('UPDATE SETTING set quickbook_token=$1,quickbook_enabled=$2 where company_id=$3 RETURNING id',[oauthClient ,true,req.user.company_id], function(err, updatedSetting) {
+                          if (err){
+                            handleResponse.shouldAbort(err, client, done);
+                            res.redirect('/integration-dashboard');
+                          } else {
+                            client.query('COMMIT', (err) => {
+                              if (err) {
+                                handleResponse.shouldAbort(err, client, done);
+                                res.redirect('/integration-dashboard');
+                              } else {
+                                done();
+                                res.redirect('/integration-dashboard');
+                              }
+                            })
+                          }
+                        });
+                      }else{
+                          res.redirect('/quickbook-company-confirmation?newCompanyData='+JSON.stringify(oauthClient));
+                      }
+                    }else{
+                      console.log('inside quickbook_token null')
+                      client.query('UPDATE SETTING set quickbook_token=$1,quickbook_enabled=$2 where company_id=$3 RETURNING id',[oauthClient ,true,req.user.company_id], function(err, updatedSetting) {
                         if (err){
                           handleResponse.shouldAbort(err, client, done);
                           res.redirect('/integration-dashboard');
                         } else {
-                          if(companySetting.rows[0].quickbook_token!=null){
-                            console.log('Inside company setting quickbook_token found');
-                            console.log(companySetting.rows[0].quickbook_token);
-                            console.log(oauthClient.token.realmId);
-                            console.log(req.user.company_id);
-                            let previousQuickbookCompanyId = JSON.parse(companySetting.rows[0].quickbook_token).token.realmId;
-                            console.log(previousQuickbookCompanyId);
-                            if(previousQuickbookCompanyId == oauthClient.token.realmId){
-                              client.query('UPDATE SETTING set quickbook_token=$1,quickbook_enabled=$2 where company_id=$3 RETURNING id',[oauthClient ,true,req.user.company_id], function(err, updatedSetting) {
-                                if (err){
-                                  handleResponse.shouldAbort(err, client, done);
-                                  res.redirect('/integration-dashboard');
-                                } else {
-                                  client.query('COMMIT', (err) => {
-                                    if (err) {
-                                      handleResponse.shouldAbort(err, client, done);
-                                      res.redirect('/integration-dashboard');
-                                    } else {
-                                      done();
-                                      res.redirect('/integration-dashboard');
-                                    }
-                                  })
-                                }
-                              });
-                            }else{
-                                res.redirect('/quickbook-company-confirmation?newCompanyData='+JSON.stringify(oauthClient));
+                          client.query('COMMIT', (err) => {
+                            if (err) {
+                              handleResponse.shouldAbort(err, client, done);
+                              res.redirect('/integration-dashboard');
+                            } else {
+                              console.log('transaction ends')
+                              done();
+                              res.redirect('/integration-dashboard');
                             }
-                          }else{
-                            console.log('inside quickbook_token null')
-                            client.query('UPDATE SETTING set quickbook_token=$1,quickbook_enabled=$2 where company_id=$3 RETURNING id',[oauthClient ,true,req.user.company_id], function(err, updatedSetting) {
+                          })
+                        }
+                      });
+                    }
+                 }
+               })
+             }
+           })
+         })
+
+        //  console.log('oauth2_token_json');
+        //  console.log(oauth2_token_json);
+        //  console.log(oauthClient);
+        //  res.redirect('/');
+     })
+    .catch(function(e) {
+         console.error(e);
+         res.redirect('/integration-dashboard');
+        //  handleResponse.handleError(res, e, ' Error in connecting to quickbook');
+     });
+//  res.send(200);
+  /*pool.connect((err, client, done) => {
+    client.query('BEGIN', (err) => {
+      if (err){
+        handleResponse.shouldAbort(err, client, done);
+        handleResponse.handleError(res, err, ' error in connecting to database');
+      } else {
+        console.log('transaction begins');
+              client.query('SELECT quickbook_token,company_id FROM SETTING WHERE quickbook_token IS NOT NULL',function(err, companySetting) {
+                if (err){
+                  handleResponse.shouldAbort(err, client, done);
+                  handleResponse.handleError(res, err, ' Error in fetching settings');
+                } else {
+                  if(companySetting.rows.length>0){
+                    let selectedCompSet = companySetting.rows.filter(setting => JSON.parse(setting.quickbook_token).token.realmId == req.query.realmId);
+
+                    if(selectedCompSet.length>0){
+                      let quickbook_token = JSON.parse(selectedCompSet[0].quickbook_token);
+                      oauthClient = new OAuthClient({
+                        clientId: quickbook_token.clientId,
+                        clientSecret: quickbook_token.clientSecret,
+                        environment: quickbook_token.environment,
+                        redirectUri: quickbook_token.redirectUri,
+                        logging:true
+                      });
+
+                      let selectedCompSetId = selectedCompSet.map(compSet => parseInt(compSet.company_id));
+                      console.log('selectedCompSetId');
+                      console.log(selectedCompSetId);
+                      oauthClient.createToken(req.url)
+                       .then(function(authResponse) {
+                             oauth2_token_json = JSON.stringify(authResponse.getJson(), null,2);
+                             console.log('oauth2_token_json');
+                             console.log(oauth2_token_json);
+                             client.query('SELECT quickbook_token from SETTING where company_id=$1',[req.user.company_id], function(err, companySetting) {
                               if (err){
                                 handleResponse.shouldAbort(err, client, done);
                                 res.redirect('/integration-dashboard');
                               } else {
-                                client.query('COMMIT', (err) => {
-                                  if (err) {
-                                    handleResponse.shouldAbort(err, client, done);
-                                    res.redirect('/integration-dashboard');
-                                  } else {
-                                    console.log('transaction ends')
-                                    done();
-                                    res.redirect('/integration-dashboard');
+                                if(companySetting.rows[0].quickbook_token!=null){
+                                  console.log('Inside company setting quickbook_token found');
+                                  console.log(companySetting.rows[0].quickbook_token);
+                                  console.log(oauthClient.token.realmId);
+                                  console.log(req.user.company_id);
+                                  let previousQuickbookCompanyId = JSON.parse(companySetting.rows[0].quickbook_token).token.realmId;
+                                  console.log(previousQuickbookCompanyId);
+                                  if(previousQuickbookCompanyId == oauthClient.token.realmId){
+                                    client.query('UPDATE SETTING set quickbook_token=$1,quickbook_enabled=$2 where company_id=$3 RETURNING id',[oauthClient ,true,req.user.company_id], function(err, updatedSetting) {
+                                      if (err){
+                                        handleResponse.shouldAbort(err, client, done);
+                                        res.redirect('/integration-dashboard');
+                                      } else {
+                                        client.query('COMMIT', (err) => {
+                                          if (err) {
+                                            handleResponse.shouldAbort(err, client, done);
+                                            res.redirect('/integration-dashboard');
+                                          } else {
+                                            done();
+                                            res.redirect('/integration-dashboard');
+                                          }
+                                        })
+                                      }
+                                    });
+                                  }else{
+                                      res.redirect('/quickbook-company-confirmation?newCompanyData='+JSON.stringify(oauthClient));
                                   }
-                                })
-                              }
-                            });
-                          }
-                       }
-                     })
-                   }
-                 })
-             });
-            //  console.log('oauth2_token_json');
-            //  console.log(oauth2_token_json);
-            //  console.log(oauthClient);
-            //  res.redirect('/');
-         })
-        .catch(function(e) {
-             console.error(e);
-             res.redirect('/integration-dashboard');
-            //  handleResponse.handleError(res, e, ' Error in connecting to quickbook');
-         });
-    //  res.send(200);
+                                }else{
+                                  console.log('inside quickbook_token null')
+                                  client.query('UPDATE SETTING set quickbook_token=$1,quickbook_enabled=$2 where company_id=$3 RETURNING id',[oauthClient ,true,req.user.company_id], function(err, updatedSetting) {
+                                    if (err){
+                                      handleResponse.shouldAbort(err, client, done);
+                                      res.redirect('/integration-dashboard');
+                                    } else {
+                                      client.query('COMMIT', (err) => {
+                                        if (err) {
+                                          handleResponse.shouldAbort(err, client, done);
+                                          res.redirect('/integration-dashboard');
+                                        } else {
+                                          console.log('transaction ends')
+                                          done();
+                                          res.redirect('/integration-dashboard');
+                                        }
+                                      })
+                                    }
+                                  });
+                                }
+                             }
+                           })
 
+                            //  console.log('oauth2_token_json');
+                            //  console.log(oauth2_token_json);
+                            //  console.log(oauthClient);
+                            //  res.redirect('/');
+                         })
+                        .catch(function(e) {
+                             console.error(e);
+                             res.redirect('/integration-dashboard');
+                            //  handleResponse.handleError(res, e, ' Error in connecting to quickbook');
+                         });
+                    //  res.send(200);
+                    }
+                  }
+                }
+              })
+            }
+          })
+        })*/
 }
 
 OAuthClient.prototype.postApiCall = function(params)  {
