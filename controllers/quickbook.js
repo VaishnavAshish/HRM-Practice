@@ -101,8 +101,8 @@ exports.changeQuickbookAccount = (req,res) => {
 }
 
 exports.getAuthCode = (req,res) => {
-  // console.log('req');
-  // console.log(oauthClient);
+   console.log('req');
+   console.log(oauthClient);
   oauthClient.createToken(req.url)
        .then(function(authResponse) {
              oauth2_token_json = JSON.stringify(authResponse.getJson(), null,2);
