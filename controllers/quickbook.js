@@ -461,7 +461,7 @@ exports.postInvoiceToQuickbook = (req,res) => {
                                                               "value": invoiceLineItems.rows[key].ItemRef
                                                             },
                                                             "TaxCodeRef": {
-                                                                "value": "TAX"
+                                                                "value": "NON"
                                                              },
                                                             "UnitPrice":invoiceLineItems.rows[key].unit_price,
                                                             "Qty":invoiceLineItems.rows[key].quantity,

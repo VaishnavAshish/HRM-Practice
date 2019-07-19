@@ -3,7 +3,6 @@
  */
 const cluster = require('cluster');
 const ipify = require('ipify');
-
 const express = require('express');
 const compression = require('compression');
 const session = require('express-session');
