@@ -38,7 +38,8 @@ exports.initiateXero = (req, res) => {
 
 exports.getAuthCodeXero = (req,res) => {
   console.log('req');
-  // console.log(res.query);
+  console.log(req.user);
+
   (async () => {
     try {
       const oauth_verifier = req.query.oauth_verifier;
