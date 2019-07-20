@@ -4,6 +4,7 @@ const handleResponse = require('./page-error-handle');
 const moment = require('moment-timezone');
 const setting = require('./company-setting');
 const XeroClient = require('xero-node').AccountingAPIClient;
+let company_id;
 let companyDefaultTimezone;
 const xeroConfig = {
   "appType":"public",
@@ -18,6 +19,7 @@ let requestToken = null;
 
 exports.initiateXero = (req, res) => {
   console.log('inside initiate xero');
+  company_id = req.user.company_id;
   // console.log('xero');
   // console.log(xero);
   (async () => {
@@ -57,7 +59,7 @@ exports.getAuthCodeXero = (req,res) => {
             handleResponse.shouldAbort(err, client, done);
             res.redirect('/integration-dashboard');
           } else {
-             client.query('UPDATE SETTING set xero_token=$1,xero_enabled=$2 where company_id=$3 RETURNING *',[xero,true, req.user.company_id], function(err, updatedSetting) {
+             client.query('UPDATE SETTING set xero_token=$1,xero_enabled=$2 where company_id=$3 RETURNING *',[xero,true, company_id], function(err, updatedSetting) {
                if (err){
                  console.log(err);
                  handleResponse.shouldAbort(err, client, done);
