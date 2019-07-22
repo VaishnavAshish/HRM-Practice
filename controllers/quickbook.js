@@ -461,7 +461,7 @@ exports.postInvoiceToQuickbook = (req,res) => {
                                                               "value": invoiceLineItems.rows[key].ItemRef
                                                             },
                                                             "TaxCodeRef": {
-                                                                "value": "NON"
+                                                                "value": "TAX"
                                                              },
                                                             "UnitPrice":invoiceLineItems.rows[key].unit_price,
                                                             "Qty":invoiceLineItems.rows[key].quantity,
@@ -483,7 +483,7 @@ exports.postInvoiceToQuickbook = (req,res) => {
                                                         },
                                                         "TxnTaxDetail": {
                                                             "TxnTaxCodeRef": {
-                                                               "value": "1"
+                                                               "value": "3"
                                                             },
                                                             "TotalTax": invoiceDetails.rows[0].final_amount - invoiceDetails.rows[0].total_amount
                                                          },

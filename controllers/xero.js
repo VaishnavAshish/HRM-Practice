@@ -516,7 +516,7 @@ function getXeroContactItem(req,res,xero_token,companySetting){
 
 exports.getXeroData = (req,res) => {
   console.log('getXeroData');
-  console.log(req.body);
+  //console.log(req.body);
   setting.getCompanySetting(req, res ,(err,result)=>{
     if(err==true){
       // console.log('error in setting');
@@ -540,6 +540,8 @@ exports.getXeroData = (req,res) => {
                       if(companySetting.rows[0].xero_token!=null&&companySetting.rows[0].xero_enabled){
                         let xero_token = JSON.parse(companySetting.rows[0].xero_token);
                         let oauth_expires_at = xero_token.oauth1Client._state.oauth_expires_at;
+                        console.log('oauth_expires_at');
+                        console.log(oauth_expires_at);
                         // console.log(moment.tz(oauth_expires_at, companyDefaultTimezone).format());
                         // console.log(moment.tz(companyDefaultTimezone).format());
                         // console.log(moment.tz(oauth_expires_at, companyDefaultTimezone).diff(moment.tz(companyDefaultTimezone)));
