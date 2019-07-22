@@ -814,10 +814,10 @@
         error: function(response){
             console.log(response);
             hideLoader('#globalLoader');
-            showGlobalToast('#globalToast', 'error', response.responseJSON.message, 8000);
+            showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
             setTimeout(function(){
               disconnectIntegrationData();
-            },8000);
+            },5000);
         }
     });
 
@@ -831,7 +831,9 @@
             success : function(response){
               console.log('response is : '+JSON.stringify(response));
               hideLoader('#globalLoader');
-              window.location.href = "/integration-dashboard";
+              setTimeout(function(){
+                window.location.href = "/integration-dashboard";
+              },5000);
             },
             error: function(response){
               hideLoader('#globalLoader');
