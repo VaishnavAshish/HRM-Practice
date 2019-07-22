@@ -814,7 +814,7 @@
         error: function(response){
             console.log(response);
             hideLoader('#globalLoader');
-            showGlobalToast('#globalToast', 'error', response.statusText, 4000);
+            showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
         }
     });
 
