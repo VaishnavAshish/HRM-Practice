@@ -508,7 +508,7 @@ function getXeroContactItem(req,res,xero_token,companySetting){
         console.log('err');
         console.log(err);
         // handleResponse.shouldAbort(err, client, done);
-        handleResponse.handleError(res, ' Error in getting account and item info from xero ', ' Error in getting account and item info from xero '+err);
+        handleResponse.handleError(res, ' Error in getting account and item info from xero ', ' Error in getting account and item info from xero '+err+' Please reconnect to xero.');
       }
 
     })();

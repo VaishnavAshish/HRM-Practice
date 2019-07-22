@@ -814,11 +814,37 @@
         error: function(response){
             console.log(response);
             hideLoader('#globalLoader');
-            showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+            showGlobalToast('#globalToast', 'error', response.responseJSON.message, 8000);
+            setTimeout(function(){
+              disconnectIntegrationData();
+            },8000);
         }
     });
 
   }
+
+  function disconnectIntegrationData(){
+      showLoader('#globalLoader');
+      $.ajax({
+            type: 'POST',
+            url : '/disconnectXero',
+            success : function(response){
+              console.log('response is : '+JSON.stringify(response));
+              hideLoader('#globalLoader');
+              window.location.href = "/integration-dashboard";
+            },
+            error: function(response){
+              hideLoader('#globalLoader');
+              showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+              setTimeout(function(){
+                window.location.href = "/integration-dashboard";
+              },5000)
+              console.log('error is : '+JSON.stringify(response));
+
+            }
+          });
+  }
+
 
   function postInvoice(modalId,formId,integrationType){
     showLoader('#globalLoader');
