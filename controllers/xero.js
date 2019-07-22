@@ -487,8 +487,9 @@ exports.xeroInvoiceUpdate = (req,res) => {
 }
 
 function getXeroContactItem(req,res,xero_token,companySetting){
-  console.log(xero_token);
+  console.log('xero_token');
   xero.oauth1Client._state = xero_token.oauth1Client._state;
+  console.log('oauthclient xero token found ');
     (async () => {
       try {
 
