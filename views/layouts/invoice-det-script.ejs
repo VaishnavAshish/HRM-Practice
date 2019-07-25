@@ -11,7 +11,7 @@
     invoice_item_id = <%= invoiceDetails.id ;%>;
     $("#subject_line").val('<%= companySetting.invoice_email_subject %>')
     if($("#subject_line").val() == ''){
-      $("#subject_line").val('Invoice from <%=user.company_info.name %> on krow timesheet app');
+      $("#subject_line").val('Invoice from <%=user.company_info.name %> on Krow PSA');
     }
     $("#invoice_note").val('<%= invoiceDetails.description %>');
     $("#currency").val('<%= invoiceDetails.currency %>');

@@ -427,7 +427,7 @@ function setDataToCard(invoice){
                             '<div>'+
                                 '<div class="">'+
                                     '<div class="slds-truncate">'+
-                                        '<a href="/invoice-details?invoiceId='+ invoice.id +'" class="text-size-16">#'+invoice.record_id +'</a>'+
+                                        '<a href="/invoice-details?invoiceId='+ invoice.id +'" class="text-size-16">#'+parseInt(invoice.record_id.substring(3)) +'</a>'+
                                     '</div>'+
                                     '<div class="slds-grid">'+
                                         '<div class="slds-no-flex slds-p-right_x-small">'+
@@ -480,7 +480,7 @@ function setDataToTable(invoice){
                     '<td role="gridcell">'+
                         '<div class="slds-truncate" title="">'+
                             '<a href="/invoice-details?invoiceId='+invoice.id+'" tabindex="-1">'+
-                                invoice.record_id+
+                                parseInt(invoice.record_id.substring(3))+
                             '</a>'+
                         '</div>'+
                     '</td>'+

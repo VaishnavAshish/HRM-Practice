@@ -294,7 +294,7 @@ sendInvitationEmail = (req, res, next) => {
     let mailOptions = {
       to: req.body.email,
       from: 'krowtesting@athenalogics.com',
-      subject: req.user.email+" had invited you to join krow timesheet app"
+      subject: req.user.email+" had invited you to join Krow PSA"
     };
     let hostN=process.env.BASE_URL;
     let redirectUrl= hostN+'/reset/'+req.token;
@@ -321,7 +321,7 @@ sendInvitationEmail = (req, res, next) => {
                                                                 '<td valign="top">'+
                                                                     '<h1 style="font-family: arial,sans-serif; font-size:24px; font-weight:normal; line-height: 20px; color: orange;">'+
                                                                         '<strong>'+
-                                                                            'You are invited to join '+req.company.name.toLowerCase()+' on krow timesheet app.'+
+                                                                            'You are invited to join '+req.company.name.toLowerCase()+' on Krow PSA.'+
                                                                         '</strong>'+
                                                                     '</h1>'+
                                                                     '<p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; line-height: 20px;">'+

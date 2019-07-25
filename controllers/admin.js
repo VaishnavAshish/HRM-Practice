@@ -734,7 +734,7 @@ sendEmailToUser = (req, res, next) => {
   const mailOptions = {
     to: req.body.adminEmail,
     from: 'krowtesting@athenalogics.com',
-    subject: "Confirmation of " + req.body.orgName + " on krow timesheet app",
+    subject: "Confirmation of " + req.body.orgName + " on Krow PSA",
     html: html
   };
 

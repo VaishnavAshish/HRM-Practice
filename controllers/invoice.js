@@ -2854,7 +2854,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
     to: req.body.client_email,
     cc: req.body.extra_email.split(','),
     from: 'krowtesting@athenalogics.com',
-    subject: req.body.subject_line?req.body.subject_line:"Invoice from " + companyName + " on krow timesheet app",
+    subject: req.body.subject_line?req.body.subject_line:"Invoice from " + companyName + " on Krow PSA",
     html: html,
     attachments :[
       {
