@@ -1,5 +1,5 @@
 const { Pool,types } = require('pg');
-const connectionString = process.env.DATABASE_CONNECTION_POOL_URL ? process.env.DATABASE_CONNECTION_POOL_URL || process.env.DATABASE_URL ;
+const connectionString = process.env.DATABASE_URL;
 
 types.setTypeParser(1114, function(stringValue) {
   return stringValue;
