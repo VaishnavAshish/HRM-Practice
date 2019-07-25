@@ -1188,3 +1188,17 @@ AFTER UPDATE
 ON setting
 FOR EACH ROW
 EXECUTE PROCEDURE change_invoice_sequence_number();
+
+--update project record id for global project
+CREATE OR REPLACE FUNCTION public.create_project_recordid() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+	IF (NEW.isGlobal = TRUE AND NEW.name = 'global project') THEN
+		NEW.record_id := rpad('PROGP',11, '9');
+	ELSE
+		NEW.record_id := 'PRO' || lpad(nextval('seq_project_' || NEW.company_id)::varchar, 8, '0');
+	END IF;
+	RETURN NEW;
+END;
+$$;

@@ -1337,7 +1337,7 @@ exports.getInvoiceDetails = (req, res) => {
                                                                             lineItem.inv_qauntity = minuteToHours(lineItem.quantity);
                                                                         }
                                                                         // console.log(lineItem.total_amount+' '+typeof(lineItem.total_amount)+' '+parseFloat(lineItem.total_amount));
-                                                                        let currentCurrency=currencyWithSymbolArray.filter(function(currency){
+                                                                        /*let currentCurrency=currencyWithSymbolArray.filter(function(currency){
                                                                           return currency.name == invoiceDetails.rows[0].currency;
                                                                         })
 
@@ -1352,12 +1352,12 @@ exports.getInvoiceDetails = (req, res) => {
                                                                         previousCurrency=parseFloat(previousCurrency[0].value);
                                                                         let line_total_amount=(currentCurrency/previousCurrency*parseFloat(lineItem.total_amount)).toFixed(2);
                                                                         lineItem.total_amount = line_total_amount;
-                                                                        lineItem.unit_price = (currentCurrency/previousCurrency*parseFloat(lineItem.unit_price)).toFixed(2);
+                                                                        lineItem.unit_price = (currentCurrency/previousCurrency*parseFloat(lineItem.unit_price)).toFixed(2);*/
                                                                         // console.log('total_amount '+line_total_amount);
                                                                         if(lineItem.expense_id==null){
-                                                                          invoice_taxable_amount+=parseFloat(line_total_amount);
+                                                                          invoice_taxable_amount+=parseFloat(lineItem.total_amount);
                                                                         }
-                                                                        invoice_total_amount+=parseFloat(line_total_amount);
+                                                                        invoice_total_amount+=parseFloat(lineItem.total_amount);
                                                                         // console.log('total_amount '+invoice_total_amount);
 
                                                                     });
@@ -2152,7 +2152,7 @@ function invoiceHtmlData (req,res,invoiceHtml,responseType){
                                                                             let symbolsToSearch="EUR, "+invoiceDetails.rows[0].currency+", "+lines.currency;
                                                                             // console.log(symbolsToSearch)
                                                                             /*fixer.latest({ symbols: symbolsToSearch }).then((latest)=>{*/
-                                                                                let currentCurrency=currencyWithSymbolArray.filter(function(currency){
+                                                                                /*let currentCurrency=currencyWithSymbolArray.filter(function(currency){
                                                                                   return currency.name == invoiceDetails.rows[0].currency;
                                                                                 })
                                                                                 currentCurrency=parseFloat(currentCurrency[0].value);
@@ -2161,12 +2161,12 @@ function invoiceHtmlData (req,res,invoiceHtml,responseType){
                                                                                 })
                                                                                 // // console.log('currentCurrency '+currentCurrency)
                                                                                 previousCurrency=parseFloat(previousCurrency[0].value)
-                                                                                /*// console.log('previousCurrency '+previousCurrency)
-                                                                                // console.log('line amount is'+lines.total_amount);*/
+                                                                                // console.log('previousCurrency '+previousCurrency)
+                                                                                // console.log('line amount is'+lines.total_amount);
 
                                                                                 // console.log('total_amount '+line_total_amount);
                                                                                 lines.total_amount=(currentCurrency/previousCurrency*(lines.total_amount)).toFixed(2);
-                                                                                lines.unit_price=(currentCurrency/previousCurrency*(lines.unit_price)).toFixed(2);
+                                                                                lines.unit_price=(currentCurrency/previousCurrency*(lines.unit_price)).toFixed(2);*/
                                                                                 /*// console.log('-------latest------');
                                                                                 // console.log(latest);*/
                                                                                 lines.inv_qauntity = lines.quantity;
