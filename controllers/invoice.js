@@ -1288,135 +1288,143 @@ exports.getInvoiceDetails = (req, res) => {
                       handleResponse.shouldAbort(err, client, done);
                       handleResponse.handleError(res, err, ' error in connecting to database');
                     } else {
-                      client.query('SELECT i.id ,i.status ,i.account_id ,i.company_id ,i.created_by ,i.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,i.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,i.archived ,i.account_name ,i.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,i.due_date at time zone \''+companyDefaultTimezone+'\' as due_date ,i.description ,i.project_id ,i.project_name ,i.total_amount ,i.record_id ,i.currency ,i.tax,i.final_amount  FROM INVOICE i WHERE company_id=$1 AND id=$2', [req.user.company_id, req.query.invoiceId], function (err, invoiceDetails) {
+                      client.query('SELECT invoice_email_subject,invoice_email_body FROM setting WHERE company_id=$1', [req.user.company_id], function (err, companySetting) {
                           if (err) {
                               console.error(err);
                               handleResponse.shouldAbort(err, client, done);
-                              handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.user, userList:[], error:err},"error"," Error in finding invoice data");
-                              /*handleResponse.handleError(res, err, ' Error in finding invoice data');*/
-                          }  else {
-                              if(invoiceDetails.rows.length>0){
-                                client.query('SELECT * FROM ACCOUNT WHERE id=$1', [invoiceDetails.rows[0].account_id], function (err, accountData) {
-                                  if (err) {
+                              handleResponse.handleError(res, err, ' Error in finding company setting ');
+                          } else {
+                            client.query('SELECT i.id ,i.status ,i.account_id ,i.company_id ,i.created_by ,i.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,i.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,i.archived ,i.account_name ,i.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,i.due_date at time zone \''+companyDefaultTimezone+'\' as due_date ,i.description ,i.project_id ,i.project_name ,i.total_amount ,i.record_id ,i.currency ,i.tax,i.final_amount  FROM INVOICE i WHERE company_id=$1 AND id=$2', [req.user.company_id, req.query.invoiceId], function (err, invoiceDetails) {
+                                if (err) {
                                     console.error(err);
                                     handleResponse.shouldAbort(err, client, done);
-                                    handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.user, userList:[], error:err},"error"," Error in finding account data");
+                                    handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.user, userList:[], error:err},"error"," Error in finding invoice data");
                                     /*handleResponse.handleError(res, err, ' Error in finding invoice data');*/
-                                  }  else {
-                                      // console.log('account id is '+invoiceDetails.rows[0].account_id)
-                                      client.query('SELECT * FROM PROJECT WHERE company_id=$1 AND account_id=$2 AND archived=$3 ORDER BY id', [req.user.company_id, invoiceDetails.rows[0].account_id,false], function (err, projects) {
-                                          if (err) {
-                                              console.error(err);
-                                                  handleResponse.shouldAbort(err, client, done);
-                                                  handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.user, userList:[], error:err},"error"," Error in finding project data");
-                                                  /*handleResponse.handleError(res, err, ' Error in finding project data');*/
-                                              }  else {
-                                                      // console.log('projects are '+JSON.stringify(projects));
-                                                      client.query('SELECT il.id ,il.type ,il.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,il.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,il.item_date at time zone \''+companyDefaultTimezone+'\' as item_date ,il.archived ,il.hours ,il.unit_price ,il.cost_rate ,il.note ,il.amount ,il.tax ,il.total_amount ,il.timesheet_id ,il.expense_id ,il.project_id ,il.account_id ,il.invoice_id ,il.company_id ,il.user_id ,il.user_role ,il.quantity ,il.record_id ,il.currency ,il.timesheet_row_id FROM INVOICE_LINE_ITEM il WHERE company_id=$1 AND invoice_id=$2 AND archived=$3 ORDER BY project_id,timesheet_id,expense_id,created_date', [req.user.company_id, req.query.invoiceId, false], function (err, invoiceItems) {
-                                                      if (err) {
-                                                          console.error(err);
-                                                          handleResponse.shouldAbort(err, client, done);
-                                                          handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.user, userList:[], error:err},"error"," Error in finding invoice line item data");
-                                                          /*handleResponse.handleError(res, err, ' Error in finding invoice line item data');*/
-                                                      } else {
-                                                          let invoice_total_amount=0,invoice_taxable_amount=0;
-                                                          if (invoiceItems.rows.length > 0) {
-                                                              invoiceItems.rows.forEach(function (lineItem) {
-                                                                  // lineItem["item_date"] = dateFormat(moment.tz(lineItem.item_date, companyDefaultTimezone).format());
-                                                                  lineItem["item_date"] = dateFormat(lineItem.item_date);
-                                                                  lineItem.inv_qauntity = lineItem.quantity;
-                                                                  // console.log('lineItem');
-                                                                  // console.log(lineItem);
-                                                                  if(lineItem.type == "Timesheet" && lineItem.timesheet_row_id) {
-                                                                      lineItem.inv_qauntity = minuteToHours(lineItem.quantity);
-                                                                  }
-                                                                  // console.log(lineItem.total_amount+' '+typeof(lineItem.total_amount)+' '+parseFloat(lineItem.total_amount));
-                                                                  let currentCurrency=currencyWithSymbolArray.filter(function(currency){
-                                                                    return currency.name == invoiceDetails.rows[0].currency;
-                                                                  })
+                                }  else {
+                                    if(invoiceDetails.rows.length>0){
+                                      client.query('SELECT * FROM ACCOUNT WHERE id=$1', [invoiceDetails.rows[0].account_id], function (err, accountData) {
+                                        if (err) {
+                                          console.error(err);
+                                          handleResponse.shouldAbort(err, client, done);
+                                          handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.user, userList:[], error:err},"error"," Error in finding account data");
+                                          /*handleResponse.handleError(res, err, ' Error in finding invoice data');*/
+                                        }  else {
+                                            // console.log('account id is '+invoiceDetails.rows[0].account_id)
+                                            client.query('SELECT * FROM PROJECT WHERE company_id=$1 AND account_id=$2 AND archived=$3 ORDER BY id', [req.user.company_id, invoiceDetails.rows[0].account_id,false], function (err, projects) {
+                                                if (err) {
+                                                    console.error(err);
+                                                        handleResponse.shouldAbort(err, client, done);
+                                                        handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.user, userList:[], error:err},"error"," Error in finding project data");
+                                                        /*handleResponse.handleError(res, err, ' Error in finding project data');*/
+                                                    }  else {
+                                                            // console.log('projects are '+JSON.stringify(projects));
+                                                            client.query('SELECT il.id ,il.type ,il.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,il.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,il.item_date at time zone \''+companyDefaultTimezone+'\' as item_date ,il.archived ,il.hours ,il.unit_price ,il.cost_rate ,il.note ,il.amount ,il.tax ,il.total_amount ,il.timesheet_id ,il.expense_id ,il.project_id ,il.account_id ,il.invoice_id ,il.company_id ,il.user_id ,il.user_role ,il.quantity ,il.record_id ,il.currency ,il.timesheet_row_id FROM INVOICE_LINE_ITEM il WHERE company_id=$1 AND invoice_id=$2 AND archived=$3 ORDER BY project_id,timesheet_id,expense_id,created_date', [req.user.company_id, req.query.invoiceId, false], function (err, invoiceItems) {
+                                                            if (err) {
+                                                                console.error(err);
+                                                                handleResponse.shouldAbort(err, client, done);
+                                                                handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.user, userList:[], error:err},"error"," Error in finding invoice line item data");
+                                                                /*handleResponse.handleError(res, err, ' Error in finding invoice line item data');*/
+                                                            } else {
+                                                                let invoice_total_amount=0,invoice_taxable_amount=0;
+                                                                if (invoiceItems.rows.length > 0) {
+                                                                    invoiceItems.rows.forEach(function (lineItem) {
+                                                                        // lineItem["item_date"] = dateFormat(moment.tz(lineItem.item_date, companyDefaultTimezone).format());
+                                                                        lineItem["item_date"] = dateFormat(lineItem.item_date);
+                                                                        lineItem.inv_qauntity = lineItem.quantity;
+                                                                        // console.log('lineItem');
+                                                                        // console.log(lineItem);
+                                                                        if(lineItem.type == "Timesheet" && lineItem.timesheet_row_id) {
+                                                                            lineItem.inv_qauntity = minuteToHours(lineItem.quantity);
+                                                                        }
+                                                                        // console.log(lineItem.total_amount+' '+typeof(lineItem.total_amount)+' '+parseFloat(lineItem.total_amount));
+                                                                        let currentCurrency=currencyWithSymbolArray.filter(function(currency){
+                                                                          return currency.name == invoiceDetails.rows[0].currency;
+                                                                        })
 
-                                                                  currentCurrency=parseFloat(currentCurrency[0].value);
-                                                                  // console.log('currentCurrency '+JSON.stringify(currentCurrency));
-                                                                  //
-                                                                  // console.log('lineItem.currency' +lineItem.currency);
-                                                                  let previousCurrency=currencyWithSymbolArray.filter(function(currency){
-                                                                    return currency.name == lineItem.currency;
-                                                                  })
-                                                                  // console.log('previousCurrency '+JSON.stringify(previousCurrency));
-                                                                  previousCurrency=parseFloat(previousCurrency[0].value);
-                                                                  let line_total_amount=(currentCurrency/previousCurrency*parseFloat(lineItem.total_amount)).toFixed(2);
-                                                                  lineItem.total_amount = line_total_amount;
-                                                                  lineItem.unit_price = (currentCurrency/previousCurrency*parseFloat(lineItem.unit_price)).toFixed(2);
-                                                                  // console.log('total_amount '+line_total_amount);
-                                                                  if(lineItem.expense_id==null){
-                                                                    invoice_taxable_amount+=parseFloat(line_total_amount);
-                                                                  }
-                                                                  invoice_total_amount+=parseFloat(line_total_amount);
-                                                                  // console.log('total_amount '+invoice_total_amount);
+                                                                        currentCurrency=parseFloat(currentCurrency[0].value);
+                                                                        // console.log('currentCurrency '+JSON.stringify(currentCurrency));
+                                                                        //
+                                                                        // console.log('lineItem.currency' +lineItem.currency);
+                                                                        let previousCurrency=currencyWithSymbolArray.filter(function(currency){
+                                                                          return currency.name == lineItem.currency;
+                                                                        })
+                                                                        // console.log('previousCurrency '+JSON.stringify(previousCurrency));
+                                                                        previousCurrency=parseFloat(previousCurrency[0].value);
+                                                                        let line_total_amount=(currentCurrency/previousCurrency*parseFloat(lineItem.total_amount)).toFixed(2);
+                                                                        lineItem.total_amount = line_total_amount;
+                                                                        lineItem.unit_price = (currentCurrency/previousCurrency*parseFloat(lineItem.unit_price)).toFixed(2);
+                                                                        // console.log('total_amount '+line_total_amount);
+                                                                        if(lineItem.expense_id==null){
+                                                                          invoice_taxable_amount+=parseFloat(line_total_amount);
+                                                                        }
+                                                                        invoice_total_amount+=parseFloat(line_total_amount);
+                                                                        // console.log('total_amount '+invoice_total_amount);
 
-                                                              });
-                                                              // console.log("************ invoiceItems *************");
-                                                              // console.log(invoiceItems);
-                                                          }
-                                                          if(invoiceDetails.rows.length>0){
-                                                              /*// console.log('total_amount '+invoice_total_amount); */
-                                                              invoiceDetails.rows[0].total_amount=invoice_total_amount.toFixed(2);
-                                                              console.log('invoiceDetails.tax '+(invoice_taxable_amount*invoiceDetails.rows[0].tax/100)+' '+invoice_total_amount);
-                                                              invoiceDetails.rows[0].tax =parseInt(invoiceDetails.rows[0].tax);
-                                                              if(invoiceDetails.rows[0].tax&&invoiceDetails.rows[0].tax>0){
-                                                                invoiceDetails.rows[0].final_amount=parseFloat(invoice_total_amount.toFixed(2))+parseFloat(invoice_taxable_amount*invoiceDetails.rows[0].tax/100);
-                                                              }else{
-                                                                invoiceDetails.rows[0].final_amount=invoice_total_amount.toFixed(2);
-                                                              }
-
-                                                              // invoiceDetails.rows[0]['startDateFormatted'] = invoiceDetails.rows[0].start_date == null ? '' : dateFormat(moment.tz(invoiceDetails.rows[0].start_date, companyDefaultTimezone).format());
-                                                              // invoiceDetails.rows[0]['dueDateFormatted'] = invoiceDetails.rows[0].due_date == null ? '' : dateFormat(moment.tz(invoiceDetails.rows[0].due_date, companyDefaultTimezone).format());
-                                                              invoiceDetails.rows[0]['startDateFormatted'] = invoiceDetails.rows[0].start_date == null ? '' : dateFormat(invoiceDetails.rows[0].start_date);
-                                                              invoiceDetails.rows[0]['dueDateFormatted'] = invoiceDetails.rows[0].due_date == null ? '' : dateFormat(invoiceDetails.rows[0].due_date);
-                                                          }
-                                                          // let invoice_tax=(parseFloat(invoice_total_amount) * parseFloat(invoiceDetails.rows[0].tax)) / 100;
-                                                          // invoice_total_amount=(parseFloat(invoice_total_amount)+parseFloat(invoice_tax)).toFixed(2);
-                                                          let newDate=moment.tz(new Date(), companyDefaultTimezone).format();
-                                                          client.query('UPDATE INVOICE SET total_amount=$1,final_amount=$2 ,updated_date=$3 WHERE id=$4 RETURNING *', [invoiceDetails.rows[0].total_amount,invoiceDetails.rows[0].final_amount,'now()',req.query.invoiceId], function (err, invoiceUpdated) {
-                                                              if (err) {
-                                                                  console.error(err);
-                                                                  handleResponse.shouldAbort(err, client, done);
-                                                                  handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.user, userList:[], error:err},"error"," Error in updating invoice data");
-                                                                  /*handleResponse.handleError(res, err, ' Error in updating invoice data');*/
-                                                              } else {
-                                                                client.query('COMMIT', (err) => {
-                                                                  if (err) {
-                                                                    // console.log('Error committing transaction', err.stack)
-                                                                    handleResponse.shouldAbort(err, client, done);
-                                                                    handleResponse.handleError(res, err, ' Error in committing transaction');
-                                                                  } else {
-                                                                      getUserDetails(req, res, client, err, done, function (response) {
-                                                                          // console.log("response");
-                                                                          // // console.log(projects.rows);
-                                                                          // console.log('invoice detail is ');
-                                                                          // console.log(invoiceDetails.rows[0]);
-                                                                          // console.log('invoice_total_amount '+invoice_total_amount);
-                                                                          accountData.rows[0].quickbook_customer_id=accountData.rows[0].quickbook_customer_id?accountData.rows[0].quickbook_customer_id:null;
-                                                                          // console.log('accountData.rows[0].quickbook_customer_id '+accountData.rows[0].quickbook_customer_id)
-                                                                          done();
-                                                                          handleResponse.responseToPage(res,'pages/invoice-details',{projects:projects.rows, invoiceDetails: invoiceDetails.rows[0], invoiceItems: invoiceItems.rows, user: req.user,account:accountData.rows[0], userList:response ,companyDefaultTimezone:companyDefaultTimezone,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD') },"success","Successfully rendered");
-                                                                      })
+                                                                    });
+                                                                    // console.log("************ invoiceItems *************");
+                                                                    // console.log(invoiceItems);
+                                                                }
+                                                                if(invoiceDetails.rows.length>0){
+                                                                    /*// console.log('total_amount '+invoice_total_amount); */
+                                                                    invoiceDetails.rows[0].total_amount=invoice_total_amount.toFixed(2);
+                                                                    console.log('invoiceDetails.tax '+(invoice_taxable_amount*invoiceDetails.rows[0].tax/100)+' '+invoice_total_amount);
+                                                                    invoiceDetails.rows[0].tax =parseInt(invoiceDetails.rows[0].tax);
+                                                                    if(invoiceDetails.rows[0].tax&&invoiceDetails.rows[0].tax>0){
+                                                                      invoiceDetails.rows[0].final_amount=parseFloat(invoice_total_amount.toFixed(2))+parseFloat(invoice_taxable_amount*invoiceDetails.rows[0].tax/100);
+                                                                    }else{
+                                                                      invoiceDetails.rows[0].final_amount=invoice_total_amount.toFixed(2);
                                                                     }
-                                                                  })
-                                                              }
-                                                          });
-                                                      }
-                                                  });
-                                              }
+
+                                                                    // invoiceDetails.rows[0]['startDateFormatted'] = invoiceDetails.rows[0].start_date == null ? '' : dateFormat(moment.tz(invoiceDetails.rows[0].start_date, companyDefaultTimezone).format());
+                                                                    // invoiceDetails.rows[0]['dueDateFormatted'] = invoiceDetails.rows[0].due_date == null ? '' : dateFormat(moment.tz(invoiceDetails.rows[0].due_date, companyDefaultTimezone).format());
+                                                                    invoiceDetails.rows[0]['startDateFormatted'] = invoiceDetails.rows[0].start_date == null ? '' : dateFormat(invoiceDetails.rows[0].start_date);
+                                                                    invoiceDetails.rows[0]['dueDateFormatted'] = invoiceDetails.rows[0].due_date == null ? '' : dateFormat(invoiceDetails.rows[0].due_date);
+                                                                }
+                                                                // let invoice_tax=(parseFloat(invoice_total_amount) * parseFloat(invoiceDetails.rows[0].tax)) / 100;
+                                                                // invoice_total_amount=(parseFloat(invoice_total_amount)+parseFloat(invoice_tax)).toFixed(2);
+                                                                let newDate=moment.tz(new Date(), companyDefaultTimezone).format();
+                                                                client.query('UPDATE INVOICE SET total_amount=$1,final_amount=$2 ,updated_date=$3 WHERE id=$4 RETURNING *', [invoiceDetails.rows[0].total_amount,invoiceDetails.rows[0].final_amount,'now()',req.query.invoiceId], function (err, invoiceUpdated) {
+                                                                    if (err) {
+                                                                        console.error(err);
+                                                                        handleResponse.shouldAbort(err, client, done);
+                                                                        handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.user, userList:[], error:err},"error"," Error in updating invoice data");
+                                                                        /*handleResponse.handleError(res, err, ' Error in updating invoice data');*/
+                                                                    } else {
+                                                                      client.query('COMMIT', (err) => {
+                                                                        if (err) {
+                                                                          // console.log('Error committing transaction', err.stack)
+                                                                          handleResponse.shouldAbort(err, client, done);
+                                                                          handleResponse.handleError(res, err, ' Error in committing transaction');
+                                                                        } else {
+                                                                            getUserDetails(req, res, client, err, done, function (response) {
+                                                                                // console.log("response");
+                                                                                // // console.log(projects.rows);
+                                                                                // console.log('invoice detail is ');
+                                                                                // console.log(invoiceDetails.rows[0]);
+                                                                                // console.log('invoice_total_amount '+invoice_total_amount);
+                                                                                accountData.rows[0].quickbook_customer_id=accountData.rows[0].quickbook_customer_id?accountData.rows[0].quickbook_customer_id:null;
+                                                                                // console.log('accountData.rows[0].quickbook_customer_id '+accountData.rows[0].quickbook_customer_id)
+                                                                                done();
+                                                                                handleResponse.responseToPage(res,'pages/invoice-details',{projects:projects.rows, invoiceDetails: invoiceDetails.rows[0], invoiceItems: invoiceItems.rows, user: req.user,account:accountData.rows[0], userList:response ,companySetting:companySetting.rows[0],companyDefaultTimezone:companyDefaultTimezone,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD') },"success","Successfully rendered");
+                                                                            })
+                                                                          }
+                                                                        })
+                                                                    }
+                                                                });
+                                                            }
+                                                        });
+                                                    }
+                                            });
+                                          }
                                       });
-                                    }
-                                });
-                            }else{
-                              done();
-                              handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.user, userList:[], error:'error'},"error"," Error in finding invoice data");
-                            }
-                        }
-                      });
+                                  }else{
+                                    done();
+                                    handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.user, userList:[], error:'error'},"error"," Error in finding invoice data");
+                                  }
+                              }
+                            });
+                          }
+                        })
                     }
                   })
                 });
@@ -2674,14 +2682,15 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
     var options = {
       format: 'A4',
       width: '280mm',
-      height: '396mm',
-      header: {
-        "height": "28mm",
-      },
-      footer: {
-        "height": "28mm",
-      }
+      height: '396mm'
     };
+    /*,
+    header: {
+      "height": "0mm",
+    },
+    footer: {
+      "height": "0mm",
+    }*/
     // console.log('hmtl is:');
     // console.log(pdfHTML);
     console.log('responseType'+responseType)

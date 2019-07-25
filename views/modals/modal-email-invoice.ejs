@@ -38,7 +38,7 @@
                               <abbr class="slds-required" title="required">*</abbr>
                           </label>
                           <div class="slds-form-element__control">
-                              <input type="text" id="subject_line" name="subject_line" class="slds-input" value="Invoice from <%= user.company_info.name %> on krow timesheet app" placeholder="Enter subject line of the email." required="">
+                              <input type="text" id="subject_line" name="subject_line" class="slds-input" placeholder="Enter subject line of the email." required="">
                               <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset="errmsg"></div>
                           </div>
                       </div>
@@ -47,7 +47,7 @@
                               Body
                           </label>
                           <div class="slds-form-element__control">
-                              <input type="text" id="body_of_email" name="body_of_email" class="slds-input" reset='value' placeholder="Enter body of the email.">
+                              <input type="text" id="body_of_email" name="body_of_email" class="slds-input" value="<%= companySetting.invoice_email_body?companySetting.invoice_email_body:'' %>" placeholder="Enter body of the email.">
                               <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset="errmsg"></div>
                           </div>
                       </div>

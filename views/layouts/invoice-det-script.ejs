@@ -9,6 +9,10 @@
     var invoiceDetails = <%- JSON.stringify(invoiceDetails) %>;
     invoice_account_id = <%= invoiceDetails.account_id ;%>;
     invoice_item_id = <%= invoiceDetails.id ;%>;
+    $("#subject_line").val('<%= companySetting.invoice_email_subject %>')
+    if($("#subject_line").val() == ''){
+      $("#subject_line").val('Invoice from <%=user.company_info.name %> on krow timesheet app');
+    }
     $("#invoice_note").val('<%= invoiceDetails.description %>');
     $("#currency").val('<%= invoiceDetails.currency %>');
     var invoiceItems = <%- JSON.stringify(invoiceItems) %>;

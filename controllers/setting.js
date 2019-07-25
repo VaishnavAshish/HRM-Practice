@@ -138,7 +138,7 @@ exports.postEditSettingInvoice = (req, res) => {
                     handleResponse.shouldAbort(err, client, done);
                     handleResponse.handleError(res, err, ' error in connecting to database');
                   } else {
-              			client.query('UPDATE SETTING set invoice_note=$1,invoice_timesheet_note=$2,invoice_fixedfee_note=$3,invoice_expense_note=$4,invoice_other_note=$5,invoice_starting_number=$6 where company_id=$7 RETURNING id',[req.body.defaultInvoiceNote,req.body.defaultTimesheetNote,req.body.defaultFixedFeeNote,req.body.defaultExpenseNote,req.body.defaultOtherNote,req.body.defaultInvoiceStartNumber,req.user.company_id], function(err, updatedSetting) {
+              			client.query('UPDATE SETTING set invoice_note=$1,invoice_timesheet_note=$2,invoice_fixedfee_note=$3,invoice_expense_note=$4,invoice_other_note=$5,invoice_starting_number=$6,invoice_email_subject=$7,invoice_email_body=$8 where company_id=$9 RETURNING id',[req.body.defaultInvoiceNote,req.body.defaultTimesheetNote,req.body.defaultFixedFeeNote,req.body.defaultExpenseNote,req.body.defaultOtherNote,req.body.defaultInvoiceStartNumber,req.body.defaultEmailSubject,req.body.defaultEmailBody,req.user.company_id], function(err, updatedSetting) {
         			          if (err){
         			            handleResponse.shouldAbort(err, client, done);
         			            handleResponse.handleError(res, err, ' Error in updating settings');
@@ -376,7 +376,7 @@ exports.getSettingUserRole = (req, res) => {
 };
 exports.getSettingInvoice = (req, res) => {
   pool.connect((err, client, done) => {
-    client.query("SELECT invoice_note,invoice_timesheet_note,invoice_fixedfee_note,invoice_expense_note,invoice_other_note,invoice_starting_number FROM SETTING WHERE company_id=$1", [req.user.company_id], function (err, companySetting) {
+    client.query("SELECT invoice_note,invoice_timesheet_note,invoice_fixedfee_note,invoice_expense_note,invoice_other_note,invoice_starting_number,invoice_email_subject,invoice_email_body FROM SETTING WHERE company_id=$1", [req.user.company_id], function (err, companySetting) {
       if (err) {
         handleResponse.shouldAbort(err, client, done);
         handleResponse.responseToPage(res,'pages/org-settings-invoice',{setting:{},user:req.user, error:err},"error","  Error in finding setting data");

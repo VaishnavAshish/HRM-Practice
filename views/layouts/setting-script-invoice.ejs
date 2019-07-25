@@ -9,6 +9,9 @@
 			$("#defaultExpenseNote").val(setting.invoice_expense_note);
 			$("#defaultOtherNote").val(setting.invoice_other_note);
 			$("#defaultInvoiceStartNumber").val(setting.invoice_starting_number);
+			$("#defaultEmailSubject").val(setting.invoice_email_subject);
+			$("#defaultEmailBody").val(setting.invoice_email_body);
+
 			/*let companyLogoImg=window.atob(setting.company_logo);*/
 			/*$("#companyLogoImg").attr('src',setting.company_logo);*/
 			/*$("#companyLogoImg").attr('src',`data:image/png;base64,${setting.company_logo}`);*/
@@ -28,6 +31,9 @@
 		let defaultExpenseNote = $("#defaultExpenseNote").val();
 		let defaultOtherNote = $("#defaultOtherNote").val();
 		let defaultInvoiceStartNumber = $("#defaultInvoiceStartNumber").val();
+		let defaultEmailSubject = $("#defaultEmailSubject").val();
+		let defaultEmailBody = $("#defaultEmailBody").val();
+
 		/*let companyLogo = $('#companyLogoImg').attr('src');*/
 		/*var formdata = new FormData()
 	    formdata.append('photo',$('#input-image').files[0])
@@ -53,7 +59,9 @@
 							"defaultFixedFeeNote":defaultFixedFeeNote,
 							"defaultExpenseNote":defaultExpenseNote,
 							"defaultOtherNote":defaultOtherNote,
-							"defaultInvoiceStartNumber":defaultInvoiceStartNumber
+							"defaultInvoiceStartNumber":defaultInvoiceStartNumber,
+							"defaultEmailSubject":defaultEmailSubject,
+							"defaultEmailBody":defaultEmailBody
 						}),
 			       success : function(response){
 					   if(response.success){
