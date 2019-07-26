@@ -2501,7 +2501,7 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
                                     <tbody>
                                         <tr>
                                             <td class="">
-                                                <div class="text-uppercase">
+                                                <div class="text-uppercase text-center">
                                                     <img src="data:image/jpeg;base64, ${Buffer.from(companySetting.company_logo).toString('base64')}" alt="company_logo" class="max-w-150">
                                                 </div>
                                             </td>
@@ -2745,8 +2745,8 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
             <table border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#f7f8f9">
                 <tbody>
                     <tr>
-                        <td valign="top" align="center" style="padding-top: 20px; padding-bottom: 10px;">
-                            <a href="javascript:void(0);" target="_blank"><img src="${process.env.BASE_URL}/img/krow-logo.png" alt="" height="29" width="84"></a>
+                        <td valign="top" style="padding-top: 20px; padding-bottom: 10px;">
+                            <a href="javascript:void(0);" target="_blank"><img src="${process.env.BASE_URL}/img/krow-logo.png" alt=""></a>
                         </td>
                     </tr>
                     <tr>
@@ -2854,7 +2854,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
   const mailOptions = {
     to: req.body.client_email,
     cc: req.body.extra_email.split(','),
-    from: 'krowtesting@athenalogics.com',
+    from: req.user.email,
     subject: req.body.subject_line?req.body.subject_line:"Invoice from " + companyName + " on Krow PSA",
     html: html,
     attachments :[
