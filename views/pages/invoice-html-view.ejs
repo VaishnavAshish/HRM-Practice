@@ -81,7 +81,8 @@
                                                     </td>
                                                     <td>
                                                         <div class="slds-truncate">
-                                                            Invoice-<%= invoiceDetails.id %>
+                                                            Invoice-<%= parseInt(invoiceDetails.record_id.substring(3)) %>
+                                                            <!-- <%= invoiceDetails.id %> -->
                                                         </div>
                                                     </td>
                                                 </tr>

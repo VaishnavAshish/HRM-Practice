@@ -2524,7 +2524,7 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
                                                                 </td>
                                                                 <td>
                                                                     <div class="">
-                                                                        Invoice-${invoiceDetails.id}
+                                                                        Invoice-${parseInt(invoiceDetails.record_id.substring(3))}
                                                                     </div>
                                                                 </td>
                                                             </tr>
