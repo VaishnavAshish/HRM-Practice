@@ -125,7 +125,8 @@ exports.postEditSettingUserRole = (req, res) => {
 
 };
 exports.postEditSettingInvoice = (req, res) => {
-  // console.log("Inside edit setting post method");
+  console.log("Inside edit setting post method");
+  console.log(req.body.defaultEmailBody);
   pool.connect((err, client, done) => {
     client.query('SELECT * FROM SETTING where company_id=$1',[req.user.company_id], function(err, selectedSetting) {
           if (err){
