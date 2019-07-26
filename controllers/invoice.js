@@ -2677,7 +2677,7 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
 
                     </html>`;
 
-    // console.log(pdfHTML);
+     console.log(pdfHTML);
     // request('https://webtopdf.expeditedaddons.com/?api_key=' + process.env.WEBTOPDF_API_KEY + '&content='+pdfHTML+'&html_width=1024&margin=10&title=My+PDF+Title', function (error, response, body) {
     //   // // console.log('Status:', response.statusCode);
     //   // // console.log('Headers:', JSON.stringify(response.headers));
