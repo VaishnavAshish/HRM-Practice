@@ -2850,7 +2850,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
   let extra_email = req.body.extra_email.split(',');
   extra_email = extra_email.filter(email_id => isValidEmail(email_id));
   console.log('extra_email')
-  console.log(extra_email)
+  console.log(extra_email+' '+req.user.email)
   const mailOptions = {
     to: req.body.client_email,
     cc: req.body.extra_email.split(','),
