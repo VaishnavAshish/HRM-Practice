@@ -2744,6 +2744,8 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
   let redirectUrl = serverName + '/invoice-html-view/' + req.body.invoiceId;
   console.log("redirectUrl");
   console.log(redirectUrl);
+  let startDateFormatted=invoiceDetails['created_date']==null?'':moment.tz(invoiceDetails.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
+  let dueDateFormatted=invoiceDetails['due_date']==null?'':moment.tz(invoiceDetails.due_date, companyDefaultTimezone).format('MM-DD-YYYY');
   let html = `<html><head></head><body><div style="background-color: #f7f8f9;">
             <table border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#f7f8f9">
                 <tbody>
@@ -2775,7 +2777,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
                                                                             Invoice
                                                                         </td>
                                                                         <td align="right" style=" font-size:14px;font-family: arial,sans-serif; padding:10px; border-bottom: 1px solid #eee; ">
-                                                                            Invoice-${invoiceDetails.id}
+                                                                            Invoice-${parseInt(invoiceDetails.record_id.substring(3))}
                                                                         </td>
                                                                     </tr>
                                                                     <tr>
@@ -2783,7 +2785,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
                                                                             Issue Date
                                                                         </td>
                                                                         <td align="right" style=" font-size:14px;font-family: arial,sans-serif; padding:10px; border-bottom: 1px solid #eee; ">
-                                                                            ${dateFormat(invoiceDetails.created_date)}
+                                                                            ${startDateFormatted}
                                                                         </td>
                                                                     </tr>
                                                                     <tr>
@@ -2791,7 +2793,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
                                                                             Due Date
                                                                         </td>
                                                                         <td align="right" style=" font-size:14px;font-family: arial,sans-serif; padding:10px; border-bottom: 1px solid #eee; ">
-                                                                            ${dateFormat(invoiceDetails.due_date)}
+                                                                            ${dueDateFormatted}
                                                                         </td>
                                                                     </tr>
                                                                     <tr>
