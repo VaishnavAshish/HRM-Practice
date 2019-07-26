@@ -2420,7 +2420,7 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
                             }
 
                             .tmd-small {
-                                margin-top: 0.75rem;
+                                margin-top: 1rem;
                             }
 
                             .tbl-border>tr>td,
