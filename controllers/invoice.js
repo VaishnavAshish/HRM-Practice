@@ -2859,7 +2859,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
   const mailOptions = {
     to: req.body.client_email,
     cc: req.body.extra_email.split(','),
-    from: req.user.email,
+    from: req.user.domain+' <'+req.user.email+'>',
     subject: req.body.subject_line?req.body.subject_line:"Invoice from " + companyName + " on Krow PSA",
     html: html,
     attachments :[
