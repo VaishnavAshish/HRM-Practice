@@ -293,7 +293,7 @@ sendInvitationEmail = (req, res, next) => {
 
     let mailOptions = {
       to: req.body.email,
-      from: 'krowtesting@athenalogics.com',
+      from: req.user.email,
       subject: req.user.email+" had invited you to join Krow PSA"
     };
     let hostN=process.env.BASE_URL;
@@ -394,7 +394,7 @@ sendInvitationEmail = (req, res, next) => {
 sendResetEmail = (req,res,next)=>{
   let mailOptions = {
       to: req.body.email,
-      from: 'krowtesting@athenalogics.com',
+      from: req.user.email,
       subject: "Reset your password"
     };
     let hostN=process.env.BASE_URL;
