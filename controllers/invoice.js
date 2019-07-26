@@ -2744,6 +2744,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
   let redirectUrl = serverName + '/invoice-html-view/' + req.body.invoiceId;
   console.log("redirectUrl");
   console.log(redirectUrl);
+  console.log(req.body.body_of_email);
   let startDateFormatted=invoiceDetails['created_date']==null?'':moment.tz(invoiceDetails.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
   let dueDateFormatted=invoiceDetails['due_date']==null?'':moment.tz(invoiceDetails.due_date, companyDefaultTimezone).format('MM-DD-YYYY');
   let html = `<html><head></head><body><div style="background-color: #f7f8f9;">

@@ -708,7 +708,7 @@
     let client_email = "<%= account.email %>"
     let extra_email = $("#extra_email").val();
     let subject_line = $("#subject_line").val();
-    let body_of_email = $("#body_of_email").val()..replace(/\r?\n/g,"\\n");
+    let body_of_email = $("#body_of_email").val().replace(/\r?\n/g,"\\n");
     checkFormValidation(formId);
     if(!$(formId).hasClass('has-error')) {
       $.ajax({
