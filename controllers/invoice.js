@@ -2745,6 +2745,10 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
   console.log("redirectUrl");
   console.log(redirectUrl);
   console.log(req.body.body_of_email); 
+  let emailBody = '';
+    req.body.body_of_email.split("\\n").forEach(data => {
+      emailBody += `<p class="slds-hyphenate">${data}</p>`;
+    })
   let startDateFormatted=invoiceDetails['created_date']==null?'':moment.tz(invoiceDetails.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
   let dueDateFormatted=invoiceDetails['due_date']==null?'':moment.tz(invoiceDetails.due_date, companyDefaultTimezone).format('MM-DD-YYYY');
   let html = `<html><head></head><body><div style="background-color: #f7f8f9;">
@@ -2809,7 +2813,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
                                                             </table>
 
                                                         <p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; line-height: 20px;">
-                                                            ${req.body.body_of_email?req.body.body_of_email:''}
+                                                            ${req.body.body_of_email?emailBody:''}
                                                         </p>
                                                         <p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; margin-bottom: 5px;">
                                                             Thank you for your business,
