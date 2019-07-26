@@ -47,7 +47,10 @@
                               Body
                           </label>
                           <div class="slds-form-element__control">
-                              <input type="text" id="body_of_email" name="body_of_email" class="slds-input" value="<%= companySetting.invoice_email_body?companySetting.invoice_email_body:'' %>" placeholder="Enter body of the email.">
+                              <textarea class="slds-textarea" placeholder="Enter body of the email." rows="1" id="body_of_email" name="body_of_email" getFormData>
+                                <%= companySetting.invoice_email_body?companySetting.invoice_email_body:'' %>
+                              </textarea>
+                              <!-- <input type="text" id="body_of_email" name="body_of_email" class=input" value="<%= companySetting.invoice_email_body?companySetting.invoice_email_body:'' %> placeholder="Enter body of the email."> -->
                               <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset="errmsg"></div>
                           </div>
                       </div>

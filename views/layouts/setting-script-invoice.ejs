@@ -32,7 +32,7 @@
 		let defaultOtherNote = $("#defaultOtherNote").val();
 		let defaultInvoiceStartNumber = $("#defaultInvoiceStartNumber").val();
 		let defaultEmailSubject = $("#defaultEmailSubject").val();
-		let defaultEmailBody = $("#defaultEmailBody").val();
+		let defaultEmailBody = $("#defaultEmailBody").val().replace(/\r?\n/g,"\\n");
 
 		/*let companyLogo = $('#companyLogoImg').attr('src');*/
 		/*var formdata = new FormData()
