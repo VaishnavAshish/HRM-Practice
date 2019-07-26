@@ -2745,8 +2745,8 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
             <table border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#f7f8f9">
                 <tbody>
                     <tr>
-                        <td valign="top" style="padding-top: 20px; padding-bottom: 10px;">
-                            <a href="javascript:void(0);" target="_blank"><img src="${process.env.BASE_URL}/img/krow-logo.png" alt=""></a>
+                        <td valign="top" align="center" style="padding-top: 20px; padding-bottom: 10px;">
+                            <a href="javascript:void(0);" target="_blank"><img src="${process.env.BASE_URL}/img/krow-logo.png" alt="" width="84" height="29"></a>
                         </td>
                     </tr>
                     <tr>
