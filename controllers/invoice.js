@@ -2493,6 +2493,9 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
                               letter-spacing: 0.0625rem;
                               font-weight: normal
                             }
+                            .max-w-150 {
+                                max-width: 150px; 
+                              }
 
                         </style>
                         <div>
