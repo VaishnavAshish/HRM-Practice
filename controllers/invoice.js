@@ -2199,12 +2199,13 @@ function invoiceHtmlData (req,res,invoiceHtml,responseType){
                                                                                         invoiceDetails.rows[0].total_amount=invoice_total_amount.toFixed(2);
 
                                                                                         invoiceDetails.rows[0].tax =parseInt(invoiceDetails.rows[0].tax);
+                                                                                        console.log('invoiceDetails.rows[0].total_amount '+invoiceDetails.rows[0].total_amount);
                                                                                         if(invoiceDetails.rows[0].tax&&invoiceDetails.rows[0].tax>0){
                                                                                           invoiceDetails.rows[0].final_amount=parseFloat(invoice_total_amount.toFixed(2))+parseFloat(invoice_taxable_amount*invoiceDetails.rows[0].tax/100);
                                                                                         }else{
                                                                                           invoiceDetails.rows[0].final_amount=invoice_total_amount.toFixed(2);
                                                                                         }
-
+                                                                                        console.log('invoiceDetails.rows[0].final_amount '+invoiceDetails.rows[0].final_amount);
                                                                                         invoiceDetails.rows[0]['startDateFormatted'] = startDateFormatted;
                                                                                         invoiceDetails.rows[0]['dueDateFormatted'] = dueDateFormatted;
                                                                                         // invoiceDetails.rows[0]['description'] = invoiceDetails.rows[0]['description'].split("\\n").join("<br />");
@@ -2221,7 +2222,7 @@ function invoiceHtmlData (req,res,invoiceHtml,responseType){
                                                                                         companySetting.rows[0].state = (companySetting.rows[0].state==null) ? '' : companySetting.rows[0].state;
                                                                                         companySetting.rows[0].country = (companySetting.rows[0].country==null) ? '' : companySetting.rows[0].country;
                                                                                         companySetting.rows[0].zip_code = (companySetting.rows[0].zip_code==null) ? '' : companySetting.rows[0].zip_code;
-                                                                                        console.log('invoiceHtml '+invoiceHtml)
+                                                                                        
                                                                                         if(invoiceHtml==true){
                                                                                             console.log('inside invoiceHTML');
                                                                                             /*// console.log('dates are');
@@ -2745,7 +2746,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
                 <tbody>
                     <tr>
                         <td valign="top" align="center" style="padding-top: 20px; padding-bottom: 10px;">
-                            <a href="javascript:void(0);" target="_blank"><img src="${process.env.BASE_URL}/img/krow-logo.png" alt="" height="60"></a>
+                            <a href="javascript:void(0);" target="_blank"><img src="${process.env.BASE_URL}/img/krow-logo.png" alt="" height="29" width="84"></a>
                         </td>
                     </tr>
                     <tr>
