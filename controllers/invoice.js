@@ -2221,7 +2221,7 @@ function invoiceHtmlData (req,res,invoiceHtml,responseType){
                                                                                         companySetting.rows[0].state = (companySetting.rows[0].state==null) ? '' : companySetting.rows[0].state;
                                                                                         companySetting.rows[0].country = (companySetting.rows[0].country==null) ? '' : companySetting.rows[0].country;
                                                                                         companySetting.rows[0].zip_code = (companySetting.rows[0].zip_code==null) ? '' : companySetting.rows[0].zip_code;
-
+                                                                                        console.log('invoiceHtml '+invoiceHtml)
                                                                                         if(invoiceHtml==true){
                                                                                             console.log('inside invoiceHTML');
                                                                                             /*// console.log('dates are');
@@ -2500,8 +2500,8 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
                                     <tbody>
                                         <tr>
                                             <td class="">
-                                                <div class="text-uppercase text-center">
-                                                    <img src="data:image/jpeg;base64, ${Buffer.from(companySetting.company_logo).toString('base64')}" alt="company_logo" class="max-w-150" height='80' width='80'>
+                                                <div class="text-uppercase">
+                                                    <img src="data:image/jpeg;base64, ${Buffer.from(companySetting.company_logo).toString('base64')}" alt="company_logo" class="max-w-150" height='29' width='84'>
                                                 </div>
                                             </td>
                                             <td width="15%">
@@ -2524,7 +2524,7 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
                                                                 </td>
                                                                 <td>
                                                                     <div class="">
-                                                                        Invoice-${invoiceDetails.id}
+                                                                        Invoice-${parseInt(invoiceDetails.record_id.substring(3))}
                                                                     </div>
                                                                 </td>
                                                             </tr>
