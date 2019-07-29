@@ -2222,7 +2222,7 @@ function invoiceHtmlData (req,res,invoiceHtml,responseType){
                                                                                         companySetting.rows[0].state = (companySetting.rows[0].state==null) ? '' : companySetting.rows[0].state;
                                                                                         companySetting.rows[0].country = (companySetting.rows[0].country==null) ? '' : companySetting.rows[0].country;
                                                                                         companySetting.rows[0].zip_code = (companySetting.rows[0].zip_code==null) ? '' : companySetting.rows[0].zip_code;
-                                                                                        
+
                                                                                         if(invoiceHtml==true){
                                                                                             console.log('inside invoiceHTML');
                                                                                             /*// console.log('dates are');
@@ -2498,7 +2498,7 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
                               font-weight: normal
                             }
                             .max-w-150 {
-                                max-width: 150px; 
+                                max-width: 150px;
                               }
 
                         </style>
@@ -2532,7 +2532,7 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
                                                                 </td>
                                                                 <td>
                                                                     <div class="">
-                                                                        Invoice-${parseInt(invoiceDetails.record_id.substring(3))}
+                                                                        ${parseInt(invoiceDetails.record_id.substring(3))}
                                                                     </div>
                                                                 </td>
                                                             </tr>
@@ -2748,12 +2748,12 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
   let redirectUrl = serverName + '/invoice-html-view/' + req.body.invoiceId;
   console.log("redirectUrl");
   console.log(redirectUrl);
-  console.log(req.body.body_of_email); 
+  console.log(req.body.body_of_email);
   let emailBody = '';
     req.body.body_of_email.split("\\n").forEach(data => {
       emailBody += `<p class="slds-hyphenate">${data}</p>`;
     })
-  console.log(emailBody); 
+  console.log(emailBody);
   let startDateFormatted=invoiceDetails['created_date']==null?'':moment.tz(invoiceDetails.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
   let dueDateFormatted=invoiceDetails['due_date']==null?'':moment.tz(invoiceDetails.due_date, companyDefaultTimezone).format('MM-DD-YYYY');
   let html = `<html><head></head><body><div style="background-color: #f7f8f9;">

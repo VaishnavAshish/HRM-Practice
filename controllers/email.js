@@ -11,8 +11,8 @@ exports.sendMail = (req, res, next) => {
       //     pass: 'ggeekkoo11' // Your password
       // },
       auth: {
-          user: 'krowtesting@athenalogics.com', // Your email id
-          pass: 'athenalogics123@' // Your password
+          user: 'support@krowsoftware.com', // Your email id
+          pass: 'ggeekkoo22' // Your password
       },
       logger: true,
       tls: {
