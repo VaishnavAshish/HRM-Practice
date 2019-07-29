@@ -202,7 +202,8 @@ exports.fileupload = (req, res) => {
                   return res.status(500).redirect('/org-settings-invoice');
                 } else {
                     if(selectedSetting.rows.length>0){
-
+                      console.log('informatino of req.files.uploadedImageFile');
+                      console.log(req.files.uploadedImageFile)
                       sharp(req.files.uploadedImageFile.data).resize(200,200).toBuffer()
                             .then( data =>{
                                 // console.log('company_logo after resizing :')

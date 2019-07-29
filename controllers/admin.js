@@ -701,7 +701,7 @@ sendEmailToUser = (req, res, next) => {
     '</tbody>' +
     '</table>' +
     '<p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; line-height: 20px;">' +
-        Confirm your email address
+        'Confirm your email address'+
     '</p>' +
     '<p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; margin-bottom: 5px;">' +
     'Thanks,' +
