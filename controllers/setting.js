@@ -7,6 +7,8 @@ const moment = require('moment-timezone');
 const path = require('path');
 const fs = require('fs');
 const sharp = require('sharp');
+const gm = require('gm').subClass({imageMagick: true});
+
 exports.postEditSetting = (req, res) => {
   // console.log("Inside edit setting post method") ;
   // console.log(req.body);
@@ -202,38 +204,72 @@ exports.fileupload = (req, res) => {
                   return res.status(500).redirect('/org-settings-invoice');
                 } else {
                     if(selectedSetting.rows.length>0){
-                      console.log('informatino of req.files.uploadedImageFile');
-                      console.log(req.files.uploadedImageFile)
-                      sharp(req.files.uploadedImageFile.data).resize(200,200).toBuffer()
+                      gm(req.files.uploadedImageFile.data)
+                      .identify(function (err, features) {
+                        if (err) {
+                          done();
+                          return res.status(500).redirect('/org-settings-invoice');
+                        }else{
+                          console.log('information of uploaded file is');
+                          console.log(features.Filesize);
+                          if(features.Filesize > 4){
+                            sharp(req.files.uploadedImageFile.data).resize(200,200).toBuffer()
                             .then( data =>{
-                                // console.log('company_logo after resizing :')
-                                // console.log(data);
-                                client.query('UPDATE SETTING set contenttype=$1,company_logo=$2 where company_id=$3 RETURNING *',[req.files.uploadedImageFile.mimetype,data,req.user.company_id], function(err, updatedSetting) {
-                                    if (err){
+                              // console.log('company_logo after resizing :')
+                              // console.log(data);
+                              client.query('UPDATE SETTING set contenttype=$1,company_logo=$2 where company_id=$3 RETURNING *',[req.files.uploadedImageFile.mimetype,data,req.user.company_id], function(err, updatedSetting) {
+                                if (err){
+                                  handleResponse.shouldAbort(err, client, done);
+                                  return res.status(500).redirect('/org-settings-invoice');
+                                } else {
+                                  client.query('COMMIT', (err) => {
+                                    if (err) {
+                                      // console.log('Error committing transaction', err.stack)
                                       handleResponse.shouldAbort(err, client, done);
+                                      // handleResponse.handleError(res, err, ' Error in committing transaction');
                                       return res.status(500).redirect('/org-settings-invoice');
                                     } else {
-                                      client.query('COMMIT', (err) => {
-                                        if (err) {
-                                          // console.log('Error committing transaction', err.stack)
-                                          handleResponse.shouldAbort(err, client, done);
-                                          // handleResponse.handleError(res, err, ' Error in committing transaction');
-                                          return res.status(500).redirect('/org-settings-invoice');
-                                        } else {
-                                            done();
-                                            res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
-                                            res.header('Expires', '-1');
-                                            res.header('Pragma', 'no-cache');
-                                            return res.status(200).redirect('/org-settings-invoice');
-                                        }
-                                      })
+                                      done();
+                                      res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+                                      res.header('Expires', '-1');
+                                      res.header('Pragma', 'no-cache');
+                                      return res.status(200).redirect('/org-settings-invoice');
                                     }
-                                });
+                                  })
+                                }
+                              });
                             })
                             .catch( err => {
-                              // console.log('err');
-                              // console.log(err);
+                              done();
+                              return res.status(500).redirect('/org-settings-invoice');
                             });
+                          }else{
+                            client.query('UPDATE SETTING set contenttype=$1,company_logo=$2 where company_id=$3 RETURNING *',[req.files.uploadedImageFile.mimetype,req.files.uploadedImageFile.data,req.user.company_id], function(err, updatedSetting) {
+                              if (err){
+                                handleResponse.shouldAbort(err, client, done);
+                                return res.status(500).redirect('/org-settings-invoice');
+                              } else {
+                                client.query('COMMIT', (err) => {
+                                  if (err) {
+                                    // console.log('Error committing transaction', err.stack)
+                                    handleResponse.shouldAbort(err, client, done);
+                                    // handleResponse.handleError(res, err, ' Error in committing transaction');
+                                    return res.status(500).redirect('/org-settings-invoice');
+                                  } else {
+                                    done();
+                                    res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+                                    res.header('Expires', '-1');
+                                    res.header('Pragma', 'no-cache');
+                                    return res.status(200).redirect('/org-settings-invoice');
+                                  }
+                                })
+                              }
+                            });
+                          }
+                        }
+                      });
+
+
 
                     }else{
                       done();

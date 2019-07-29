@@ -2426,7 +2426,7 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
                             }
 
                             .tmd-small {
-                                margin-top: 1.5rem;
+                                margin-top: 0.50rem;
                             }
 
                             .tbl-border>tr>td,
@@ -2513,8 +2513,8 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
                                 <table class="tbl-fixed">
                                     <tbody>
                                         <tr>
-                                            <td class="">
-                                                <div class="text-uppercase text-center tmd-small">
+                                            <td class="" style="vertical-align: text-top;">
+                                                <div class="text-uppercase tmd-small">
                                                     <img src="data:image/jpeg;base64, ${Buffer.from(companySetting.company_logo).toString('base64')}" alt="company_logo" class="max-w-150">
                                                 </div>
                                             </td>
@@ -2683,7 +2683,7 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
 
                     </html>`;
 
-    console.log(pdfHTML);
+    //console.log(pdfHTML);
     // request('https://webtopdf.expeditedaddons.com/?api_key=' + process.env.WEBTOPDF_API_KEY + '&content='+pdfHTML+'&html_width=1024&margin=10&title=My+PDF+Title', function (error, response, body) {
     //   // // console.log('Status:', response.statusCode);
     //   // // console.log('Headers:', JSON.stringify(response.headers));
