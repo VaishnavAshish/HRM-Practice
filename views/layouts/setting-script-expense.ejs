@@ -12,7 +12,7 @@
 	function addExpenseToList(expenseCat){
 
 		//'<a href="javascript:void(0);" title="category-name" onclick="getEditData(this)">'+expenseCat+'</a>'+
-		let expCatLi='<li class="line-top slds-p-vertical_small" category-name="'+expenseCat.toLowerCase()+'">'+
+		let expCatLi='<li class="line-top slds-p-vertical_small" category-name="'+expenseCat+'">'+
 					    '<div class="slds-grid slds-wrap slds-grid_pull-padded">'+
 					        '<div class="slds-size_1-of-1 slds-medium-size_8-of-12 slds-p-horizontal_small sm-bpd-15">'+
 					            '<div class="slds-truncate text-size-11 text-dull">'+
@@ -40,7 +40,7 @@
 					                            '<ul class="slds-dropdown__list" role="menu">'+
 
 					                                '<li class="slds-dropdown__item" role="presentation">'+
-					                                    '<a href="javascript:void(0);" role="deleteItem" tabindex="-1" onclick=\'deleteBeforeConfirm("#globalAlert", "deleteExpCat('+`\`${expenseCat.toLowerCase()}\``+')","Are you sure you want to delete this expense category?")\'>'+
+					                                    '<a href="javascript:void(0);" role="deleteItem" tabindex="-1" onclick=\'deleteBeforeConfirm("#globalAlert", "deleteExpCat('+`\`${expenseCat}\``+')","Are you sure you want to delete this expense category?")\'>'+
 					                                        '<span class="slds-truncate text-red" title="">'+
 					                                            'Delete'+
 					                                        '</span>'+
@@ -154,9 +154,9 @@
 	function saveCompanyExpenseSetting(){
 		showLoader('#globalLoader');
 		let expCategory=[];
-		let expenseLi=$("#expenseCatList li.slds-p-vertical_small a[title=category-name]");
+		let expenseLi=$("#expenseCatList li.slds-p-vertical_small[category-name]");
 		$.each(expenseLi,function(index,li) {
-			expCategory.push($(li).text());
+			expCategory.push($(li).attr('category-name'));
 		});
 		console.log(expCategory);
 		$.ajax({

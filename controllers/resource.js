@@ -395,7 +395,7 @@ sendResetEmail = (req,res,next)=>{
   let mailOptions = {
       to: req.body.email,
       from: 'support@krowsoftware.com',
-      subject: "Reset your password"
+      subject: "Krow PSA reset password"
     };
     let hostN=process.env.BASE_URL;
     let redirectUrl= hostN+'/reset/'+req.token;
@@ -426,7 +426,7 @@ sendResetEmail = (req,res,next)=>{
                                                               'Hi '+req.body.first_name?req.body.first_name:''+' '+req.body.last_name?req.body.last_name:''+','+mailOptions.to+
                                                           '</h5>'+
                                                           '<p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; line-height: 20px;">'+
-                                                              'We received a request to reset the password for account '+mailOptions.to+'. If you made this request, click the link below to'+
+                                                              'We have received a request to reset the password for account '+mailOptions.to+'. If you made this request, Click the link below to'+
                                                               'change your password:'+
                                                           '</p>'+
                                                           '<p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal;">'+

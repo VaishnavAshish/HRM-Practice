@@ -14,7 +14,7 @@
 	function addUserRoleToList(userRole){
 
 		//'<a href="javascript:void(0);" title="role-name" onclick="getEditData(this)">'+userRole+'</a>'+
-		let userRoleLi='<li class="line-top slds-p-vertical_small" user-role-li role-name="'+userRole.toLowerCase()+'">'+
+		let userRoleLi='<li class="line-top slds-p-vertical_small" user-role-li role-name="'+userRole+'">'+
 					    '<div class="slds-grid slds-wrap slds-grid_pull-padded">'+
 					        '<div class="slds-size_1-of-1 slds-medium-size_8-of-12 slds-p-horizontal_small sm-bpd-15">'+
 					            '<div class="slds-truncate text-size-11 text-dull">'+
@@ -42,7 +42,7 @@
 					                            '<ul class="slds-dropdown__list" role="menu">'+
 
 					                                '<li class="slds-dropdown__item" role="presentation">'+
-					                                    '<a href="javascript:void(0);" role="deleteItem" tabindex="-1"  onclick=\'deleteBeforeConfirm("#globalAlert", "deleteUserRole('+`\`${userRole.toLowerCase()}\``+')","Are you sure you want to delete this user role?")\'>'+
+					                                    '<a href="javascript:void(0);" role="deleteItem" tabindex="-1"  onclick=\'deleteBeforeConfirm("#globalAlert", "deleteUserRole('+`\`${userRole}\``+')","Are you sure you want to delete this user role?")\'>'+
 					                                        '<span class="slds-truncate text-red" title="">'+
 					                                            'Delete'+
 					                                        '</span>'+
@@ -155,9 +155,9 @@
 	function saveCompanyUserRole(){
 		showLoader('#globalLoader');
 		let userRole=[];
-		let roleLi=$("#userRoleList li.slds-p-vertical_small a[title=role-name]");
+		let roleLi=$("#userRoleList li.slds-p-vertical_small[role-name]");
 		$.each(roleLi,function(index,li) {
-			userRole.push($(li).text());
+			userRole.push($(li).attr('role-name'));
 		});
 		console.log(userRole);
 		$.ajax({
