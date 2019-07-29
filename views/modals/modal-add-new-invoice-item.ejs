@@ -30,6 +30,29 @@
                             </div>
                         </div>
                     </div>
+                    <div class="slds-form-element slds-m-bottom_medium" reset='errorclass'>
+                        <label class="slds-form-element__label">
+                            Project
+                            <abbr class="slds-required" title="required">*</abbr>
+                        </label>
+                        <div class="slds-form-element__control">
+                            <div class="slds-select_container">
+                                <select class="slds-select" id="invoice-manual-entry-project" reset='value'>
+                                    <% if(projects.length >0) { %>
+                                        <option value=""> </option>
+                                        <% projects.forEach(function(project) { %>
+                                            <option pr_type="<%= project.type %>" pr_id="<%= project.id %>" value="<%= project.id %>"><%= project.name %></option>
+                                        <% }); %>
+                                    <% } else { %>
+                                        <option value=""> </option>
+                                    <% } %>
+                                </select>
+                            </div>
+                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" reset='errmsg'>
+
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="slds-form-element slds-m-bottom_small">
                         <label class="slds-form-element__label">

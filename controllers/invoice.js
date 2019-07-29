@@ -431,6 +431,7 @@ function getUserBRandCR(req, res, client, err, done, userId, projectId, userRole
     });
 }
 exports.insertNewInvoiceItem = (req, res) => {
+  console.log('Inside insertNewInvoiceItem ');
   setting.getCompanySetting(req, res ,(err,result)=>{
      if(err==true){
        handleResponse.handleError(res, err, ' Error in finding company setting data');
@@ -475,9 +476,12 @@ exports.insertNewInvoiceItem = (req, res) => {
                              invoiceLineData.user_role = '';
                              invoiceLineData.type = req.body.invoice_line_type;
                              invoiceLineData.currency = invoiceDetail.rows[0].currency;
+                             req.body.projectId =  req.body.invoice_manual_entry_project;
                              // ['Expense', new Date(), req.body.projectId, req.body.accountId, req.body.invoiceId, req.user.company_id, new Date(), new Date(), data.amount, data.user_id, data.quantity, data.amount, data.note, data.id, data.user_role]
                              addInvoiceLineItem(req, res, client, err, done, invoiceLineData, function (result) {
                                  if(result) {
+                                   //console.log('Adding new manual entry result is :')
+                                   //console.log(result);
                                    client.query('COMMIT', (err) => {
                                      if (err) {
                                        console.error('Error committing transaction', err.stack)
@@ -1212,7 +1216,7 @@ function addInvoiceLineItem(req, res, client, err, done, data, result) {
     // console.log(companyDefaultCurrency);
     // let newDate=moment.tz(new Date(), companyDefaultTimezone).format();
     // client.query('INSERT INTO INVOICE_LINE_ITEM (type,item_date,project_id,account_id,invoice_id,company_id,created_date, updated_date, total_amount, user_id, quantity, unit_price, note, timesheet_id, user_role) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING id', ['Timesheet', new Date(), req.body.projectId, req.body.accountId, req.body.invoiceId, req.user.company_id, new Date(), new Date(), invoicedAmount, timesheet.resource_id, timesheet.user_role,parseInt(response.bill_rate), parseInt(timesheet.total_billable_hours), timesheet.id], function (err, invoiceLineItem) {
-
+    console.log(req.body.projectId);
     client.query('INSERT INTO INVOICE_LINE_ITEM (type,item_date,project_id,account_id,invoice_id,company_id,created_date, updated_date, total_amount, user_id, quantity, unit_price, note, expense_id, timesheet_id, user_role,currency) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) RETURNING id', [type, 'now()', req.body.projectId, req.body.accountId, req.body.invoiceId, req.user.company_id, 'now()', 'now()', data.amount, data.user_id, data.quantity, data.unit_price, data.note, expense_id, timesheet_id, data.user_role, currency], function (err, invoiceLineItem) {
         if (err) {
             console.error(err);

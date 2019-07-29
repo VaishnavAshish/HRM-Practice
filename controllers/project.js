@@ -442,7 +442,8 @@ exports.getProject = (req, res) => {
                     handleResponse.shouldAbort(err, client, done);
                     handleResponse.responseToPage(res,'pages/projects-listing',{projects: [], totalCount: 0,notStartedCount:0, inProgressCount :0, atRiskCount :0, completedCount:0,user:req.user, error:err},"error","  Error in finding account data");
                   } else {
-                    // console.log("----------project.rows-------------");
+                     //console.log("----------project.rows-------------");
+
                         let accountIdArr=[];
                           if(accountList.rows.length>0){
                             accountIdArr = accountList.rows.map(function (ele) {
@@ -491,7 +492,8 @@ exports.getProject = (req, res) => {
                             atRiskCount=project.rows[0].atriskcount;
                             completedCount=project.rows[0].completedcount;
                         }
-                        // console.log(project.rows);
+                         //console.log('-----------project.rows------------');
+
                         // console.log('--------project----------');
                         // console.log(allProjectCount+' '+notStartedCount+' '+atRiskCount+' '+completedCount+' '+inProgressCount);
                         /*projectNotStarted=projectArr.filter(pro => pro.status=="Not Started");
@@ -499,7 +501,7 @@ exports.getProject = (req, res) => {
                         projectAtRisk=projectArr.filter(pro => pro.status=="At Risk");
                         projectCompleted=projectArr.filter(pro => pro.status=="Completed");*/
                         done();
-                        handleResponse.responseToPage(res,'pages/projects-listing',{projects: projectArr.length>process.env.PAGE_RECORD_NO?projectArr.slice(0, process.env.PAGE_RECORD_NO-1):projectArr, totalCount: allProjectCount,notStartedCount:notStartedCount, inProgressCount :inProgressCount, atRiskCount :atRiskCount, completedCount:completedCount,user:req.user, error:err, accounts:accountList.rows,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD'),companyDefaultTimezone:companyDefaultTimezone,stripeCustomerId:result.stripe_customer_id},"success","Successfully rendered");
+                        handleResponse.responseToPage(res,'pages/projects-listing',{projects: projectArr.length>process.env.PAGE_RECORD_NO?projectArr.slice(0, process.env.PAGE_RECORD_NO):projectArr, totalCount: allProjectCount,notStartedCount:notStartedCount, inProgressCount :inProgressCount, atRiskCount :atRiskCount, completedCount:completedCount,user:req.user, error:err, accounts:accountList.rows,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD'),companyDefaultTimezone:companyDefaultTimezone,stripeCustomerId:result.stripe_customer_id},"success","Successfully rendered");
                   }
                 });
                 /*res.render('pages/projects-listing', { projects: project.rows, user: req.user, error: err });*/
