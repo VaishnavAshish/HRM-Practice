@@ -681,7 +681,7 @@ sendEmailToUser = (req, res, next) => {
 
     +
     '<p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; line-height: 20px;">' +
-    ' To get started, we need to confirm.your email address, so please click this link to finish creating your account:' +
+    ' To get started, you need to verify your email address. Please click on the link given below to finish creating your account:' +
     '</p>' +
     '<table border="0" cellpadding="0" cellspacing="0" width="100%">' +
     '<tbody>' +
@@ -701,7 +701,7 @@ sendEmailToUser = (req, res, next) => {
     '</tbody>' +
     '</table>' +
     '<p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; line-height: 20px;">' +
-    'Lorem ipsum dolor sit amet, consectetur adipiscing elit.Sed accumsan convallis iaculis.Quisque at convallis leo.' +
+        Confirm your email address
     '</p>' +
     '<p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; margin-bottom: 5px;">' +
     'Thanks,' +
@@ -722,7 +722,7 @@ sendEmailToUser = (req, res, next) => {
     '<tr>' +
     '<td valign="top" align="center" style=" font-family: arial,sans-serif; padding:20px 20px 20px 20px; color: #999; font-size: 14px;">' +
     'For more help and support' +
-    '<a href="/" target="_blank" style="color: #4387fd;">contact us</a>' +
+    '<a href="/" target="_blank" style="color: #4387fd;"> contact us</a>' +
     '</td>' +
     '</tr>' +
     '</tbody>' +
