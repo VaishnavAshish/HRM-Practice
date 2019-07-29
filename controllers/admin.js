@@ -733,7 +733,7 @@ sendEmailToUser = (req, res, next) => {
   // console.log("Inside send mail " + req.body);
   const mailOptions = {
     to: req.body.adminEmail,
-    from: req.user.domain+' <'+req.user.email+'>',
+    from: 'support@krowsoftware.com',
     subject: "Confirmation of " + req.body.orgName + " on Krow PSA",
     html: html
   };

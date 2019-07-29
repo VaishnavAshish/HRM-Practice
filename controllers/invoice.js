@@ -2255,7 +2255,9 @@ function invoiceHtmlData (req,res,invoiceHtml,responseType){
                                                                         console.log('start and due dates arre'+startDateFormatted+' '+dueDateFormatted);
                                                                         invoiceDetails.rows[0]['startDateFormatted'] = startDateFormatted;
                                                                         invoiceDetails.rows[0]['dueDateFormatted'] = dueDateFormatted;
+                                                                        console.log('inside invoiceHTML');
                                                                         handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.user, error:err, invoiceDetails : invoiceDetails.rows[0], lineItems : [], accountDetails:accountDetails.rows[0],companySetting:companySetting.rows[0], projects:projects.rows,companyName:companyName.rows[0].name},"success","Successfully rendered");
+
                                                                     }
 
                                                           })
@@ -2873,7 +2875,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
   const mailOptions = {
     to: req.body.client_email,
     cc: req.body.extra_email.split(','),
-    from: req.user.domain+' <'+req.user.email+'>',
+    from: 'support@krowsoftware.com',
     subject: req.body.subject_line?req.body.subject_line:"Invoice from " + companyName + " on Krow PSA",
     html: html,
     attachments :[
