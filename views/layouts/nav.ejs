@@ -265,7 +265,7 @@
 
                                         hmsToSecondsOnly('23:59:59',(timesheetDateTime)=>{
 
-                                            let difference=timesheetDateTime-playStartTime;
+                                            let difference=Math.abs(timesheetDateTime-playStartTime);
                                             let previousTotalHours=(response.timesheetData[0].total_work_hours*60);
                                             secondsToHms(previousTotalHours+difference,(currentPlayingTime)=>{
 
