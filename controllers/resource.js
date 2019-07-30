@@ -99,7 +99,7 @@ getCompanyId = (domain,next) => {
     }
 }
 exports.postResetPassword = (req, res) => {
-  // console.log('inside ');
+  console.log('inside postResetPassword');
   req.assert('email', 'Email cannot be blank').notEmpty();
   const errors = req.validationErrors();
 
@@ -399,6 +399,8 @@ sendResetEmail = (req,res,next)=>{
     };
     let hostN=process.env.BASE_URL;
     let redirectUrl= hostN+'/reset/'+req.token;
+    let firstName = req.body.first_name?req.body.first_name:'';
+    let lastName = req.body.last_name?req.body.last_name:'';
     // console.log(hostN+' '+redirectUrl);
   let html= '<html>'+
    '<body>'+
@@ -423,10 +425,10 @@ sendResetEmail = (req,res,next)=>{
                                                   '<tr>'+
                                                       '<td valign="top">'+
                                                           '<h5 style="font-family: arial,sans-serif; font-size:18px; font-weight:normal;margin: 0; ">'+
-                                                              'Hi '+req.body.first_name?req.body.first_name:''+' '+req.body.last_name?req.body.last_name:''+','+mailOptions.to+
+                                                              'Hi '+firstName+' '+lastName+','+mailOptions.to+
                                                           '</h5>'+
                                                           '<p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; line-height: 20px;">'+
-                                                              'We have received a request to reset the password for account '+mailOptions.to+'. If you made this request, Click the link below to'+
+                                                              'We have received a request to reset the password for account '+mailOptions.to+'. If you made this request, Click the link below to '+
                                                               'change your password:'+
                                                           '</p>'+
                                                           '<p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal;">'+
@@ -470,15 +472,16 @@ sendResetEmail = (req,res,next)=>{
                   '<tr>'+
                       '<td valign="top" align="center" style=" font-family: arial,sans-serif; padding:20px 20px 20px 20px; color: #999; font-size: 14px;">'+
                           'For more help and support'+
-                          '<a href="/" target="_blank" style="color: #4387fd;">contact us</a>'+
+                          '<a href="/" target="_blank" style="color: #4387fd;"> contact us</a>'+
                       '</td>'+
                   '</tr>'+
               '</tbody>'+
           '</table>'+
       '</div>'+
    '</body>'+
-
    '</html>';
+   //console.log('html');
+   //console.log(html);
    mailOptions.html=html;
     req.mailOptions=mailOptions;
     // console.log('transpoter');
