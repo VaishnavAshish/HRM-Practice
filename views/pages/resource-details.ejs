@@ -303,7 +303,7 @@
                                                 <span class="slds-checkbox">
                                                 <% if (resource.permissions!=null){ %>
                                                     <% if (resource.permissions.includes('timesheetEntry')) { %>
-                                                        <input type="checkbox" name="permissions" id="timesheetEntry" value="timesheetEntry" checked onchange='isPermissionModified(this);'>
+                                                        <input type="checkbox" name="permissions" id="timesheetEntry" value="timesheetEntry" checked onchange='isPermissionModified(this);' <%= resource.permissions.includes('timesheetApprover')?'disabled':'' %> >
                                                 <% } else { %>
                                                         <input type="checkbox" name="permissions" id="timesheetEntry" value="timesheetEntry" onchange='isPermissionModified(this);'>
                                                 <% } } else{ %>
@@ -322,7 +322,7 @@
                                                 <span class="slds-checkbox">
                                                 <% if (resource.permissions!=null){ %>
                                                     <% if (resource.permissions.includes('expenseManager')) { %>
-                                                        <input type="checkbox" name="permissions" id="expenseManager" value="expenseManager" checked onchange='isPermissionModified(this);'>
+                                                        <input type="checkbox" name="permissions" id="expenseManager" value="expenseManager" checked onchange='isPermissionModified(this);' <%= resource.permissions.includes('expenseApprover')?'disabled':'' %>   >
                                                     <% } else { %>
                                                         <input type="checkbox" name="permissions" id="expenseManager" value="expenseManager" onchange='isPermissionModified(this);'>
                                                 <% } } else{ %>

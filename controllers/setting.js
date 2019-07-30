@@ -212,7 +212,9 @@ exports.fileupload = (req, res) => {
                         }else{
                           console.log('information of uploaded file is');
                           console.log(features.Filesize);
-                          if(features.Filesize > 4){
+                          let featureFileSize = parseFloat(features.Filesize.replace( /^\D+/g, ''));
+                          console.log('featureFileSize '+ featureFileSize)
+                          if(featureFileSize > 2 && features.Filesize.substring(features.Filesize.length-2) == 'MB'){
                             sharp(req.files.uploadedImageFile.data).resize(200,200).toBuffer()
                             .then( data =>{
                               // console.log('company_logo after resizing :')

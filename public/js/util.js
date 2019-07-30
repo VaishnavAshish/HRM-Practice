@@ -460,7 +460,7 @@ function startKwTimerGlobally(ele,id) {
                                 // var timesheet_date=dateFormat(moment.tz(new Date(), companyDefaultTimezone).format());
                                 // dayTimeSheetData.timesheet_date = timesheet_date;
                                 dayTimeSheetData.user_role = 'Manager';
-                                console.log(dayTimeSheetData);
+                                //console.log(dayTimeSheetData);
                                 $.ajax({
                                     type: 'POST',
                                     url: '/addTimesheet',
@@ -468,7 +468,7 @@ function startKwTimerGlobally(ele,id) {
                                     dataType: 'json',
                                     data: JSON.stringify(dayTimeSheetData),
                                     success: function (response) {
-                                        console.log(response);
+                                        //console.log(response);
                                         if (response.success == true) {
                                             $("[name=globalStart]").addClass('hide');
                                             // $("[name=globalStart]").css('display','none');
@@ -1013,7 +1013,7 @@ function resetForm(elementID, isModalOpen, isTabOpen) {
     $("[reset-disabled='false']", modal).removeAttr('disabled');
     $("[reset-checked='true']", modal).prop("checked",true);
     $("[reset-unchecked='true']", modal).prop("checked",false);
-    $("[reset='default']", modal).val($("[reset='default']", modal).attr('default-val'));     
+    $("[reset='default']", modal).val($("[reset='default']", modal).attr('default-val'));
 
     if (isModalOpen) {
         console.log("returned to open modal")

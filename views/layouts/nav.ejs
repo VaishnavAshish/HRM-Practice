@@ -206,9 +206,9 @@
                         contentType: 'application/json',
                         dataType: 'json',
                         success: function (response) {
-                            console.log(response);
+                            //console.log(response);
                             if (response.success == true) {
-                                console.log('timesheet data which is playing '+JSON.stringify(response.timesheetData));
+                                //console.log('timesheet data which is playing '+JSON.stringify(response.timesheetData));
                                 if(response.timesheetData.length>0){
                                   // $("[timerDiv]").on('click',function(){stopKwTimerGlobally(this, '[name=kwTimer]', '#syncTimer', '#modalAddNewTsheetQuick')});
                                   let timesheetCreatedDate=response.timesheetData[0].created_date.toString().split(' ')[0].split('T')[0];
