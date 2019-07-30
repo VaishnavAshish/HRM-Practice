@@ -2759,6 +2759,10 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
     req.body.body_of_email.split("\\n").forEach(data => {
       emailBody += `<p class="slds-hyphenate">${data}</p>`;
     })
+  let currency_symbols = currencyWithSymbolArray.filter(function(currency){
+      return currency.name == invoiceDetails.currency;
+  })
+  console.log(currency_symbols);
   console.log(emailBody);
   let startDateFormatted=invoiceDetails['created_date']==null?'':moment.tz(invoiceDetails.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
   let dueDateFormatted=invoiceDetails['due_date']==null?'':moment.tz(invoiceDetails.due_date, companyDefaultTimezone).format('MM-DD-YYYY');
@@ -2790,7 +2794,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
                                                                 <tbody>
                                                                     <tr>
                                                                         <td align="" style=" font-size:14px;font-family: arial,sans-serif; padding:10px; border-bottom: 1px solid #eee; color: #999;">
-                                                                            Invoice
+                                                                            Invoice No.
                                                                         </td>
                                                                         <td align="right" style=" font-size:14px;font-family: arial,sans-serif; padding:10px; border-bottom: 1px solid #eee; ">
                                                                             ${parseInt(invoiceDetails.record_id.substring(3))}
@@ -2817,7 +2821,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
                                                                             Invoice Total
                                                                         </td>
                                                                         <td align="right" style=" font-size:18px;font-family: arial,sans-serif; padding:10px; border-bottom: 1px solid #eee; font-weight: bold;">
-                                                                            ${invoiceDetails.total_amount}
+                                                                            ${currency_symbols[0].symbol}${invoiceDetails.final_amount}
                                                                         </td>
                                                                     </tr>
                                                                 </tbody>
