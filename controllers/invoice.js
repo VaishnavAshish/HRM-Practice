@@ -2793,7 +2793,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
                                                                             Invoice
                                                                         </td>
                                                                         <td align="right" style=" font-size:14px;font-family: arial,sans-serif; padding:10px; border-bottom: 1px solid #eee; ">
-                                                                            Invoice-${parseInt(invoiceDetails.record_id.substring(3))}
+                                                                            ${parseInt(invoiceDetails.record_id.substring(3))}
                                                                         </td>
                                                                     </tr>
                                                                     <tr>
