@@ -67,7 +67,7 @@ function uploadUserPicture(input){
 						console.log('File uploaded size')
 						console.log(input.files[0].size/1024/1024);
 						if((height>200 || width>200) || input.files[0].size/1024/1024 > 2){
-								addError($(input), "Please select company logo having maximum height and width of 200*200");
+								addError($(input), "Please select user image having maximum height and width of 200*200");
 						}else{
 							$('#userimg').attr('src', e.target.result);
 							$('[img-upload]').removeAttr('disabled');
