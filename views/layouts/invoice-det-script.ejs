@@ -13,6 +13,7 @@
     if($("#subject_line").val() == ''){
       $("#subject_line").val('Invoice from <%=user.company_info.name %> on Krow PSA');
     }
+    console.log(<%= invoiceDetails.description %>);
     $("#invoice_note").val(`<%= invoiceDetails.description %>`);
     $("#currency").val('<%= invoiceDetails.currency %>');
     var invoiceItems = <%- JSON.stringify(invoiceItems) %>;
