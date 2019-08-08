@@ -270,6 +270,7 @@ exports.postInvoiceToXero = (req,res) => {
                                                     try {
                                                         let invoiceResult = await xero.invoices.update(invoiceData);
                                                         console.log(invoiceResult);
+                                                        console.log(invoiceResult.ValidationErrors);
                                                         done();
                                                         handleResponse.sendSuccess(res,'Xero invoice updated successfully',{});
                                                     } catch(err){
