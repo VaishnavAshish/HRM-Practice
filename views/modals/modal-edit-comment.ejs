@@ -1,0 +1,35 @@
+
+<!-- edit conversation modal start -->
+<div id="modalEditConversation">
+    <section role="dialog" tabindex="-1" class="slds-modal">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="closeModal('#modalEditConversation');">
+                    <span class="slds-button__icon">
+                        <i class="fa fa-times text-size-21"></i>
+                    </span>
+                </button>
+                <h2 class="slds-text-heading_medium slds-hyphenate" id="editConversationDataHeading">Edit Comment / Conversation</h2>
+            </header>
+            <div class="slds-modal__content slds-p-around_medium">
+                <div>
+                    <div class="slds-form-element ">
+                        <div class="slds-form-element__control">
+                            <textarea id="editConversationDataTitle" class="slds-textarea" placeholder="Write a comment" rows="3" required=""> Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorem, impedit, iusto. Id perspiciatis, quam blanditiis saepe optio deserunt libero, odit praesentium fugiat, tenetur doloribus quos corrupti atque! Obcaecati, ut, optio.</textarea>
+                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="slds-modal__footer">
+                <button class="slds-button slds-button_neutral" onclick="closeModal('#modalEditConversation');">Cancel</button>
+                <button class="slds-button slds-button_brand" id="postEditConversationData">Done</button>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop"></div>
+</div>
+  <!-- edit conversation modal end -->

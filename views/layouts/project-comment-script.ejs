@@ -1,0 +1,268 @@
+<script>
+    $(document).ready(function(){
+        $("#converWrapper .conver-accord-title:first .expandDiv:first").click();
+
+    })
+   function toggleConversation(wrapperId, ele){
+       var parent  = $(wrapperId);
+       var title  = $(ele).closest('.conver-accord-title');
+       if($(title).hasClass('active')){
+         $(title).removeClass('active');
+         return(false);
+       }
+        loadRelatedComment(ele,function(){
+          $('.conver-accord-title', parent).removeClass('active');
+          $(title).addClass('active');
+        })
+    }
+    function loadRelatedComment(ele,cb) {
+        let conversation_id = $(ele).closest('.conver-accord-title').attr('id');
+        showLoader('#globalLoader');
+        $.ajax({
+          type: 'POST',
+          url : '/getAllRelatedComment',
+          contentType: 'application/json',
+          dataType: 'json',
+          data:JSON.stringify({"conversation_id":conversation_id,"project_id":<%= project.id %>}),
+          success : function(response){
+            if(response.success) {
+              hideLoader('#globalLoader');
+              //showGlobalToast('#globalToast', 'success', response.message, 4000);
+              let commentList = response.relatedCommentList;
+              if(commentList.length>0){
+                $('.conver-accord-content #commentList',$(ele).closest('.conver-accord-title')).html('');
+                commentList.forEach((comment,index) => {
+                  addCommentToList($(ele).closest('.conver-accord-title'),comment);
+                  if(index == (commentList.length-1)){
+                    return cb();
+                  }
+                })
+              }else{
+                return cb();
+              }
+
+            }
+          },
+          error: function(response){
+            console.log('error is : '+JSON.stringify(response));
+            hideLoader('#globalLoader');
+            return cb();
+            //showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+          }
+        });
+    }
+
+    function addCommentToList(parentElement,commentData){
+      let userDataRole = '<%= user.user_role %>';
+      let editableHTML = ``;
+      if(commentData.resource_id == <%= user.id %> || userDataRole.includes('ADMIN') ){
+        editableHTML = `<div class="slds-no-flex">
+                              <a href="javascript:void(0)" onclick="editCommentData('${commentData.id}', \`${commentData.message}\`,'${commentData.parent_id}')">
+                                  <i class="fa fa-edit"></i>
+                              </a>
+                              <a href="javascript:void(0)" class="lpd-10" onclick="deleteBeforeConfirm('#globalAlert', 'deleteCommentData(${commentData.id},${commentData.parent_id})','Are you sure you want to remove this comment ? Press confirm to delete.');">
+                                  <i class="fa fa-trash text-red"></i>
+                              </a>
+                          </div>`;
+      }
+
+      let commentHTML = `<section class="line-top tmr-20 tpd-10">
+                            <div class="slds-grid">
+                                <div class="slds-no-flex slds-p-right_small">
+                                    <span class="slds-avatar slds-avatar_circle">
+                                        <img alt="Person name" src="/getUserPicture/${commentData.resource_id}" title="${commentData.first_name} ${commentData.last_name} By: ${commentData.email}">
+                                    </span>
+                                </div>
+                                <div class="slds-has-flexi-truncate">
+                                    <div class="slds-grid">
+                                        <div class="slds-has-flexi-truncate">
+                                            <div class="text-dull text-size-11">
+                                                ${commentData.modified_date}
+                                            </div>
+                                        </div>
+                                        ${editableHTML}
+                                    </div>
+                                    <div>
+                                        <p>
+                                            ${commentData.message.replace(/\r?\n/g,"<BR/>") }
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>`;
+
+          $('.conver-accord-content #commentList',parentElement).append(commentHTML);
+    }
+
+    function editConversationData(conversation_id,conversation_message){
+      $("#editConversationDataHeading").text('Edit Conversation');
+      $("#editConversationDataTitle").val(`${conversation_message}`);
+      $("#editConversationDataTitle").focus();
+      $("#postEditConversationData").on('click',{"conversation_id":conversation_id,"type":"conversation"},updateConversationData);
+      openModal('#modalEditConversation');
+    }
+
+    function deleteConversationData(conversation_id){
+      showLoader('#globalLoader');
+      $.ajax({
+        type: 'POST',
+        url : '/deleteConversation',
+        contentType: 'application/json',
+        dataType: 'json',
+        data:JSON.stringify({"conversation_id":conversation_id}),
+        success : function(response){
+          if(response.success){
+            hideLoader('#globalLoader');
+            showGlobalToast('#globalToast', 'success', response.message, 4000);
+            location.reload();
+          }
+        },
+        error: function(response){
+          console.log('error is : '+JSON.stringify(response));
+          hideLoader('#globalLoader');
+          showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+        }
+      });
+    }
+
+    function deleteCommentData(comment_id,conversation_id){
+      showLoader('#globalLoader');
+      $.ajax({
+        type: 'POST',
+        url : '/deleteComment',
+        contentType: 'application/json',
+        dataType: 'json',
+        data:JSON.stringify({"comment_id":comment_id,"conversation_id":conversation_id}),
+        success : function(response){
+          if(response.success){
+            hideLoader('#globalLoader');
+            showGlobalToast('#globalToast', 'success', response.message, 4000);
+            location.reload();
+          }
+        },
+        error: function(response){
+          console.log('error is : '+JSON.stringify(response));
+          hideLoader('#globalLoader');
+          showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+        }
+      });
+    }
+
+    function updateConversationData(event){
+      showLoader('#globalLoader');
+      clearError('#editConversationDataTitle')
+      let conversation_id = event.data.conversation_id;
+      let type = event.data.type;
+      let message = $("#editConversationDataTitle").val();
+      if(message == '' || message == undefined ||message == null){
+          hideLoader('#globalLoader');
+          addError('#editConversationDataTitle', "Please enter the message");
+      }else {
+          let url =  ``;
+          let updatedData = {};
+          if(type == 'conversation'){
+            url = '/editConversation';
+            updatedData.conversation_id = conversation_id;
+            updatedData.conversation_message = message;
+          }else{
+            url = '/editComment';
+            updatedData.comment_id = event.data.comment_id;
+            updatedData.comment_message = message;
+            updatedData.conversation_id = conversation_id;
+          }
+          $.ajax({
+            type: 'POST',
+            url : url,
+            contentType: 'application/json',
+            dataType: 'json',
+            data:JSON.stringify(updatedData),
+            success : function(response){
+              if(response.success){
+                hideLoader('#globalLoader');
+                showGlobalToast('#globalToast', 'success', response.message, 4000);
+                location.reload();
+              }
+            },
+            error: function(response){
+              console.log('error is : '+JSON.stringify(response));
+              hideLoader('#globalLoader');
+              showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+            }
+          });
+      }
+
+    }
+
+    function editCommentData(comment_id,comment_message,conversation_id){
+      $("#editConversationDataHeading").text('Edit Comment')
+      $("#editConversationDataTitle").val(`${comment_message}`);
+      $("#editConversationDataTitle").focus();
+      $("#postEditConversationData").on('click',{"comment_id":comment_id,"conversation_id":conversation_id,"type":"comment"},updateConversationData);
+      openModal('#modalEditConversation');
+    }
+
+    function addNewComment(conversation_id){
+      showLoader('#globalLoader');
+      let commentParent = $("#addNewComment",`#${conversation_id}`)
+      clearError(commentParent);
+      let commentMessage = $("#addNewComment",`#${conversation_id}`).val();
+      if(commentMessage == '' || commentMessage == undefined || commentMessage == null){
+          hideLoader('#globalLoader');
+          addError(commentParent, "Please enter the comment");
+      }else{
+          $.ajax({
+            type: 'POST',
+            url : '/addComment',
+            contentType: 'application/json',
+            dataType: 'json',
+            data:JSON.stringify({"newCommentTitle":$("#addNewComment",`#${conversation_id}`).val(),"conversation_id":conversation_id,"project_id":<%= project.id %>}),
+            success : function(response){
+              if(response.success){
+                hideLoader('#globalLoader');
+                showGlobalToast('#globalToast', 'success', response.message, 4000);
+                location.reload();
+              }
+            },
+            error: function(response){
+              console.log('error is : '+JSON.stringify(response));
+              hideLoader('#globalLoader');
+              showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+            }
+          });
+      }
+
+
+
+    }
+
+    function createNewConversationThread(){
+      showLoader('#globalLoader');
+      $("#newConversationSection").removeClass('has-error');
+      clearError("#newConversationTitle");
+      checkFormValidation("#newConversationSection");
+      if(!$("#newConversationSection").hasClass('has-error')) {
+		    $.ajax({
+		      type: 'POST',
+		      url : '/addConversation',
+		      contentType: 'application/json',
+		      dataType: 'json',
+		      data:JSON.stringify({"newConversationTitle":$("#newConversationTitle").val(),"project_id":<%= project.id %>}),
+		       success : function(response){
+				   if(response.success){
+    						hideLoader('#globalLoader');
+    						showGlobalToast('#globalToast', 'success', response.message, 4000);
+    					   	location.reload();
+    				   }
+		       },
+		       error: function(response){
+                console.log('error is : '+JSON.stringify(response));
+                hideLoader('#globalLoader');
+                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+		       }
+		    });
+			}else{
+				hideLoader('#globalLoader');
+			}
+    }
+
+</script>
