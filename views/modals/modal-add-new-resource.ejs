@@ -251,7 +251,19 @@
                                                 <div class="slds-form-element slds-m-bottom_large">
                                                     <div class="slds-form-element__control">
                                                         <span class="slds-checkbox">
-                                                            <input type="checkbox" name="permissions" id="projectManager" value="projectManager" reset-unchecked='true'/>
+                                                            <input type="checkbox" name="permissions" id="projectUser" value="projectUser" reset-unchecked='true'/>
+                                                            <label class="slds-checkbox__label" for="projectUser">
+                                                                <span class="slds-checkbox_faux"></span>
+                                                                <span class="slds-form-element__label">Project User </span>
+                                                            </label>
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="slds-form-element slds-m-bottom_large">
+                                                    <div class="slds-form-element__control">
+                                                        <span class="slds-checkbox">
+                                                            <input type="checkbox" name="permissions" id="projectManager" value="projectManager" reset-unchecked='true' onchange='selectProjectManager(this)'/>
                                                             <label class="slds-checkbox__label" for="projectManager">
                                                                 <span class="slds-checkbox_faux"></span>
                                                                 <span class="slds-form-element__label">Project Manager </span>

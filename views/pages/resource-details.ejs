@@ -340,12 +340,31 @@
                                             <div class="slds-form-element__control">
                                                 <span class="slds-checkbox">
                                                 <% if (resource.permissions!=null){ %>
-                                                    <% if (resource.permissions.includes('projectManager')) { %>
-                                                        <input type="checkbox" name="permissions" id="projectManager" value="projectManager" checked onchange='isPermissionModified(this);'>
+                                                    <% if (resource.permissions.includes('projectUser')) { %>
+                                                        <input type="checkbox" name="permissions" id="projectUser" value="projectUser" checked onchange='isPermissionModified(this);'  <%= resource.permissions.includes('projectManager')?'disabled':'' %> >
                                                 <% } else { %>
-                                                        <input type="checkbox" name="permissions" id="projectManager" value="projectManager" onchange='isPermissionModified(this);'>
+                                                        <input type="checkbox" name="permissions" id="projectUser" value="projectUser"  onchange='isPermissionModified(this);'>
+                                                <% } } else { %>
+                                                    <input type="checkbox" name="permissions" id="projectUser" value="projectUser" onchange='isPermissionModified(this);'>
+                                                <% } %>
+                                                    <label class="slds-checkbox__label" for="projectUser">
+                                                        <span class="slds-checkbox_faux"></span>
+                                                        <span class="slds-form-element__label">Project User </span>
+                                                    </label>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div class="slds-form-element slds-m-bottom_large">
+                                            <div class="slds-form-element__control">
+                                                <span class="slds-checkbox">
+                                                <% if (resource.permissions!=null){ %>
+                                                    <% if (resource.permissions.includes('projectManager')) { %>
+                                                        <input type="checkbox" name="permissions" id="projectManager" value="projectManager" checked onchange='isPermissionModified(this);selectProjectManager(this);'>
+                                                <% } else { %>
+                                                        <input type="checkbox" name="permissions" id="projectManager" value="projectManager" onchange='isPermissionModified(this);selectProjectManager(this);'>
                                                 <% } } else{ %>
-                                                    <input type="checkbox" name="permissions" id="projectManager" value="projectManager" onchange='isPermissionModified(this);'>
+                                                    <input type="checkbox" name="permissions" id="projectManager" value="projectManager" onchange='isPermissionModified(this);selectProjectManager(this);'>
                                                 <% } %>
                                                     <label class="slds-checkbox__label" for="projectManager">
                                                         <span class="slds-checkbox_faux"></span>

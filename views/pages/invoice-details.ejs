@@ -168,6 +168,28 @@
                                                 <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
                                                     <div class="slds-form-element slds-m-bottom_medium">
                                                         <label class="slds-form-element__label">
+                                                            Status
+                                                        </label>
+                                                        <div class="slds-form-element__control">
+                                                            <div class="slds-select_container">
+                                                                <select class="slds-select" name="status" id="status" getFormData disableWhenPaid>
+
+                                                                      <option value="DRAFT">DRAFT</option>
+                                                                      <option value="OVERDUE">OVERDUE</option>
+                                                                      <option value="POSTED">POSTED</option>
+                                                                      <option value="PAID">PAID</option>
+
+                                                                </select>
+                                                            </div>
+                                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                    <div class="slds-form-element slds-m-bottom_medium">
+                                                        <label class="slds-form-element__label">
                                                             Currency
                                                         </label>
                                                         <div class="slds-form-element__control">
@@ -184,23 +206,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
-                                                    <div class="slds-form-element slds-m-bottom_medium">
-                                                        <label class="slds-form-element__label">
-                                                            Due Date
-                                                            <abbr class="slds-required" title="required">*</abbr>
-                                                        </label>
-                                                        <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
-                                                            <span class="slds-input__icon slds-input__icon_right">
-                                                                <i class="fa fa-calendar"></i>
-                                                            </span>
-                                                            <input type="date" id="invoice_due_date" name="due_date" required="" getFormData value="<%= invoiceDetails.dueDateFormatted %>" class="slds-input open-date-pik" disableWhenPaid>
-                                                        </div>
-                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
-                                                        </div>
-                                                    </div>
-                                                </div>
                                             </div>
 
                                             <!-- <div class="slds-grid slds-wrap slds-gutters">
@@ -248,6 +254,23 @@
                                                 <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
                                                     <div class="slds-form-element slds-m-bottom_medium">
                                                         <label class="slds-form-element__label">
+                                                            Due Date
+                                                            <abbr class="slds-required" title="required">*</abbr>
+                                                        </label>
+                                                        <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
+                                                            <span class="slds-input__icon slds-input__icon_right">
+                                                                <i class="fa fa-calendar"></i>
+                                                            </span>
+                                                            <input type="date" id="invoice_due_date" name="due_date" required="" getFormData value="<%= invoiceDetails.dueDateFormatted %>" class="slds-input open-date-pik" disableWhenPaid>
+                                                        </div>
+                                                        <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                    <div class="slds-form-element slds-m-bottom_medium">
+                                                        <label class="slds-form-element__label">
                                                             Tax %
                                                         </label>
                                                         <div class="slds-form-element__control">
@@ -258,8 +281,8 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
-                                                  <!-- <div class="slds-form-element slds-m-bottom_medium">
+                                                <!--<div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                   <div class="slds-form-element slds-m-bottom_medium">
                                                       <label class="slds-form-element__label">
                                                           Terms
                                                       </label>
@@ -278,8 +301,8 @@
 
                                                           </div>
                                                       </div>
-                                                  </div> -->
-                                                </div>
+                                                  </div>
+                                                </div>-->
                                             </div>
 
                                         </div>

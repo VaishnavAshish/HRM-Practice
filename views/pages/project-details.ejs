@@ -119,26 +119,35 @@
                                             <i class="fa fa-file-export"></i>
                                          <span class="sm-hide">Export Project Details</span>
                                        </button> -->
-                                       <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteProject(\'<%= project.id %>\')','Are you sure you want to delete this project?');" title="Delete">
-                                                <!-- updateProjectDetails('<%= project.id %>', '#edit-project') -->
-                                              <span class="slds-button__icon">
-                                                <i class=" fa fa-trash text-red" aria-hidden="true"></i>
-                                              </span>
-                                        </button>
+                                       <% if(user.permissions.includes('projectManager')) { %>
+                                         <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteProject(\'<%= project.id %>\')','Are you sure you want to delete this project?');" title="Delete">
+                                                  <!-- updateProjectDetails('<%= project.id %>', '#edit-project') -->
+                                                <span class="slds-button__icon">
+                                                  <i class=" fa fa-trash text-red" aria-hidden="true"></i>
+                                                </span>
+                                          </button>
+                                        <% } %>
 
                                     </div>
                                 </div>
                             </div>
                             <div class="slds-p-top_x-small">
                                 <ul class="slds-tabs_default__nav radius-4 scroll-x-auto bpd-2 text-size-14">
-                                    <li data-navigation="settings" class="slds-tabs_default__item slds-is-active" onclick="openTab(this, 'project-settings')">
-                                        <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="-1">
-                                            Settings
-                                        </a>
-                                    </li>
+                                    <% if(user.permissions.includes('projectManager')) { %>
+                                      <li data-navigation="settings" class="slds-tabs_default__item slds-is-active" onclick="openTab(this, 'project-settings')">
+                                          <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="-1">
+                                              Settings
+                                          </a>
+                                      </li>
+                                    <% } %>
                                     <li data-navigation="tasks" class="slds-tabs_default__item" onclick="openTab(this, 'project-tasks')">
                                         <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="0">
                                             Tasks (<%= taskTotalCount %>)
+                                        </a>
+                                    </li>
+                                    <li data-navigation="activity" class="slds-tabs_default__item" onclick="openTab(this, 'task-forums')">
+                                        <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="0">
+                                            Activity(<%= projectConversationThread.length %>)
                                         </a>
                                     </li>
                                     <!-- <li class="slds-tabs_default__item" onclick="openTab(this, 'project-files')">
@@ -362,7 +371,8 @@
                             <!-- tasks tab end -->
 
                             <!-- settings tab start -->
-                            <div class="slds-tabs_default__content" target-tab="project-settings">
+                            <% if(user.permissions.includes('projectManager')) { %>
+                              <div class="slds-tabs_default__content" target-tab="project-settings">
                                 <div class=" slds-card slds-p-around_large sm-pd-10" data-modified id="editProjectForm">
                                     <div class="slds-grid slds-wrap slds-grid_pull-padded">
                                         <div class="slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_6-of-12 slds-p-horizontal_small">
@@ -936,7 +946,307 @@
                                     </div>
                                 </div>
                             </div>
+                            <% } %>
                             <!-- settings tab end -->
+
+                            <!-- task-forums tab start -->
+                            <div class="slds-tabs_default__content hide" target-tab="task-forums">
+
+                                <!-- conversation form start -->
+                                <div class=" slds-card bmr-15" id="newConversationSection">
+                                    <div class="slds-p-around_small">
+                                        <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                            <div class="slds-size_1-of-1 slds-medium-size_10-of-12  slds-p-horizontal_small">
+                                                <div>
+                                                    <div class="slds-form-element ">
+                                                        <label class="slds-form-element__label" for="">New Conversation</label>
+                                                        <div class="slds-form-element__control">
+                                                            <textarea id="newConversationTitle" class="slds-textarea" required=""  placeholder="" rows="1" reset="value"></textarea>
+                                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-size_1-of-1 slds-medium-size_2-of-12 slds-p-horizontal_small">
+                                                <div class="">
+                                                     <label class="slds-form-element__label sm-hide" for="">&nbsp;</label>
+                                                    <button class="slds-button slds-button_brand slds-align-top w-full" onclick="createNewConversationThread()">
+                                                        <i class="fa fa-plus"></i>
+                                                        <span class="">Create</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                 <!-- conversation form end -->
+
+                                <div class="bpd-50" id="converWrapper">
+
+                                  <% if(projectConversationThread.length > 0) { %>
+                                      <% projectConversationThread.forEach(function(conversationData,index) { %>
+                                        <!-- conversation thread start -->
+                                        <div class="slds-card slds-p-around_medium conver-accord-title bmr-15" id="<%= conversationData.id%>">
+                                          <div class="slds-grid slds-wrap">
+                                            <div class="slds-size_1-of-1 slds-medium-size_8-of-12">
+                                              <div class="slds-grid expandDiv" onclick="toggleConversation('#converWrapper', this);">
+                                                  <div class="slds-no-flex slds-p-right_small ">
+                                                      <div class="conver-icon-close">
+                                                          <i class="fa fa-plus-circle fa-2x text-blue"></i>
+                                                      </div>
+                                                      <div class="conver-icon-open">
+                                                          <i class="fa fa-minus-circle fa-2x text-dull"></i>
+                                                      </div>
+                                                  </div>
+                                                  <div class="slds-has-flexi-truncate">
+                                                      <div class="">
+                                                          <a href="javascript:void(0);" class="text-size-16">
+                                                              <% conversationData.message.split('\n').forEach(conversationline => { %>
+                                                                  <%= conversationline %><BR>
+                                                              <% }) %>
+                                                          </a>
+                                                      </div>
+
+                                                      <div>
+                                                          <span class="text-dull text-size-11 ">
+                                                              Last Modify: <%= conversationData.modified_date %>
+                                                          </span>
+                                                          <span class="text-dull text-size-11 ">
+                                                               / By: <%= conversationData.first_name %><%= conversationData.last_name %><%= conversationData.email %>
+                                                          </span>
+                                                      </div>
+                                                  </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-size_1-of-1 slds-medium-size_4-of-12">
+                                              <div class="slds-grid">
+                                                <div class="slds-has-flexi-truncate">
+                                                  <div class="sm-tpd-15">
+                                                      <div class="slds-truncate  text-dull slds-p-bottom_xx-small text-size-11 sm-hide">
+                                                          Response
+                                                      </div>
+                                                      <div>
+                                                         <span class="slds-badge"><%= conversationData.responsecount %></span>
+                                                      </div>
+                                                  </div>
+                                                </div>
+                                                <div class="slds-no-flex">
+                                                  <% if(conversationData.resource_id == user.id || user.user_role.includes('ADMIN')) { %>
+                                                    <a href="javascript:void(0)" onclick="editConversationData('<%= conversationData.id %>', `<%= conversationData.message %>`)" title="edit conversation">
+                                                         <i class="fa fa-edit"></i>
+                                                     </a>
+                                                     <a href="javascript:void(0)" class="lpd-10" onclick="deleteBeforeConfirm('#globalAlert', 'deleteConversationData(\'<%= conversationData.id %>\')','Are you sure you want to remove this conversation ? All the comment related to this conversation will also be removed . Press confirm to delete this conversation.');" title="delete conversation">
+                                                         <i class="fa fa-trash text-red"></i>
+                                                     </a>
+                                                   <% } %>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                            <!--<div class="slds-grid" onclick="toggleConversation('#converWrapper', this);">
+                                                <div class="slds-no-flex slds-p-right_small ">
+                                                    <div class="conver-icon-close">
+                                                        <i class="fa fa-plus-circle fa-2x text-blue"></i>
+                                                    </div>
+                                                    <div class="conver-icon-open">
+                                                        <i class="fa fa-minus-circle fa-2x text-dull"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-has-flexi-truncate">
+                                                    <div class="">
+                                                        <a href="#" class="text-size-16" style="display:block;">
+                                                            <%= conversationData.message %>
+                                                        </a>
+                                                    </div>
+
+                                                    <div>
+                                                        <% if(conversationData.resource_id == user.id || user.user_role.includes('ADMIN') ) { %>
+                                                          <div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">
+                                                              <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" title="Show More">
+                                                                  <span class="slds-button__icon">
+                                                                      <i class=" fa fa-caret-down" aria-hidden="true"></i>
+                                                                  </span>
+                                                                  <span class="slds-assistive-text">Show More</span>
+                                                              </button>
+                                                              <div class="slds-dropdown slds-dropdown_left slds-dropdown_actions">
+                                                                  <ul class="slds-dropdown__list" role="menu">
+                                                                      <li class="slds-dropdown__item" role="presentation">
+                                                                          <a href="javascript:void(0);" role="menuitem" tabindex="0" title="edit conversation" onclick="editConversationData('<%= conversationData.id %>', `<%= conversationData.message %>`)">
+                                                                              <span class="slds-truncate" title="" >
+                                                                                  Edit
+                                                                              </span>
+                                                                          </a>
+                                                                      </li>
+
+                                                                      <li class="slds-dropdown__item" role="presentation">
+                                                                          <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteConversationData(\'<%= conversationData.id %>\')','Are you sure you want to remove this conversation ? All the comment related to this conversation will also be removed . Press confirm to delete this conversation.');">
+                                                                              <span class="slds-truncate text-red" title="remove conversation">
+                                                                                  Remove
+                                                                              </span>
+                                                                          </a>
+                                                                      </li>
+                                                                  </ul>
+                                                              </div>
+                                                          </div>
+                                                        <% } %>
+                                                        <span class="text-dull text-size-11 ">
+                                                            Last Modify: <%= conversationData.modified_date %>
+                                                        </span>
+                                                        <span class="text-dull text-size-11 ">
+                                                             / By: <%= conversationData.first_name %><%= conversationData.last_name %><%= conversationData.email %>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-no-flex">
+                                                    <div class="sm-tpd-15">
+                                                        <div class="slds-truncate  text-dull slds-p-bottom_xx-small text-size-11 sm-hide">
+                                                            Response
+                                                        </div>
+                                                        <div>
+                                                           <span class="slds-badge"><%= conversationData.responsecount %></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div> -->
+                                            <div class="conver-accord-content line-top tpd-10 tmr-10">
+                                                <!-- comment form start -->
+                                                <div>
+                                                    <div class="slds-grid">
+                                                        <div class="slds-no-flex slds-p-right_small">
+                                                            <span class="slds-avatar slds-avatar_circle" >
+                                                                <img alt="Person name" src="/getUserPicture/<%= user.id %>" title = "<%= user.first_name %>  <%= user.last_name %>  By:<%= user.email %>" >
+                                                            </span>
+                                                        </div>
+                                                        <div class="slds-has-flexi-truncate">
+                                                            <div class="slds-form-element ">
+                                                                <div class="slds-form-element__control">
+                                                                    <textarea id="addNewComment" class="slds-textarea" required = "" placeholder="Write a comment" rows="3"></textarea>
+                                                                    <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="text-right">
+                                                                <button class="slds-button slds-button_brand" id="addCommentBtn" onclick="addNewComment('<%= conversationData.id %>')">
+                                                                    Add
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- comment form end -->
+                                                <div id="commentList">
+                                                </div>
+                                                <!-- comment -->
+                                                <!-- <section class="line-top tmr-20 tpd-10">
+                                                    <div class="slds-grid">
+                                                        <div class="slds-no-flex slds-p-right_small">
+                                                            <span class="slds-avatar slds-avatar_circle">
+                                                                <img alt="Person name" src="img/avatar1.jpg" title="">
+                                                            </span>
+                                                        </div>
+                                                        <div class="slds-has-flexi-truncate">
+                                                            <div class="slds-grid">
+                                                                <div class="slds-has-flexi-truncate">
+                                                                    <div class="text-dull text-size-11">
+                                                                        2019-06-24 00:11:56
+                                                                    </div>
+                                                                </div>
+                                                                <div class="slds-no-flex">
+                                                                    <a href="javascript:void(0)" onclick="openModal('#modalEditConversation');">
+                                                                        <i class="fa fa-edit"></i>
+                                                                    </a>
+                                                                    <a href="javascript:void(0)" class="lpd-10">
+                                                                        <i class="fa fa-trash text-red"></i>
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                            <div>
+                                                                <p>
+                                                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Laudantium temporibus, nihil tempora officiis blanditiis laborum maiores fugiat! Rerum illo, voluptas, perferendis esse molestiae eos quasi, quis ducimus cupiditate animi a.
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </section> -->
+                                                <!-- comment -->
+                                                <!--<section class="line-top tmr-20 tpd-10">
+                                                    <div class="slds-grid">
+                                                        <div class="slds-no-flex slds-p-right_small">
+                                                            <span class="slds-avatar slds-avatar_circle">
+                                                                <img alt="Person name" src="public/img/avatar1.jpg" title="">
+                                                            </span>
+                                                        </div>
+                                                        <div class="slds-has-flexi-truncate">
+                                                            <div class="slds-grid">
+                                                                <div class="slds-has-flexi-truncate">
+                                                                    <div class="text-dull text-size-11">
+                                                                        2019-06-24 00:11:56
+                                                                    </div>
+                                                                </div>
+                                                                <div class="slds-no-flex">
+                                                                    <a href="javascript:void(0)" onclick="openModal('#modalEditConversation');">
+                                                                        <i class="fa fa-edit"></i>
+                                                                    </a>
+                                                                    <a href="javascript:void(0)" class="lpd-10">
+                                                                        <i class="fa fa-trash text-red"></i>
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                            <div>
+                                                                <p>
+                                                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Laudantium temporibus, nihil tempora officiis blanditiis laborum maiores fugiat! Rerum illo, voluptas, perferendis esse molestiae eos quasi, quis ducimus cupiditate animi a.
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </section> -->
+                                                <!-- comment -->
+                                                <!--<section class="line-top tmr-20 tpd-10">
+                                                    <div class="slds-grid">
+                                                        <div class="slds-no-flex slds-p-right_small">
+                                                            <span class="slds-avatar slds-avatar_circle">
+                                                                <img alt="Person name" src="public/img/avatar1.jpg" title="">
+                                                            </span>
+                                                        </div>
+                                                        <div class="slds-has-flexi-truncate">
+                                                            <div class="slds-grid">
+                                                                <div class="slds-has-flexi-truncate">
+                                                                    <div class="text-dull text-size-11">
+                                                                        2019-06-24 00:11:56
+                                                                    </div>
+                                                                </div>
+                                                                <div class="slds-no-flex">
+                                                                    <a href="javascript:void(0)" onclick="openModal('#modalEditConversation');">
+                                                                        <i class="fa fa-edit"></i>
+                                                                    </a>
+                                                                    <a href="javascript:void(0)" class="lpd-10">
+                                                                        <i class="fa fa-trash text-red"></i>
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                            <div>
+                                                                <p>
+                                                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Laudantium temporibus, nihil tempora officiis blanditiis laborum maiores fugiat! Rerum illo, voluptas, perferendis esse molestiae eos quasi, quis ducimus cupiditate animi a.
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </section> -->
+
+                                            </div>
+                                        </div>
+                                        <!-- conversation thread end -->
+                                      <% }) %>
+                                    <% } %>
+
+                                </div>
+                            </div>
+                            <!-- task-forums tab end -->
+
                         </div>
 
 
@@ -948,6 +1258,8 @@
         <% include ../modals/modal-add-new-task %>
         <% include ../modals/modal-add-new-project %>
         <% include ../modals/modal-add-new-project-resource %>
+        <% include ../modals/modal-edit-comment %>
+
         <% include ../layouts/footer %>
     </main>
 
@@ -957,6 +1269,7 @@
     <% include ../layouts/task-listing-script %>
 
     <% include ../layouts/common-project-script %>
+    <% include ../layouts/project-comment-script %>
 
     <script>
         $(document).ready(function(){

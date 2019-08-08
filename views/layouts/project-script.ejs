@@ -37,7 +37,7 @@ function addProject(modalId) {
                     success : function(response){
                         if(response.success == true) {
                             console.log(response)
-                            window.location.href="/project-details?projectId="+response.projectId;
+                            window.location.href="/project-details?projectId="+response.projectId+"#tasks";
                         } else {
                             hideLoader('#globalLoader');
                             closeModal(modalId);
@@ -358,16 +358,28 @@ function findProjectByName(){
         } else if(project.status == "Completed") {
         icon = `<i class="fa fa-check-circle text-green"></i>`;
         }
+        let deleteBtn = ``;
+        if(<%= user.permissions.includes('projectManager') %>) {
+              deleteBtn = `<li class="slds-has-divider_top-space" role="separator"></li>
+                              <li class="slds-dropdown__item" role="presentation">
+                                  <a href="javascript:void(0);" role="menuitem" tabindex="-1"  onclick="deleteBeforeConfirm('#globalAlert', 'deleteProject(\'`+project.id+`\')','Are you sure you want to delete this project?');">
+                                      <span class="slds-truncate sf-text-red" title="">
+                                          <i class="fa fa-trash text-red"></i> &nbsp;
+                                          Delete
+                                      </span>
+                                  </a>
+                              </li>`;
+        }
         let projectCard=`<div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_3-of-12 slds-p-horizontal_small">
                             <div class=" slds-m-bottom_medium slds-card">
                                 <div class="line-bottom  slds-p-around_x-small">
                                     <div class="slds-grid">
                                         <div class="slds-has-flexi-truncate slds-p-horizontal_x-small">
                                             <div class="slds-truncate">
-                                                <a href="/project-details?projectId=`+project.id+`" class="text-size-16">`+project.name+`</a>
+                                                <a href="/project-details?projectId=`+project.id+`#tasks" class="text-size-16">`+project.name+`</a>
                                             </div>
                                             <div class="slds-truncate text-dull text-size-8">
-                                                    #<a href="/project-details?projectId=`+project.id+`" class="text-size-6">`+project.record_id+` </a>
+                                                    #<a href="/project-details?projectId=`+project.id+`#tasks" class="text-size-6">`+project.record_id+` </a>
                                             </div>
                                         </div>
                                         <div class="slds-no-flex">
@@ -381,22 +393,14 @@ function findProjectByName(){
                                                 <div class="slds-dropdown slds-dropdown_right slds-dropdown_actions">
                                                     <ul class="slds-dropdown__list" role="menu">
                                                         <li class="slds-dropdown__item" role="presentation">
-                                                            <a href="/project-details?projectId=`+project.id+`" role="menuitem" tabindex="0">
+                                                            <a href="/project-details?projectId=`+project.id+`#tasks" role="menuitem" tabindex="0">
                                                                 <span class="slds-truncate" title="">
                                                                     <i class="fa fa-eye"></i> &nbsp;
                                                                     View Details
                                                                 </span>
                                                             </a>
                                                         </li>
-                                                        <li class="slds-has-divider_top-space" role="separator"></li>
-                                                        <li class="slds-dropdown__item" role="presentation">
-                                                            <a href="javascript:void(0);" role="menuitem" tabindex="-1"  onclick="deleteBeforeConfirm('#globalAlert', 'deleteProject(\'`+project.id+`\')','Are you sure you want to delete this project?');">
-                                                                <span class="slds-truncate sf-text-red" title="">
-                                                                    <i class="fa fa-trash text-red"></i> &nbsp;
-                                                                    Delete
-                                                                </span>
-                                                            </a>
-                                                        </li>
+                                                          ${deleteBtn}
                                                     </ul>
                                                 </div>
                                             </div>
@@ -458,18 +462,29 @@ function findProjectByName(){
             project_status='<i class="fa fa-exclamation-circle text-red"></i>';
          } else if(project.status == "Completed") {
             project_status='<i class="fa fa-check-circle text-green"></i>';
-         } %>
+         }
+         let deleteBtn = ``;
+         if(<%= user.permissions.includes('projectManager') %>) {
+               deleteBtn = '<li class="slds-has-divider_top-space" role="separator"></li>'+
+                               '<li class="slds-dropdown__item" role="presentation">'+
+                                   '<a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick=\'deleteBeforeConfirm("#globalAlert", "deleteProject('+project.id+')","Are you sure you want to delete this project?")\'>'+
+                                       '<span class="slds-truncate " title="">'+
+                                           '<i class="fa fa-trash text-red"></i> &nbsp; Delete'+
+                                       '</span>'+
+                                   '</a>'+
+                               '</li>';
+         }
         let projectTr='<tr class="">'+
                             '<th scope="row" tabindex="0">'+
                                 '<div class="slds-truncate" title="">'+
-                                    '<a href="/project-details?projectId='+project.id +'" tabindex="-1">'+
+                                    '<a href="/project-details?projectId='+project.id +'#tasks" tabindex="-1">'+
                                         project.record_id+
                                     '</a>'+
                                 '</div>'+
                             '</th>'+
                             '<th scope="row" tabindex="0">'+
                                 '<div class="slds-truncate" title="">'+
-                                    '<a href="/project-details?projectId='+project.id +'" tabindex="-1">'+
+                                    '<a href="/project-details?projectId='+project.id +'#tasks" tabindex="-1">'+
                                         project.name+
                                     '</a>'+
                                 '</div>'+
@@ -511,20 +526,13 @@ function findProjectByName(){
                                     '<div class="slds-dropdown slds-dropdown_right slds-dropdown_actions">'+
                                         '<ul class="slds-dropdown__list" role="menu">'+
                                             '<li class="slds-dropdown__item" role="presentation">'+
-                                                '<a href="/project-details?projectId='+project.id+'" role="menuitem" tabindex="0">'+
+                                                '<a href="/project-details?projectId='+project.id+'#tasks" role="menuitem" tabindex="0">'+
                                                     '<span class="slds-truncate" title="">'+
                                                         '<i class="fa fa-eye"></i> &nbsp; View Details'+
                                                     '</span>'+
                                                 '</a>'+
                                             '</li>'+
-                                            '<li class="slds-has-divider_top-space" role="separator"></li>'+
-                                            '<li class="slds-dropdown__item" role="presentation">'+
-                                                '<a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick=\'deleteBeforeConfirm("#globalAlert", "deleteProject('+project.id+')","Are you sure you want to delete this project?")\'>'+
-                                                    '<span class="slds-truncate " title="">'+
-                                                        '<i class="fa fa-trash text-red"></i> &nbsp; Delete'+
-                                                    '</span>'+
-                                                '</a>'+
-                                            '</li>'+
+                                            deleteBtn+
                                         '</ul>'+
                                     '</div>'+
                                 '</div>'+

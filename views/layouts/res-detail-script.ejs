@@ -749,4 +749,14 @@ function  selectExpenseManager(obj){
 				$("#expenseManager").prop('disabled',false);
 		}
 }
+function selectProjectManager(obj){
+	let projectApproverSelected=$(obj).is(':checked');
+	if(projectApproverSelected==true){
+			$("#projectUser").prop('checked',true);
+			$("#projectUser").prop('disabled',true);
+	}else{
+			$("#projectUser").prop('checked',false);
+			$("#projectUser").prop('disabled',false);
+	}
+}
 </script>

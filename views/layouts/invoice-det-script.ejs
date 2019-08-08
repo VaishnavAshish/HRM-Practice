@@ -9,11 +9,13 @@
     var invoiceDetails = <%- JSON.stringify(invoiceDetails) %>;
     invoice_account_id = <%= invoiceDetails.account_id ;%>;
     invoice_item_id = <%= invoiceDetails.id ;%>;
-    $("#subject_line").val('<%= companySetting.invoice_email_subject %>')
+    $("#subject_line").val(`<%= companySetting.invoice_email_subject %>`)
     if($("#subject_line").val() == ''){
       $("#subject_line").val('Invoice from <%=user.company_info.name %> on Krow PSA');
     }
+
     $("#invoice_note").val(`<%= invoiceDetails.description %>`);
+    $("#status").val('<%= invoiceDetails.status %>');
     $("#currency").val('<%= invoiceDetails.currency %>');
     var invoiceItems = <%- JSON.stringify(invoiceItems) %>;
     var tax = parseInt('<%= invoiceDetails.tax%>');
@@ -40,6 +42,7 @@
     });
     if('<%= invoiceDetails.status %>' == 'PAID'){
       $("#invoiceDetailDiv [disableWhenPaid]").attr('disabled','disabled');
+      $("#invoiceDetailDiv .flatpickr-input").attr('disabled','disabled');
     }
   });
 

@@ -294,6 +294,10 @@ exports.getAccountDetail = (req, res) => {
                                   if(invoice.project_id==null||projectIdArr.includes(invoice.project_id)){
                                     invoice['start_date'] = invoice.start_date == null ? '' : moment.tz(invoice.start_date, companyDefaultTimezone).format('MM-DD-YYYY');
                                     invoice['due_date'] = invoice.due_date == null ? '' : moment.tz(invoice.due_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                    let currency_symbols = currencyWithSymbolArray.filter(function(currency){
+                                        return currency.name == invoice.currency;
+                                    })
+                                    invoice['currency_symbol'] = currency_symbols[0].symbol;
                                     // invoice['start_date'] = invoice.start_date == null ? '' : dateFormat(invoice.start_date);
                                     // invoice['due_date'] = invoice.due_date == null ? '' : dateFormat(invoice.due_date);
 

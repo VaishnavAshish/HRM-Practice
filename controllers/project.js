@@ -215,6 +215,10 @@ exports.findProjectByCriteria = (req, res) => {
               }
               whereClause+=' AND account_id In (SELECT id from ACCOUNT WHERE company_id=$1 AND archived=$'+(searchCriteriaVal.length+1)+') ';
               searchCriteriaVal.push(false);
+              if(!req.user.permissions.includes('projectManager')){
+                whereClause += ' AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$'+(searchCriteriaVal.length+1)+')';
+                searchCriteriaVal.push(req.user.id);
+              }
               let queryToExec='SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id ,(SELECT count(*) from PROJECT '+whereClause+') as searchcount FROM PROJECT p '+whereClause+' ORDER BY start_date DESC,name OFFSET '+offset+' LIMIT '+process.env.PAGE_RECORD_NO;
               // console.log('queryToExec '+queryToExec);
               client.query(queryToExec,searchCriteriaVal, function (err,project) {
@@ -331,24 +335,29 @@ exports.findProjectByName = (req, res) => {
                       }
                   }
                 });
-              }else{
+              } else {
                   if(req.body.offset){
                     offset=req.body.offset;
                   }
                   let whereClause ='WHERE name ilike $1 AND company_id=$2 AND isGlobal=$3 AND archived=$4 AND account_id In (SELECT id from ACCOUNT WHERE company_id=$2 AND archived=$4 ) ';
-                  let searchFieldVal=['%'+req.body.searchText+'%',req.user.company_id, false,false];
+                  let searchFieldVal = ['%'+req.body.searchText+'%',req.user.company_id, false,false];
+                  if(!req.user.permissions.includes('projectManager')){
+                    whereClause += ' AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$2 AND user_id=$'+(searchFieldVal.length+1)+')';
+                    searchFieldVal.push(req.user.id);
+                  }
                   let innerQuery='SELECT count(*) from PROJECT '+whereClause;
                   let queryToExec='' ;
-                  if(req.body.status){
-                    innerQuery+=' AND status ilike $5';
-                    queryToExec='SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id,('+innerQuery+') as searchcount FROM PROJECT p '+whereClause+' AND status ilike $5 ';
+                  if(req.body.status) {
+                    innerQuery+=' AND status ilike $'+(searchFieldVal.length+1);
+                    queryToExec='SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id,('+innerQuery+') as searchcount FROM PROJECT p '+whereClause+' AND status ilike $'+(searchFieldVal.length+1);
                     searchFieldVal.push(req.body.status);
                   }else{
                     queryToExec='SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id,('+innerQuery+') as searchcount FROM PROJECT p '+whereClause;
                   }
                   queryToExec+=' ORDER BY start_date DESC,name OFFSET '+offset+' LIMIT '+process.env.PAGE_RECORD_NO;
                   // console.log('---------queryToExec for filter-------'+req.body.status);
-                  // console.log(queryToExec);
+                   //console.log(queryToExec);
+                   //console.log(searchFieldVal);
                   client.query(queryToExec, searchFieldVal, function (err, project) {
                   if (err) {
                     handleResponse.shouldAbort(err, client, done);
@@ -430,8 +439,13 @@ exports.getProject = (req, res) => {
           // console.log(companyDefaultTimezone);
           pool.connect((err, client, done) => {
             whereClause='WHERE company_id=$1 AND archived=$2 AND account_id In (SELECT id from ACCOUNT WHERE company_id=$1 AND archived=$2)';
+            let queryParamArray = [req.user.company_id, false,false,'%Not Started%','%In Progress%','%At Risk%','%Completed%'];
+            if(!req.user.permissions.includes('projectManager')){
+              whereClause += ' AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$8)';
+              queryParamArray.push(req.user.id);
+            }
             client.query('SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id,(SELECT count(*) FROM PROJECT '+whereClause+' AND isGlobal=$3) as totalCount,(SELECT count(*) FROM PROJECT '+whereClause+' AND isGlobal=$3 AND status ilike $4) as notStartedCount,(SELECT count(*) FROM PROJECT '+whereClause+' AND isGlobal=$3 AND status ilike $5) as inProgressCount,(SELECT count(*) FROM PROJECT '+whereClause+' AND isGlobal=$3 AND status ilike $6) as atRiskCount,(SELECT count(*) FROM PROJECT '+whereClause+
-            ' AND isGlobal=$3 AND status ilike $7) as completedCount FROM PROJECT p '+whereClause+' AND isGlobal=$3 ORDER BY start_date DESC,name ', [req.user.company_id, false,false,'%Not Started%','%In Progress%','%At Risk%','%Completed%'], function (err, project) {
+            ' AND isGlobal=$3 AND status ilike $7) as completedCount FROM PROJECT p '+whereClause+' AND isGlobal=$3 ORDER BY start_date DESC,name ', queryParamArray, function (err, project) {
               if (err) {
                 handleResponse.shouldAbort(err, client, done);
                 handleResponse.responseToPage(res,'pages/projects-listing',{projects: [], totalCount: 0,notStartedCount:0, inProgressCount :0, atRiskCount :0, completedCount:0,user:req.user, error:err},"error","  Error in finding project data");
@@ -779,27 +793,37 @@ exports.getProjectDetail = (req, res) => {
                                     /*handleResponse.handleError(res, err, ' Error in finding user data');*/
                                   } else {
                                     client.query('SELECT user_role FROM SETTING WHERE company_id=$1', [req.user.company_id], function (err, userRoleData) {
-                                    if (err) {
-                                      console.error(err);
-                                      handleResponse.shouldAbort(err, client, done);
-                                      handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [], user:req.user, error:err},"error"," Error in finding user role for the company");
-                                    }
-                                    else {
-                                        let userRole=['Manager'];
-                                        if(userRoleData.rows.length>0){
-                                            userRole=userRoleData.rows[0].user_role;
-                                        }
-                                        let userRoleList = userList.rows.concat(resUsers.rows).sort(function(a,b){return (a.email>b.email)-(a.email<b.email)})
-                                        // console.log('----------taskList.rows-----------');
-                                        // console.log(taskList.rows);
-                                        // // console.log(userRoleList);
-                                        // // console.log('----------resUsers.rows-----------');
-                                        // // console.log(resUsers.rows);
-                                        done();
-                                        handleResponse.responseToPage(res,'pages/project-details',{ project: project.rows[0], userRoleList:userRole ,tasks: taskList.rows, accounts: accountList.rows, userList: userList.rows, user: req.user, resUsers: resUsers.rows ,taskTotalCount:taskTotalCount,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD'),stripeCustomerId:result.stripe_customer_id},"success","Successfully rendered");
-                                        /*res.render('pages/project-details', { project: project.rows[0], tasks: taskList.rows, accounts: accountList.rows, userList: userList.rows, user: req.user, error: err, resUsers: resUsers.rows });*/
-                                       }
-                                    });
+                                      if (err) {
+                                        console.error(err);
+                                        handleResponse.shouldAbort(err, client, done);
+                                        handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [], user:req.user, error:err},"error"," Error in finding user role for the company");
+                                      }
+                                      else {
+
+                                          let userRole=['Manager'];
+                                          if(userRoleData.rows.length>0){
+                                              userRole=userRoleData.rows[0].user_role;
+                                          }
+                                          let userRoleList = userList.rows.concat(resUsers.rows).sort(function(a,b){return (a.email>b.email)-(a.email<b.email)})
+                                          client.query('SELECT id,message,modified_date,resource_id,(SELECT email from users where id = resource_id) as email , (SELECT first_name from users where id = resource_id) as first_name , (SELECT last_name from users where id = resource_id) as last_name , (Select count(id) from PROJECT_COMMENT where parent_id = pc.id) as responseCount FROM PROJECT_COMMENT pc WHERE company_id = $1 AND project_id = $2 AND type = $3 AND parent_id IS NULL ORDER BY modified_date desc', [req.user.company_id,req.query.projectId,"Conversation"], function (err, projectConversationThread) {
+                                            if (err) {
+                                              console.error(err);
+                                              handleResponse.shouldAbort(err, client, done);
+                                              handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [], user:req.user, error:err},"error"," Error in finding user role for the company");
+                                            }
+                                            else {
+                                              projectConversationThread.rows.forEach(data=>{
+                                                  data.modified_date = moment.tz(data.modified_date, companyDefaultTimezone).format('MM-DD-YYYY hh:mm:ss');
+                                              })
+                                              console.log('projectConversationThread')
+                                              console.log(projectConversationThread.rows)
+                                              done();
+                                              handleResponse.responseToPage(res,'pages/project-details',{ project: project.rows[0], userRoleList:userRole ,tasks: taskList.rows, accounts: accountList.rows, userList: userList.rows, user: req.user, resUsers: resUsers.rows ,taskTotalCount:taskTotalCount,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD'),stripeCustomerId:result.stripe_customer_id,"projectConversationThread":projectConversationThread.rows },"success","Successfully rendered");
+                                              /*res.render('pages/project-details', { project: project.rows[0], tasks: taskList.rows, accounts: accountList.rows, userList: userList.rows, user: req.user, error: err, resUsers: resUsers.rows });*/
+                                            }
+                                          })
+                                         }
+                                      });
                                   }
                                 });
                               }

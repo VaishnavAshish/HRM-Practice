@@ -115,10 +115,12 @@
                                               <span class="sm-hide">Export Projects</span>
                                             </button>
                                         <% } %> -->
-                                        <button class="slds-button slds-button_brand slds-align-top" onclick="openModal('#modalAddNewProject', true)">
-                                          <i class="fa fa-plus"></i>
-                                          <span class="sm-hide">Add New</span>
-                                        </button>
+                                        <% if(user.permissions.includes('projectManager')) { %>
+                                          <button class="slds-button slds-button_brand slds-align-top" onclick="openModal('#modalAddNewProject', true)">
+                                            <i class="fa fa-plus"></i>
+                                            <span class="sm-hide">Add New</span>
+                                          </button>
+                                        <% } %>
                                     </div>
                                 </div>
                             </div>
@@ -300,21 +302,23 @@
                                                             <div class="slds-dropdown slds-dropdown_right slds-dropdown_actions">
                                                                 <ul class="slds-dropdown__list" role="menu">
                                                                     <li class="slds-dropdown__item" role="presentation">
-                                                                        <a href="/project-details?projectId=<%= project.id %>#details" role="menuitem" tabindex="0">
+                                                                        <a href="/project-details?projectId=<%= project.id %>#tasks" role="menuitem" tabindex="0">
                                                                             <span class="slds-truncate" title="">
                                                                                 <i class="fa fa-eye"></i> &nbsp; View Details
                                                                             </span>
                                                                         </a>
                                                                     </li>
-                                                                    <li class="slds-has-divider_top-space" role="separator"></li>
-                                                                    <li class="slds-dropdown__item" role="presentation">
+                                                                    <% if(user.permissions.includes('projectManager')) { %>
+                                                                      <li class="slds-has-divider_top-space" role="separator"></li>
+                                                                      <li class="slds-dropdown__item" role="presentation">
 
-                                                                        <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteProject(\'<%= project.id %>\')','Are you sure you want to delete this project?');">
-                                                                            <span class="slds-truncate " title="">
-                                                                                <i class="fa fa-trash text-red"></i> &nbsp; Delete
-                                                                            </span>
-                                                                        </a>
-                                                                    </li>
+                                                                          <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteProject(\'<%= project.id %>\')','Are you sure you want to delete this project?');">
+                                                                              <span class="slds-truncate " title="">
+                                                                                  <i class="fa fa-trash text-red"></i> &nbsp; Delete
+                                                                              </span>
+                                                                          </a>
+                                                                      </li>
+                                                                    <% } %>
                                                                 </ul>
                                                             </div>
                                                         </div>
@@ -633,10 +637,10 @@
                                                         <div class="slds-grid">
                                                             <div class="slds-has-flexi-truncate slds-p-horizontal_x-small">
                                                                 <div class="slds-truncate">
-                                                                    <a href="/project-details?projectId=<%= project.id %>" class="text-size-16"> <%= project.name %> </a>
+                                                                    <a href="/project-details?projectId=<%= project.id %>#tasks" class="text-size-16"> <%= project.name %> </a>
                                                                 </div>
                                                                 <div class="slds-truncate text-dull text-size-8">
-                                                                        #<a href="/project-details?projectId=<%= project.id %>" class="text-size-6"><%= project.record_id %> </a>
+                                                                        <a href="/project-details?projectId=<%= project.id %>#tasks" class="text-size-6"><%= project.record_id %> </a>
                                                                 </div>
                                                             </div>
                                                             <div class="slds-no-flex">
@@ -650,22 +654,24 @@
                                                                     <div class="slds-dropdown slds-dropdown_right slds-dropdown_actions">
                                                                         <ul class="slds-dropdown__list" role="menu">
                                                                             <li class="slds-dropdown__item" role="presentation">
-                                                                                <a href="/project-details?projectId=<%= project.id %>" role="menuitem" tabindex="0">
+                                                                                <a href="/project-details?projectId=<%= project.id %>#tasks" role="menuitem" tabindex="0">
                                                                                     <span class="slds-truncate" title="">
                                                                                         <i class="fa fa-eye"></i> &nbsp;
                                                                                         View Details
                                                                                     </span>
                                                                                 </a>
                                                                             </li>
-                                                                            <li class="slds-has-divider_top-space" role="separator"></li>
-                                                                            <li class="slds-dropdown__item" role="presentation">
-                                                                                <a href="javascript:void(0);" role="menuitem" tabindex="-1"  onclick="deleteBeforeConfirm('#globalAlert', 'deleteProject(\'<%= project.id %>\')','Are you sure you want to delete this project?');">
-                                                                                    <span class="slds-truncate sf-text-red" title="">
-                                                                                        <i class="fa fa-trash text-red"></i> &nbsp;
-                                                                                        Delete
-                                                                                    </span>
-                                                                                </a>
-                                                                            </li>
+                                                                            <% if(user.permissions.includes('projectManager')) { %>
+                                                                                <li class="slds-has-divider_top-space" role="separator"></li>
+                                                                                <li class="slds-dropdown__item" role="presentation">
+                                                                                    <a href="javascript:void(0);" role="menuitem" tabindex="-1"  onclick="deleteBeforeConfirm('#globalAlert', 'deleteProject(\'<%= project.id %>\')','Are you sure you want to delete this project?');">
+                                                                                        <span class="slds-truncate sf-text-red" title="">
+                                                                                            <i class="fa fa-trash text-red"></i> &nbsp;
+                                                                                            Delete
+                                                                                        </span>
+                                                                                    </a>
+                                                                                </li>
+                                                                            <% } %>
                                                                         </ul>
                                                                     </div>
                                                                 </div>

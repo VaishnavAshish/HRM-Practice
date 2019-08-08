@@ -1519,7 +1519,7 @@ exports.postInvoiceDetails = (req, res) => {
                     handleResponse.shouldAbort(err, client, done);
                     handleResponse.handleError(res, err, ' Error in finding invoice data');
                 } else {
-                    client.query('UPDATE INVOICE SET  due_date=$1, description=$2, updated_date=$3, currency=$4, total_amount=$7, tax=$8 WHERE id=$5 AND company_id=$6', [moment.tz(req.body.due_date.split('T')[0], companyDefaultTimezone).format(), req.body.description, 'now()',req.body.currency , req.body.invoiceId, req.user.company_id, req.body.total_amount, req.body.tax_per], function (err, updatedData) {
+                    client.query('UPDATE INVOICE SET  due_date=$1, description=$2, updated_date=$3, currency=$4, total_amount=$7, tax=$8 , status= $9 WHERE id=$5 AND company_id=$6', [moment.tz(req.body.due_date.split('T')[0], companyDefaultTimezone).format(), req.body.description, 'now()',req.body.currency , req.body.invoiceId, req.user.company_id, req.body.total_amount, req.body.tax_per,req.body.status], function (err, updatedData) {
                         // console.log('Error >>>>>>>>>>>>>');
                         // console.log(err);
                         if (err) {
@@ -2235,7 +2235,15 @@ function invoiceHtmlData (req,res,invoiceHtml,responseType){
                                                                                             handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.user, error:err, invoiceDetails : invoiceDetails.rows[0], lineItems : invoiceLineList, accountDetails:accountDetails.rows[0],companySetting:companySetting.rows[0], projects:projects.rows,companyName:companyName.rows[0].name},"success","Successfully rendered");
                                                                                         }else{
                                                                                             console.log('inside generatePDF');
-                                                                                            generatePdf(req,res,invoiceDetails.rows[0],invoiceLineList,accountDetails.rows[0],companySetting.rows[0], projects.rows,companyName.rows[0].name,responseType);
+                                                                                            if(companySetting.rows[0].company_logo == null){
+                                                                                              fs.readFile(`${process.env.PWD}/public/img/logo-place-holder.jpg`, (err, data)=>{
+                                                                                                    if(err) return res.status(500).send(err);
+                                                                                                    companySetting.rows[0].company_logo = new Buffer(data, 'base64');
+                                                                                                    generatePdf(req,res,invoiceDetails.rows[0],invoiceLineList,accountDetails.rows[0],companySetting.rows[0], projects.rows,companyName.rows[0].name,responseType);
+                                                                                                })
+                                                                                            }else{
+                                                                                              generatePdf(req,res,invoiceDetails.rows[0],invoiceLineList,accountDetails.rows[0],companySetting.rows[0], projects.rows,companyName.rows[0].name,responseType);
+                                                                                            }
                                                                                         }
 
                                                                                 }
@@ -2366,6 +2374,9 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
     // console.log('company_logo in invoice');
     // console.log(company_logo);
     /*let company_logo = companySetting.company_logo;*/
+    console.log('companySetting.company_logo');
+    console.log(companySetting.company_logo);
+
     let contenttype = companySetting.contenttype;
 
     let comapny_address = `<strong>${companyName} </strong><BR />
@@ -2696,15 +2707,14 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
     var options = {
       format: 'A4',
       width: '280mm',
-      height: '396mm'
+      height: '396mm',
+      header: {
+        "height": "0mm",
+      },
+      footer: {
+        "height": "20mm",
+      }
     };
-    /*,
-    header: {
-      "height": "0mm",
-    },
-    footer: {
-      "height": "0mm",
-    }*/
     // console.log('hmtl is:');
     // console.log(pdfHTML);
     console.log('responseType'+responseType)
