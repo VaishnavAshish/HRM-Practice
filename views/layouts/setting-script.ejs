@@ -66,6 +66,7 @@ function disableIntegration(){
 				success : function(response){
 						hideLoader('#globalLoader');
 						closeModal('#modalAddPaymentDetail');
+						showGlobalToast('#globalToast', 'success', response.message, 4000);
 						$("button[enableIntegration]").show();
 						$("button[disableIntegration]").hide();
 						$("#integration-dashboard").hide();
@@ -104,6 +105,7 @@ function checkPaymentAndAdd(){
 						success : function(response){
 								hideLoader('#globalLoader');
 								closeModal('#modalAddPaymentDetail');
+								showGlobalToast('#globalToast', 'success', response.message, 4000);
 								$("button[enableIntegration]").hide();
 								$("button[disableIntegration]").show();
 								$("#integration-dashboard").show();
