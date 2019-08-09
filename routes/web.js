@@ -193,6 +193,8 @@ module.exports = function(app) {
     app.post('/addResource', passportConfig.isAuthenticated, resourceController.postAddResource);
     app.post('/deleteResource', passportConfig.isAuthenticated, resourceController.deleteResource);
     app.post('/updateResource', passportConfig.isAuthenticated, resourceController.updateResource);
+    app.post('/updateResourcePassword', passportConfig.isAuthenticated, resourceController.updateResourcePassword);
+
 
     // app.get('/task', passportConfig.isAuthenticated, taskController.getTask);
     app.post('/deleteTask', passportConfig.isAuthenticated, taskController.deleteTask);

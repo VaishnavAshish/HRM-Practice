@@ -563,6 +563,72 @@ exports.deleteResource = (req, res) => {
       });
 
 }
+exports.updateResourcePassword = (req, res) => {
+  setting.getCompanySetting(req, res ,(err,result)=>{
+      if(err==true){
+        handleResponse.handleError(res, err, ' error in finding company setting');
+
+      }else{
+        companyDefaultTimezone=result.timezone;
+
+        req.assert('new_password', 'New Password cannot be blank').notEmpty();
+        req.assert('old_password', 'Old Password cannot be blank').notEmpty();
+
+        const errors = req.validationErrors();
+
+        if (errors) {
+          handleResponse.handleError(res, errors, errors.message);
+        }
+        else {
+          pool.connect((err, client, done) => {
+            client.query('BEGIN', (err) => {
+              if (err) {
+                handleResponse.shouldAbort(err, client, done);
+                handleResponse.handleError(res, err, ' Error in connecting to database .');
+              } else {
+                client.query('SELECT email,password FROM USERS WHERE id=$1',[req.user.id], function (err, selectedUser) {
+                  if (err) {
+                    handleResponse.shouldAbort(err, client, done);
+                    handleResponse.handleError(res, err, ' Error in getting resource data');
+                  } else {
+                    if(selectedUser.rows[0].password != req.body.old_password){
+                        handleResponse.shouldAbort(err, client, done);
+                        handleResponse.handleError(res, err, 'Old password is not correct.Please enter correct password.');
+                    }else{
+                      client.query('UPDATE users set password=$1 where id=$2  RETURNING *', [req.body.new_password, req.user.id], function (err, updatedResource) {
+                        if (err) {
+                          handleResponse.shouldAbort(err, client, done);
+                          handleResponse.handleError(res, err, ' Error in updating resource password');
+                        } else {
+                          // console.log("resource------------");
+                          // console.log(resource);
+                          client.query('COMMIT', (err) => {
+                            if (err) {
+                              handleResponse.shouldAbort(err, client, done);
+                              console.error('Error committing transaction', err.stack);
+                              handleResponse.handleError(res, err, ' Error in committing transaction');
+                            }else{
+                              done();
+                              handleResponse.sendSuccess(res,'Resource password updated successfully',{});
+                            }
+                          })
+
+                        }
+                      });
+
+                    }
+                  }
+                });
+
+              }
+            });
+          });
+        }
+    }
+  });
+};
+
+
 
 exports.updateResource = (req, res) => {
   setting.getCompanySetting(req, res ,(err,result)=>{
