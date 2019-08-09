@@ -563,6 +563,7 @@ exports.deleteResource = (req, res) => {
       });
 
 }
+
 exports.updateResourcePassword = (req, res) => {
   setting.getCompanySetting(req, res ,(err,result)=>{
       if(err==true){

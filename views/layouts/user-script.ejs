@@ -92,7 +92,7 @@ function updateUserPassword(modalId, formId) {
 				return false;
 		}
 		if(userPasswordData.new_password != userPasswordData.confirm_password) {
-				addError('#con-confirm_password', "Password does not match");
+				addError('#confirm_password', "Password does not match");
 				$(formId).addClass('has-error');
 				return false;
 		}
@@ -106,6 +106,7 @@ function updateUserPassword(modalId, formId) {
 				success : function(response){
 						console.log(response);
 						hideLoader('#globalLoader');
+						closeModal(modalId);
 						if(response.success){
 								showGlobalToast('#globalToast', 'success', response.message, 4000);
 						}
@@ -117,7 +118,7 @@ function updateUserPassword(modalId, formId) {
 						hideLoader('#globalLoader');
 						if(response.responseJSON.message.includes('Old password ')){
 							addError('#old_password', response.responseJSON.message);
-							$(formId).addClass('has-error');							
+							$(formId).addClass('has-error');
 						}else{
 							showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
 						}
