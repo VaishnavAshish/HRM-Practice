@@ -59,7 +59,7 @@ function addStripeToken(req,res,customer){
                                   } else {
                   			            done();
                   			            // handleResponse.sendSuccess(res,'settings updated successfully',{});
-                                    handleResponse.sendSuccess(res,'Stripes data updated successfully',{customer:customer,subscription:subscription});
+                                    handleResponse.sendSuccess(res,'Your account has been successfully to paid version.Now you can integrate with other softwares.',{customer:customer,subscription:subscription});
                                   }
                                 })
               			          }
@@ -163,7 +163,7 @@ exports.disableStripe = (req, res) => {
                                           handleResponse.handleError(res, err, ' Error in committing transaction');
                                         } else {
                                           done();
-                                          handleResponse.sendSuccess(res,'Stripes subscription data deleted successfully',{});
+                                          handleResponse.sendSuccess(res,'Your account has been downgrade to free version.Now you cannot integrate with other softwares.',{});
                                         }
                                       })
                                     }
