@@ -16,6 +16,8 @@ $(document).ready(function(){
             time_24hr: true
         }
     );
+
+    $('input[type!=hidden]:enabled,select').first().focus();
     /*let tabText=$(".slds-nav-vertical__item.slds-is-active .side-nav-text").text().trim();
     if(tabText!="Timesheet"){
 */
@@ -41,6 +43,9 @@ function modifyInputEvent(ele){
   $('input,select,textarea',ele).on('focus',function(){
     $('[save-btn]',ele).removeAttr('disabled');
   })
+  $('input[type=checkbox]',ele).on('change',function(){
+    $('[save-btn]',ele).removeAttr('disabled');
+  })
 }
 
 function exportToCsv(csvEndPoint){
@@ -62,8 +67,13 @@ function handleHashLinks(){
     var hash = document.URL.substr(document.URL.indexOf('#')+1);
 
     var element  = $('[data-navigation="'+hash+'"]');
-    if(document.URL.indexOf('#')!=-1&&element.length==0){
-      window.location.href = document.URL.substr(0,document.URL.indexOf('#')+1)+'dayview';
+    if(document.URL.indexOf('#')!=-1 && element.length==0){
+      var element  = $('[data-navigation="dayview"]');
+      if(element.length >0){
+        window.location.href = document.URL.substr(0,document.URL.indexOf('#')+1)+'dayview';
+      }else{
+        window.location.href = document.URL.substr(0,document.URL.indexOf('#')+1)+'default';
+      }
       // element = $('[data-navigation="dayview"]');
     }
     if ( element.is( "button" ) ) {
@@ -149,7 +159,9 @@ function openModal(modalId, isModalReset){
         console.log("inside open modal - Else");
         $('.slds-modal',modalId).addClass('slds-fade-in-open');
         $('.slds-backdrop',modalId).addClass('slds-backdrop_open');
+        $('input[type!=hidden]:enabled,select',modalId).first().focus();
     }
+
 }
 function closeModal(modalId){
     $('.slds-modal',modalId).removeClass('slds-fade-in-open');

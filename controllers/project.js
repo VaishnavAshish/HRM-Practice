@@ -687,7 +687,6 @@ function minuteToHours(min) {
   return rhours + ":" + rminutes;
   }
 exports.getProjectDetail = (req, res) => {
-  console.log('inside getProjectDetail')
   setting.getCompanySetting(req, res ,(err,result)=>{
      if(err==true){
        // console.log('error in setting');
