@@ -23,6 +23,8 @@ const stripeController = require('./../controllers/stripe');
 const quickbookController = require('./../controllers/quickbook');
 const xeroController = require('./../controllers/xero');
 
+const commentController = require('./../controllers/comment');
+
 module.exports = function(app) {
 
     /**
@@ -88,6 +90,17 @@ module.exports = function(app) {
     /*app.post('/findCompanyByName', passportConfig.isAuthenticated,adminController.findCompanyByName);*/
     /*app.post('/findUserByEmail', passportConfig.isAuthenticated,resourceController.findUserByEmail);*/
     /*app.post('/findAccountByName', passportConfig.isAuthenticated,accountController.findAccountByName);*/
+
+
+    /* comment routers */
+
+    app.post('/addConversation', passportConfig.isAuthenticated, commentController.postAddConversation);
+    app.post('/deleteConversation', passportConfig.isAuthenticated, commentController.deleteConversation);
+    app.post('/editConversation', passportConfig.isAuthenticated, commentController.postEditConversation);
+    app.post('/addComment', passportConfig.isAuthenticated, commentController.postAddComment);
+    app.post('/deleteComment', passportConfig.isAuthenticated, commentController.deleteComment);
+    app.post('/editComment', passportConfig.isAuthenticated, commentController.postEditComment);
+    app.post('/getAllRelatedComment', passportConfig.isAuthenticated, commentController.getAllRelatedComment);
 
 
     app.post('/initiateStripe', passportConfig.isAuthenticated,stripeController.initiateStripe);
@@ -194,7 +207,6 @@ module.exports = function(app) {
     app.post('/deleteResource', passportConfig.isAuthenticated, resourceController.deleteResource);
     app.post('/updateResource', passportConfig.isAuthenticated, resourceController.updateResource);
     app.post('/updateResourcePassword', passportConfig.isAuthenticated, resourceController.updateResourcePassword);
-
 
     // app.get('/task', passportConfig.isAuthenticated, taskController.getTask);
     app.post('/deleteTask', passportConfig.isAuthenticated, taskController.deleteTask);
