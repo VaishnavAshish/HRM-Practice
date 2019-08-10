@@ -5,7 +5,7 @@ let role={
 };
 let assignment={
 	"timesheetEntry":["timesheet"],
-	"projectManager":["projects-listing","project-details","task-details"],
+	"projectUser":["projects-listing","project-details","task-details"],
 	"expenseManager":["expenses-listing","expense-details"],
 	"invoiceManager":["invoices-listing","invoice-details"]
 };
@@ -26,7 +26,7 @@ exports.setupPagePermissions = (userData, user) => {
 	  pages.push({ label: 'Team', url: '/resources-listing' });
 
 
-	  if(userData.permissions.includes('projectManager')){
+	  if(userData.permissions.includes('projectUser')){
 		pages.push({ label: 'Projects', url: '/projects-listing' });
 	  }
 	  if(userData.permissions.includes('timesheetEntry')){
@@ -42,7 +42,7 @@ exports.setupPagePermissions = (userData, user) => {
 	  pages.push({ label: 'Settings', url: '/org-settings'});
 		pages.push({ label: 'Integrations', url:'/integration-dashboard'});
 	} else {
-	  if(userData.permissions.includes('projectManager')){
+	  if(userData.permissions.includes('projectUser')){
 		  pages.push({ label: 'Projects', url: '/projects-listing' });
 	  }
 	  if(userData.permissions.includes('timesheetEntry')){
@@ -130,11 +130,11 @@ assigned = (req, res, done) => {
   	}
 
   	if (req.user && req.user.permissions && isAssigned(req.user.permissions,page)){
-    	 // console.log('Inside user checked assignement'+req.user.permissions);
+    	  console.log('Inside user checked assignement'+req.user.permissions);
 	     return done(true);
     }
     else {
-		  // console.log('Inside user unchecked assignement');
+		   console.log('Inside user unchecked assignement');
     	return done(false);
     }
 
