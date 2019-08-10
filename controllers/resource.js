@@ -629,8 +629,6 @@ exports.updateResourcePassword = (req, res) => {
   });
 };
 
-
-
 exports.updateResource = (req, res) => {
   setting.getCompanySetting(req, res ,(err,result)=>{
       if(err==true){

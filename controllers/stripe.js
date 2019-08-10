@@ -59,7 +59,7 @@ function addStripeToken(req,res,customer){
                                   } else {
                   			            done();
                   			            // handleResponse.sendSuccess(res,'settings updated successfully',{});
-                                    handleResponse.sendSuccess(res,'Your account has been successfully to paid version.Now you can integrate with other softwares.',{customer:customer,subscription:subscription});
+                                    handleResponse.sendSuccess(res,'Your account has been successfully to paid version.Now you can integrate with other softwares. ',{customer:customer,subscription:subscription});
                                   }
                                 })
               			          }
