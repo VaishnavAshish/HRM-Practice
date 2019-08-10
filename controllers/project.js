@@ -806,7 +806,7 @@ exports.getProjectDetail = (req, res) => {
                                               userRole=userRoleData.rows[0].user_role;
                                           }
                                           let userRoleList = userList.rows.concat(resUsers.rows).sort(function(a,b){return (a.email>b.email)-(a.email<b.email)})
-                                          client.query('SELECT id,message,modified_date,resource_id,(SELECT email from users where id = resource_id) as email , (SELECT first_name from users where id = resource_id) as first_name , (SELECT last_name from users where id = resource_id) as last_name , (Select count(id) from PROJECT_COMMENT where parent_id = pc.id) as responseCount FROM PROJECT_COMMENT pc WHERE company_id = $1 AND project_id = $2 AND type = $3 AND parent_id IS NULL ORDER BY modified_date desc', [req.user.company_id,req.query.projectId,"Conversation"], function (err, projectConversationThread) {
+                                          client.query('SELECT id,message,modified_date,resource_id,(SELECT email from users where id = resource_id) as email  FROM PROJECT_COMMENT pc WHERE company_id = $1 AND project_id = $2 AND type = $3 AND parent_id IS NULL ORDER BY modified_date desc', [req.user.company_id,req.query.projectId,"Conversation"], function (err, projectConversationThread) {
                                             if (err) {
                                               console.error(err);
                                               handleResponse.shouldAbort(err, client, done);
