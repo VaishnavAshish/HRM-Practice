@@ -75,7 +75,19 @@
                                 </div>
                                 <div class=" slds-size_1-of-1 slds-medium-size_1-of-1 slds-large-size_6-of-12">
                                     <div class="slds-grid slds-wrap slds-p-left_large slds-p-top_x-small">
-                                        <div class="slds-size_1-of-1 slds-medium-size_4-of-12">
+
+                                         <div class="slds-size_1-of-1 slds-medium-size_3-of-12">
+                                          <div class="slds-form-element slds-m-bottom_medium">
+                                              <label class="slds-form-element__label">
+                                                  Task Completion Status
+                                              </label>
+                                              <div class="slds-form-element__control">
+                                                <%= taskTotalCount %>/<%= project.total_completed_task_count%>
+                                              </div>
+                                          </div>
+                                        </div>
+
+                                        <div class="slds-size_1-of-1 slds-medium-size_3-of-12">
                                           <div class="slds-form-element slds-m-bottom_medium">
                                               <label class="slds-form-element__label">
                                                   Total Invoiced Time
@@ -83,10 +95,10 @@
                                               <div class="slds-form-element__control">
                                                 <%= project.total_invoice_time %>
                                               </div>
-                                          </div>
+                                          </div> 
                                         </div>
 
-                                        <div class="slds-size_1-of-1 slds-medium-size_4-of-12">
+                                        <div class="slds-size_1-of-1 slds-medium-size_3-of-12">
                                           <div class="slds-form-element slds-m-bottom_medium">
                                               <label class="slds-form-element__label">
                                                   Total Invoiced Expense
@@ -97,7 +109,7 @@
                                           </div>
                                         </div>
 
-                                        <div class="slds-size_1-of-1 slds-medium-size_4-of-12">
+                                        <div class="slds-size_1-of-1 slds-medium-size_3-of-12">
                                             <div class="slds-form-element slds-m-bottom_medium">
                                                 <label class="slds-form-element__label">
                                                     Total Invoice Amount
@@ -284,27 +296,6 @@
 
                                                             <div class="slds-size_1-of-1 slds-medium-size_1-of-1  slds-large-size_7-of-12 slds-p-horizontal_small">
                                                                 <div class="slds-grid slds-wrap slds-grid_pull-padded">
-                                                                    <div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-p-horizontal_small">
-                                                                        <div class="slds-grid slds-grid_pull-padded">
-                                                                            <div class="slds-size_1-of-2 slds-p-horizontal_small">
-                                                                                <div class="slds-truncate text-dull slds-p-bottom_xx-small text-size-11 text-uppercase">
-                                                                                    Start Date
-                                                                                </div>
-                                                                                <div>
-
-                                                                                    <%= task.startDateFormatted %>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="slds-size_1-of-2 slds-p-horizontal_small">
-                                                                                <div class="slds-truncate text-dull slds-p-bottom_xx-small text-size-11 text-uppercase">
-                                                                                    End Date
-                                                                                </div>
-                                                                                <div>
-                                                                                    <%= task.endDateFormatted %>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
 
                                                                     <div class="slds-size_1-of-1 slds-medium-size_3-of-12 slds-p-horizontal_small sm-tpd-15">
                                                                         <div class="slds-truncate text-dull slds-p-bottom_xx-small text-size-11 text-uppercase">
@@ -323,6 +314,30 @@
                                                                             <%= task.status %>
                                                                         </div>
                                                                     </div>
+
+                                                                    <div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-p-horizontal_small">
+                                                                        <div class="slds-grid slds-grid_pull-padded">
+                                                                            <div class="slds-size_1-of-2 slds-p-horizontal_small">
+                                                                                <div class="slds-truncate text-dull slds-p-bottom_xx-small text-size-11 text-uppercase">
+                                                                                    Start Date
+                                                                                </div>
+                                                                                <div>
+
+                                                                                    <%= task.startDateFormatted %>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="slds-size_1-of-2 slds-p-horizontal_small">
+                                                                                <div class="slds-truncate text-dull slds-p-bottom_xx-small text-size-11 text-uppercase">
+                                                                                    Due Date
+                                                                                </div>
+                                                                                <div>
+                                                                                    <%= task.endDateFormatted %>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    
 
                                                                     <div class="slds-size_1-of-1 slds-medium-size_3-of-12 slds-p-horizontal_small sm-tpd-15">
                                                                         <div class="slds-grid">
