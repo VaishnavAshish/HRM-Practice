@@ -3,13 +3,14 @@
     function addNewTask(modalId, formId, accountId) {
         var taskData = createJSONForFormData(formId);
         console.log(projectName);
-        // let taskUserEmail=$("#assigned_user option:selected").text();
-        let userData={ userEmail:'',billRate:'0.00',costRate:'0.00'}
-        // if(taskUserEmail!=''&&taskUserEmail!=undefined&&taskUserEmail!=null){
-        //     userData.userEmail= taskUserEmail;
-        //     userData.billRate=$("#assigned_user option:selected").attr('billRate');
-        //     userData.costRate=$("#assigned_user option:selected").attr('costRate');
-        // }
+        let taskUserEmail=$("#assigned_user option:selected").text();
+        let userData={ userEmail:'',billRate:'0.00',costRate:'0.00',user_role:''}
+        if(taskUserEmail!=''&&taskUserEmail!=undefined&&taskUserEmail!=null){
+             userData.userEmail= taskUserEmail;
+             userData.billRate=$("#assigned_user option:selected").attr('billRate');
+             userData.costRate=$("#assigned_user option:selected").attr('costRate');
+             taskData.user_role=$("#assigned_user option:selected").attr('role');
+        }
         taskData.billable=projectBillable;
         clearError("#task_name");
         if(taskData.task_name) {
@@ -61,20 +62,20 @@
             taskDetailsData.project_id = projectId;
             taskDetailsData.taskId = taskId;
             taskDetailsData.assignment_id = null;
-            // taskDetailsData.user_role = $('#assigned_user option:selected').attr('user_role');
-            // if($('#assigned_user option:selected').attr('pr_as_id')) {
-            //     taskDetailsData.assignment_id = $('#assigned_user option:selected').attr('pr_as_id');
-            // }
+            taskDetailsData.user_role = $('#assigned_user option:selected').attr('user_role');
+            if($('#assigned_user option:selected').attr('pr_as_id')) {
+                 taskDetailsData.assignment_id = $('#assigned_user option:selected').attr('pr_as_id');
+            }
             console.log("task details update method called");
             console.log(taskDetailsData);
-            // let taskUserEmail=($("#assigned_user option:selected").text()).trim();
-            let userData={ userEmail:'',billRate:'0.00',costRate:'0.00'}
-            // if(taskUserEmail!=''&&taskUserEmail!=undefined&&taskUserEmail!=null){
-            //    userData.userEmail= taskUserEmail;
-            //    userData.billRate=$("#assigned_user option:selected").attr('billRate');
-            //    userData.costRate=$("#assigned_user option:selected").attr('costRate');
-            //
-            // }
+            let taskUserEmail=($("#assigned_user option:selected").text()).trim();
+            let userData={ userEmail:'',billRate:'0.00',costRate:'0.00',user_role:''}
+            if(taskUserEmail!=''&&taskUserEmail!=undefined&&taskUserEmail!=null){
+                userData.userEmail= taskUserEmail;
+                userData.billRate=$("#assigned_user option:selected").attr('billRate');
+                userData.costRate=$("#assigned_user option:selected").attr('costRate');
+                //taskDetailsData.user_role=$("#assigned_user option:selected").attr('role');
+            }
             if (taskDetailsData.start_date > taskDetailsData.end_date) {
               addError("#tskDetail_due_date", "Please enter end date greater than start date");
             } else if(!$(formId).hasClass('has-error')) {
@@ -140,11 +141,8 @@
     }
 function loadMoreTask(){
     showLoader('#globalLoader');
-
     let offset=$("#offset").text();
-
     showLoader('#globalLoader');
-
     let searchText=$("#searchTaskName").val();
     let url = new URL(window.location.href);
     let projectId=getURLParameter("projectId");
@@ -308,7 +306,7 @@ function findTaskByName(){
                         </div>
                     </div>
 
-                    
+
 
                     <div class="slds-size_1-of-1 slds-medium-size_3-of-12 slds-p-horizontal_small sm-tpd-15">
                         <div class="slds-grid">

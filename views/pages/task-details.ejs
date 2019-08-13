@@ -194,7 +194,7 @@
                                                                   </div>
                                                               </div>
                                                           </div>
-                                                        <!-- <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                         <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
                                                                 <div class="slds-form-element slds-m-bottom_medium">
                                                                     <label class="slds-form-element__label">
                                                                         Assigned To
@@ -215,7 +215,7 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                        </div> -->
+                                                        </div>
 
                                                     </div>
                                                 </div>
@@ -376,19 +376,19 @@
     <script>
             $(document).ready(function(){
                 $('#status').val('<%= taskDetails.status %>');
-        $('#priority').val('<%= taskDetails.priority %>');
-        // $("#assigned_user").val('<%= taskDetails.user_id %>');
-        $.each($('#assigned_user option'), function (index, option) {
-            console.log(index);
-            if('<%= taskDetails.assigned_user_id %>' != '' || '<%= taskDetails.assigned_user_id %>' != null) {
-                console.log(index);
-                if($(option).attr('pr_as_id') == '<%= taskDetails.assigned_user_id %>') {
+                $('#priority').val('<%= taskDetails.priority %>');
+                $("#assigned_user").val('<%= taskDetails.user_id %>');
+                $.each($('#assigned_user option'), function (index, option) {
                     console.log(index);
-                    $(option).attr('selected', 'selected');
-                    return false;
-                }
-            }
-        });
+                    if('<%= taskDetails.assigned_user_id %>' != '' || '<%= taskDetails.assigned_user_id %>' != null) {
+                        console.log(index);
+                        if($(option).attr('pr_as_id') == '<%= taskDetails.assigned_user_id %>') {
+                            console.log(index);
+                            $(option).attr('selected', 'selected');
+                            return false;
+                        }
+                    }
+                });
             });
 
         </script>

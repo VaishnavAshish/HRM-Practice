@@ -82,7 +82,7 @@
                                                   Task Completion Status
                                               </label>
                                               <div class="slds-form-element__control">
-                                                <%= taskTotalCount %>/<%= project.total_completed_task_count%>
+                                                <%= project.total_completed_task_count%>/<%= taskTotalCount %>
                                               </div>
                                           </div>
                                         </div>
@@ -95,7 +95,7 @@
                                               <div class="slds-form-element__control">
                                                 <%= project.total_invoice_time %>
                                               </div>
-                                          </div> 
+                                          </div>
                                         </div>
 
                                         <div class="slds-size_1-of-1 slds-medium-size_3-of-12">
@@ -337,21 +337,25 @@
                                                                         </div>
                                                                     </div>
 
-                                                                    
+
 
                                                                     <div class="slds-size_1-of-1 slds-medium-size_3-of-12 slds-p-horizontal_small sm-tpd-15">
                                                                         <div class="slds-grid">
-                                                                            <!-- <div class="slds-has-flexi-truncate">
+                                                                             <div class="slds-has-flexi-truncate">
                                                                                 <div class="slds-truncate text-dull slds-p-bottom_xx-small text-size-11 text-uppercase">
                                                                                                     Assign
                                                                                 </div>
                                                                                 <div>
                                                                                     <span class="slds-avatar slds-avatar_small slds-avatar_circle cursor-pointer">
+                                                                                      <% if(task.user_id) { %>
                                                                                         <img alt="Person name" src="/getUserPicture/<%= task.user_id %>" title="<%= task.user_email %>(<%= task.user_role %>)">
-                                                                                    </span>
+                                                                                      <% } else { %>
+                                                                                        <img alt="Person name" src="img/avatar1.jpg" title="Person">
+                                                                                      <% } %>
+                                                                                     </span>
                                                                                 </div>
 
-                                                                            </div> -->
+                                                                            </div>
                                                                             <div class="slds-col--bump-left slds-p-left_x-small">
                                                                                 <a href="/task-details?taskId=<%= task.id %>" class="slds-button slds-button_icon" title="Edit">
                                                                                     <i class="fa fa-edit text-blue fs-lg text-size-18"></i>

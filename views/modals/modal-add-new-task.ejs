@@ -130,9 +130,7 @@
 
                                     </div>
 
-
-
-                                    <!-- <div class="slds-form-element slds-m-bottom_medium">
+                                     <div class="slds-form-element slds-m-bottom_medium">
                                         <label class="slds-form-element__label">
                                             Assigned To
                                         </label>
@@ -140,11 +138,6 @@
                                             <div class="slds-select_container">
                                                 <select class="slds-select" name="assigned_user" getFormData id="assigned_user" onchange="updateAssignRole(this);setBillCostRate(this, 'task')" reset='value'>
                                                     <option value="" billRate="0.00" costRate="0.00"></option>
-                                                     <% if(userList.length > 0) { %>
-                                                        <% userList.forEach(function(resource) { %>
-                                                           <option value="<%= resource.id %>" role="<%= resource.role %>" billrate="<%= resource.bill_rate %>" costrate="<%= resource.cost_rate %>"> <%= resource.email %> (<%= resource.role %>)</option>
-                                                        <% }); %>
-                                                    <% } %>
                                                     <% if(resUsers.length > 0) { %>
                                                         <% resUsers.forEach(function(resource) { %>
                                                            <option value="<%= resource.id %>" role="<%= resource.role %>" billrate="<%= resource.bill_rate %>" costrate="<%= resource.cost_rate %>"> <%= resource.email %> (<%= resource.role %>)</option>
@@ -157,7 +150,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="slds-form-element slds-m-bottom_medium">
+                                    <!-- <div class="slds-form-element slds-m-bottom_medium">
                                         <label class="slds-form-element__label">
                                             Select Resource Role
                                             <abbr class="slds-required" title="required">*</abbr>
