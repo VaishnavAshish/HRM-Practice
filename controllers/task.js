@@ -413,8 +413,8 @@ exports.getTaskDetails = (req, res) => {
                                     taskDetail.rows[0]["user_id"]=null;
                                     taskDetail.rows[0]["user_email"]=null;
                                     console.log('required details')
-                                    console.log( taskDetail.rows[0].assigned_user_id)
-                                    console.log( taskAssignDetail.rows[0].user_id)
+                                    //console.log( taskDetail.rows[0].assigned_user_id)
+                                    //console.log( taskAssignDetail.rows[0].user_id)
                                     if(taskAssignDetail.rows.length>0 && taskDetail.rows[0].assigned_user_id != null){
                                       taskDetail.rows[0]["user_id"]=taskAssignDetail.rows[0].user_id;
                                       taskDetail.rows[0]["user_email"]=taskAssignDetail.rows[0].user_email;
