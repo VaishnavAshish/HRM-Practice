@@ -755,22 +755,27 @@ exports.getProjectDetail = (req, res) => {
                               console.log('task assignment detail')
                               console.log(data.id)
                               console.log(data.assigned_user_id)
-                              client.query('SELECT user_id,user_email,user_role FROM TASK_ASSIGNMENT where task_id=$1 AND user_id=$2', [data.id,data.assigned_user_id], function (err, taskAssignResourceId) {
-                                if (err) {
-                                  console.error(err);
-                                  handleResponse.shouldAbort(err, client, done);
-                                  handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [], user:req.user, error:err},"error"," Error in finding task assignment data");
-                                  return false;
-                                } else {
-                                  if(taskAssignResourceId.rows.length>0){
-                                    console.log('taskAssignResourceId.rows')
-                                    console.log(taskAssignResourceId.rows[0]);
-                                    data["user_id"]=taskAssignResourceId.rows[0].user_id;
-                                    data["user_role"]=taskAssignResourceId.rows[0].user_role;
-                                    data["user_email"]=taskAssignResourceId.rows[0].user_email.substring(0,taskAssignResourceId.rows[0].user_email.indexOf('('));
+                              data["user_id"]='';
+                              data["user_role"]='';
+                              data["user_email"]='';
+                              if(data.assigned_user_id){
+                                client.query('SELECT user_id,user_email,user_role FROM TASK_ASSIGNMENT where task_id=$1', [data.id], function (err, taskAssignResourceId) {
+                                  if (err) {
+                                    console.error(err);
+                                    handleResponse.shouldAbort(err, client, done);
+                                    handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [], user:req.user, error:err},"error"," Error in finding task assignment data");
+                                    return false;
+                                  } else {
+                                    if(taskAssignResourceId.rows.length>0){
+                                      console.log('taskAssignResourceId.rows')
+                                      console.log(taskAssignResourceId.rows[0]);
+                                      data["user_id"]=taskAssignResourceId.rows[0].user_id;
+                                      data["user_role"]=taskAssignResourceId.rows[0].user_role;
+                                      data["user_email"]=taskAssignResourceId.rows[0].user_email.substring(0,taskAssignResourceId.rows[0].user_email.indexOf('('));
+                                    }
                                   }
-                                }
-                              })
+                                })
+                              }
                             });
                             taskTotalCount=taskList.rows[0].total;
                         }

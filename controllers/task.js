@@ -410,12 +410,11 @@ exports.getTaskDetails = (req, res) => {
                                     }
                                     taskDetail.rows[0]["startDateFormatted"] = startDateFormatted;
                                     taskDetail.rows[0]["endDateFormatted"] = endDateFormatted;
-                                    if(taskAssignDetail.rows.length>0 && taskDetail.rows[0].assigned_user_id == taskAssignDetail.rows[0].user_id){
+                                    taskDetail.rows[0]["user_id"]=null;
+                                    taskDetail.rows[0]["user_email"]=null;
+                                    if(taskAssignDetail.rows.length>0 && taskDetail.rows[0].assigned_user_id != null){
                                       taskDetail.rows[0]["user_id"]=taskAssignDetail.rows[0].user_id;
                                       taskDetail.rows[0]["user_email"]=taskAssignDetail.rows[0].user_email;
-                                    }else{
-                                      taskDetail.rows[0]["user_id"]=null;
-                                      taskDetail.rows[0]["user_email"]=null;
                                     }
                                     /*if(userList.rows.length>0){
                                         userListCombined=userListCombined.concat(userList.rows);
