@@ -20,6 +20,28 @@ function createTaskAssignment(req, client, err, done, taskId, billRate, costRate
     });
   }
 
+  function updateTaskAssignment(req, client, err, done, taskId, billRate, costRate, taskData, res, result) {
+      // let newDate=moment.tz(new Date(), taskData.companyDefaultTimezone).format();
+      let projectId = req.body.projectId;
+      if(!req.body.projectId) {
+        projectId = taskData.project_id;
+      }
+      let userEmail = req.body.userData.userEmail;
+      console.log('UPDATE TASK_ASSIGNMENT set user_id=$1, user_email=$2, bill_rate=$3, cost_rate=$4,updated_date=$5, user_role=$6 WHERE task_id=$7 AND project_id=$8  RETURNING id', [taskData.assigned_user,userEmail, billRate, costRate,'now()',taskData.user_role,taskId,projectId]);
+      // console.log(userEmail);
+      client.query('UPDATE TASK_ASSIGNMENT set user_id=$1, user_email=$2, bill_rate=$3, cost_rate=$4,updated_date=$5, user_role=$6 WHERE task_id=$7 AND project_id=$8  RETURNING id', [taskData.assigned_user,userEmail, billRate, costRate,'now()',taskData.user_role,taskId,projectId], function (err, taskAssignList) {
+        if (err) {
+          console.error(err);
+          handleResponse.shouldAbort(err, client, done);
+          handleResponse.handleError(res, err, ' Error in updating task assignment data');
+        } else {
+          return result(true,res);
+        }
+      });
+    }
+
+
+
   function createProjectAssignment (req, client, err, done, taskData, billRate, costRate, res, result) {
     // let newDate=moment.tz(new Date(), taskData.companyDefaultTimezone).format();
     let projectId = req.body.projectId;
@@ -72,6 +94,33 @@ function createTaskAssignment(req, client, err, done, taskId, billRate, costRate
     });
   }
 
+
+
+  function checkTaskAssignmentForTask(req, client, err, done, taskData, res, result) {
+    var whereClause = ' WHERE project_id=$1 AND company_id=$2 AND task_id=$3';
+    var searchCriteria = [taskData.project_id,req.user.company_id, taskData.taskId];
+    console.log(taskData.project_id,req.user.company_id, taskData.taskId);
+    client.query('SELECT * FROM TASK_ASSIGNMENT'+whereClause, searchCriteria, function (err, assignedUser) {
+      if (err) {
+        // console.log(">>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<");
+        console.error(err);
+        handleResponse.shouldAbort(err, client, done);
+        handleResponse.handleError(res, err, ' Error in fetching task assignment data');
+      } else {
+        // console.log("fetch project assignment");
+        // console.log(assignedUser);
+        // console.log(">>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<");
+        if(assignedUser.rows.length > 0) {
+          console.log('inside assigned user found')
+          return result(assignedUser.rows[0]);
+        } else {
+          console.log('inside assigned user not found')
+          return result(false,res);
+        }
+      }
+    });
+  }
+
   function checkTaskAssignment(req, client, err, done, taskData, res, result) {
     var whereClause = ' WHERE project_id=$1 AND user_id=$2 AND company_id=$3 AND user_role=$4 AND task_id=$5';
     var searchCriteria = [taskData.project_id,taskData.assigned_user,req.user.company_id, taskData.user_role, taskData.task_id];
@@ -116,3 +165,5 @@ function createTaskAssignment(req, client, err, done, taskId, billRate, costRate
   module.exports.createTaskAssignment = createTaskAssignment;
 
   module.exports.getCompanyAllRoles = getCompanyAllRoles;
+  module.exports.updateTaskAssignment = updateTaskAssignment;
+  module.exports.checkTaskAssignmentForTask = checkTaskAssignmentForTask;

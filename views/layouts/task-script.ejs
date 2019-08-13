@@ -64,7 +64,8 @@
             taskDetailsData.assignment_id = null;
             taskDetailsData.user_role = $('#assigned_user option:selected').attr('user_role');
             if($('#assigned_user option:selected').attr('pr_as_id')) {
-                 taskDetailsData.assignment_id = $('#assigned_user option:selected').attr('pr_as_id');
+                 //taskDetailsData.assignment_id = $('#assigned_user option:selected').attr('pr_as_id');
+                 taskDetailsData.assignment_id = $('#assigned_user option:selected').val();
             }
             console.log("task details update method called");
             console.log(taskDetailsData);

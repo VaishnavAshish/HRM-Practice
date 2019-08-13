@@ -334,12 +334,16 @@ function updateTaskRecord(req, client, err, done, res, taskData, callback) {
   if(req.body.taskDetails.task_complete_per == ''){
     req.body.taskDetails.task_complete_per = 0;
   }
-  client.query('UPDATE TASK SET name=$1, start_date=$2, end_date=$3, billable=$4, status=$5, description=$6, estimated_hours=$7, priority=$8, updated_date=$9, assigned_user_id=$12 , percent_completed=$13 WHERE id=$10 AND company_id=$11 RETURNING id', [req.body.taskDetails.title, start_date, end_date, req.body.taskDetails.billable, req.body.taskDetails.status, req.body.taskDetails.description, req.body.taskDetails.estimated_hours, req.body.taskDetails.priority, 'now()', req.body.taskDetails.taskId, req.user.company_id, taskData.assigned_user_id, req.body.taskDetails.task_complete_per], function (err, updatedData) {
+  console.log('taskData.assigned_user_id')
+  console.log(taskData.assigned_user_id)
+  client.query('UPDATE TASK SET name=$1, start_date=$2, end_date=$3, billable=$4, status=$5, description=$6, estimated_hours=$7, priority=$8, updated_date=$9, assigned_user_id=$12 , percent_completed=$13 WHERE id=$10 AND company_id=$11 RETURNING *', [req.body.taskDetails.title, start_date, end_date, req.body.taskDetails.billable, req.body.taskDetails.status, req.body.taskDetails.description, req.body.taskDetails.estimated_hours, req.body.taskDetails.priority, 'now()', req.body.taskDetails.taskId, req.user.company_id, taskData.assigned_user_id, req.body.taskDetails.task_complete_per], function (err, updatedData) {
     if (err) {
       console.error(err);
       handleResponse.shouldAbort(err, client, done);
       handleResponse.handleError(res, err, ' Error in updating task.');
     } else {
+      console.log('updated task record')
+      console.log(updatedData.rows[0]);
       return callback(updatedData.rows[0].id);
     }
   });
@@ -406,9 +410,12 @@ exports.getTaskDetails = (req, res) => {
                                     }
                                     taskDetail.rows[0]["startDateFormatted"] = startDateFormatted;
                                     taskDetail.rows[0]["endDateFormatted"] = endDateFormatted;
-                                    if(taskAssignDetail.rows.length>0){
+                                    if(taskAssignDetail.rows.length>0 && taskDetail.rows[0].assigned_user_id == taskAssignDetail.rows[0].user_id){
                                       taskDetail.rows[0]["user_id"]=taskAssignDetail.rows[0].user_id;
                                       taskDetail.rows[0]["user_email"]=taskAssignDetail.rows[0].user_email;
+                                    }else{
+                                      taskDetail.rows[0]["user_id"]=null;
+                                      taskDetail.rows[0]["user_email"]=null;
                                     }
                                     /*if(userList.rows.length>0){
                                         userListCombined=userListCombined.concat(userList.rows);
@@ -473,30 +480,52 @@ exports.postEditTask = (req, res) => {
                                  if(req.body.taskDetails.assignment_id != null) {
                                     commonController.checkTaskAssignment(req, client, err, done, reqData, res, function (response) {
                                       if(!response) {
+                                        console.log('inside task assignment not found ')
                                         commonController.checkProjectAssignment(req, client, err, done, reqData, res, function (isProjectAssignment) {
-                                          let billRate = 0;
-                                          let costRate = 0;
-                                          if(!isProjectAssignment) {
-                                            billRate = req.user.bill_rate;
-                                            costRate = req.user.cost_rate;
-                                          } else {
-                                            billRate = isProjectAssignment.bill_rate;
-                                            costRate = isProjectAssignment.cost_rate;
-                                          }
-                                          commonController.createTaskAssignment(req, client, err, done, taskId, billRate, costRate, reqData, res, function (result2) {
-                                            if(result2) {
-                                              client.query('COMMIT', (err) => {
-                                                if (err) {
-                                                  handleResponse.shouldAbort(err, client, done);
-                                                  handleResponse.handleError(res, err, ' Error in ending transaction ');
-                                                } else {
-                                                  done();
-                                                  handleResponse.sendSuccess(res,'Task added successfully',{});
-                                                }
-                                              })
+                                            let billRate = 0;
+                                            let costRate = 0;
+                                            if(!isProjectAssignment) {
+                                              billRate = req.user.bill_rate;
+                                              costRate = req.user.cost_rate;
+                                            } else {
+                                              billRate = isProjectAssignment.bill_rate;
+                                              costRate = isProjectAssignment.cost_rate;
                                             }
-                                          });
-                                        })
+                                            commonController.checkTaskAssignmentForTask(req, client, err, done, reqData, res, function (isTaskAssigned) {
+                                              if(isTaskAssigned){
+                                                console.log('inside checkTaskAssignmentForTask');
+                                                commonController.updateTaskAssignment(req, client, err, done, taskId, billRate, costRate, reqData, res, function (result2) {
+                                                  if(result2) {
+                                                    client.query('COMMIT', (err) => {
+                                                      if (err) {
+                                                        handleResponse.shouldAbort(err, client, done);
+                                                        handleResponse.handleError(res, err, ' Error in ending transaction ');
+                                                      } else {
+                                                        done();
+                                                        handleResponse.sendSuccess(res,'Task added successfully',{});
+                                                      }
+                                                    })
+                                                  }
+                                                });
+                                              } else {
+                                                console.log('inside create new task assignment')
+                                                commonController.createTaskAssignment(req, client, err, done, taskId, billRate, costRate, reqData, res, function (result2) {
+                                                  if(result2) {
+                                                    client.query('COMMIT', (err) => {
+                                                      if (err) {
+                                                        handleResponse.shouldAbort(err, client, done);
+                                                        handleResponse.handleError(res, err, ' Error in ending transaction ');
+                                                      } else {
+                                                        done();
+                                                        handleResponse.sendSuccess(res,'Task updated successfully',{});
+                                                      }
+                                                    })
+                                                  }
+                                                });
+                                              }
+                                            })
+                                          })
+
                                       } else {
                                         client.query('COMMIT', (err) => {
                                           if (err) {
@@ -504,7 +533,7 @@ exports.postEditTask = (req, res) => {
                                             handleResponse.handleError(res, err, ' Error in ending transaction ');
                                           } else {
                                             done();
-                                            handleResponse.sendSuccess(res,'Task added successfully',{});
+                                            handleResponse.sendSuccess(res,'Task updated successfully',{});
                                           }
                                         })
                                       }
@@ -516,7 +545,7 @@ exports.postEditTask = (req, res) => {
                                       handleResponse.handleError(res, err, ' Error in ending transaction ');
                                     } else {
                                       done();
-                                      handleResponse.sendSuccess(res,'Task added successfully',{});
+                                      handleResponse.sendSuccess(res,'Task updated successfully',{});
                                     }
                                   })
                                 }

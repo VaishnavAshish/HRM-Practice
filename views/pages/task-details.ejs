@@ -15,7 +15,7 @@
                     <nav role="navigation" aria-label="Breadcrumbs" >
                         <ol class="slds-breadcrumb slds-list_horizontal slds-wrap">
                             <li class="slds-breadcrumb__item "><a href="/projects-listing">Projects</a></li>
-                            <li class="slds-breadcrumb__item "><a href="/project-details?projectId=<%= taskDetails.project_id %>"><%= taskDetails.project_name %></a></li>
+                            <li class="slds-breadcrumb__item "><a href="/project-details?projectId=<%= taskDetails.project_id %>#tasks"><%= taskDetails.project_name %></a></li>
                             <li class="slds-breadcrumb__item "><a href="javascript:void(0);"><%= taskDetails.name %></a></li>
                         </ol>
                     </nav>
@@ -378,7 +378,7 @@
                 $('#status').val('<%= taskDetails.status %>');
                 $('#priority').val('<%= taskDetails.priority %>');
                 $("#assigned_user").val('<%= taskDetails.user_id %>');
-                $.each($('#assigned_user option'), function (index, option) {
+                /*$.each($('#assigned_user option'), function (index, option) {
                     console.log(index);
                     if('<%= taskDetails.assigned_user_id %>' != '' || '<%= taskDetails.assigned_user_id %>' != null) {
                         console.log(index);
@@ -388,7 +388,7 @@
                             return false;
                         }
                     }
-                });
+                });*/
             });
 
         </script>
