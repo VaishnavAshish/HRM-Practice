@@ -485,6 +485,8 @@ exports.postAddCompany = (req, res) => {
   /*req.assert('adminUserName', 'Domain\'s admin user name cannot be blank').notEmpty();*/
   /* req.assert('adminPass', 'Password cannot be blank').notEmpty();*/
   req.assert('adminEmail', 'Admin email cannot be blank').notEmpty();
+  req.assert('adminFirstName', 'Admin first name cannot be blank').notEmpty();
+
 
   /*let domainValidation=isValidDomain(req.body.domain);
   req.assert(domainValidation, 'Domain name is invalid');*/
@@ -566,7 +568,7 @@ exports.postAddCompany = (req, res) => {
                                     handleResponse.shouldAbort(err, client, done);
                                     handleResponse.handleError(res, err, ' Error in adding company task to the database');
                                   } else {
-                                    client.query('Insert into USERS( password, email, company_id, user_role,created_date,modified_date,add_status, password_reset_token, role,permissions) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING id', [req.body.adminPass, req.body.adminEmail, company.rows[0].id, '{"ADMIN"}', 'now()', 'now()', 'Invited', token, "Project Manager", '{"timesheetEntry","expenseManager","projectUser","projectManager","invoiceManager","timesheetApprover","expenseApprover"}'], function(err, addedUser) {
+                                    client.query('Insert into USERS( password, email, company_id, user_role,created_date,modified_date,add_status, password_reset_token, role,permissions,first_name) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING id', [req.body.adminPass, req.body.adminEmail, company.rows[0].id, '{"ADMIN"}', 'now()', 'now()', 'Invited', token, "Project Manager", '{"timesheetEntry","expenseManager","projectUser","projectManager","invoiceManager","timesheetApprover","expenseApprover"}',req.body.adminFirstName], function(err, addedUser) {
                                       if (err) {
                                         handleResponse.shouldAbort(err, client, done);
                                         handleResponse.handleError(res, err, ' Error in adding admin user to the database');
