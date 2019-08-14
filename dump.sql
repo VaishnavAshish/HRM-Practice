@@ -1202,3 +1202,6 @@ BEGIN
 	RETURN NEW;
 END;
 $$;
+
+-- 2019-08-14
+update users set first_name = 'first_name' where first_name IS NULL

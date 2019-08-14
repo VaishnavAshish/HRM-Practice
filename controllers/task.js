@@ -381,13 +381,13 @@ exports.getTaskDetails = (req, res) => {
                         handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.user, error:err},"error"," Error in finding task data");
                         /*handleResponse.handleError(res, err, ' Error in finding task data');*/
                       } else {
-                          client.query('SELECT id,email,bill_rate,cost_rate, role as user_role FROM USERS WHERE id NOT IN (SELECT user_id FROM PROJECT_ASSIGNMENT WHERE project_id=$1) AND company_id=$2 AND archived=$3', [taskDetail.rows[0].project_id,req.user.company_id,false], function (err, userList) {
+                          client.query('SELECT id,email,bill_rate,cost_rate, role as user_role,first_name,last_name FROM USERS WHERE id NOT IN (SELECT user_id FROM PROJECT_ASSIGNMENT WHERE project_id=$1) AND company_id=$2 AND archived=$3', [taskDetail.rows[0].project_id,req.user.company_id,false], function (err, userList) {
                             if (err) {
                               console.error(err);
                               handleResponse.shouldAbort(err, client, done);
                               handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.user, error:err},"error"," Error in finding users data");
                             } else {
-                              client.query('SELECT u.id, u.email, pa.bill_rate, pa.cost_rate, pa.user_role, pa.id as assignment_id from PROJECT_ASSIGNMENT pa INNER JOIN users u ON pa.user_id = u.id AND pa.company_id = u.company_id AND u.archived = $1 AND pa.project_id = $2', [false, taskDetail.rows[0].project_id], function (err, resList) {
+                              client.query('SELECT u.id, u.email,u.first_name, u.last_name, pa.bill_rate, pa.cost_rate, pa.user_role, pa.id as assignment_id from PROJECT_ASSIGNMENT pa INNER JOIN users u ON pa.user_id = u.id AND pa.company_id = u.company_id AND u.archived = $1 AND pa.project_id = $2', [false, taskDetail.rows[0].project_id], function (err, resList) {
                                 if (err) {
                                   console.error(err);
                                   handleResponse.shouldAbort(err, client, done);
@@ -410,14 +410,15 @@ exports.getTaskDetails = (req, res) => {
                                     }
                                     taskDetail.rows[0]["startDateFormatted"] = startDateFormatted;
                                     taskDetail.rows[0]["endDateFormatted"] = endDateFormatted;
-                                    taskDetail.rows[0]["user_id"]=null;
-                                    taskDetail.rows[0]["user_email"]=null;
+                                    taskDetail.rows[0]["user_id"] = null;
+                                    taskDetail.rows[0]["user_email"] = null;
                                     console.log('required details')
                                     //console.log( taskDetail.rows[0].assigned_user_id)
                                     //console.log( taskAssignDetail.rows[0].user_id)
                                     if(taskAssignDetail.rows.length>0 && taskDetail.rows[0].assigned_user_id != null){
-                                      taskDetail.rows[0]["user_id"]=taskAssignDetail.rows[0].user_id;
-                                      taskDetail.rows[0]["user_email"]=taskAssignDetail.rows[0].user_email;
+                                      taskDetail.rows[0]["user_id"] = taskAssignDetail.rows[0].user_id;
+                                      taskDetail.rows[0]["user_email"] = taskAssignDetail.rows[0].user_email;
+
                                     }
                                     /*if(userList.rows.length>0){
                                         userListCombined=userListCombined.concat(userList.rows);

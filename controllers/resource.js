@@ -195,6 +195,7 @@ exports.postAddResource = (req, res) => {
         let companyId = (req.body.company != undefined) ? req.body.company : req.user.company_id;
         // console.log('resource company id is ' + companyId);
             req.assert('email', 'Email cannot be blank').notEmpty();
+            req.assert('first_name', 'First name cannot be blank').notEmpty();
             /*req.assert('password', 'Password cannot be blank').notEmpty();
             req.assert('first_name', 'First name cannot be blank').notEmpty();
             req.assert('last_name', 'Last name cannot be blank').notEmpty();*/
@@ -643,8 +644,8 @@ exports.updateResource = (req, res) => {
         // console.log('inside update resource ' + req.body.email + req.body.first_name + req.body.last_name + req.body.phone + req.body.mobile);
         /*// console.log(req.body.profile_role);*/
         req.assert('email', 'Email cannot be blank').notEmpty();
-        /* req.assert('first_name', 'First name cannot be blank').notEmpty();
-         req.assert('last_name', 'Last name cannot be blank').notEmpty();*/
+        req.assert('first_name', 'First name cannot be blank').notEmpty();
+         /*req.assert('last_name', 'Last name cannot be blank').notEmpty();*/
 
         const errors = req.validationErrors();
 

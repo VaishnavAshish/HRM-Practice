@@ -30,9 +30,9 @@
             console.log(timeheet_users);
             timeheet_users.filter(function (userObj) {
                 if(userObj.id == reqUserId){
-                  $('[user-email]').html(userObj.email);
+                  $('[user-email]').html(`${userObj.first_name} ${userObj.last_name?userObj.last_name:''} (${userObj.role})`);
                   $('[user-email]').attr('selectedResourceId',userObj.id);
-                  $('[user-email]').attr('title',userObj.email);
+                  $('[user-email]').attr('title',`${userObj.first_name} ${userObj.last_name?userObj.last_name:''} (${userObj.role})`);
                 }
             });
         }

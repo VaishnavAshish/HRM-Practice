@@ -6,13 +6,16 @@ function addResource(modalId){
 	companyId=getURLParameter("companyid");
 	console.log(companyId);
 	clearError('#email');
-	let email=$("#email").val();
+	clearError('#first_name');
+	let email = $("#email").val();
+	let first_name = $("#first_name").val();
 	if(email===""||email===null||email===undefined){
 		addError('#email', "Please enter user email");
 	}else if(!(validateEmail(email))){
-			addError("#email","Please enter correct email id");
-		}else{
-
+		addError("#email","Please enter correct email id");
+	}else if(first_name === '' || first_name == null || first_name  == undefined){
+		addError('#email', "Please enter user first name");
+	}else{
 		userRole = $('#project_user_role').val();
 		if(companyId!=null){
 				userRole = 'Manager';
@@ -108,6 +111,10 @@ function deleteResource(resourceId){
 	    });
 	}
 function updateUser(userId){
+
+		$("#editResourceForm").removeClass('has-error')
+		clearError("#email");
+		clearError("#first_name");
 		let userCompanyId='<%= user.company_id %>';
 
 		console.log('user id is '+userId);
@@ -135,7 +142,9 @@ function updateUser(userId){
 		}
 		userData.team=$("#team").val();
 		if(userData.email==""||userData.email==null||userData.email==undefined){
-			addError("#email","Please enter email id");
+			addError("#email","Please enter user email id");
+		}else if(userData.first_name==""||userData.first_name==null||userData.first_name==undefined){
+			addError("#first_name","Please enter user first name");
 		}else{
 			showLoader('#globalLoader');
 			checkFormValidation("#editResourceForm");

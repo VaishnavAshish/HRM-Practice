@@ -31,13 +31,13 @@
                                                 Timesheets
                                             </div>
                                             <h1 class="slds-page-header__title slds-p-right_x-small text-height-normal ">
-                                                <% if(timeheet_users.length <= 0) {%> 
+                                                <% if(timeheet_users.length <= 0) {%>
                                                     Time Entry
                                                 <% } else { %>
                                                     <div class="slds-dropdown-trigger slds-dropdown-trigger_click cursor-pointer view-block max-w-350" aria-haspopup="true" title="" onclick="openDropdown(this, event, true);">
                                                         <div class="slds-grid  slds-grid_vertical-align-center">
-                                                            <div class="slds-truncate slds-no-flex" title="<%= user.email%>`" selectedResourceId="<%= user.id %>" user-email>
-                                                                <%= user.email%>
+                                                            <div class="slds-truncate slds-no-flex" title="<%= user.first_name%>  <%=user.last_name ?user.last_name:''%> (<%= user.role %>)" selectedResourceId="<%= user.id %>" user-email>
+                                                                <%= user.first_name%>  <%=user.last_name ?user.last_name:''%> (<%= user.role %>)
                                                             </div>
                                                             <i class="fa fa-caret-down lpd-5"></i>
                                                         </div>
@@ -45,10 +45,9 @@
                                                             <ul class="slds-dropdown__list">
                                                                 <% timeheet_users.forEach(function(timesheet_user) { %>
                                                                 <li class="slds-dropdown__item">
-                                                                    <a href="/timesheet/<%= timesheet_user.id %>#default" tabindex="0" title="<%= timesheet_user.email %> (<%= timesheet_user.first_name? timesheet_user.first_name:''%> <%=timesheet_user.last_name ?timesheet_user.last_name:''%>)">
+                                                                    <a href="/timesheet/<%= timesheet_user.id %>#default" tabindex="0" title="<%= timesheet_user.first_name? timesheet_user.first_name:''%> <%=timesheet_user.last_name ?timesheet_user.last_name:''%> (<%= timesheet_user.role %>)">
                                                                         <div class="slds-truncate slds-no-flex">
-                                                                            <%= timesheet_user.email %> 
-                                                                            (<%= timesheet_user.first_name? timesheet_user.first_name:''%> <%=timesheet_user.last_name ?timesheet_user.last_name:''%>)
+                                                                            <%= timesheet_user.first_name? timesheet_user.first_name:''%> <%=timesheet_user.last_name ?timesheet_user.last_name:''%> (<%= timesheet_user.role %>)
                                                                         </div>
                                                                     </a>
                                                                 </li>

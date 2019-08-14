@@ -205,7 +205,7 @@
                                                                                 <option value="" billRate="0.00" costRate="0.00"> </option>
                                                                                 <% if(userList.length > 0) { %>
                                                                                     <% userList.forEach(function(resource) { %>
-                                                                                        <option user_role="<%= resource.user_role %>" value="<%= resource.id %>" pr_as_id="<%= resource.assignment_id %>" billRate="<%= resource.bill_rate %>" costRate="<%= resource.cost_rate %>"> <%= resource.email %> (<%= resource.user_role %>)</option>
+                                                                                        <option user_role="<%= resource.user_role %>" value="<%= resource.id %>" pr_as_id="<%= resource.assignment_id %>" billRate="<%= resource.bill_rate %>" costRate="<%= resource.cost_rate %>"> <%= resource.first_name %> <%= resource.last_name?resource.last_name:'' %> (<%= resource.user_role %>)</option>
                                                                                     <% }); %>
                                                                                 <% } %>
                                                                             </select>

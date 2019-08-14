@@ -44,9 +44,9 @@
                                                                         <!-- <div class="slds-no-flex">
                                                                             <span class="slds-badge slds-align-middle" > <%= totalCount %> </span>
                                                                         </div> -->
-                                                                        <div class="slds-has-flexi-truncate slds-p-horizontal_small" title="<%= user.email %>(<%= user.first_name? user.first_name:''%> <%= user.last_name? user.last_name:''%>)" >
+                                                                        <div class="slds-has-flexi-truncate slds-p-horizontal_small" title="<%= user.first_name? user.first_name:''%> <%= user.last_name? user.last_name:''%> (<%= user.role %>)" >
                                                                             <div class="slds-truncate">
-                                                                                <%= user.email %> (<%= user.first_name? user.first_name:''%> <%= user.last_name? user.last_name:''%>)
+                                                                                <%= user.first_name? user.first_name:''%> <%= user.last_name? user.last_name:''%> (<%= user.role %>)
                                                                             </div>
                                                                         </div>
                                                                     </a>

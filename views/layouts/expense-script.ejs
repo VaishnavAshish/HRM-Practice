@@ -120,8 +120,8 @@ $(document).ready(function(){
         console.log(usersList);
         usersList.filter(function (userObj) {
             if(userObj.id == reqUserId){
-                $('#selectedFilter').html(userObj.email);
-                $('#selectedFilter').attr('title',userObj.email);
+                $('#selectedFilter').html(`${userObj.first_name} ${userObj.last_name?userObj.last_name:''} (${userObj.role})`);
+                $('#selectedFilter').attr('title',`${userObj.first_name} ${userObj.last_name?userObj.last_name:''} (${userObj.role})`);
             }
         });
     }

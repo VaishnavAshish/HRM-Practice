@@ -767,11 +767,22 @@ exports.getProjectDetail = (req, res) => {
                                     return false;
                                   } else {
                                     if(taskAssignResourceId.rows.length>0){
-                                      console.log('taskAssignResourceId.rows')
-                                      console.log(taskAssignResourceId.rows[0]);
-                                      data["user_id"]=taskAssignResourceId.rows[0].user_id;
-                                      data["user_role"]=taskAssignResourceId.rows[0].user_role;
-                                      data["user_email"]=taskAssignResourceId.rows[0].user_email.substring(0,taskAssignResourceId.rows[0].user_email.indexOf('('));
+                                      client.query('SELECT id, first_name, last_name, email FROM users WHERE id=$1', [taskAssignResourceId.rows[0].user_id], function (err, taskAssignResourceDetail) {
+                                        if (err) {
+                                          handleResponse.shouldAbort(err, client, done);
+                                          handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [], user:req.user, error:err},"error"," Error in finding user data");
+
+                                        } else {
+                                            console.log('taskAssignResourceId.rows')
+                                            console.log(taskAssignResourceId.rows[0]);
+                                            data["user_id"] = taskAssignResourceId.rows[0].user_id;
+                                            data["user_role"] = taskAssignResourceId.rows[0].user_role;
+                                            data["user_first_name"] = taskAssignResourceDetail.rows[0].first_name;
+                                            data["user_last_name"] = taskAssignResourceDetail.rows[0].last_name;
+                                            data["user_email"] = taskAssignResourceDetail.rows[0].email;
+                                            //data["user_email"]=taskAssignResourceId.rows[0].user_email.substring(0,taskAssignResourceId.rows[0].user_email.indexOf('('));
+                                        }
+                                      })
                                     }
                                   }
                                 })

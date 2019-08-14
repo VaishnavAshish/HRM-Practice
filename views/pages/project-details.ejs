@@ -343,12 +343,12 @@
                                                                         <div class="slds-grid">
                                                                              <div class="slds-has-flexi-truncate">
                                                                                 <div class="slds-truncate text-dull slds-p-bottom_xx-small text-size-11 text-uppercase">
-                                                                                                    Assign
+                                                                                                    Assigned
                                                                                 </div>
                                                                                 <div>
                                                                                     <span class="slds-avatar slds-avatar_small slds-avatar_circle cursor-pointer">
                                                                                       <% if(task.user_id) { %>
-                                                                                        <img alt="Person name" src="/getUserPicture/<%= task.user_id %>" title="<%= task.user_email %>(<%= task.user_role %>)">
+                                                                                        <img alt="Person name" src="/getUserPicture/<%= task.user_id %>" title="<%= task.user_first_name %> <%= task.user_last_name?task.user_last_name:'' %> (<%= task.user_role %>)">
                                                                                       <% } else { %>
                                                                                         <img alt="Person name" src="img/avatar1.jpg" title="Person">
                                                                                       <% } %>

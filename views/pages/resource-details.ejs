@@ -141,9 +141,10 @@
                                                 <div class="slds-form-element slds-m-bottom_medium">
                                                     <label class="slds-form-element__label">
                                                         First Name
+                                                        <abbr class="slds-required" title="required">*</abbr>
                                                     </label>
                                                     <div class="slds-form-element__control">
-                                                        <input type="text" id="first_name" class="slds-input" placeholder="" value="<%=resource.first_name;%>" <%=disableInput%> alphabet>
+                                                        <input type="text" id="first_name" class="slds-input" placeholder="" value="<%=resource.first_name;%>" <%=disableInput%> required="" alphabet>
                                                         <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
                                                         </div>
                                                     </div>
