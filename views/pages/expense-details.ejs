@@ -466,6 +466,23 @@
                                             <% } %>
                                         </div>
                                     </div>
+
+                                    <div class="slds-form-element slds-m-bottom_medium">
+                                        <label class="slds-form-element__label">
+                                            Total amount
+                                            <!-- <abbr class="slds-required" title="required">*</abbr> -->
+                                        </label>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-select_container">
+                                                <%= parseFloat(expense.amount).toFixed(2) + parseFloat(expense.tax_amount).toFixed(2) %>
+                                            </div>
+                                            <!-- <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" id="err-msg-project">
+
+                                            </div> -->
+                                        </div>
+                                    </div>
+
+
                                 </div>
                             </div>
                             <div class="slds-col slds-size_1-of-1">

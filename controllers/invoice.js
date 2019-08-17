@@ -2728,7 +2728,7 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
             req.body.pdfFile =  buffer;
             console.log('req.body.pdfFile')
             console.log(req.body.pdfFile)
-            sendEmail(req,res,invoiceDetails,accountDetails,companyName, function(error, info) {
+            sendEmail(req,res,invoiceDetails,accountDetails,companyName,companySetting, function(error, info) {
               if (error) {
                 handleResponse.handleError(res, error, 'Error in sending email');
               } else {
@@ -2759,7 +2759,7 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
 
 }
 
-sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
+sendEmail = (req, res, invoiceDetails, accountDetails,companyName,companySetting, next) => {
   let serverName = process.env.BASE_URL;
   let redirectUrl = serverName + '/invoice-html-view/' + req.body.invoiceId;
   console.log("redirectUrl");
@@ -2781,7 +2781,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
                 <tbody>
                     <tr>
                         <td valign="top" align="center" style="padding-top: 20px; padding-bottom: 10px;">
-                            <a href="javascript:void(0);" target="_blank"><img src="${process.env.BASE_URL}/img/krow-logo.png" alt="" width="84" height="29"></a>
+                            <a href="javascript:void(0);" target="_blank"><img src="data:image/jpeg;base64, ${Buffer.from(companySetting.company_logo).toString('base64')}" alt="company_logo" class="max-w-150"></a>
                         </td>
                     </tr>
                     <tr>
@@ -2840,12 +2840,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
                                                         <p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; line-height: 20px;">
                                                             ${emailBody}
                                                         </p>
-                                                        <p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; margin-bottom: 5px;">
-                                                            Thank you for your business,
-                                                        </p>
-                                                        <p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; margin-top: 5px;">
-                                                            ${companyName}
-                                                        </p>
+                                                        
                                                     </td>
                                                 </tr>
 
@@ -2856,14 +2851,23 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
                             </tbody></table>
                         </td>
                     </tr>
-                    <tr>
-                        <td valign="top" align="center" style=" font-family: arial,sans-serif; padding:20px 20px 20px 20px; color: #999; font-size: 14px;">
-                            For more help and support <a href="${process.env.BASE_URL}" target="_blank" style="color: #4387fd;"> contact us</a>
-                        </td>
-                    </tr>
+                    
                 </tbody>
             </table>
         </div></body></html>`;
+
+        // <tr>
+        //     <td valign="top" align="center" style=" font-family: arial,sans-serif; padding:20px 20px 20px 20px; color: #999; font-size: 14px;">
+        //         For more help and support <a href="${process.env.BASE_URL}" target="_blank" style="color: #4387fd;"> contact us</a>
+        //     </td>
+        // </tr>
+
+        // <p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; margin-bottom: 5px;">
+        //     Thank you for your business,
+        // </p>
+        // <p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; margin-top: 5px;">
+        //     ${companyName}
+        // </p>
         // <table border="0" cellpadding="0" cellspacing="0" width="100%">
         //     <tbody>
         //         <tr>
