@@ -475,7 +475,7 @@
                                             </label>
                                             <div class="slds-has-flexi-truncate">
                                                 <span>
-                                                    <% (parseFloat(expense.amount).toFixed(2)) + (parseFloat(expense.tax_amount).toFixed(2)) %>
+                                                    <% (parseFloat(expense.amount) + parseFloat(expense.tax_amount)).toFixed(2) %>
                                                 </span>
                                                 
                                                 <!-- <div class="slds-text-color_error text-size-12 slds-p-top_xx-small" id="err-msg-project">

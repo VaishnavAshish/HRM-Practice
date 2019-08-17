@@ -2117,6 +2117,7 @@ function invoiceHtmlData (req,res,invoiceHtml,responseType){
                                     handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.user, error:err,pdfError:true},"error"," Error in fetching invoice details");
                                 }
                             } else {
+                                    console.log(companySetting.rows[0])
                                     client.query('SELECT il.id ,il.type ,il.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,il.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,il.item_date at time zone \''+companyDefaultTimezone+'\' as item_date ,il.archived ,il.hours ,il.unit_price ,il.cost_rate ,il.note ,il.amount ,il.tax ,il.total_amount ,il.timesheet_id ,il.expense_id ,il.project_id ,il.account_id ,il.invoice_id ,il.company_id ,il.user_id ,il.user_role ,il.quantity ,il.record_id ,il.currency ,il.timesheet_row_id FROM invoice_line_item il WHERE  invoice_id=$1 ORDER BY project_id,timesheet_id,expense_id,created_date',[invId], function (err, invoiceLineItems) {
                                         if (err) {
                                             handleResponse.shouldAbort(err, client, done);
