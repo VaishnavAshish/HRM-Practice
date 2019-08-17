@@ -2772,8 +2772,10 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName,companySetting
   let currency_symbols = currencyWithSymbolArray.filter(function(currency){
       return currency.name == invoiceDetails.currency;
   })
-  console.log(currency_symbols);
-  console.log(emailBody);
+  // console.log(currency_symbols);
+  // console.log(emailBody);
+  console.log('companySetting.company_logo');
+    console.log(companySetting.company_logo);
   let startDateFormatted=invoiceDetails['created_date']==null?'':moment.tz(invoiceDetails.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
   let dueDateFormatted=invoiceDetails['due_date']==null?'':moment.tz(invoiceDetails.due_date, companyDefaultTimezone).format('MM-DD-YYYY');
   let html = `<html><head></head><body><div style="background-color: #f7f8f9;">
