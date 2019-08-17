@@ -373,7 +373,7 @@ exports.getExpenseDetail = (req, res) => {
             /*handleResponse.handleError(res, 'incorrect expense id', ' Expense id is not correct');*/
         } else {
             pool.connect((err, client, done) => {
-                client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id,e.submitted,e.content_type,e.document,e.doc_file_name FROM EXPENSE e where id=$1 AND company_id=$2', [req.query.expenseId, req.user.company_id], function(err, expense) {
+                client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.total_amount,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id,e.submitted,e.content_type,e.document,e.doc_file_name FROM EXPENSE e where id=$1 AND company_id=$2', [req.query.expenseId, req.user.company_id], function(err, expense) {
                     if (err) {
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);
