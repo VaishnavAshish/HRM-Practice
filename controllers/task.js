@@ -108,7 +108,7 @@ exports.findTaskByName = (req, res) => {
             offset=req.body.offset;
           }
           let queryToExec='SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,t.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,t.archived ,t.project_name ,t.record_id,(SELECT count(*) FROM TASK WHERE '+req.body.searchField+' ilike $1 AND company_id=$2 AND project_id=$3 AND archived=false) as searchcount FROM task t WHERE '+req.body.searchField+
-          ' ilike $1 AND company_id=$2 AND project_id=$3 AND archived=false ORDER BY project_id,start_date DESC,name OFFSET '+offset+' LIMIT '+process.env.PAGE_RECORD_NO;
+          ' ilike $1 AND company_id=$2 AND project_id=$3 AND archived=false ORDER BY id,project_id,start_date DESC,name OFFSET '+offset+' LIMIT '+process.env.PAGE_RECORD_NO;
           // console.log('queryToExec '+queryToExec+' '+'%'+req.body.searchText+'%'+' '+req.user.company_id+' '+req.body.project_id);
           client.query(queryToExec,['%'+req.body.searchText+'%',req.user.company_id,req.body.project_id], function (err, tasks) {
             if (err) {
@@ -116,7 +116,6 @@ exports.findTaskByName = (req, res) => {
               handleResponse.handleError(res, err, ' Error in finding task data');
             }
             else{
-
               client.query('SELECT distinct on (task_id) task_id, user_email, updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date FROM TASK_ASSIGNMENT WHERE project_id=$1 AND company_id=$2 order by task_id, updated_date desc', [req.body.project_id, req.user.company_id], function (err, taskAssList) {
                 if (err) {
                   handleResponse.shouldAbort(err, client, done);
@@ -221,17 +220,39 @@ exports.postAddTask = (req, res) => {
                   let reqData = {};
                   reqData.assigned_user_id = null;
                   createTaskRecord(req, client, err, done, reqData, res, function (result) {
-                    client.query('COMMIT', (err) => {
-                      if (err) {
-                        // console.log('Error committing transaction', err.stack)
-                        handleResponse.shouldAbort(err, client, done);
-                        handleResponse.handleError(res, err, ' Error in committing transaction');
-                      } else {
-                        done();
-                        handleResponse.sendSuccess(res,'Task added successfully',{});
-                      }
-                    })
+                    var reqData = req.body.taskData;
+                    reqData.project_id = req.body.projectId;
+                    if(req.body.taskData.assigned_user) {
+                      commonController.createTaskAssignment(req, client, err, done, result, req.body.taskData.res_bill_rate, req.body.taskData.res_cost_rate, reqData, res, function (result2) {
+                         if(result2) {
+                           client.query('COMMIT', (err) => {
+                             if (err) {
+                               // console.log('Error committing transaction', err.stack)
+                               handleResponse.shouldAbort(err, client, done);
+                               handleResponse.handleError(res, err, ' Error in committing transaction');
+                             } else {
+                                done();
+                                handleResponse.sendSuccess(res,'Task added successfully',{});
+                             }
+                           })
+                           // done();
+                           // handleResponse.sendSuccess(res,'Task added successfully',{});
+                         }
+                       });
+                    } else {
+                      client.query('COMMIT', (err) => {
+                        if (err) {
+                          // console.log('Error committing transaction', err.stack)
+                          handleResponse.shouldAbort(err, client, done);
+                          handleResponse.handleError(res, err, ' Error in committing transaction');
+                        } else {
+                           done();
+                           handleResponse.sendSuccess(res,'Task added successfully',{});
+                        }
+                      })
+                    }
                   });
+
                   // var reqData = req.body.taskData;
                   // reqData.project_id = req.body.projectId;
                   // if(req.body.taskData.assigned_user) {
@@ -313,12 +334,16 @@ function updateTaskRecord(req, client, err, done, res, taskData, callback) {
   if(req.body.taskDetails.task_complete_per == ''){
     req.body.taskDetails.task_complete_per = 0;
   }
-  client.query('UPDATE TASK SET name=$1, start_date=$2, end_date=$3, billable=$4, status=$5, description=$6, estimated_hours=$7, priority=$8, updated_date=$9, assigned_user_id=$12 , percent_completed=$13 WHERE id=$10 AND company_id=$11 RETURNING id', [req.body.taskDetails.title, start_date, end_date, req.body.taskDetails.billable, req.body.taskDetails.status, req.body.taskDetails.description, req.body.taskDetails.estimated_hours, req.body.taskDetails.priority, 'now()', req.body.taskDetails.taskId, req.user.company_id, taskData.assigned_user_id, req.body.taskDetails.task_complete_per], function (err, updatedData) {
+  console.log('taskData.assigned_user_id')
+  console.log(taskData.assigned_user_id)
+  client.query('UPDATE TASK SET name=$1, start_date=$2, end_date=$3, billable=$4, status=$5, description=$6, estimated_hours=$7, priority=$8, updated_date=$9, assigned_user_id=$12 , percent_completed=$13 WHERE id=$10 AND company_id=$11 RETURNING *', [req.body.taskDetails.title, start_date, end_date, req.body.taskDetails.billable, req.body.taskDetails.status, req.body.taskDetails.description, req.body.taskDetails.estimated_hours, req.body.taskDetails.priority, 'now()', req.body.taskDetails.taskId, req.user.company_id, taskData.assigned_user_id, req.body.taskDetails.task_complete_per], function (err, updatedData) {
     if (err) {
       console.error(err);
       handleResponse.shouldAbort(err, client, done);
       handleResponse.handleError(res, err, ' Error in updating task.');
     } else {
+      console.log('updated task record')
+      console.log(updatedData.rows[0]);
       return callback(updatedData.rows[0].id);
     }
   });
@@ -356,13 +381,13 @@ exports.getTaskDetails = (req, res) => {
                         handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.user, error:err},"error"," Error in finding task data");
                         /*handleResponse.handleError(res, err, ' Error in finding task data');*/
                       } else {
-                          client.query('SELECT id,email,bill_rate,cost_rate, role as user_role FROM USERS WHERE id NOT IN (SELECT user_id FROM PROJECT_ASSIGNMENT WHERE project_id=$1) AND company_id=$2 AND archived=$3', [taskDetail.rows[0].project_id,req.user.company_id,false], function (err, userList) {
+                          client.query('SELECT id,email,bill_rate,cost_rate, role as user_role,first_name,last_name FROM USERS WHERE id NOT IN (SELECT user_id FROM PROJECT_ASSIGNMENT WHERE project_id=$1) AND company_id=$2 AND archived=$3', [taskDetail.rows[0].project_id,req.user.company_id,false], function (err, userList) {
                             if (err) {
                               console.error(err);
                               handleResponse.shouldAbort(err, client, done);
                               handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.user, error:err},"error"," Error in finding users data");
                             } else {
-                              client.query('SELECT u.id, u.email, pa.bill_rate, pa.cost_rate, pa.user_role, pa.id as assignment_id from PROJECT_ASSIGNMENT pa INNER JOIN users u ON pa.user_id = u.id AND pa.company_id = u.company_id AND u.archived = $1 AND pa.project_id = $2', [false, taskDetail.rows[0].project_id], function (err, resList) {
+                              client.query('SELECT u.id, u.email,u.first_name, u.last_name, pa.bill_rate, pa.cost_rate, pa.user_role, pa.id as assignment_id from PROJECT_ASSIGNMENT pa INNER JOIN users u ON pa.user_id = u.id AND pa.company_id = u.company_id AND u.archived = $1 AND pa.project_id = $2', [false, taskDetail.rows[0].project_id], function (err, resList) {
                                 if (err) {
                                   console.error(err);
                                   handleResponse.shouldAbort(err, client, done);
@@ -385,13 +410,19 @@ exports.getTaskDetails = (req, res) => {
                                     }
                                     taskDetail.rows[0]["startDateFormatted"] = startDateFormatted;
                                     taskDetail.rows[0]["endDateFormatted"] = endDateFormatted;
-                                    if(taskAssignDetail.rows.length>0){
-                                      taskDetail.rows[0]["user_id"]=taskAssignDetail.rows[0].user_id;
-                                      taskDetail.rows[0]["user_email"]=taskAssignDetail.rows[0].user_email;
+                                    taskDetail.rows[0]["user_id"] = null;
+                                    taskDetail.rows[0]["user_email"] = null;
+                                    console.log('required details')
+                                    //console.log( taskDetail.rows[0].assigned_user_id)
+                                    //console.log( taskAssignDetail.rows[0].user_id)
+                                    if(taskAssignDetail.rows.length>0 && taskDetail.rows[0].assigned_user_id != null){
+                                      taskDetail.rows[0]["user_id"] = taskAssignDetail.rows[0].user_id;
+                                      taskDetail.rows[0]["user_email"] = taskAssignDetail.rows[0].user_email;
+
                                     }
-                                    if(userList.rows.length>0){
+                                    /*if(userList.rows.length>0){
                                         userListCombined=userListCombined.concat(userList.rows);
-                                    }
+                                    }*/
                                     if(resList.rows.length>0){
                                         userListCombined=userListCombined.concat(resList.rows);
                                     }
@@ -441,17 +472,86 @@ exports.postEditTask = (req, res) => {
                       handleResponse.shouldAbort(err, client, done);
                       handleResponse.handleError(res, err, ' Error in finding task data for updating');
                     } else {
-                      client.query('COMMIT', (err) => {
-                        if (err) {
-                          handleResponse.shouldAbort(err, client, done);
-                          handleResponse.handleError(res, err, ' Error in ending transaction ');
-                        } else {
+
                           if (taskDetail.rows.length > 0) {
                             var taskData = {};
-                            taskData.assigned_user_id = null;
+                            taskData.assigned_user_id = req.body.taskDetails.assignment_id;
+                            console.log('taskData.assigned_user_id')
+                            console.log(taskData.assigned_user_id)
                             updateTaskRecord(req, client, err, done, res, taskData, function (taskId) {
-                                  done();
-                                  handleResponse.sendSuccess(res,'Task added successfully',{});
+                                var reqData = req.body.taskDetails;
+                                 if(req.body.taskDetails.assignment_id != null) {
+                                    commonController.checkTaskAssignment(req, client, err, done, reqData, res, function (response) {
+                                      if(!response) {
+                                        console.log('inside task assignment not found ')
+                                        commonController.checkProjectAssignment(req, client, err, done, reqData, res, function (isProjectAssignment) {
+                                            let billRate = 0;
+                                            let costRate = 0;
+                                            if(!isProjectAssignment) {
+                                              billRate = req.user.bill_rate;
+                                              costRate = req.user.cost_rate;
+                                            } else {
+                                              billRate = isProjectAssignment.bill_rate;
+                                              costRate = isProjectAssignment.cost_rate;
+                                            }
+                                            commonController.checkTaskAssignmentForTask(req, client, err, done, reqData, res, function (isTaskAssigned) {
+                                              if(isTaskAssigned){
+                                                console.log('inside checkTaskAssignmentForTask');
+                                                commonController.updateTaskAssignment(req, client, err, done, taskId, billRate, costRate, reqData, res, function (result2) {
+                                                  if(result2) {
+                                                    client.query('COMMIT', (err) => {
+                                                      if (err) {
+                                                        handleResponse.shouldAbort(err, client, done);
+                                                        handleResponse.handleError(res, err, ' Error in ending transaction ');
+                                                      } else {
+                                                        done();
+                                                        handleResponse.sendSuccess(res,'Task added successfully',{});
+                                                      }
+                                                    })
+                                                  }
+                                                });
+                                              } else {
+                                                console.log('inside create new task assignment')
+                                                commonController.createTaskAssignment(req, client, err, done, taskId, billRate, costRate, reqData, res, function (result2) {
+                                                  if(result2) {
+                                                    client.query('COMMIT', (err) => {
+                                                      if (err) {
+                                                        handleResponse.shouldAbort(err, client, done);
+                                                        handleResponse.handleError(res, err, ' Error in ending transaction ');
+                                                      } else {
+                                                        done();
+                                                        handleResponse.sendSuccess(res,'Task updated successfully',{});
+                                                      }
+                                                    })
+                                                  }
+                                                });
+                                              }
+                                            })
+                                          })
+
+                                      } else {
+                                        client.query('COMMIT', (err) => {
+                                          if (err) {
+                                            handleResponse.shouldAbort(err, client, done);
+                                            handleResponse.handleError(res, err, ' Error in ending transaction ');
+                                          } else {
+                                            done();
+                                            handleResponse.sendSuccess(res,'Task updated successfully',{});
+                                          }
+                                        })
+                                      }
+                                    })
+                                } else {
+                                  client.query('COMMIT', (err) => {
+                                    if (err) {
+                                      handleResponse.shouldAbort(err, client, done);
+                                      handleResponse.handleError(res, err, ' Error in ending transaction ');
+                                    } else {
+                                      done();
+                                      handleResponse.sendSuccess(res,'Task updated successfully',{});
+                                    }
+                                  })
+                                }
                             });
                             // console.log("Assignment id");
                             // console.log(req.body.taskDetails);
@@ -515,8 +615,8 @@ exports.postEditTask = (req, res) => {
                             done();
                             handleResponse.sendSuccess(res,"no task found",{"msg":"no task found"});
                           }
-                        }
-                      })
+                      //   }
+                      // })
                     }
                   })
                 }

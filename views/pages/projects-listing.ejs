@@ -218,14 +218,14 @@
                                                     <th class="slds-is-sortable" scope="col" width="25%">
                                                         <span class="slds-truncate" title="Project Title">Project Title</span>
                                                     </th>
+                                                    <th class="slds-is-sortable " scope="col">
+                                                        <span class="slds-truncate" title="Account">Account</span>
+                                                    </th>
                                                     <th class="slds-is-sortable" scope="col">
                                                         <span class="slds-truncate" title="Start Date">Start Date</span>
                                                     </th>
                                                     <th class="slds-is-sortable" scope="col">
                                                         <span class="slds-truncate" title="End Date">End Date</span>
-                                                    </th>
-                                                    <th class="slds-is-sortable " scope="col">
-                                                        <span class="slds-truncate" title="Account">Account</span>
                                                     </th>
                                                     <th class="slds-is-sortable " scope="col">
                                                         <span class="slds-truncate" title="Status">Status</span>
@@ -257,6 +257,11 @@
                                                     </th>
                                                     <td role="gridcell">
                                                         <div class="slds-truncate" title="">
+                                                            <%= project.account_name %>
+                                                        </div>
+                                                    </td>
+                                                    <td role="gridcell">
+                                                        <div class="slds-truncate" title="">
                                                             <%= project.startDateFormatted %>
                                                         </div>
                                                     </td>
@@ -265,11 +270,7 @@
                                                             <%= project.endDateFormatted %>
                                                         </div>
                                                     </td>
-                                                    <td role="gridcell">
-                                                        <div class="slds-truncate" title="">
-                                                            <%= project.account_name %>
-                                                        </div>
-                                                    </td>
+                                                    
                                                     <td role="gridcell">
                                                         <div class="slds-truncate" title="">
                                                             <% if(project.status == "Not Started") { %>

@@ -627,7 +627,7 @@ function getUserProjectAssignmentRoles(req, client, err, done, res, result) {
 }
 
 function getAllCompanyUsers(req, client, err, done, res, result) {
-  client.query('SELECT id, role, email FROM users WHERE company_id=$1 AND archived=$2',[req.user.company_id, false], function(err, userRoles) {
+  client.query('SELECT id, role, email,first_name , last_name FROM users WHERE company_id=$1 AND archived=$2',[req.user.company_id, false], function(err, userRoles) {
     if (err) {
       handleResponse.shouldAbort(err, client, done);
       handleResponse.handleError(res, err, ' Error in updating timesheet detail data');

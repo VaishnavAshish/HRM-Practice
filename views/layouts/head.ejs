@@ -53,5 +53,14 @@
          display: block;
      }
     </style>
+    <script>
+      let url = window.location.href.split(':');
+      if(!window.location.href.includes('localhost')){
+        if(url[0] == 'http'){
+          url[0] = 'https';
+          window.location.href = url.join(':');
+        }
+      }
+    </script>
 
 </head>

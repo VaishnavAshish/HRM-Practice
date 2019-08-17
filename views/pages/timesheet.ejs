@@ -36,18 +36,18 @@
                                                 <% } else { %>
                                                     <div class="slds-dropdown-trigger slds-dropdown-trigger_click cursor-pointer view-block max-w-350" aria-haspopup="true" title="" onclick="openDropdown(this, event, true);">
                                                         <div class="slds-grid  slds-grid_vertical-align-center">
-                                                            <div class="slds-truncate slds-no-flex" title="<%= user.email%>`" selectedResourceId="<%= user.id %>" user-email>
-                                                                <%= user.email%>
+                                                            <div class="slds-truncate slds-no-flex" title="<%= user.first_name%>  <%=user.last_name ?user.last_name:''%> (<%= user.role %>)" selectedResourceId="<%= user.id %>" user-email>
+                                                                <%= user.first_name%>  <%=user.last_name ?user.last_name:''%> (<%= user.role %>)
                                                             </div>
                                                             <i class="fa fa-caret-down lpd-5"></i>
                                                         </div>
                                                         <div class="slds-dropdown slds-dropdown_left text-normal max-w-250 slds-dropdown_length-5">
                                                             <ul class="slds-dropdown__list">
-                                                                <% timeheet_users.forEach(function(timeheet_user) { %>
+                                                                <% timeheet_users.forEach(function(timesheet_user) { %>
                                                                 <li class="slds-dropdown__item">
-                                                                    <a href="/timesheet/<%= timeheet_user.id %>#default" tabindex="0" title="<%= timeheet_user.email %> (<%= timeheet_user.role%>)">
+                                                                    <a href="/timesheet/<%= timesheet_user.id %>#default" tabindex="0" title="<%= timesheet_user.first_name? timesheet_user.first_name:''%> <%=timesheet_user.last_name ?timesheet_user.last_name:''%> (<%= timesheet_user.role %>)">
                                                                         <div class="slds-truncate slds-no-flex">
-                                                                            <%= timeheet_user.email %> (<%= timeheet_user.role%>)
+                                                                            <%= timesheet_user.first_name? timesheet_user.first_name:''%> <%=timesheet_user.last_name ?timesheet_user.last_name:''%> (<%= timesheet_user.role %>)
                                                                         </div>
                                                                     </a>
                                                                 </li>

@@ -701,7 +701,7 @@ exports.getProjectDetail = (req, res) => {
             /*handleResponse.handleError(res, "incorrect project id", " Project id is not correct");*/
           } else {
             pool.connect((err, client, done) => {
-              client.query('SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id,p.total_hours,p.total_invoice_amount,p.total_expense_amount,p.total_invoice_time,p.total_invoice_expense FROM PROJECT p where id=$1 AND company_id=$2', [req.query.projectId, req.user.company_id], function (err, project) {
+              client.query('SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id,p.total_hours,p.total_invoice_amount,p.total_expense_amount,p.total_invoice_time,p.total_invoice_expense,(SELECT count(id) from task where project_id = $1 AND status = $3) as total_completed_task_count FROM PROJECT p where id=$1 AND company_id=$2', [req.query.projectId, req.user.company_id,"Completed"], function (err, project) {
                 if (err) {
                   console.error(err);
                   handleResponse.shouldAbort(err, client, done);
@@ -712,7 +712,7 @@ exports.getProjectDetail = (req, res) => {
                     // console.error('getProject>>>>>>>>>>>>>');
                     // // console.log(project.rows[0]);
                     // console.log('queryToExec in project details: SELECT t.*,(select count(*) from TASK where company_id=$1 AND project_id=$2 AND archived=$3) as total FROM TASK t where company_id=$1 AND project_id=$2 AND archived=$3 ORDER BY project_id,name OFFSET 0 LIMIT '+process.env.PAGE_RECORD_NO+' '+req.user.company_id+' '+ req.query.projectId+' '+ false);
-                    client.query('SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date ,t.updated_date ,t.archived ,t.project_name ,t.record_id ,(select count(*) from TASK where company_id=$1 AND project_id=$2 AND archived=$3) as total FROM TASK t where company_id=$1 AND project_id=$2 AND archived=$3 ORDER BY project_id,start_date DESC,name OFFSET 0 LIMIT '+process.env.PAGE_RECORD_NO, [req.user.company_id, req.query.projectId, false], function (err, taskList) {
+                    client.query('SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date ,t.updated_date ,t.archived ,t.project_name ,t.record_id ,(select count(*) from TASK where company_id=$1 AND project_id=$2 AND archived=$3) as total FROM TASK t where company_id=$1 AND project_id=$2 AND archived=$3 ORDER BY id,project_id,start_date DESC,name OFFSET 0 LIMIT '+process.env.PAGE_RECORD_NO, [req.user.company_id, req.query.projectId, false], function (err, taskList) {
                       if (err) {
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);
@@ -752,21 +752,41 @@ exports.getProjectDetail = (req, res) => {
                               }
                               data["startDateFormatted"] = startDateFormatted;
                               data["endDateFormatted"] = endDateFormatted;
-                              client.query('SELECT user_id,user_email,user_role FROM TASK_ASSIGNMENT where task_id=$1', [data.id], function (err, taskAssignResourceId) {
-                                if (err) {
-                                  console.error(err);
-                                  handleResponse.shouldAbort(err, client, done);
-                                  handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [], user:req.user, error:err},"error"," Error in finding task assignment data");
-                                  return false;
-                                } else {
-                                  if(taskAssignResourceId.rows.length>0){
-                                    data["user_id"]=taskAssignResourceId.rows[0].user_id;
-                                    data["user_role"]=taskAssignResourceId.rows[0].user_role;
-                                    data["user_email"]=taskAssignResourceId.rows[0].user_email.substring(0,taskAssignResourceId.rows[0].user_email.indexOf('('));
+                              console.log('task assignment detail')
+                              console.log(data.id)
+                              console.log(data.assigned_user_id)
+                              data["user_id"]='';
+                              data["user_role"]='';
+                              data["user_email"]='';
+                              if(data.assigned_user_id){
+                                client.query('SELECT user_id,user_email,user_role FROM TASK_ASSIGNMENT where task_id=$1', [data.id], function (err, taskAssignResourceId) {
+                                  if (err) {
+                                    console.error(err);
+                                    handleResponse.shouldAbort(err, client, done);
+                                    handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [], user:req.user, error:err},"error"," Error in finding task assignment data");
+                                    return false;
+                                  } else {
+                                    if(taskAssignResourceId.rows.length>0){
+                                      client.query('SELECT id, first_name, last_name, email FROM users WHERE id=$1', [taskAssignResourceId.rows[0].user_id], function (err, taskAssignResourceDetail) {
+                                        if (err) {
+                                          handleResponse.shouldAbort(err, client, done);
+                                          handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [], user:req.user, error:err},"error"," Error in finding user data");
 
+                                        } else {
+                                            console.log('taskAssignResourceId.rows')
+                                            console.log(taskAssignResourceId.rows[0]);
+                                            data["user_id"] = taskAssignResourceId.rows[0].user_id;
+                                            data["user_role"] = taskAssignResourceId.rows[0].user_role;
+                                            data["user_first_name"] = taskAssignResourceDetail.rows[0].first_name;
+                                            data["user_last_name"] = taskAssignResourceDetail.rows[0].last_name;
+                                            data["user_email"] = taskAssignResourceDetail.rows[0].email;
+                                            //data["user_email"]=taskAssignResourceId.rows[0].user_email.substring(0,taskAssignResourceId.rows[0].user_email.indexOf('('));
+                                        }
+                                      })
+                                    }
                                   }
-                                }
-                              })
+                                })
+                              }
                             });
                             taskTotalCount=taskList.rows[0].total;
                         }
@@ -792,6 +812,8 @@ exports.getProjectDetail = (req, res) => {
                                     handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [], user:req.user, error:err},"error"," Error in finding user data");
                                     /*handleResponse.handleError(res, err, ' Error in finding user data');*/
                                   } else {
+                                    console.log('res users')
+                                    console.log(resUsers.rows);
                                     client.query('SELECT user_role FROM SETTING WHERE company_id=$1', [req.user.company_id], function (err, userRoleData) {
                                       if (err) {
                                         console.error(err);
@@ -815,8 +837,8 @@ exports.getProjectDetail = (req, res) => {
                                               projectConversationThread.rows.forEach(data=>{
                                                   data.modified_date = moment.tz(data.modified_date, companyDefaultTimezone).format('MM-DD-YYYY hh:mm:ss');
                                               })
-                                              console.log('projectConversationThread')
-                                              console.log(projectConversationThread.rows)
+                                              // console.log('projectConversationThread')
+                                              // console.log(projectConversationThread.rows)
                                               done();
                                               handleResponse.responseToPage(res,'pages/project-details',{ project: project.rows[0], userRoleList:userRole ,tasks: taskList.rows, accounts: accountList.rows, userList: userList.rows, user: req.user, resUsers: resUsers.rows ,taskTotalCount:taskTotalCount,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD'),stripeCustomerId:result.stripe_customer_id,"projectConversationThread":projectConversationThread.rows },"success","Successfully rendered");
                                               /*res.render('pages/project-details', { project: project.rows[0], tasks: taskList.rows, accounts: accountList.rows, userList: userList.rows, user: req.user, error: err, resUsers: resUsers.rows });*/
