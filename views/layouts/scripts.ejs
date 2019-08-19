@@ -280,8 +280,10 @@
       }
       return false;
     }
+
+    //[a-zA-Z][a-zA-Z ]+[a-zA-Z]
     function alphabetChecking(inputtxt){
-      var alphaExp = /^[a-zA-Z][a-zA-Z ]+[a-zA-Z]$/i;
+      var alphaExp = /^[a-zA-Z][a-zA-Z ]+[a-zA-Z]*$/;
       if(inputtxt.match(alphaExp)) {
           return true;
       }
