@@ -220,7 +220,7 @@ passport.use('user', new LocalStrategy({ usernameField: 'email',passReqToCallbac
   let domain=req.body.domain;
 
   pool.connect((err, client, poolDone) => {
-    client.query("select * from company INNER JOIN (SELECT company_id,stripe_customer_id,stripe_subscription_id,quickbook_enabled,xero_enabled FROM setting) setting ON company.id = setting.company_id AND company.domain=$1 AND company.archived=$2", [domain,false], function(err, company) {
+    client.query("select * from company INNER JOIN (SELECT company_id,stripe_customer_id,stripe_subscription_id,quickbook_enabled,xero_enabled FROM setting) setting ON company.id = setting.company_id AND company.domain ilike $1 AND company.archived=$2", [domain,false], function(err, company) {
     // client.query("select * from company where domain=$1 AND archived=$2", [domain,false], function(err, company) {
       if (err) {
         // console.log('err-----------' + JSON.stringify(err));

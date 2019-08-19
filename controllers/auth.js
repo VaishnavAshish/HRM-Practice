@@ -58,7 +58,7 @@ exports.getLogin = (req, res) => {
             handleResponse.responseToPage(res,'pages/login',{domain: req.query.domain,isAuthenticate : false},"error"," Error in connecting to the database");
             /*handleResponse.handleError(res, err, ' Error in connecting to the database');*/
           } else {
-            client.query('SELECT * FROM COMPANY where domain = $1 AND token=$2', [req.query.domain, req.query.token], function (err, company) {
+            client.query('SELECT * FROM COMPANY where domain ilike $1 AND token=$2', [req.query.domain, req.query.token], function (err, company) {
               if (err) {
                 handleResponse.shouldAbort(err, client, done);
                 handleResponse.responseToPage(res,'pages/login',{domain: req.query.domain,isAuthenticate : false},"error"," Error in finding company data");
@@ -96,7 +96,7 @@ exports.getLogin = (req, res) => {
                     }
                   });
                 } else {
-                  client.query('SELECT * FROM COMPANY where domain = $1 AND add_status=$2', [req.query.domain, 'Approved'], function (err, getComp) {
+                  client.query('SELECT * FROM COMPANY where domain ilike $1 AND add_status=$2', [req.query.domain, 'Approved'], function (err, getComp) {
                     if(err) {
                       handleResponse.shouldAbort(err, client, done);
                       handleResponse.responseToPage(res,'pages/login',{domain: req.query.domain,isAuthenticate : false},"error"," Error in finding company");
