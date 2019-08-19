@@ -2117,6 +2117,7 @@ function invoiceHtmlData (req,res,invoiceHtml,responseType){
                                     handleResponse.responseToPage(res,'pages/invoice-html-view',{user:req.user, error:err,pdfError:true},"error"," Error in fetching invoice details");
                                 }
                             } else {
+                                    console.log(companySetting.rows[0])
                                     client.query('SELECT il.id ,il.type ,il.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,il.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,il.item_date at time zone \''+companyDefaultTimezone+'\' as item_date ,il.archived ,il.hours ,il.unit_price ,il.cost_rate ,il.note ,il.amount ,il.tax ,il.total_amount ,il.timesheet_id ,il.expense_id ,il.project_id ,il.account_id ,il.invoice_id ,il.company_id ,il.user_id ,il.user_role ,il.quantity ,il.record_id ,il.currency ,il.timesheet_row_id FROM invoice_line_item il WHERE  invoice_id=$1 ORDER BY project_id,timesheet_id,expense_id,created_date',[invId], function (err, invoiceLineItems) {
                                         if (err) {
                                             handleResponse.shouldAbort(err, client, done);
@@ -2728,7 +2729,7 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
             req.body.pdfFile =  buffer;
             console.log('req.body.pdfFile')
             console.log(req.body.pdfFile)
-            sendEmail(req,res,invoiceDetails,accountDetails,companyName, function(error, info) {
+            sendEmail(req,res,invoiceDetails,accountDetails,companyName,companySetting, function(error, info) {
               if (error) {
                 handleResponse.handleError(res, error, 'Error in sending email');
               } else {
@@ -2759,7 +2760,7 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
 
 }
 
-sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
+sendEmail = (req, res, invoiceDetails, accountDetails,companyName,companySetting, next) => {
   let serverName = process.env.BASE_URL;
   let redirectUrl = serverName + '/invoice-html-view/' + req.body.invoiceId;
   console.log("redirectUrl");
@@ -2772,8 +2773,10 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
   let currency_symbols = currencyWithSymbolArray.filter(function(currency){
       return currency.name == invoiceDetails.currency;
   })
-  console.log(currency_symbols);
-  console.log(emailBody);
+  // console.log(currency_symbols);
+  // console.log(emailBody);
+  console.log('companySetting.company_logo');
+    console.log(companySetting.company_logo);
   let startDateFormatted=invoiceDetails['created_date']==null?'':moment.tz(invoiceDetails.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
   let dueDateFormatted=invoiceDetails['due_date']==null?'':moment.tz(invoiceDetails.due_date, companyDefaultTimezone).format('MM-DD-YYYY');
   let html = `<html><head></head><body><div style="background-color: #f7f8f9;">
@@ -2781,7 +2784,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
                 <tbody>
                     <tr>
                         <td valign="top" align="center" style="padding-top: 20px; padding-bottom: 10px;">
-                            <a href="javascript:void(0);" target="_blank"><img src="${process.env.BASE_URL}/img/krow-logo.png" alt="" width="84" height="29"></a>
+                            <a href="javascript:void(0);" target="_blank"><img src="data:image/jpeg;base64, ${Buffer.from(companySetting.company_logo).toString('base64')}" alt="company_logo" class="max-w-150"></a>
                         </td>
                     </tr>
                     <tr>
@@ -2840,12 +2843,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
                                                         <p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; line-height: 20px;">
                                                             ${emailBody}
                                                         </p>
-                                                        <p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; margin-bottom: 5px;">
-                                                            Thank you for your business,
-                                                        </p>
-                                                        <p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; margin-top: 5px;">
-                                                            ${companyName}
-                                                        </p>
+                                                        
                                                     </td>
                                                 </tr>
 
@@ -2856,14 +2854,23 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName, next) => {
                             </tbody></table>
                         </td>
                     </tr>
-                    <tr>
-                        <td valign="top" align="center" style=" font-family: arial,sans-serif; padding:20px 20px 20px 20px; color: #999; font-size: 14px;">
-                            For more help and support <a href="${process.env.BASE_URL}" target="_blank" style="color: #4387fd;"> contact us</a>
-                        </td>
-                    </tr>
+                    
                 </tbody>
             </table>
         </div></body></html>`;
+
+        // <tr>
+        //     <td valign="top" align="center" style=" font-family: arial,sans-serif; padding:20px 20px 20px 20px; color: #999; font-size: 14px;">
+        //         For more help and support <a href="${process.env.BASE_URL}" target="_blank" style="color: #4387fd;"> contact us</a>
+        //     </td>
+        // </tr>
+
+        // <p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; margin-bottom: 5px;">
+        //     Thank you for your business,
+        // </p>
+        // <p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; margin-top: 5px;">
+        //     ${companyName}
+        // </p>
         // <table border="0" cellpadding="0" cellspacing="0" width="100%">
         //     <tbody>
         //         <tr>

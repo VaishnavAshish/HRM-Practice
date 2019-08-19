@@ -552,7 +552,7 @@ exports.postAddCompany = (req, res) => {
                         let company_id = company.rows[0].id;
                         client.query('Insert into SETTING (expense_category,user_role,company_address,invoice_note,currency,timezone,company_id,weekstartday) values ($1,$2,$3,$4,$5,$6,$7,$8)  RETURNING id', [
                           ['Food'],
-                          ['Consultant', 'Project Manager'], '', '', 'USD', 'America/Los_Angeles', company_id , 'sunday'
+                          ['Consultant', 'Project Manager','Customer'], '', '', 'USD', 'America/Los_Angeles', company_id , 'sunday'
                         ], function(err, companySetting) {
                           if (err) {
                             handleResponse.shouldAbort(err, client, done);
@@ -568,7 +568,7 @@ exports.postAddCompany = (req, res) => {
                                     handleResponse.shouldAbort(err, client, done);
                                     handleResponse.handleError(res, err, ' Error in adding company task to the database');
                                   } else {
-                                    client.query('Insert into USERS( password, email, company_id, user_role,created_date,modified_date,add_status, password_reset_token, role,permissions,first_name) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING id', [req.body.adminPass, req.body.adminEmail, company.rows[0].id, '{"ADMIN"}', 'now()', 'now()', 'Invited', token, "Project Manager", '{"timesheetEntry","expenseManager","projectUser","projectManager","invoiceManager","timesheetApprover","expenseApprover"}',req.body.adminFirstName], function(err, addedUser) {
+                                    client.query('Insert into USERS( password, email, company_id, user_role,created_date,modified_date,add_status, password_reset_token, role,permissions,first_name,last_name) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING id', [req.body.adminPass, req.body.adminEmail, company.rows[0].id, '{"ADMIN"}', 'now()', 'now()', 'Invited', token, "Project Manager", '{"timesheetEntry","expenseManager","projectUser","projectManager","invoiceManager","timesheetApprover","expenseApprover"}',req.body.adminFirstName,req.body.adminLastName], function(err, addedUser) {
                                       if (err) {
                                         handleResponse.shouldAbort(err, client, done);
                                         handleResponse.handleError(res, err, ' Error in adding admin user to the database');
@@ -664,7 +664,7 @@ sendEmailToUser = (req, res, next) => {
     '<tbody>' +
     '<tr>' +
     '<td align="" style=" font-size:14px;font-family: arial,sans-serif; padding:10px; border-bottom: 1px solid #eee; color: #999;">' +
-    'Your Company Domian' +
+    'Your Company Domain' +
     '</td>' +
     '<td align="right" style=" font-size:14px;font-family: arial,sans-serif; padding:10px; border-bottom: 1px solid #eee; ">' +
     '<a href="' + serverName + '" target="_blank">' + req.body.domain + '</a>' +
@@ -683,7 +683,7 @@ sendEmailToUser = (req, res, next) => {
 
     +
     '<p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; line-height: 20px;">' +
-    ' To get started, you need to verify your email address. Please click on the link given below to finish creating your account:' +
+    ' To get started, you need to verify your email address. Please click on the link below to finish creating your account:' +
     '</p>' +
     '<table border="0" cellpadding="0" cellspacing="0" width="100%">' +
     '<tbody>' +
@@ -703,7 +703,7 @@ sendEmailToUser = (req, res, next) => {
     '</tbody>' +
     '</table>' +
     '<p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; line-height: 20px;">' +
-        'Confirm your email address'+
+        
     '</p>' +
     '<p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; margin-bottom: 5px;">' +
     'Thanks,' +
