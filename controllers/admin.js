@@ -703,7 +703,7 @@ sendEmailToUser = (req, res, next) => {
     '</tbody>' +
     '</table>' +
     '<p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; line-height: 20px;">' +
-        
+
     '</p>' +
     '<p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; margin-bottom: 5px;">' +
     'Thanks,' +
@@ -735,7 +735,7 @@ sendEmailToUser = (req, res, next) => {
   // console.log("Inside send mail " + req.body);
   const mailOptions = {
     to: req.body.adminEmail,
-    from: 'support@krowsoftware.com',
+    from: '"'+req.user.company_info.name+'"support@krowsoftware.com',
     subject: "Confirmation of " + req.body.orgName + " on Krow PSA",
     html: html
   };

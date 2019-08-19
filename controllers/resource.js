@@ -294,7 +294,7 @@ sendInvitationEmail = (req, res, next) => {
 
     let mailOptions = {
       to: req.body.email,
-      from: 'support@krowsoftware.com',
+      from: '"'+req.user.company_info.name+'"support@krowsoftware.com',
       subject: req.user.email+" has invited you to join Krow PSA"
     };
     let hostN=process.env.BASE_URL;
@@ -345,7 +345,7 @@ sendInvitationEmail = (req, res, next) => {
                                                                             '</tr>'+
                                                                         '</tbody>'+
                                                                     '</table>'+
-                                                                    
+
                                                                 '</td>'+
                                                             '</tr>'+
 
@@ -396,7 +396,7 @@ sendInvitationEmail = (req, res, next) => {
 sendResetEmail = (req,res,next)=>{
   let mailOptions = {
       to: req.body.email,
-      from: 'support@krowsoftware.com',
+      from: '"'+req.user.company_info.name+'"support@krowsoftware.com',
       subject: "Krow PSA reset password"
     };
     let hostN=process.env.BASE_URL;

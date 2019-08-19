@@ -8,7 +8,7 @@ const OAuthClient = require('intuit-oauth');
 const Cryptr = require('cryptr');
 const cryptr = new Cryptr('myTotalySecretKey');
 
-oauthClient = null ;
+oauthClient = null;
 
 exports.initiateQuickbook = (req, res) => {
     // console.log('req.query');
