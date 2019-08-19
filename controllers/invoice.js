@@ -2776,7 +2776,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName,companySetting
   // console.log(currency_symbols);
   // console.log(emailBody);
   console.log('companySetting.company_logo');
-    console.log(companySetting.company_logo);
+  console.log(companySetting.company_logo);
   let startDateFormatted=invoiceDetails['created_date']==null?'':moment.tz(invoiceDetails.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
   let dueDateFormatted=invoiceDetails['due_date']==null?'':moment.tz(invoiceDetails.due_date, companyDefaultTimezone).format('MM-DD-YYYY');
   let html = `<html><head></head><body><div style="background-color: #f7f8f9;">
@@ -2784,7 +2784,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName,companySetting
                 <tbody>
                     <tr>
                         <td valign="top" align="center" style="padding-top: 20px; padding-bottom: 10px;">
-                            <a href="javascript:void(0);" target="_blank"><img src="data:image/jpeg;base64, ${Buffer.from(companySetting.company_logo).toString('base64')}" alt="company_logo" class="max-w-150"></a>
+                            <a href="javascript:void(0);" target="_blank"><img src="${process.env.BASE_URL}/getCompanyLogoForEmail/${req.user.company_id}" alt="company_logo" class="max-w-150"></a>
                         </td>
                     </tr>
                     <tr>
@@ -2843,7 +2843,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName,companySetting
                                                         <p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; line-height: 20px;">
                                                             ${emailBody}
                                                         </p>
-                                                        
+
                                                     </td>
                                                 </tr>
 
@@ -2854,7 +2854,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName,companySetting
                             </tbody></table>
                         </td>
                     </tr>
-                    
+
                 </tbody>
             </table>
         </div></body></html>`;

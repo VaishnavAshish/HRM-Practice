@@ -440,6 +440,73 @@ exports.getSettingInvoice = (req, res) => {
   })
 };
 
+exports.getCompanyLogoForEmail = (req,res) =>{
+  console.log('inside getCompanyLogoForEmail')
+  console.log(req.params.companyid)
+    pool.connect((err, client, done) => {
+        client.query("SELECT company_logo,contenttype FROM SETTING WHERE company_id=$1", [req.params.companyid], function (err, companySetting) {
+          if (err) {
+            handleResponse.shouldAbort(err, client, done);
+            handleResponse.responseToPage(res,'pages/org-settings-invoice',{setting:{},user:req.user, error:err},"error","  Error in finding setting data");
+          } else {
+                /*companySetting.rows[0].company_logo=companySetting.rows[0].company_logo.toString('base64');*/
+                // console.log('--------------------------------AJAY ----------');
+                // console.log(companySetting.rows);
+                done();
+                if(companySetting.rows.length>0){
+                  if(companySetting.rows[0].company_logo!=null){
+                    let company_logo = new Buffer(companySetting.rows[0].company_logo, 'base64');
+
+                         /*// console.log(company_logo);*/
+                          // res.setHeader('Cache-Control', 'public, max-age=10');
+                          // res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+                          // res.setHeader("Pragma", "no-cache");
+                          // res.setHeader("Cache-Control", "no-cache, must-revalidate");
+                          // res.setDateHeader("Expires", 0);
+                          res.writeHead(200, {
+                             'Content-Type': companySetting.rows[0].contenttype,
+                             'Content-Length': company_logo.length
+                           });
+                           res.end(companySetting.rows[0].company_logo);
+
+
+                  }
+                  else{
+                      if (!process.env.PWD) {
+                        process.env.PWD = process.cwd();
+                      }
+                      fs.readFile(`${process.env.PWD}/public/img/logo-place-holder.jpg`, (err, data)=>{
+                            if(err) return res.status(500).send(err);
+                            let company_logo = new Buffer(data, 'base64');
+                            // res.setHeader('Cache-Control', 'public, max-age=10');
+                            // res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+                                  res.writeHead(200, {
+                                     'Content-Type': 'image/jpg',
+                                     'Content-Length': company_logo.length
+                                   });
+                                  // console.log(data);
+                                  res.end(data);
+                        })
+                      /*let company_logo = new Buffer('https://multitenant-example-1.herokuapp.com/img/logo-place-holder.jpg', 'base64');
+                      done();
+                      res.writeHead(200, {
+                         'Content-Type': 'image/jpg',
+                         'Content-Length': company_logo.length
+                       });
+                      // console.log(company_logo);
+                      res.send(company_logo);*/
+                       /*res.sendFile('https://multitenant-example-1.herokuapp.com/img/logo-place-holder.jpg');  */
+                  }
+                }
+
+
+          }
+
+
+        });
+      })
+}
+
 exports.getCompanyLogo = (req,res) =>{
     pool.connect((err, client, done) => {
         client.query("SELECT company_logo,contenttype FROM SETTING WHERE company_id=$1", [req.user.company_id], function (err, companySetting) {

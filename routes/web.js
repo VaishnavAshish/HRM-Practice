@@ -144,6 +144,8 @@ module.exports = function(app) {
     app.post('/checkUserRoleAssignment', passportConfig.isAuthenticated,settingController.checkUserRoleAssignment);
     app.post('/checkExpenseCategoryAssign', passportConfig.isAuthenticated,settingController.checkExpenseCategoryAssign);
     app.get('/getCompanyLogo', passportConfig.isAuthenticated,settingController.getCompanyLogo);
+    app.get('/getCompanyLogoForEmail/:companyid', settingController.getCompanyLogoForEmail);
+
     app.post('/fileupload', passportConfig.isAuthenticated,settingController.fileupload);
 
 
