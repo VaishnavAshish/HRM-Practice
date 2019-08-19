@@ -2784,7 +2784,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName,companySetting
                 <tbody>
                     <tr>
                         <td valign="top" align="center" style="padding-top: 20px; padding-bottom: 10px;">
-                            <a href="javascript:void(0);" target="_blank"><img src="${process.env.BASE_URL}/getCompanyLogoForEmail/${req.user.company_id}" alt="company_logo" class="max-w-150"></a>
+                            <a href="javascript:void(0);" target="_blank"><img src="${process.env.BASE_URL}/getCompanyLogoForEmail/${req.user.company_id}" alt="company_logo" style="max-width:150px;"></a>
                         </td>
                     </tr>
                     <tr>
