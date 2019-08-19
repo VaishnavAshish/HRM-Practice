@@ -167,7 +167,7 @@ exports.postDomain = (req, res) => {
       // console.log(err);
       let domainName = req.body.domain+".krow.com";
       console.log('domainName '+domainName);
-      client.query('SELECT * FROM company where domain = $1 AND archived=$2', [domainName,false], function (err, company) {
+      client.query('SELECT * FROM company where domain ilike $1 AND archived=$2', [domainName,false], function (err, company) {
         if (err) {
           handleResponse.shouldAbort(err, client, done);
           handleResponse.handleError(res, err, ' Error in finding company data');

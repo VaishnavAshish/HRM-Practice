@@ -1204,4 +1204,5 @@ END;
 $$;
 
 -- 2019-08-14
-update users set first_name = 'first_name' where first_name IS NULL
+update users set first_name = 'blank' where first_name IS NULL
+update users set first_name = 'blank' where first_name like ''
