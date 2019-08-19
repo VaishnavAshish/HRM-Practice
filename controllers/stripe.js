@@ -59,7 +59,7 @@ function addStripeToken(req,res,customer){
                                   } else {
                   			            done();
                   			            // handleResponse.sendSuccess(res,'settings updated successfully',{});
-                                    handleResponse.sendSuccess(res,'Your account has been successfully upgraded to paid version.Now you can integrate with other softwares. ',{customer:customer,subscription:subscription});
+                                    handleResponse.sendSuccess(res,'Success!  Your account has been successfully upgraded to the paid version. ',{customer:customer,subscription:subscription});
                                   }
                                 })
               			          }
@@ -163,7 +163,7 @@ exports.disableStripe = (req, res) => {
                                           handleResponse.handleError(res, err, ' Error in committing transaction');
                                         } else {
                                           done();
-                                          handleResponse.sendSuccess(res,'Your account has been downgrade to free version.Now you cannot integrate with other softwares.',{});
+                                          handleResponse.sendSuccess(res,'Success! Your account has been downgrade to free version.Now you cannot integrate with other softwares.',{});
                                         }
                                       })
                                     }

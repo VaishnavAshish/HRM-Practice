@@ -92,7 +92,7 @@
                     console.log(response);
                     if(response.success && response.message == 'mail sent'){
                         hideLoader('#globalLoader');
-                        showGlobalToast('#globalToast', 'success', 'Company added successfully.A confirmation mail has been send.Please confirm on email.', 4000);
+                        showGlobalToast('#globalToast', 'success', 'Success!  An email has been sent to you to confirm you account.', 4000);
                         setTimeout(() => {
                             window.location.href = "/login?domain="+orgData.domain;
                         }, 4000);
