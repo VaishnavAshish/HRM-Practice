@@ -8,18 +8,19 @@ const Cryptr = require('cryptr');
 const cryptr = new Cryptr('myTotalySecretKey');
 
 const util = require('util');
-oauthClient = null;
+//oauthClient = null;
+oauthClient = new OAuthClient({
+    clientId: process.env.QUICKBOOK_CLIENTID,
+    clientSecret: process.env.QUICKBOOK_CLIENT_SECRET,
+    environment: process.env.QUICKBOOK_ENV,
+    redirectUri: process.env.QUICKBOOK_REDIRECTURL
+});
 
 exports.initiateQuickbook = (req, res) => {
     // console.log('req.query');
     // console.log(req.query);
 
-    oauthClient = new OAuthClient({
-        clientId: process.env.QUICKBOOK_CLIENTID,
-        clientSecret: process.env.QUICKBOOK_CLIENT_SECRET,
-        environment: process.env.QUICKBOOK_ENV,
-        redirectUri: process.env.QUICKBOOK_REDIRECTURL
-    });
+
     // console.log('oauthClient');
     // console.log(oauthClient);
     /*pool.connect((err, client, done) => {
@@ -136,7 +137,7 @@ exports.getAuthCode = (req,res) => {
   console.log('req');
   console.log(req.session.passport.user.oauthClient);
 
-  //console.log(res); 
+  //console.log(res);
   if(oauthClient == null){
     console.log('------------oauthClient-------------');
     console.log(oauthClient);
