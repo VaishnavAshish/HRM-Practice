@@ -140,6 +140,7 @@ exports.getAuthCode = (req,res) => {
   if(oauthClient == null){
     console.log('inside oauthClient value is null '+oauthClient)
     oauthClient = req.user.oauthClient;
+    console.log('after assigning values '+req.user.oauthClient);
   }
   oauthClient.createToken(req.url)
    .then(function(authResponse) {
