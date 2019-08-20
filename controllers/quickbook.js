@@ -164,6 +164,7 @@ exports.getAuthCode = (req,res) => {
                       if(previousQuickbookCompanyId == oauthClient.token["realmId"]){
                         console.log('------------oauthClient--------')
                         console.log(oauthClient);
+                        oauthClient.logger = null
                         client.query('UPDATE SETTING set quickbook_token=$1,quickbook_enabled=$2 where company_id=$3 RETURNING id',[oauthClient ,true,req.user.company_id], function(err, updatedSetting) {
                           if (err){
                             handleResponse.shouldAbort(err, client, done);
