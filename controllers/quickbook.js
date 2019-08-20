@@ -135,7 +135,14 @@ exports.getAuthCode = (req,res) => {
   console.log('req');
   console.log(req.query.realmId);
   //console.log(res);
-
+  if(oauthClient == null){
+    oauthClient = new OAuthClient({
+        clientId: process.env.QUICKBOOK_CLIENTID,
+        clientSecret: process.env.QUICKBOOK_CLIENT_SECRET,
+        environment: process.env.QUICKBOOK_ENV,
+        redirectUri: process.env.QUICKBOOK_REDIRECTURL
+    });
+  }
   oauthClient.createToken(req.url)
    .then(function(authResponse) {
          oauth2_token_json = JSON.stringify(authResponse.getJson(), null,2);
