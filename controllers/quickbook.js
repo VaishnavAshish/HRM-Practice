@@ -54,6 +54,7 @@ exports.initiateQuickbook = (req, res) => {
       })
     })*/
     var authUri = oauthClient.authorizeUri({scope:[OAuthClient.scopes.Accounting,OAuthClient.scopes.OpenId]});  // can be an array of multiple scopes ex : {scope:[OAuthClient.scopes.Accounting,OAuthClient.scopes.OpenId]}
+    req.user.oauthClient = oauthClient;
     // console.log('authUri')
     // console.log(authUri)
     res.redirect(authUri);
@@ -136,12 +137,7 @@ exports.getAuthCode = (req,res) => {
   console.log(req.query.realmId);
   //console.log(res);
   if(oauthClient == null){
-    oauthClient = new OAuthClient({
-        clientId: process.env.QUICKBOOK_CLIENTID,
-        clientSecret: process.env.QUICKBOOK_CLIENT_SECRET,
-        environment: process.env.QUICKBOOK_ENV,
-        redirectUri: process.env.QUICKBOOK_REDIRECTURL
-    });
+    oauthClient = req.user.oauthClient;
   }
   oauthClient.createToken(req.url)
    .then(function(authResponse) {
