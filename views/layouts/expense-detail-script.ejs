@@ -121,9 +121,10 @@ function updateExpense(expenseId){
                            success : function(response){
                               console.log(response);
                               $('[save-btn]').attr('disabled',true);
+                              showGlobalToast('#globalToast', 'success',response.message, 4000);
+                              hideLoader('#globalLoader');
                               setTimeout(function () {
-                                  showGlobalToast('#globalToast', 'success',response.message, 4000);
-                                  hideLoader('#globalLoader');
+                                  location.reload();
                               }, 2000);
 
                             },
