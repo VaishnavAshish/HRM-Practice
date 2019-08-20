@@ -164,12 +164,12 @@ exports.getAuthCode = (req,res) => {
                       if(previousQuickbookCompanyId == oauthClient.token["realmId"]){
                         console.log('------------oauthClient--------')
                         let oauthClientObj = {};
-                        /*oauthClientObj.environment = oauthClient.environment;
+                        oauthClientObj.environment = oauthClient.environment;
                         oauthClientObj.clientId = oauthClient.clientId,
                         oauthClientObj.clientSecret = oauthClient.clientSecret,
                         oauthClientObj.redirectUri = oauthClient.redirectUri,
                         oauthClientObj.logging = oauthClient.logging
-                        oauthClientObj.token = oauthClient.token*/
+                        oauthClientObj.token = oauthClient.token
 
                         console.log(oauthClientObj);
                         client.query('UPDATE SETTING set quickbook_token=$1,quickbook_enabled=$2 where company_id=$3 RETURNING id',[oauthClientObj ,true,req.user.company_id], function(err, updatedSetting) {
