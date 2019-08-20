@@ -135,20 +135,7 @@ exports.changeQuickbookAccount = (req,res) => {
 
 exports.getAuthCode = (req,res) => {
   console.log('req');
-  //console.log(req.session.passport.user.oauthClient);
 
-  // //console.log(res);
-  // if(oauthClient == null){
-  //   console.log('------------oauthClient-------------');
-  //   console.log(oauthClient);
-  //   console.log('------------oauthClient-------------');
-  //   console.log('inside oauthClient value is null ');
-  //   oauthClient = req.session.passport.user.oauthClient;
-  //   console.log('after assigning values '+req.session.passport.user.oauthClient);
-  // }
-  // console.log('------------oauthClient-------------');
-  // console.log(oauthClient);
-  // console.log('------------oauthClient-------------');
   oauthClient.createToken(req.url)
    .then(function(authResponse) {
          oauth2_token_json = JSON.stringify(authResponse.getJson(), null,2);
@@ -175,7 +162,7 @@ exports.getAuthCode = (req,res) => {
                       console.log(previousQuickbookCompanyId);
                       console.log(oauthClient.token["realmId"]);
                       if(previousQuickbookCompanyId == oauthClient.token["realmId"]){
-                        client.query('UPDATE SETTING set quickbook_token=$1,quickbook_enabled=$2 where company_id=$3 RETURNING id',[oauthClient ,true,req.user.company_id], function(err, updatedSetting) {
+                        client.query('UPDATE SETTING set quickbook_token=$1,quickbook_enabled=$2 where company_id=$3 RETURNING id',[util.inspect(oauthClient) ,true,req.user.company_id], function(err, updatedSetting) {
                           if (err){
                             handleResponse.shouldAbort(err, client, done);
                             res.redirect('/integration-dashboard');

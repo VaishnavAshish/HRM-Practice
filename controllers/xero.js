@@ -284,7 +284,7 @@ exports.postInvoiceToXero = (req,res) => {
                                                       handleResponse.handleError(res, err, ' error in updating invoice to xero');
                                                     }
                                                   })();
-                                                }else{
+                                                } else {
                                                   (async () => {
                                                     try {
                                                       let invoiceResult = await xero.invoices.create(invoiceData);
