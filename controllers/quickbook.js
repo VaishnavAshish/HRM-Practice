@@ -136,7 +136,7 @@ exports.getAuthCode = (req,res) => {
   console.log('req');
   console.log(req.session.passport.user.oauthClient);
 
-  //console.log(res);
+  //console.log(res); 
   if(oauthClient == null){
     console.log('------------oauthClient-------------');
     console.log(oauthClient);
