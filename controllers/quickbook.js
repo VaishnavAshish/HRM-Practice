@@ -138,9 +138,11 @@ exports.getAuthCode = (req,res) => {
 
   //console.log(res);
   //if(oauthClient == null){
-    console.log('inside oauthClient value is null '+oauthClient)
+    console.log(oauthClient);
+    console.log('inside oauthClient value is null ');
     oauthClient = req.session.passport.user.oauthClient;
     console.log('after assigning values '+req.session.passport.user.oauthClient);
+    console.log(oauthClient);
   //}
   oauthClient.createToken(req.url)
    .then(function(authResponse) {
