@@ -166,7 +166,7 @@ exports.getAuthCode = (req,res) => {
                       //companySetting.rows[0].quickbook_token = util.inspect(companySetting.rows[0].quickbook_token);
                       let previousQuickbookCompanyId = JSON.parse(companySetting.rows[0].quickbook_token).token["realmId"];
                       console.log(previousQuickbookCompanyId);
-                      if(previousQuickbookCompanyId == oauthClient.token.realmId){
+                      if(previousQuickbookCompanyId == oauthClient.token["realmId"]){
                         client.query('UPDATE SETTING set quickbook_token=$1,quickbook_enabled=$2 where company_id=$3 RETURNING id',[JSON.stringify(oauthClient) ,true,req.user.company_id], function(err, updatedSetting) {
                           if (err){
                             handleResponse.shouldAbort(err, client, done);
