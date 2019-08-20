@@ -162,7 +162,9 @@ exports.getAuthCode = (req,res) => {
                       console.log(previousQuickbookCompanyId);
                       console.log(oauthClient.token["realmId"]);
                       if(previousQuickbookCompanyId == oauthClient.token["realmId"]){
-                        client.query('UPDATE SETTING set quickbook_token=$1,quickbook_enabled=$2 where company_id=$3 RETURNING id',[JSON.stringify(oauthClient) ,true,req.user.company_id], function(err, updatedSetting) {
+                        console.log('------------oauthClient--------')
+                        console.log(oauthClient);
+                        client.query('UPDATE SETTING set quickbook_token=$1,quickbook_enabled=$2 where company_id=$3 RETURNING id',[oauthClient ,true,req.user.company_id], function(err, updatedSetting) {
                           if (err){
                             handleResponse.shouldAbort(err, client, done);
                             res.redirect('/integration-dashboard');
