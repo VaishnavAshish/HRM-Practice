@@ -55,7 +55,7 @@ exports.initiateQuickbook = (req, res) => {
       })
     })*/
     var authUri = oauthClient.authorizeUri({scope:[OAuthClient.scopes.Accounting,OAuthClient.scopes.OpenId]});  // can be an array of multiple scopes ex : {scope:[OAuthClient.scopes.Accounting,OAuthClient.scopes.OpenId]}
-    req.session.passport.user.oauthClient = oauthClient;
+    //req.session.passport.user.oauthClient = oauthClient;
     // console.log('authUri')
     // console.log(authUri)
     res.redirect(authUri);
@@ -135,7 +135,7 @@ exports.changeQuickbookAccount = (req,res) => {
 
 exports.getAuthCode = (req,res) => {
   console.log('req');
-  console.log(req.session.passport.user.oauthClient);
+  //console.log(req.session.passport.user.oauthClient);
 
   // //console.log(res);
   // if(oauthClient == null){
