@@ -134,9 +134,11 @@ exports.changeQuickbookAccount = (req,res) => {
 
 exports.getAuthCode = (req,res) => {
   console.log('req');
-  console.log(req.query.realmId);
+  console.log(req.user.oauthClient);
+
   //console.log(res);
   if(oauthClient == null){
+    console.log('inside oauthClient value is null '+oauthClient)
     oauthClient = req.user.oauthClient;
   }
   oauthClient.createToken(req.url)
