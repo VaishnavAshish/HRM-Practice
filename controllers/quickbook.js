@@ -163,8 +163,8 @@ exports.getAuthCode = (req,res) => {
                       console.log(oauthClient.token["realmId"]);
                       if(previousQuickbookCompanyId == oauthClient.token["realmId"]){
                         console.log('------------oauthClient--------')
-                        /*let oauthClientObj = {};
-                        oauthClientObj.environment = oauthClient.environment;
+                        let oauthClientObj = {};
+                        /*oauthClientObj.environment = oauthClient.environment;
                         oauthClientObj.clientId = oauthClient.clientId,
                         oauthClientObj.clientSecret = oauthClient.clientSecret,
                         oauthClientObj.redirectUri = oauthClient.redirectUri,
