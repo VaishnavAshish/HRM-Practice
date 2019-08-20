@@ -4,10 +4,10 @@ const handleResponse = require('./page-error-handle');
 const moment = require('moment-timezone');
 const setting = require('./company-setting');
 const OAuthClient = require('intuit-oauth');
-
 const Cryptr = require('cryptr');
 const cryptr = new Cryptr('myTotalySecretKey');
 
+const util = require('util');
 oauthClient = null;
 
 exports.initiateQuickbook = (req, res) => {
@@ -162,6 +162,7 @@ exports.getAuthCode = (req,res) => {
                       console.log(companySetting.rows[0].quickbook_token);
                       console.log(oauthClient.token.realmId);
                       console.log(req.user.company_id);
+                      companySetting.rows[0].quickbook_token = util.inspect(companySetting.rows[0].quickbook_token);
                       let previousQuickbookCompanyId = JSON.parse(companySetting.rows[0].quickbook_token).token.realmId;
                       console.log(previousQuickbookCompanyId);
                       if(previousQuickbookCompanyId == oauthClient.token.realmId){
