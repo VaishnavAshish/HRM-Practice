@@ -15,8 +15,8 @@ const xeroConfig = {
 };
 // "privateKeyPath": "./privatekey.pem",
 let xero = new XeroClient(xeroConfig);
-let requestToken = null;
-
+// let requestToken = null;
+let requestToken = await xero.oauth1Client.getRequestToken();
 exports.initiateXero = (req, res) => {
   console.log('inside initiate xero');
   company_id = req.user.company_id;
@@ -24,7 +24,7 @@ exports.initiateXero = (req, res) => {
   // console.log(xero);
   (async () => {
      try {
-        requestToken = await xero.oauth1Client.getRequestToken();
+        //requestToken = await xero.oauth1Client.getRequestToken();
         // console.log('Received Request Token:', requestToken);
 
         var authUrl = xero.oauth1Client.buildAuthoriseUrl(requestToken);
