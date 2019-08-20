@@ -15,8 +15,8 @@ const xeroConfig = {
 };
 // "privateKeyPath": "./privatekey.pem",
 let xero = new XeroClient(xeroConfig);
-// let requestToken = null;
-let requestToken = xero.oauth1Client.getRequestToken();
+let requestToken = null;
+//let requestToken = await xero.oauth1Client.getRequestToken();
 exports.initiateXero = (req, res) => {
   console.log('inside initiate xero');
   company_id = req.user.company_id;
@@ -24,7 +24,8 @@ exports.initiateXero = (req, res) => {
   // console.log(xero);
   (async () => {
      try {
-        //requestToken = await xero.oauth1Client.getRequestToken();
+        requestToken = await xero.oauth1Client.getRequestToken();
+        req.session.passport.user.xeroRequestToken = requestToken;
         // console.log('Received Request Token:', requestToken);
 
         var authUrl = xero.oauth1Client.buildAuthoriseUrl(requestToken);
@@ -45,6 +46,12 @@ exports.getAuthCodeXero = (req,res) => {
   (async () => {
     try {
       const oauth_verifier = req.query.oauth_verifier;
+      if(requestToken == null){
+        console.log('inside request token is null')
+        requestToken = req.session.passport.user.xeroRequestToken;
+        console.log(req.session.passport.user.xeroRequestToken)
+        console.log(requestToken)
+      }
       const savedRequestToken = {
           oauth_token: requestToken.oauth_token,
           oauth_token_secret: requestToken.oauth_token_secret
