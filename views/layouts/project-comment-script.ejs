@@ -65,13 +65,21 @@
                               </a>
                           </div>`;
       }
+      let user_image_data = `<div><i class="circular large icon text-default">
+                                <span user-name-initials  title="${commentData.first_name} ${commentData.last_name} By: ${commentData.email}">
+                                  ${commentData.first_name.substring(0,1).toUpperCase()} ${commentData.last_name?commentData.last_name.substring(0,1).toUpperCase():''}
+                                </span>
+                            </i></div>`;
+      if(commentData.user_img){
+        user_image_data = `<span class="slds-avatar slds-avatar_circle">
+                            <img alt="Person name" src="/getUserPicture/${commentData.resource_id}" title="${commentData.first_name} ${commentData.last_name} By: ${commentData.email}">
+                        </span>`
+      }
 
       let commentHTML = `<section class="line-top tmr-20 tpd-10">
                             <div class="slds-grid">
                                 <div class="slds-no-flex slds-p-right_small">
-                                    <span class="slds-avatar slds-avatar_circle">
-                                        <img alt="Person name" src="/getUserPicture/${commentData.resource_id}" title="${commentData.first_name} ${commentData.last_name} By: ${commentData.email}">
-                                    </span>
+                                    ${user_image_data}
                                 </div>
                                 <div class="slds-has-flexi-truncate">
                                     <div class="slds-grid">

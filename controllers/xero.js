@@ -41,7 +41,10 @@ exports.initiateXero = (req, res) => {
 
 exports.getAuthCodeXero = (req,res) => {
   console.log('req');
-  console.log(req.user);
+  console.log('------------session requestToken------------')
+  console.log(req.session.passport.user.xeroRequestToken);
+  console.log('------------requestToken------------')
+  console.log(requestToken)
 
   (async () => {
     try {

@@ -200,7 +200,7 @@ exports.getAllRelatedComment = (req, res) => {
               handleResponse.shouldAbort(err, client, done);
               handleResponse.handleError(res, err, ' error in connecting to database');
             } else {
-                client.query('SELECT id,message,modified_date,parent_id,resource_id,(SELECT email from users where id = resource_id) as email , (SELECT first_name from users where id = resource_id) as first_name , (SELECT last_name from users where id = resource_id) as last_name FROM PROJECT_COMMENT pc where parent_id=$1 AND project_id=$2 ORDER BY modified_date desc', [req.body.conversation_id,req.body.project_id], function (err, relatedCommentList) {
+                client.query('SELECT id,message,modified_date,parent_id,resource_id,(SELECT email from users where id = resource_id) as email , (SELECT first_name from users where id = resource_id) as first_name , (SELECT last_name from users where id = resource_id) as last_name, (SELECT user_img from users where id = resource_id) as user_img FROM PROJECT_COMMENT pc where parent_id=$1 AND project_id=$2 ORDER BY modified_date desc', [req.body.conversation_id,req.body.project_id], function (err, relatedCommentList) {
                   if (err) {
                     handleResponse.shouldAbort(err, client, done);
                     handleResponse.handleError(res, err, ' Error in fetching project comment related to conversation from the database');
