@@ -51,6 +51,14 @@
           }
         });
     }
+    function getRandomColor() {
+         var letters = 'BCDEF'.split('');
+         var color = '#';
+         for (var i = 0; i < 6; i++ ) {
+             color += letters[Math.floor(Math.random() * letters.length)];
+         }
+         return color;
+     }
 
     function addCommentToList(parentElement,commentData){
       let userDataRole = '<%= user.user_role %>';
@@ -65,11 +73,9 @@
                               </a>
                           </div>`;
       }
-      let user_image_data = `<div><i class="circular large icon text-default">
-                                <span user-name-initials  title="${commentData.first_name} ${commentData.last_name} By: ${commentData.email}">
-                                  ${commentData.first_name.substring(0,1).toUpperCase()} ${commentData.last_name?commentData.last_name.substring(0,1).toUpperCase():''}
-                                </span>
-                            </i></div>`;
+      let user_image_data = `<span class="slds-avatar slds-avatar_circle user-name-initials" style="background-color:${getRandomColor()}" title="${commentData.first_name} ${commentData.last_name} By: ${commentData.email}">
+                                  ${commentData.first_name.substring(0,1).toUpperCase()}${commentData.last_name?commentData.last_name.substring(0,1).toUpperCase():''}
+                                </span>`;
       if(commentData.user_img){
         user_image_data = `<span class="slds-avatar slds-avatar_circle">
                             <img alt="Person name" src="/getUserPicture/${commentData.resource_id}" title="${commentData.first_name} ${commentData.last_name} By: ${commentData.email}">
