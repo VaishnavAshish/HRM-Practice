@@ -50,7 +50,7 @@ exports.getAuthCodeXero = (req,res) => {
       console.log(requestToken)
       const oauth_verifier = req.query.oauth_verifier;
       //if(requestToken == null){
-        /console.log('inside request token is null')
+        console.log('inside request token is null')
         requestToken = req.session.passport.user.xeroRequestToken;
         console.log(req.session.passport.user.xeroRequestToken)
         console.log(requestToken)
