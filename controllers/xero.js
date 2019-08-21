@@ -49,12 +49,12 @@ exports.getAuthCodeXero = (req,res) => {
       console.log('------------requestToken------------')
       console.log(requestToken)
       const oauth_verifier = req.query.oauth_verifier;
-      if(requestToken == null){
-        console.log('inside request token is null')
+      //if(requestToken == null){
+        /console.log('inside request token is null')
         requestToken = req.session.passport.user.xeroRequestToken;
         console.log(req.session.passport.user.xeroRequestToken)
         console.log(requestToken)
-      }
+      //}
       const savedRequestToken = {
           oauth_token: requestToken.oauth_token,
           oauth_token_secret: requestToken.oauth_token_secret
