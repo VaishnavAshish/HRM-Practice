@@ -261,10 +261,9 @@
                                     // $("[name=kwTimer]").attr("lineItemTaskId",response.timesheetData[0].task_id);
                                     // $("[name=kwTimer]").attr("lineItemDate",response.timesheetData[0].created_date.toString().split('T')[0].split(' ')[0]);
                                     // stopKwTimerGlobally(this, '[name=kwTimer]', '#syncTimer', '#modalAddNewTsheetQuick');
-                                    hmsToSecondsOnly(response.timesheetData[0].lastruntime,(playStartTime)=>{
-
+                                    let lastruntime = moment.tz(response.timesheetData[0].lastruntime , companyDefaultTimezone).format('HH:mm:ss');
+                                    hmsToSecondsOnly(lastruntime,(playStartTime)=>{
                                         hmsToSecondsOnly('23:59:59',(timesheetDateTime)=>{
-
                                             let difference=Math.abs(timesheetDateTime-playStartTime);
                                             let previousTotalHours=(response.timesheetData[0].total_work_hours*60);
                                             secondsToHms(previousTotalHours+difference,(currentPlayingTime)=>{
