@@ -495,6 +495,9 @@ exports.postInvoiceToQuickbook = (req,res) => {
                                                       }
 
                                                       // "TxnDate":invoiceDetails.rows[0].due_date,
+
+                                                      console.log('Total tax calculated :')
+                                                      console.log(invoiceDetails.rows[0].final_amount - invoiceDetails.rows[0].total_amount);
                                                       let invoiceData={
                                                         "Line": lineItemArray,
                                                         "ApplyTaxAfterDiscount":false,
