@@ -252,6 +252,7 @@ exports.postInvoiceToXero = (req,res) => {
                                                     "Quantity": invoiceLineItems.rows[key].quantity,
                                                     "UnitAmount": invoiceLineItems.rows[key].unit_price,
                                                     "LineAmount": invoiceLineItems.rows[key].total_amount,
+                                                    "TaxType" : "OUTPUT",
                                                     "AccountCode": req.body.account_code
                                                   }
                                                   // if(invoiceLineItems.rows[key].quickbook_invoice_line_id){
@@ -272,7 +273,8 @@ exports.postInvoiceToXero = (req,res) => {
                                                   "DueDate": invoiceDetails.rows[0].due_date,
                                                   "LineAmountTypes": "Exclusive",
                                                   "Status":"AUTHORISED",
-                                                  "LineItems":lineItemArray
+                                                  "LineItems":lineItemArray,
+                                                  "TotalTax":invoiceDetails.rows[0].final_amount - invoiceDetails.rows[0].total_amount
                                                 }
                                                 // console.log('invoiceData');
                                                 // console.log(invoiceData);
