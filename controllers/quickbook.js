@@ -459,6 +459,7 @@ exports.postInvoiceToQuickbook = (req,res) => {
                                                         if(invoiceLineItems.rows[key].timesheet_id!=null){
                                                           invoiceLineItems.rows[key].quantity = minuteToHours(invoiceLineItems.rows[key].quantity);
                                                         }
+                                                        invoiceLineItems.rows[key].TaxCodeRef = 'TAX';
                                                         if(invoiceLineItems.rows[key].type.includes('Timesheet')){
                                                             invoiceLineItems.rows[key].ItemRef = req.body.timesheet_item;
                                                             invoiceLineItems.rows[key].ItemRefType = 'Timesheet';
@@ -468,6 +469,9 @@ exports.postInvoiceToQuickbook = (req,res) => {
                                                         } else if(invoiceLineItems.rows[key].type.includes('Expense')){
                                                             invoiceLineItems.rows[key].ItemRef = req.body.expense_item;
                                                             invoiceLineItems.rows[key].ItemRefType = 'Expense';
+                                                            if(invoiceLineItems.rows[key].expense_id != null){
+                                                              invoiceLineItems.rows[key].TaxCodeRef = 'NON'
+                                                            }
                                                         } else {
                                                             invoiceLineItems.rows[key].ItemRef = req.body.other_item;
                                                             invoiceLineItems.rows[key].ItemRefType = 'Others';
@@ -482,7 +486,7 @@ exports.postInvoiceToQuickbook = (req,res) => {
                                                               "value": invoiceLineItems.rows[key].ItemRef
                                                             },
                                                             "TaxCodeRef": {
-                                                                "value": "TAX"
+                                                                "value": invoiceLineItems.rows[key].TaxCodeRef
                                                              },
                                                             "UnitPrice":invoiceLineItems.rows[key].unit_price,
                                                             "Qty":invoiceLineItems.rows[key].quantity,
