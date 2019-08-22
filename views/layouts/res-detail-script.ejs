@@ -14,7 +14,7 @@ function addResource(modalId){
 	}else if(!(validateEmail(email))){
 		addError("#email","Please enter correct email id");
 	}else if(first_name === '' || first_name == null || first_name  == undefined){
-		addError('#email', "Please enter user first name");
+		addError('#first_name', "Please enter user first name");
 	}else{
 		userRole = $('#project_user_role').val();
 		if(companyId!=null){
