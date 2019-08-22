@@ -237,12 +237,16 @@ exports.postInvoiceToXero = (req,res) => {
                                                   if(invoiceLineItems.rows[key].timesheet_id!=null){
                                                     invoiceLineItems.rows[key].quantity = minuteToHours(invoiceLineItems.rows[key].quantity);
                                                   }
+                                                  invoiceLineItems.rows[key].taxAmount = invoiceLineItems.rows[key].total_amount*invoiceDetails.rows[0].tax/100;
                                                   if(invoiceLineItems.rows[key].type.includes('Timesheet')){
                                                       invoiceLineItems.rows[key].ItemCode = req.body.timesheet_item;
                                                   } else if(invoiceLineItems.rows[key].type.includes('Fixed Fee')){
                                                       invoiceLineItems.rows[key].ItemCode = req.body.fixed_fee_item;
                                                   } else if(invoiceLineItems.rows[key].type.includes('Expense')){
                                                       invoiceLineItems.rows[key].ItemCode = req.body.expense_item;
+                                                      if(invoiceLineItems.rows[key].expense_id != null){
+                                                        invoiceLineItems.rows[key].taxAmount = 0
+                                                      }
                                                   } else {
                                                       invoiceLineItems.rows[key].ItemCode = req.body.other_item;
                                                   }
@@ -252,6 +256,7 @@ exports.postInvoiceToXero = (req,res) => {
                                                     "Quantity": invoiceLineItems.rows[key].quantity,
                                                     "UnitAmount": invoiceLineItems.rows[key].unit_price,
                                                     "LineAmount": invoiceLineItems.rows[key].total_amount,
+                                                    "TaxAmount": invoiceLineItems.rows[key].taxAmount,
                                                     "TaxType" : "OUTPUT",
                                                     "AccountCode": req.body.account_code
                                                   }
