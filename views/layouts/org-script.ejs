@@ -344,6 +344,7 @@ function setDataToTable(companyData){
 function addOrganization(modalId){
 	clearError("#orgName");
 	clearError("#domain");
+	clearError("#firstName")
 	/*clearError("#adminPass");*/
 	clearError("#adminEmail");
 	let orgData={};
@@ -352,6 +353,7 @@ function addOrganization(modalId){
 	/*orgData.adminUserName=$("#adminUserName").val();*/
 	/*orgData.adminPass=$("#adminPass").val();*/
 	orgData.adminEmail=$("#adminEmail").val();
+	orgData.adminFirstName = $("#firstName").val()
 	orgData.isSignup = true;
 	console.log(orgData);
 	if(orgData.orgName==""||orgData.orgName==null||orgData.orgName==undefined){
@@ -362,6 +364,8 @@ function addOrganization(modalId){
 		addError("#adminEmail","Please enter company admin email id");
 	}else if(!(validateEmail(orgData.adminEmail))){
 		addError("#adminEmail","Please enter correct email id");
+	}else if(orgData.adminFirstName==""||orgData.adminFirstName==null||orgData.adminFirstName==undefined){
+		addError("#adminEmail","Please enter company admin first name");
 	}else{
 		orgData.domain = domain+".krow.com";
 		checkFormValidation("#addCompanyForm");
@@ -369,6 +373,7 @@ function addOrganization(modalId){
 				showLoader('#globalLoader');
 				clearError("#orgName");
 				clearError("#domain");
+				clearError("#firstName")
 				/*clearError("#adminPass");*/
 				clearError("#adminEmail");
 			    $.ajax({

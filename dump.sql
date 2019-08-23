@@ -883,7 +883,7 @@ INSERT INTO public.role(name, permissions) VALUES ('ADMIN', '{"ACCOUNT","PROJECT
 INSERT INTO public.role(name, permissions) VALUES ('USER', '{"PROJECT","TASK","TIMESHEET"}');
 
 INSERT INTO public.company(id, name, domain, add_status,created_date,modified_date) VALUES (999999999999999, 'Krow Softwares', 'krowsoftware.krow.com', 'Approved',current_timestamp,current_timestamp);
-INSERT INTO public.users(id, email, password, username, company_id, user_role,add_status, role,created_date,modified_date) VALUES (9999999999999990, 'admin@krowsoftware.com', 'admin', 'admin@krowsoftware.com', 999999999999999 , '{"SUPER_ADMIN"}', 'Approved', 'SUPER_ADMIN',current_timestamp,current_timestamp);
+INSERT INTO public.users(id, email, password, username,first_name, company_id, user_role,add_status, role,created_date,modified_date) VALUES (9999999999999990, 'admin@krowsoftware.com', 'admin', 'admin@krowsoftware.com','admin', 999999999999999 , '{"SUPER_ADMIN"}', 'Approved', 'SUPER_ADMIN',current_timestamp,current_timestamp);
 Insert into public.setting (expense_category,user_role,company_address,invoice_note,currency,timezone,company_id) values(array['Food'],array['Manager','Developer'],'','','USD','America/Los_Angeles',999999999999999)
 
 
