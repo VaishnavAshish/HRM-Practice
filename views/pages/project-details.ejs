@@ -1141,9 +1141,23 @@
                                                 <div>
                                                     <div class="slds-grid">
                                                         <div class="slds-no-flex slds-p-right_small">
-                                                            <span class="slds-avatar slds-avatar_circle" >
-                                                                <img alt="Person name" src="/getUserPicture/<%= user.id %>" title = "<%= user.first_name %>  <%= user.last_name %>  By:<%= user.email %>" >
-                                                            </span>
+                                                          <% function getRandomColor() {
+                                                               var letters = 'BCDEF'.split('');
+                                                               var color = '#';
+                                                               for (var i = 0; i < 6; i++ ) {
+                                                                   color += letters[Math.floor(Math.random() * letters.length)];
+                                                               }
+                                                               return color;
+                                                           } %>
+                                                           <% if(!user.user_img){ %>
+                                                              <span class="slds-avatar slds-avatar_circle user-name-initials" style="background-color:<%= getRandomColor() %>" title="<%= user.first_name%> <%=user.last_name%> By: <%=user.email%>">
+                                                                <%= user.first_name.substring(0,1).toUpperCase()%><%= user.last_name?user.last_name.substring(0,1).toUpperCase():'' %>
+                                                              </span>
+                                                            <% } else { %>
+                                                              <span class="slds-avatar slds-avatar_circle" >
+                                                                  <img alt="Person name" src="/getUserPicture/<%= user.id %>" title = "<%= user.first_name %>  <%= user.last_name %>  By:<%= user.email %>" >
+                                                              </span>
+                                                            <% } %>
                                                         </div>
                                                         <div class="slds-has-flexi-truncate">
                                                             <div class="slds-form-element ">
