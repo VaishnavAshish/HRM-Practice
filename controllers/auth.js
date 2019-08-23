@@ -38,7 +38,7 @@ shouldAbort = (err, client, done) => {
  */
 exports.getLogin = (req, res) => {
   // console.log(req.user);
-  if (req.user) {
+  /*if (req.user) {
     if (req.user.user_role.includes('SUPER_ADMIN')) {
         // console.log('SUPER_ADMIN');
         res.redirect('/org-listing');
@@ -49,7 +49,7 @@ exports.getLogin = (req, res) => {
         // console.log('user');
         res.redirect('/timesheet/'+req.user.id+'#default');
       }
-  } else {
+  } else {*/
     if(req.query.token != '' || req.query.token != null || req.query.token != undefined) {
       pool.connect((err, client, done) => {
         client.query('BEGIN', (err) => {
@@ -121,12 +121,20 @@ exports.getLogin = (req, res) => {
         });
       })
     } else {
-      handleResponse.responseToPage(res,'pages/login',{domain: req.query.domain,isAuthenticate : false},"success","Successfully rendered");
-      /*res.render('pages/login', {
-        domain: req.query.domain,
-        isAuthenticate : false
-      });*/
-    }
+      if (req.user) {
+        if (req.user.user_role.includes('SUPER_ADMIN')) {
+            // console.log('SUPER_ADMIN');
+            res.redirect('/org-listing');
+          } else if (req.user.user_role.includes('ADMIN')) {
+            // console.log('ADMIN');
+            res.redirect('/timesheet/'+req.user.id+'#default');
+          } else {
+            // console.log('user');
+            res.redirect('/timesheet/'+req.user.id+'#default');
+          }
+      } else {
+        handleResponse.responseToPage(res,'pages/login',{domain: req.query.domain,isAuthenticate : false},"success","Successfully rendered");
+      }
   }
 };
 
@@ -287,7 +295,7 @@ exports.postLogin = (req, res, next) => {
             let userData = user;
 
             req.logIn(userData, (err) => {
-              userData.domain = domain;              
+              userData.domain = domain;
               if (err) {
                  console.debug("--------2222-" + err);
 
