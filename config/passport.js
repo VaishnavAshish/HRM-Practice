@@ -260,9 +260,11 @@ passport.use('user', new LocalStrategy({ usernameField: 'email',passReqToCallbac
                   user.rows[0]['company'] = company.rows[0].name;
                   user.rows[0]['company_id'] = company.rows[0].id;
                   user.rows[0]['company_info'] = company.rows[0];
-                  // console.log("**********************user*********************");
-                  // console.log(user.rows[0]);
-                  // console.log("**********************user*********************");
+                  user.rows[0].stripe_publish_key = process.env.STRIPE_PUBLISH_KEY;
+
+                  console.log("**********************user*********************");
+                  console.log(user.rows[0].stripe_publish_key);
+                  console.log("**********************user*********************");
                   poolDone();
                   return done(null, user.rows[0]);
                 }
@@ -891,6 +893,7 @@ exports.isAuthenticated = (req, res, next) => {
                         userData.company = company.rows[0].name;
                         userData.company_id = company.rows[0].id;
                         userData.company_info=company.rows[0];
+                        userData.stripe_publish_key = process.env.STRIPE_PUBLISH_KEY;
                         req.login(userData, function(err) {
                           if (err) {
                             try {

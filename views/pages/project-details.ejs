@@ -79,7 +79,7 @@
                                          <div class="slds-size_1-of-1 slds-medium-size_3-of-12">
                                           <div class="slds-form-element slds-m-bottom_medium">
                                               <label class="slds-form-element__label">
-                                                  Task Completion Status
+                                                  Task Completion
                                               </label>
                                               <div class="slds-form-element__control">
                                                 <%= project.total_completed_task_count%>/<%= taskTotalCount %>
@@ -104,7 +104,11 @@
                                                   Total Invoiced Expense
                                               </label>
                                               <div class="slds-form-element__control">
-                                                <%= project.total_invoice_expense %>
+                                                  <% var currency_symbols = currencyWithSymbolArray.filter(function(currency){
+                                                      return currency.name == accounts.filter(accountDetail => accountDetail.id == project.account_id)[0].currency;
+                                                  })%>
+                                                  <span class="text-uppercase text-dull"><%=  currency_symbols[0].symbol %></span>
+                                                  <%= project.total_invoice_expense %>
                                               </div>
                                           </div>
                                         </div>
@@ -115,6 +119,7 @@
                                                     Total Invoice Amount
                                                 </label>
                                                 <div class="slds-form-element__control">
+                                                  <span class="text-uppercase text-dull"><%=  currency_symbols[0].symbol %></span>
                                                   <%= project.total_invoice_amount %>
                                                 </div>
                                             </div>
@@ -629,6 +634,7 @@
                                                                       Total Expense
                                                                   </label>
                                                                   <div class="slds-form-element__control">
+                                                                    <span class="text-uppercase text-dull"><%=  currency_symbols[0].symbol %></span>
                                                                     <%= project.total_expense_amount %>
                                                                   </div>
 

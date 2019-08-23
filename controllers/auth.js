@@ -287,7 +287,7 @@ exports.postLogin = (req, res, next) => {
             let userData = user;
 
             req.logIn(userData, (err) => {
-              userData.domain = domain;
+              userData.domain = domain;              
               if (err) {
                  console.debug("--------2222-" + err);
 
