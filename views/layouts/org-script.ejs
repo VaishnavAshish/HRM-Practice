@@ -365,7 +365,7 @@ function addOrganization(modalId){
 	}else if(!(validateEmail(orgData.adminEmail))){
 		addError("#adminEmail","Please enter correct email id");
 	}else if(orgData.adminFirstName==""||orgData.adminFirstName==null||orgData.adminFirstName==undefined){
-		addError("#adminEmail","Please enter company admin first name");
+		addError("#firstName","Please enter company admin first name");
 	}else{
 		orgData.domain = domain+".krow.com";
 		checkFormValidation("#addCompanyForm");
