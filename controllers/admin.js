@@ -787,55 +787,63 @@ sendEmailToUser = (req, res, next) => {
 
 exports.findCompanyByCriteria = (req, res) => {
   // console.log("findCompanyByCriteria----------------------------------"+req.body.searchField);
-  pool.connect((err, client, done) => {
-    let searchCriteriaVal = [];
-    let whereClause = '';
-    if (req.body.searchField.length > 0) {
-      let searchField = req.body.searchField;
-      searchField.forEach((search, index) => {
-        if (index == 0) {
-          whereClause += 'WHERE ' + search.fieldName + ' $' + (index + 1) + ' ';
-        } else {
-          whereClause += 'AND ' + search.fieldName + ' $' + (index + 1) + ' ';
-        }
-        searchCriteriaVal.push(search.fieldValue);
-      });
-      /*let queryToExec='SELECT * FROM account WHERE '+req.body.searchField+' like $1 AND company_id=$2';*/
-    }
-    let offset = 0;
-    if (req.body.offset) {
-      offset = req.body.offset;
-    }
-    let queryToExec = 'SELECT c.id ,c.name ,c.domain ,c.archived ,c.created_date at time zone \'' + companyDefaultTimezone + '\' as created_date ,c.modified_date at time zone \'' + companyDefaultTimezone + '\' as modified_date ,c.street ,c.city ,c.state ,c.country ,c.zip_code ,c.add_status ,c.token,(SELECT count(*) from company ' + whereClause + ') as searchcount FROM company c ' + whereClause + ' ORDER BY created_date DESC,name,domain OFFSET ' + offset + ' LIMIT ' + process.env.PAGE_RECORD_NO;
-    // console.log('queryToExec '+queryToExec);
-    client.query(queryToExec, searchCriteriaVal, function(err, companies) {
-      if (err) {
-        handleResponse.shouldAbort(err, client, done);
-        handleResponse.handleError(res, err, ' Error in finding company data');
-      } else {
-        let searchCount = 0;
-        // console.log(JSON.stringify(companies.rows));
-        if (companies.rows.length > 0) {
-          companies.rows.forEach(function(data) {
-            let created_date = moment.tz(data.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
-            let modified_date = moment.tz(data.modified_date, companyDefaultTimezone).format('MM-DD-YYYY');
-            // let created_date = dateFormat(data.created_date);
-            // let modified_date = dateFormat(data.modified_date);
-            data["created_date"] = created_date;
-            data["modified_date"] = modified_date;
-          })
-          searchCount = companies.rows[0].searchcount;
-          // console.log('search count result is: '+companies.rows[0].searchcount);
-        }
-        done();
-        handleResponse.sendSuccess(res, 'Companies searched successfully', {
-          companies: companies.rows,
-          count: searchCount
-        });
-      }
-    });
+  setting.getCompanySetting(req, res ,(err,result)=>{
+     if(err==true){
+          handleResponse.handleError(res, err, ' error in finding company setting');
+     }else{
+         companyDefaultTimezone=result.timezone;
+         console.log('companyDefaultTimezone '+companyDefaultTimezone);
+          pool.connect((err, client, done) => {
+            let searchCriteriaVal = [];
+            let whereClause = '';
+            if (req.body.searchField.length > 0) {
+              let searchField = req.body.searchField;
+              searchField.forEach((search, index) => {
+                if (index == 0) {
+                  whereClause += 'WHERE ' + search.fieldName + ' $' + (index + 1) + ' ';
+                } else {
+                  whereClause += 'AND ' + search.fieldName + ' $' + (index + 1) + ' ';
+                }
+                searchCriteriaVal.push(search.fieldValue);
+              });
+              /*let queryToExec='SELECT * FROM account WHERE '+req.body.searchField+' like $1 AND company_id=$2';*/
+            }
+            let offset = 0;
+            if (req.body.offset) {
+              offset = req.body.offset;
+            }
+            let queryToExec = 'SELECT c.id ,c.name ,c.domain ,c.archived ,c.created_date at time zone \'' + companyDefaultTimezone + '\' as created_date ,c.modified_date at time zone \'' + companyDefaultTimezone + '\' as modified_date ,c.street ,c.city ,c.state ,c.country ,c.zip_code ,c.add_status ,c.token,(SELECT count(*) from company ' + whereClause + ') as searchcount FROM company c ' + whereClause + ' ORDER BY created_date DESC,name,domain OFFSET ' + offset + ' LIMIT ' + process.env.PAGE_RECORD_NO;
+            // console.log('queryToExec '+queryToExec);
+            client.query(queryToExec, searchCriteriaVal, function(err, companies) {
+              if (err) {
+                handleResponse.shouldAbort(err, client, done);
+                handleResponse.handleError(res, err, ' Error in finding company data');
+              } else {
+                let searchCount = 0;
+                // console.log(JSON.stringify(companies.rows));
+                if (companies.rows.length > 0) {
+                  companies.rows.forEach(function(data) {
+                    let created_date = moment.tz(data.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                    let modified_date = moment.tz(data.modified_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                    // let created_date = dateFormat(data.created_date);
+                    // let modified_date = dateFormat(data.modified_date);
+                    data["created_date"] = created_date;
+                    data["modified_date"] = modified_date;
+                  })
+                  searchCount = companies.rows[0].searchcount;
+                  // console.log('search count result is: '+companies.rows[0].searchcount);
+                }
+                done();
+                handleResponse.sendSuccess(res, 'Companies searched successfully', {
+                  companies: companies.rows,
+                  count: searchCount
+                });
+              }
+            });
 
-  })
+        })
+      }
+    })
 };
 
 exports.getCompany = (req, res) => {
