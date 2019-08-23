@@ -354,6 +354,8 @@ function addOrganization(modalId){
 	/*orgData.adminPass=$("#adminPass").val();*/
 	orgData.adminEmail=$("#adminEmail").val();
 	orgData.adminFirstName = $("#firstName").val()
+	orgData.adminPass = $("#password").val()
+	orgData.con_password = $("#con-password").val()
 	orgData.isSignup = true;
 	console.log(orgData);
 	if(orgData.orgName==""||orgData.orgName==null||orgData.orgName==undefined){
@@ -367,6 +369,16 @@ function addOrganization(modalId){
 	}else if(orgData.adminFirstName==""||orgData.adminFirstName==null||orgData.adminFirstName==undefined){
 		addError("#firstName","Please enter company admin first name");
 	}else{
+		if(orgData.adminPass.trim().length < 6) {
+				addError('#password', 'Password must be greater than 6 characters');
+				$("#user-signup-form").addClass('has-error');
+				return false;
+		}
+		if(orgData.adminPass != orgData.con_password) {
+				addError('#con-password', "Password does not match");
+				$("#user-signup-form").addClass('has-error');
+				return false;
+		}
 		orgData.domain = domain+".krow.com";
 		checkFormValidation("#addCompanyForm");
 		if(!$("#addCompanyForm").hasClass('has-error')) {
