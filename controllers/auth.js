@@ -277,6 +277,7 @@ exports.postLogin = (req, res, next) => {
           // console.log('req.body.remember_me '+user.id);
           if (req.body.remember_me) {
             console.log('inside remember_me');
+
             issueToken(user, function(err, token) {
               // if (err) { return next(err); }
               // console.log(token);
@@ -285,7 +286,7 @@ exports.postLogin = (req, res, next) => {
               if (err) {
                 handleResponse.handleError(res, err, err);
               }else{
-                res.cookie('remember_me', token, { path: '/', httpOnly: true, maxAge: 604800000 });
+                res.cookie('remember_me', token, { path: '/', httpOnly: true, maxAge: 2592000000 });
               }
             });
           }
