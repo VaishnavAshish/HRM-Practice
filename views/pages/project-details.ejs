@@ -534,8 +534,8 @@
                                                                     <div class="slds-form-element__control">
                                                                         <div class="slds-select_container">
                                                                             <select class="slds-select" getFormData='' name="project_type" id="project_type"  onchange="isProjectFixedFee(this);">
-                                                                                <option value="time_and_material">Time and Material</option>
-                                                                                <option value="milestone">Milestone</option>
+                                                                                <option value="time_and_expense">Time and Expense</option>
+                                                                                <!-- <option value="milestone">Milestone</option> -->
                                                                                 <option value="fixed_fee">Fixed Fee</option>
                                                                             </select>
                                                                         </div>
@@ -547,7 +547,7 @@
                                                             </div>
                                                             <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
                                                                     <div class="slds-form-element slds-m-bottom_medium">
-                                                                    <label class="slds-form-element__label">Project Cost</label>
+                                                                    <label class="slds-form-element__label">Fixed Cost</label>
                                                                     <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
                                                                         <% if(project.type == "fixed_fee") { %>
                                                                             <input type="number" class="slds-input" name="project_cost" getFormData id="project-cost" min="0" project-cost value="<%= project.project_cost %>" decimal>

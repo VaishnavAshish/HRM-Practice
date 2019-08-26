@@ -16,7 +16,7 @@ function addProject(modalId) {
     console.log(projectData);
     if(!projectData.title) {
         addError("#new-project-title", "Please enter project title");
-    } else if (projectData.startDate > projectData.endDate) {
+    } else if (projectData.endDate!='' &&projectData.startDate > projectData.endDate) {
       addError("#new-project-end-date", "Please enter end date greater than start date");
     } else {
         if(projectData.accountId == "" || projectData.accountId == null || projectData.accountId == undefined) {
