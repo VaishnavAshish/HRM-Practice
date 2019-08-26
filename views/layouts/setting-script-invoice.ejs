@@ -24,6 +24,7 @@
 	}
 
 	function saveInvoiceSetting(){
+		clearError('#defaultInvoiceStartNumber');
 		showLoader('#globalLoader');
 		let defaultInvoiceNote=$("#defaultInvoiceNote").val();
 		let defaultTimesheetNote = $("#defaultTimesheetNote").val();
@@ -44,6 +45,11 @@
 		if(defaultInvoiceNote.length>5000||defaultTimesheetNote.length>5000||defaultFixedFeeNote.length>5000||defaultExpenseNote.length>5000||defaultOtherNote.length>5000){
 			hideLoader('#globalLoader');
 			showGlobalToast('#globalToast', 'error', 'All Invoice notes cannot be more than 5000 characters', 4000);
+			return false;
+		}
+		if(defaultInvoiceStartNumber <= (<%= setting.invoice_starting_number %>)){
+			hideLoader('#globalLoader');
+			addError("#defaultInvoiceStartNumber",'Invoice start number must be greater then previous invoice start number')
 			return false;
 		}
 		checkFormValidation("#defaultInvoiceSetting");
@@ -77,7 +83,11 @@
 			       error: function(response){
 		                console.log('error is : '+JSON.stringify(response));
 		                hideLoader('#globalLoader');
-		                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+										if(response.responseJSON.message.includes('Invoice start number must be greater then the generated invoice numbers')){
+											addError('#defaultInvoiceStartNumber', "Invoice start number must be greater then generated invoice numbers ");
+										}else{
+											showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+										}
 			        }
 			    });
 			}else{

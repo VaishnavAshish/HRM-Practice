@@ -1172,13 +1172,17 @@ CREATE OR REPLACE FUNCTION change_invoice_sequence_number()
 $BODY$
 DECLARE
   	invoice_start_number INT;
+    last_seq_value INT;
 BEGIN
-	IF NEW.invoice_starting_number <> OLD.invoice_starting_number THEN
+  execute 'SELECT last_value from seq_invoice_' || OLD.company_id INTO last_seq_value;
+  RAISE NOTICE 'last_seq_value(%)', last_seq_value;
+	IF NEW.invoice_starting_number <> OLD.invoice_starting_number AND NEW.invoice_starting_number>last_seq_value THEN
 		RAISE NOTICE 'invoice_starting_number(%)', NEW.invoice_starting_number;
 		RAISE NOTICE 'company_id(%)', OLD.company_id;
 		SELECT INTO invoice_start_number setval('seq_invoice_'||OLD.company_id, NEW.invoice_starting_number, TRUE);
-
-  	END IF;
+  ELSEIF NEW.invoice_starting_number<last_seq_value THEN
+  	    RAISE EXCEPTION 'Invoice start number must be greater then the generated invoice number';
+	END IF;
  RETURN NEW;
 END;
 $BODY$

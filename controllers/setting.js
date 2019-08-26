@@ -143,8 +143,15 @@ exports.postEditSettingInvoice = (req, res) => {
                   } else {
               			client.query('UPDATE SETTING set invoice_note=$1,invoice_timesheet_note=$2,invoice_fixedfee_note=$3,invoice_expense_note=$4,invoice_other_note=$5,invoice_starting_number=$6,invoice_email_subject=$7,invoice_email_body=$8 where company_id=$9 RETURNING id',[req.body.defaultInvoiceNote,req.body.defaultTimesheetNote,req.body.defaultFixedFeeNote,req.body.defaultExpenseNote,req.body.defaultOtherNote,req.body.defaultInvoiceStartNumber,req.body.defaultEmailSubject,req.body.defaultEmailBody,req.user.company_id], function(err, updatedSetting) {
         			          if (err){
-        			            handleResponse.shouldAbort(err, client, done);
-        			            handleResponse.handleError(res, err, ' Error in updating settings');
+                          console.log('error in updating invoice number');
+                          console.log(err.where);
+                          if(err.where && err.where.includes('change_invoice_sequence_number')){
+                            handleResponse.shouldAbort(err, client, done);
+                            handleResponse.handleError(res, err, 'Error in updating settings.Invoice start number must be greater then the generated invoice numbers ');
+                          }else{
+                            handleResponse.shouldAbort(err, client, done);
+                            handleResponse.handleError(res, err, 'Error in updating settings');
+                          }
         			          } else {
                           client.query('COMMIT', (err) => {
                             if (err) {
