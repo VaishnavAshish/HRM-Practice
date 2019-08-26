@@ -50,7 +50,9 @@ exports.getLogin = (req, res) => {
         res.redirect('/timesheet/'+req.user.id+'#default');
       }
   } else {*/
-    if(req.query.token != '' || req.query.token != null || req.query.token != undefined) {
+    if(req.query.token != '' && req.query.token != null && req.query.token != undefined) {
+      // console.log('inside token found '+req.query.token);
+      // console.log(typeof req.query.token +' '+ typeof undefined);
       pool.connect((err, client, done) => {
         client.query('BEGIN', (err) => {
           if(err) {
@@ -122,6 +124,7 @@ exports.getLogin = (req, res) => {
       })
     } else {
       if (req.user) {
+        // console.log('inside user found');
         if (req.user.user_role.includes('SUPER_ADMIN')) {
             // console.log('SUPER_ADMIN');
             res.redirect('/org-listing');

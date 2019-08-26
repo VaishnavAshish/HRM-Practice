@@ -1180,7 +1180,7 @@ BEGIN
 		RAISE NOTICE 'invoice_starting_number(%)', NEW.invoice_starting_number;
 		RAISE NOTICE 'company_id(%)', OLD.company_id;
 		SELECT INTO invoice_start_number setval('seq_invoice_'||OLD.company_id, NEW.invoice_starting_number, TRUE);
-  ELSEIF NEW.invoice_starting_number<last_seq_value THEN
+  ELSEIF NEW.invoice_starting_number <> OLD.invoice_starting_number AND  NEW.invoice_starting_number<last_seq_value THEN
   	    RAISE EXCEPTION 'Invoice start number must be greater then the generated invoice number';
 	END IF;
  RETURN NEW;
