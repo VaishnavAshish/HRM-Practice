@@ -73,7 +73,6 @@ function addStripeToken(req,res,customer){
 
               }
             })
-
       }
     }
   );

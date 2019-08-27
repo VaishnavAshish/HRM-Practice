@@ -186,7 +186,10 @@
         						$("button[enableIntegration]").show();
         						$("button[disableIntegration]").hide();
         						$("#integration-dashboard").hide();
-        						console.log('response is : '+JSON.stringify(response));
+                    console.log('response is : '+JSON.stringify(response));
+                    setTimeout(function(){
+          						location.reload();
+          					},4000)
         				},
         				error: function(response){
         					hideLoader('#globalLoader');
