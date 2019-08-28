@@ -248,7 +248,7 @@ passport.use('user', new LocalStrategy({ usernameField: 'email',passReqToCallbac
             }else if (user.rows.length<=0) {
               // console.log(user.rows[0]);
               poolDone();
-              return done('Email is not correct or not connected to the company.Please contact to the administrator', null);
+              return done('Email is not correct or not connected to the company. Please contact the administrator', null);
             }else{
               // console.log(user.rows[0]);
               comparePassword(password, user.rows[0].password, (err, isMatch) => {

@@ -326,7 +326,7 @@ sendInvitationEmail = (req, res, next) => {
                                                                         '</strong>'+
                                                                     '</h1>'+
                                                                     '<p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; line-height: 20px;">'+
-                                                                        req.user.email+' has invited you to join the Krow PSA for company '+req.company.name.toLowerCase()+' .\n Click the button below to join!'+
+                                                                        req.user.email+' has invited you to join the Krow PSA for company '+req.company.name.toLowerCase()+' . <br><br> Click the button below to join!'+
                                                                     '</p>'+
                                                                     '<table border="0" cellpadding="0" cellspacing="0" width="100%">'+
                                                                         '<tbody>'+
