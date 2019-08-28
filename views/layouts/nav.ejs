@@ -180,7 +180,6 @@
         				type: 'POST',
         				url : '/disableStripe',
         				success : function(response){
-        						hideLoader('#globalLoader');
         						closeModal('#modalAddPaymentDetail');
         						showGlobalToast('#globalToast', 'success', response.message, 4000);
         						$("button[enableIntegration]").show();
@@ -188,6 +187,7 @@
         						$("#integration-dashboard").hide();
                     console.log('response is : '+JSON.stringify(response));
                     setTimeout(function(){
+                      hideLoader('#globalLoader');
           						location.reload();
           					},4000)
         				},
