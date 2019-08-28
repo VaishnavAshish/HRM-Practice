@@ -10,7 +10,7 @@
   "license": "MIT",
   "scripts": {
     "postinstall": "npm rebuild node-sass",
-    "start": "nodemon --inspect=8000 app.js",
+    "start": "node app.js",
     "devstart" : "nodemon --inspect=9000 app.js",
     "test": "nyc mocha --timeout=3000 --exit",
     "lint": "eslint **/*.js"
