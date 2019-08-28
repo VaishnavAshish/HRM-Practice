@@ -24,10 +24,8 @@ function addResource(modalId){
 			clearError('#email');
 			addError('#project_user_role', "Please select user role");
 		} else {
-
 			clearError('#project_user_role');
 			showLoader('#globalLoader');
-
 			checkFormValidation("#addResourceForm");
 			if(!$("#addResourceForm").hasClass('has-error')) {
 					let userData={};
@@ -48,8 +46,8 @@ function addResource(modalId){
 						userData.bill_rate = ($("#billRate").val()=='')?"0.00":$("#billRate").val();
 						userData.cost_rate = ($("#costRate").val()=='')?"0.00":$("#costRate").val();
 						$("input[name=permissions]:checked").each( function () {
--						   userData.permissions.push($(this).val());
--						});
+						   userData.permissions.push($(this).val());
+						});
 					}
 					console.log(userData);
 					$.ajax({
