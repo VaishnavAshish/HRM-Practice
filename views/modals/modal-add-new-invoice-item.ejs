@@ -11,7 +11,7 @@
                 <h2  class="slds-text-heading_medium slds-hyphenate">Add New Row Item</h2>
             </header>
             <div class="slds-modal__content slds-p-around_medium">
-                <div>
+                <div id="addNewRowItemForm">
                     <div class="slds-form-element slds-m-bottom_small">
                         <label class="slds-form-element__label">
                             Type
@@ -68,7 +68,7 @@
                             <abbr class="slds-required" title="required">*</abbr>
                         </label>
                         <div class="slds-form-element__control">
-                            <input type="number" id="invoice-quantity" class="slds-input" placeholder="">
+                            <input type="number" min="0" id="invoice-quantity" class="slds-input" placeholder="" positiveInteger>
                             <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
                             </div>
@@ -80,7 +80,7 @@
                             <abbr class="slds-required" title="required">*</abbr>
                         </label>
                         <div class="slds-form-element__control">
-                            <input type="number" id="invoice-unit-price" class="slds-input" placeholder="">
+                            <input type="number" min="0" id="invoice-unit-price" class="slds-input" placeholder="" positiveInteger>
                             <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
                             </div>
@@ -116,7 +116,6 @@
                     </div> -->
 
                 </div>
-
             </div>
             <footer class="slds-modal__footer">
                 <button class="slds-button slds-button_neutral" onclick="closeModal('#modalAddNewInvItem');">Cancel</button>

@@ -25,7 +25,7 @@
     // $("#invoice-tax").text(inv_tax.toFixed(2));
     if(parseFloat(<%= invoiceDetails.final_amount%>)-parseFloat(<%= invoiceDetails.total_amount%>)>0){
       $("#invoice-tax").closest('.text-right').show();
-      $("#invoice-tax").text((<%= invoiceDetails.final_amount%>-<%= invoiceDetails.total_amount%>).toFixed(2));
+      $("#invoice-tax").text((<%= invoiceDetails.final_amount%>-(<%= invoiceDetails.total_amount%>)).toFixed(2));
     }else{
       $("#invoice-tax").closest('.text-right').hide();
     }
@@ -454,16 +454,20 @@
     let invoice_quantity = $("input[id=invoice-quantity]").val();
     let invoice_unit_price = $("input[id=invoice-unit-price]").val();
     let description = $("textarea[id=invoice-description]").val();
-
+    // checkFormValidation("#addNewRowItemForm");
     if (invoice_line_type == "" || invoice_line_type == null || invoice_line_type == undefined) {
       addError($("select[id=invoice-type]"), "Please select any invoice line item type ");
     } else if (invoice_manual_entry_project == "" || invoice_manual_entry_project == null || invoice_manual_entry_project == undefined) {
       addError($("select[id=invoice-manual-entry-project]"), "Please select the associated project. ");
-    } else if (invoice_quantity == "" || invoice_quantity == null || invoice_quantity == undefined) {
+    } else if (invoice_quantity == "" || invoice_quantity == null || invoice_quantity == undefined ) {
       addError($("input[id=invoice-quantity]"), "Please enter the quantity ");
-    } else if (invoice_unit_price == "" || invoice_unit_price == null || invoice_unit_price == undefined) {
+    }else if (invoice_unit_price == "" || invoice_unit_price == null || invoice_unit_price == undefined) {
       addError($("input[id=invoice-unit-price]"), "Please enter the unit price ");
-    } else {
+    }else if(invoice_quantity < 0){
+      addError($("input[id=invoice-quantity]"), "Please enter a positive value");
+    }else if(invoice_unit_price < 0){
+      addError($("input[id=invoice-unit-price]"), "Please enter a positive value");
+    }else {
       clearError("select[id=invoice-manual-entry-project]");
       clearError($("select[id=invoice-type]"));
       clearError($("input[id=invoice-quantity]"));

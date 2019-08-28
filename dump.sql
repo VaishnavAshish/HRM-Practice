@@ -1210,3 +1210,7 @@ $$;
 -- 2019-08-14
 update users set first_name = 'blank' where first_name IS NULL
 update users set first_name = 'blank' where first_name like ''
+
+-- 2019-08-27
+alter table invoice_line_item add constraint quantity_nonnegative check (quantity >= 0);
+alter table invoice_line_item add constraint quantity_nonnegative check (quantity >= 0);
