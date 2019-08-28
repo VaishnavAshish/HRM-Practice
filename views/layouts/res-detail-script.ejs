@@ -74,11 +74,9 @@ function addResource(modalId){
 							showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
 						}
 					});
-				} else {
-					hideLoader('#globalLoader');
-				}
+				} 
 		}
-	}
+
 }
 function deleteResource(resourceId){
 		console.log('resource id is '+resourceId);
