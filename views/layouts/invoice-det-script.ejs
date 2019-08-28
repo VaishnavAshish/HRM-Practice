@@ -25,7 +25,7 @@
     // $("#invoice-tax").text(inv_tax.toFixed(2));
     if(parseFloat(<%= invoiceDetails.final_amount%>)-parseFloat(<%= invoiceDetails.total_amount%>)>0){
       $("#invoice-tax").closest('.text-right').show();
-      $("#invoice-tax").text((<%= invoiceDetails.final_amount%>-(<%= invoiceDetails.total_amount%>)).toFixed(2));
+      $("#invoice-tax").text((<%= invoiceDetails.final_amount%>-<%= invoiceDetails.total_amount%>).toFixed(2));
     }else{
       $("#invoice-tax").closest('.text-right').hide();
     }
@@ -445,6 +445,7 @@
   }
 
   function addInvoiceLineItem(modalId) {
+    $("#addNewRowItemForm").removeClass('has-error')
     clearError("select[id=invoice-manual-entry-project]");
     clearError($("select[id=invoice-type]"));
     clearError($("input[id=invoice-quantity]"));
@@ -454,7 +455,7 @@
     let invoice_quantity = $("input[id=invoice-quantity]").val();
     let invoice_unit_price = $("input[id=invoice-unit-price]").val();
     let description = $("textarea[id=invoice-description]").val();
-    // checkFormValidation("#addNewRowItemForm");
+    checkFormValidation("#addNewRowItemForm");
     if (invoice_line_type == "" || invoice_line_type == null || invoice_line_type == undefined) {
       addError($("select[id=invoice-type]"), "Please select any invoice line item type ");
     } else if (invoice_manual_entry_project == "" || invoice_manual_entry_project == null || invoice_manual_entry_project == undefined) {
@@ -463,51 +464,49 @@
       addError($("input[id=invoice-quantity]"), "Please enter the quantity ");
     }else if (invoice_unit_price == "" || invoice_unit_price == null || invoice_unit_price == undefined) {
       addError($("input[id=invoice-unit-price]"), "Please enter the unit price ");
-    }else if(invoice_quantity < 0){
-      addError($("input[id=invoice-quantity]"), "Please enter a positive value");
-    }else if(invoice_unit_price < 0){
-      addError($("input[id=invoice-unit-price]"), "Please enter a positive value");
     }else {
-      clearError("select[id=invoice-manual-entry-project]");
-      clearError($("select[id=invoice-type]"));
-      clearError($("input[id=invoice-quantity]"));
-      clearError($("input[id=invoice-unit-price]"));
-      showLoader('#globalLoader');
-      $.ajax({
-        type: 'POST',
-        url: '/insertNewInvoiceItem',
-        contentType: 'application/json',
-        dataType: 'json',
-        data: JSON.stringify({
-          "invoice_line_type": invoice_line_type,
-          "invoice_manual_entry_project":invoice_manual_entry_project,
-          "invoice_quantity": invoice_quantity,
-          "invoice_unit_price": invoice_unit_price,
-          "description": description,
-          "accountId": invoice_account_id,
-          "invoiceId": invoice_item_id,
-        }),
-        success: function(response) {
-          if (response.success == true) {
-            console.log(response);
-            closeModal(modalId);
-            hideLoader('#globalLoader');
-            location.reload();
-          } else {
-            closeModal(modalId);
-            hideLoader('#globalLoader');
-            showGlobalToast('#globalToast', 'error', response.message, 4000);
-          }
-        },
-        error: function(response) {
-          console.log(response);
-          closeModal(modalId);
-          hideLoader('#globalLoader');
-          showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
-        }
-      });
+      if(!$("#addNewRowItemForm").hasClass('has-error')) {
+          clearError("select[id=invoice-manual-entry-project]");
+          clearError($("select[id=invoice-type]"));
+          clearError($("input[id=invoice-quantity]"));
+          clearError($("input[id=invoice-unit-price]"));
+          showLoader('#globalLoader');
+          $.ajax({
+            type: 'POST',
+            url: '/insertNewInvoiceItem',
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify({
+              "invoice_line_type": invoice_line_type,
+              "invoice_manual_entry_project":invoice_manual_entry_project,
+              "invoice_quantity": invoice_quantity,
+              "invoice_unit_price": invoice_unit_price,
+              "description": description,
+              "accountId": invoice_account_id,
+              "invoiceId": invoice_item_id,
+            }),
+            success: function(response) {
+              if (response.success == true) {
+                console.log(response);
+                closeModal(modalId);
+                hideLoader('#globalLoader');
+                location.reload();
+              } else {
+                closeModal(modalId);
+                hideLoader('#globalLoader');
+                showGlobalToast('#globalToast', 'error', response.message, 4000);
+              }
+            },
+            error: function(response) {
+              console.log(response);
+              closeModal(modalId);
+              hideLoader('#globalLoader');
+              showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+            }
+          });
 
-    }
+        }
+      }
   }
 
   function addProjectInvoiceItem(modalId) {

@@ -47,6 +47,9 @@ function addResource(modalId){
 						userData.user_role=$("#project_user_role").val();
 						userData.bill_rate = ($("#billRate").val()=='')?"0.00":$("#billRate").val();
 						userData.cost_rate = ($("#costRate").val()=='')?"0.00":$("#costRate").val();
+						$("input[name=permissions]:checked").each( function () {
+-						   userData.permissions.push($(this).val());
+-						});
 					}
 					console.log(userData);
 					$.ajax({
