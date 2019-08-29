@@ -1562,10 +1562,12 @@ exports.deleteTimesheetRow = (req, res) => {
               console.log('req.body.timesheet_lineitem_id '+req.body.timesheet_lineitem_id);
               if(timesheetLiData.rowCount > 0) {
                 let differenceOfTime ;
+                console.log('time of last run time:')
+                console.log(hoursToMinutes(moment.tz(timesheetLiData.rows[0].lastruntime,companyDefaultTimezone).format('hh:mm')));
                 if(moment.tz(timesheetLiData.rows[0].currentTimestamp,companyDefaultTimezone).format('YYYY-MM-DD') == moment.tz(timesheetLiData.rows[0].lastruntime,companyDefaultTimezone).format('YYYY-MM-DD')){
                   differenceOfTime = hoursToMinutes(moment.tz(timesheetLiData.rows[0].currentTimestamp,companyDefaultTimezone).format('hh:mm')) - hoursToMinutes(moment.tz(timesheetLiData.rows[0].lastruntime,companyDefaultTimezone).format('hh:mm'))
                 }else{
-                  differenceOfTime = hoursToMinutes('19:00') - hoursToMinutes(moment.tz(timesheetLiData.rows[0].lastruntime,companyDefaultTimezone).format('hh:mm'))
+                  differenceOfTime = hoursToMinutes('23:59') - hoursToMinutes(moment.tz(timesheetLiData.rows[0].lastruntime,companyDefaultTimezone).format('hh:mm'))
                 }
                 console.log('differenceOfTime after deleting element '+minuteToHours(differenceOfTime));
                 console.log(moment.tz(timesheetLiData.rows[0].currentTimestamp,companyDefaultTimezone).format());
