@@ -120,60 +120,60 @@ exports.getXeroConfirmation =(req,res) => {
   })
 }
 
-exports.changeXeroAccount = (req,res) => {
-    console.log('changeXeroAccount req.body');
-    console.log(JSON.parse(req.body.newCompanyData));
-    console.log(req.user.company_id);
-    pool.connect((err, client, done) => {
-      client.query('BEGIN', (err) => {
-        if (err){
-          handleResponse.shouldAbort(err, client, done);
-          res.redirect('/integration-dashboard');
-        } else {
-           client.query('UPDATE INVOICE_LINE_ITEM set quickbook_invoice_line_id=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedInvoice) {
-             if (err){
-               handleResponse.shouldAbort(err, client, done);
-              //  handleResponse.handleError(res, err, ' Error in updating invoice line item');
-              res.redirect('/integration-dashboard');
-             } else {
-               client.query('UPDATE INVOICE set quickbook_invoice_id=$1,status=$2 where company_id=$3 AND status=$4 RETURNING id',[null,'DRAFT', req.user.company_id,'POSTED'], function(err, updatedInvoice) {
-                 if (err){
-                   handleResponse.shouldAbort(err, client, done);
-                  //  handleResponse.handleError(res, err, ' Error in updating invoice');
-                  res.redirect('/integration-dashboard');
-                 } else {
-                   client.query('UPDATE ACCOUNT set quickbook_customer_id=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedInvoice) {
-                     if (err){
-                       handleResponse.shouldAbort(err, client, done);
-                      //  handleResponse.handleError(res, err, ' Error in updating account');
-                      res.redirect('/integration-dashboard');
-                     } else {
-                        client.query('UPDATE SETTING set quickbook_token=$1,quickbook_enabled=$2,invoice_timesheet_item_id=$3,invoice_other_item_id=$3,invoice_fixedfee_item_id=$3,invoice_expense_item_id=$3,last_integration_time=$5 where company_id=$4 RETURNING id',[JSON.parse(req.body.newCompanyData) ,true,null,req.user.company_id,'now()'], function(err, updatedSetting) {
-                          if (err){
-                            handleResponse.shouldAbort(err, client, done);
-                            res.redirect('/integration-dashboard');
-                          } else {
-                            client.query('COMMIT', (err) => {
-                              if (err) {
-                                handleResponse.shouldAbort(err, client, done);
-                                res.redirect('/integration-dashboard');
-                              } else {
-                                done();
-                                res.redirect('/integration-dashboard');
-                              }
-                            })
-                          }
-                        });
-                      }
-                    })
-                  }
-                })
-              }
-          })
-        }
-      })
-    })
-}
+// exports.changeXeroAccount = (req,res) => {
+//     console.log('changeXeroAccount req.body');
+//     console.log(JSON.parse(req.body.newCompanyData));
+//     console.log(req.user.company_id);
+//     pool.connect((err, client, done) => {
+//       client.query('BEGIN', (err) => {
+//         if (err){
+//           handleResponse.shouldAbort(err, client, done);
+//           res.redirect('/integration-dashboard');
+//         } else {
+//            client.query('UPDATE INVOICE_LINE_ITEM set quickbook_invoice_line_id=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedInvoice) {
+//              if (err){
+//                handleResponse.shouldAbort(err, client, done);
+//               //  handleResponse.handleError(res, err, ' Error in updating invoice line item');
+//               res.redirect('/integration-dashboard');
+//              } else {
+//                client.query('UPDATE INVOICE set quickbook_invoice_id=$1,status=$2 where company_id=$3 AND status=$4 RETURNING id',[null,'DRAFT', req.user.company_id,'POSTED'], function(err, updatedInvoice) {
+//                  if (err){
+//                    handleResponse.shouldAbort(err, client, done);
+//                   //  handleResponse.handleError(res, err, ' Error in updating invoice');
+//                   res.redirect('/integration-dashboard');
+//                  } else {
+//                    client.query('UPDATE ACCOUNT set quickbook_customer_id=$1 where company_id=$2 RETURNING id',[null, req.user.company_id], function(err, updatedInvoice) {
+//                      if (err){
+//                        handleResponse.shouldAbort(err, client, done);
+//                       //  handleResponse.handleError(res, err, ' Error in updating account');
+//                       res.redirect('/integration-dashboard');
+//                      } else {
+//                         client.query('UPDATE SETTING set quickbook_token=$1,quickbook_enabled=$2,invoice_timesheet_item_id=$3,invoice_other_item_id=$3,invoice_fixedfee_item_id=$3,invoice_expense_item_id=$3,last_integration_time=$5 where company_id=$4 RETURNING id',[JSON.parse(req.body.newCompanyData) ,true,null,req.user.company_id,'now()'], function(err, updatedSetting) {
+//                           if (err){
+//                             handleResponse.shouldAbort(err, client, done);
+//                             res.redirect('/integration-dashboard');
+//                           } else {
+//                             client.query('COMMIT', (err) => {
+//                               if (err) {
+//                                 handleResponse.shouldAbort(err, client, done);
+//                                 res.redirect('/integration-dashboard');
+//                               } else {
+//                                 done();
+//                                 res.redirect('/integration-dashboard');
+//                               }
+//                             })
+//                           }
+//                         });
+//                       }
+//                     })
+//                   }
+//                 })
+//               }
+//           })
+//         }
+//       })
+//     })
+// }
 
 function minuteToHours(min) {
     var num = min;

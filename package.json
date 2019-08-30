@@ -11,7 +11,7 @@
   "scripts": {
     "postinstall": "npm rebuild node-sass",
     "start": "node app.js",
-    "devstart" : "nodemon --inspect=8000 app.js",
+    "devstart": "nodemon --inspect=8000 app.js",
     "test": "nyc mocha --timeout=3000 --exit",
     "lint": "eslint **/*.js"
   },
@@ -49,6 +49,7 @@
     "formidable": "1.2.1",
     "gm": "^1.23.1",
     "handlebars": "4.0.11",
+    "hbs": "^4.0.4",
     "html-pdf": "^2.2.0",
     "instagram-node": "^0.5.8",
     "intuit-oauth": "^1.1.3",
