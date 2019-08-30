@@ -172,7 +172,7 @@ exports.getAuthCode = (req,res) => {
                         oauthClientObj.token = oauthClient.token
 
                         console.log(oauthClientObj);
-                        client.query('UPDATE SETTING set quickbook_token=$1,quickbook_enabled=$2 where company_id=$3 RETURNING id',[oauthClientObj ,true,req.user.company_id], function(err, updatedSetting) {
+                        client.query('UPDATE SETTING set quickbook_token=$1,quickbook_enabled=$2,last_integration_time=$4 where company_id=$3 RETURNING id',[oauthClientObj ,true,req.user.company_id,'now()'], function(err, updatedSetting) {
                           if (err){
                             handleResponse.shouldAbort(err, client, done);
                             res.redirect('/integration-dashboard');
@@ -202,7 +202,7 @@ exports.getAuthCode = (req,res) => {
                       oauthClientObj.token = oauthClient.token
 
                       console.log(oauthClientObj);
-                      client.query('UPDATE SETTING set quickbook_token=$1,quickbook_enabled=$2 where company_id=$3 RETURNING id',[oauthClientObj ,true,req.user.company_id], function(err, updatedSetting) {
+                      client.query('UPDATE SETTING set quickbook_token=$1,quickbook_enabled=$2,last_integration_time=$4 where company_id=$3 RETURNING id',[oauthClientObj ,true,req.user.company_id], function(err, updatedSetting) {
                         if (err){
                           handleResponse.shouldAbort(err, client, done);
                           res.redirect('/integration-dashboard');
@@ -1326,7 +1326,7 @@ exports.disconnectQuickbook = (req,res) =>{
                           //              handleResponse.shouldAbort(err, client, done);
                           //              handleResponse.handleError(res, err, ' Error in updating settings');
                           //            } else {
-                                       client.query('UPDATE SETTING set quickbook_enabled=$1 where company_id=$2 RETURNING id',[false, req.user.company_id], function(err, updatedSetting) {
+                                       client.query('UPDATE SETTING set quickbook_enabled=$1,last_integration_time=$3 where company_id=$2 RETURNING id',[false, req.user.company_id,null], function(err, updatedSetting) {
                                          if (err){
                                            handleResponse.shouldAbort(err, client, done);
                                            handleResponse.handleError(res, err, ' Error in updating settings');

@@ -71,7 +71,7 @@ exports.getAuthCodeXero = (req,res) => {
             handleResponse.shouldAbort(err, client, done);
             res.redirect('/integration-dashboard');
           } else {
-             client.query('UPDATE SETTING set xero_token=$1,xero_enabled=$2 where company_id=$3 RETURNING *',[xero,true, req.user.company_id], function(err, updatedSetting) {
+             client.query('UPDATE SETTING set xero_token=$1,xero_enabled=$2,last_integration_time=$4 where company_id=$3 RETURNING *',[xero,true, req.user.company_id,'now()'], function(err, updatedSetting) {
                if (err){
                  console.log(err);
                  handleResponse.shouldAbort(err, client, done);
@@ -148,7 +148,7 @@ exports.changeXeroAccount = (req,res) => {
                       //  handleResponse.handleError(res, err, ' Error in updating account');
                       res.redirect('/integration-dashboard');
                      } else {
-                        client.query('UPDATE SETTING set quickbook_token=$1,quickbook_enabled=$2,invoice_timesheet_item_id=$3,invoice_other_item_id=$3,invoice_fixedfee_item_id=$3,invoice_expense_item_id=$3 where company_id=$4 RETURNING id',[JSON.parse(req.body.newCompanyData) ,true,null,req.user.company_id], function(err, updatedSetting) {
+                        client.query('UPDATE SETTING set quickbook_token=$1,quickbook_enabled=$2,invoice_timesheet_item_id=$3,invoice_other_item_id=$3,invoice_fixedfee_item_id=$3,invoice_expense_item_id=$3,last_integration_time=$5 where company_id=$4 RETURNING id',[JSON.parse(req.body.newCompanyData) ,true,null,req.user.company_id,'now()'], function(err, updatedSetting) {
                           if (err){
                             handleResponse.shouldAbort(err, client, done);
                             res.redirect('/integration-dashboard');
@@ -623,7 +623,7 @@ exports.disconnectXero = (req,res) => {
         handleResponse.shouldAbort(err, client, done);
         handleResponse.handleError(res, err, ' error in connecting to database');
       } else {
-          client.query('UPDATE SETTING set xero_enabled=$1 where company_id=$2 RETURNING id',[false, req.user.company_id], function(err, updatedSetting) {
+          client.query('UPDATE SETTING set xero_enabled=$1,last_integration_time=$3 where company_id=$2 RETURNING id',[false, req.user.company_id,null], function(err, updatedSetting) {
             if (err){
               handleResponse.shouldAbort(err, client, done);
               handleResponse.handleError(res, err, ' Error in updating settings');

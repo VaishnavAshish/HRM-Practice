@@ -5,7 +5,7 @@ const moment = require('moment-timezone');
 const setting = require('./company-setting');
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 stripe.setApiVersion(process.env.STRIPE_VERSION);
-
+let companyDefaultTimezone;
 
 // Set your secret key: remember to change this to your live secret key in production
 // See your keys here: https://dashboard.stripe.com/account/apikeys
@@ -251,17 +251,28 @@ exports.invoicePaymentDeclined = (req, res) => {
 }
 
 exports.getIntegrationDashboard = (req, res) => {
-  pool.connect((err, client, done) => {
-      client.query('SELECT stripe_customer_id,stripe_subscription_id FROM SETTING WHERE company_id=$1',[req.user.company_id], function(err, stripeSetting) {
-        if (err){
-          handleResponse.shouldAbort(err, client, done);
-          handleResponse.responseToPage(res,'pages/integration-dashboard',{user:req.user,error:err,stripeCustomerId:''},"error"," error in finding company setting");
-        } else {
-          done();
-          handleResponse.responseToPage(res,'pages/integration-dashboard',{user:req.user,error:err,stripeCustomerId:stripeSetting.rows[0].stripe_customer_id},"success","Successfully rendered");
+  setting.getCompanySetting(req, res ,(err,result)=>{
+    if(err==true){
+      // console.log('error in setting');
+      // console.log(err);
+      handleResponse.responseToPage(res,'pages/integration-dashboard',{user:req.user,error:err,stripeCustomerId:''},"error"," error in finding company setting");
+      /*handleResponse.handleError(res, err, ' error in finding company setting');*/
+    }else{
+      companyDefaultTimezone=result.timezone;
+        pool.connect((err, client, done) => {
+            client.query('SELECT stripe_customer_id,stripe_subscription_id,last_integration_time at time zone \''+companyDefaultTimezone+'\' as last_integration_time FROM SETTING WHERE company_id=$1',[req.user.company_id], function(err, stripeSetting) {
+              if (err){
+                handleResponse.shouldAbort(err, client, done);
+                handleResponse.responseToPage(res,'pages/integration-dashboard',{user:req.user,error:err,stripeCustomerId:''},"error"," error in finding company setting");
+              } else {
+                stripeSetting.rows[0].last_integration_time = moment.tz(stripeSetting.rows[0].last_integration_time, companyDefaultTimezone).format('MM-DD-YYYY hh:mm:ss');
+                done();
+                handleResponse.responseToPage(res,'pages/integration-dashboard',{user:req.user,error:err,stripeCustomerId:stripeSetting.rows[0].stripe_customer_id,last_integration_time:stripeSetting.rows[0].last_integration_time},"success","Successfully rendered");
+              }
+            })
+          });
         }
       })
-    });
 }
 
     // stripe.tokens.create({
