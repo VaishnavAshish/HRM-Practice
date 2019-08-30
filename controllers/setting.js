@@ -30,7 +30,7 @@ exports.postEditSetting = (req, res) => {
       			            handleResponse.shouldAbort(err, client, done);
       			            handleResponse.handleError(res, err, ' Error in updating settings');
       			          } else {
-                        client.query('UPDATE COMPANY set name=$1 where id=$2',[req.body.companyName,req.user.company_id],function(err,updatedSetting){
+                        client.query('UPDATE COMPANY set name=$1 where id=$2',[req.body.companyName,req.user.company_id],function(err,updatedCompany){
                           if (err){
                             handleResponse.shouldAbort(err, client, done);
                             handleResponse.handleError(res, err, ' Error in updating company name');

@@ -547,15 +547,15 @@
                                                                 <div class="slds-grid slds-p-vertical_xx-small text-size-11">
                                                                     <div class="slds-has-flexi-truncate">
                                                                         <span>
-                                                                            Burn <%= project.total_hours %> of <%= project.estimated_hours %>
+                                                                            Task Completion <%= project.taskcompleted %> / <%= project.totaltasks %>
                                                                         </span>
                                                                     </div>
                                                                     <div class="slds-no-flex">
-                                                                        <%= project.percent_completed %>%
-                                                                    </div>
+                                                                        <% var perComple = (!isNaN((project.taskcompleted / project.totaltasks)*100))?((project.taskcompleted / project.totaltasks)*100):'0' %> 
+                                                                        <%= perComple %> %                                                                 </div>
                                                                 </div>
                                                                 <div class="slds-progress-bar slds-progress-bar_small slds-progress-bar_circular">
-                                                                    <span class="slds-progress-bar__value" style="width: <%= project.percent_completed;%>%">
+                                                                    <span class="slds-progress-bar__value" style="width: <%= perComple %>%">
                                                                     </span>
                                                                 </div>
                                                             </div>
@@ -586,7 +586,8 @@
                                                                         Completion
                                                                     </div>
                                                                     <div>
-                                                                        <%= project.percent_completed %>%
+                                                                        <%= perComple %> %                      
+                                                                    </div>
                                                                     </div>
                                                                 </div>
 

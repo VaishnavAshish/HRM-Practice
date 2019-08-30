@@ -26,27 +26,27 @@ function addAccount(modalId){
 			checkFormValidation("#addAccountForm");
 			if(!$("#addAccountForm").hasClass('has-error')) {
 
-		    $.ajax({
-		      type: 'POST',
-		      url : '/addAccount',
-		      contentType: 'application/json',
-		      dataType: 'json',
-		      data:JSON.stringify(accountData),
-		       success : function(response){
-				   if(response.success){
+				$.ajax({
+				type: 'POST',
+				url : '/addAccount',
+				contentType: 'application/json',
+				dataType: 'json',
+				data:JSON.stringify(accountData),
+				success : function(response){
+					if(response.success){
+							hideLoader('#globalLoader');
+							closeModal(modalId);
+							showGlobalToast('#globalToast', 'success', response.message, 4000);
+							location.reload();
+					}
+					},
+				error: function(response){
+						console.log('error is : '+JSON.stringify(response));
 						hideLoader('#globalLoader');
 						closeModal(modalId);
-						showGlobalToast('#globalToast', 'success', response.message, 4000);
-					   	location.reload();
-				   }
-		        },
-		       error: function(response){
-	                console.log('error is : '+JSON.stringify(response));
-	                hideLoader('#globalLoader');
-	                closeModal(modalId);
-	                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
-		        }
-		    });
+						showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+					}
+				});
 			}else{
 				hideLoader('#globalLoader');
 			}

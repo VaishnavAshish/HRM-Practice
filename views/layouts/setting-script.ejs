@@ -32,33 +32,34 @@ function addNewExpenseCat(){
 }
 
 function saveCompanyGeneralSetting(){
-	if(checkFormValidation('#orgSettingGeneral')){
-		return false;
-	}
+	checkFormValidation('#orgSettingGeneral');
 	showLoader('#globalLoader');
 	let settingData = createJSONForFormData('#orgSettingGeneral');
 	console.log(settingData);
-	$.ajax({
-	      type: 'POST',
-	      url : '/editCompanySetting',
-	      contentType: 'application/json',
-	      dataType: 'json',
-	      data:JSON.stringify(settingData),
-	       success : function(response){
-			   if(response.success){
-					setTimeout(function(){
+	if (!$("#addAccountForm").hasClass('has-error')) {
+		$.ajax({
+			type: 'POST',
+			url: '/editCompanySetting',
+			contentType: 'application/json',
+			dataType: 'json',
+			data: JSON.stringify(settingData),
+			success: function (response) {
+				if (response.success) {
+					setTimeout(function () {
 						hideLoader('#globalLoader');
 						showGlobalToast('#globalToast', 'success', response.message, 4000);
-					},2000);
-					setTimeout(location.reload(),8000);;
-			   }
-	        },
-	       error: function(response){
-                console.log('error is : '+JSON.stringify(response));
-                hideLoader('#globalLoader');
-                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
-	        }
-	    });
-
+					}, 2000);
+					setTimeout(location.reload(), 8000);;
+				}
+			},
+			error: function (response) {
+				console.log('error is : ' + JSON.stringify(response));
+				hideLoader('#globalLoader');
+				showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+			}
+		});
+	}else{
+		hideLoader('#globalLoader');
+	}
 }
 </script>
