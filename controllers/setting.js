@@ -30,19 +30,26 @@ exports.postEditSetting = (req, res) => {
       			            handleResponse.shouldAbort(err, client, done);
       			            handleResponse.handleError(res, err, ' Error in updating settings');
       			          } else {
-                        client.query('COMMIT', (err) => {
-                          if (err) {
-                            // console.log('Error committing transaction', err.stack)
+                        client.query('UPDATE COMPANY set name=$1 where id=$2',[req.body.companyName,req.user.company_id],function(err,updatedSetting){
+                          if (err){
                             handleResponse.shouldAbort(err, client, done);
-                            handleResponse.handleError(res, err, ' Error in committing transaction');
+                            handleResponse.handleError(res, err, ' Error in updating company name');
                           } else {
-          			            done();
-          			            handleResponse.sendSuccess(res,'settings updated successfully',{});
+                            client.query('COMMIT', (err) => {
+                              if (err) {
+                                // console.log('Error committing transaction', err.stack)
+                                handleResponse.shouldAbort(err, client, done);
+                                handleResponse.handleError(res, err, ' Error in committing transaction');
+                              } else {
+                                done();
+                                handleResponse.sendSuccess(res, 'settings updated successfully', {});
+                              }
+                            })
                           }
                         })
 
-      			          }
-    		            });
+                      }
+                    });
                   }
                 })
           		}else{

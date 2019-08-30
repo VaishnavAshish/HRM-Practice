@@ -32,6 +32,9 @@ function addNewExpenseCat(){
 }
 
 function saveCompanyGeneralSetting(){
+	if(checkFormValidation('#orgSettingGeneral')){
+		return false;
+	}
 	showLoader('#globalLoader');
 	let settingData = createJSONForFormData('#orgSettingGeneral');
 	console.log(settingData);
