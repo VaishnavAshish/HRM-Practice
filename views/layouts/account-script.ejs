@@ -423,7 +423,7 @@ function findProjectByName(){
 
 }
 function setDataToProjectCard(project){
-	let perComple = (!isNaN((project.taskcompleted / project.totaltasks)*100))?((project.taskcompleted / project.totaltasks)*100):0;
+	let perComple = (!isNaN((project.taskcompleted / project.totaltasks)*100))?((project.taskcompleted / project.totaltasks)*100).toFixed(2):0;
     let projectCard='<div class="line-around slds-p-around_small slds-m-bottom_small">'+
 					    '<div class="slds-grid slds-wrap">'+
 					        '<div class="slds-size_1-of-1 slds-medium-size_1-of-2">'+

@@ -551,7 +551,7 @@
                                                                         </span>
                                                                     </div>
                                                                     <div class="slds-no-flex">
-                                                                        <% var perComple = (!isNaN((project.taskcompleted / project.totaltasks)*100))?((project.taskcompleted / project.totaltasks)*100):0 %> 
+                                                                        <% var perComple = (!isNaN((project.taskcompleted / project.totaltasks)*100))?((project.taskcompleted / project.totaltasks)*100).toFixed(2):0 %> 
                                                                         <%= perComple %> %                                                                 </div>
                                                                 </div>
                                                                 <div class="slds-progress-bar slds-progress-bar_small slds-progress-bar_circular">
