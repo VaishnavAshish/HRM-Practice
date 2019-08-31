@@ -423,6 +423,7 @@ function findProjectByName(){
 
 }
 function setDataToProjectCard(project){
+	let perComple = (!isNaN((project.taskcompleted / project.totaltasks)*100))?((project.taskcompleted / project.totaltasks)*100):0;
     let projectCard='<div class="line-around slds-p-around_small slds-m-bottom_small">'+
 					    '<div class="slds-grid slds-wrap">'+
 					        '<div class="slds-size_1-of-1 slds-medium-size_1-of-2">'+
@@ -434,15 +435,15 @@ function setDataToProjectCard(project){
 					                    '<div class="slds-grid slds-p-vertical_xx-small text-size-11">'+
 					                        '<div class="slds-has-flexi-truncate">'+
 					                            '<span>'+
-					                                'Burn '+ project.total_hours +' of '+ project.estimated_hours+
+					                                'Task Completion '+ project.taskcompleted +' / '+ project.totaltasks+
 					                            '</span>'+
 					                        '</div>'+
 					                        '<div class="slds-no-flex">'+
-					                            project.percent_completed +' %'+
+					                            perComple +' %'+
 					                        '</div>'+
 					                    '</div>'+
 					                    '<div class="slds-progress-bar slds-progress-bar_small slds-progress-bar_circular">'+
-					                        '<span class="slds-progress-bar__value" style="width: '+project.percent_completed+'%;">'+
+					                        '<span class="slds-progress-bar__value" style="width: '+perComple+'%;">'+
 					                        '</span>'+
 					                    '</div>'+
 					                '</div>'+
@@ -472,7 +473,7 @@ function setDataToProjectCard(project){
 					                            'Completion'+
 					                        '</div>'+
 					                        '<div>'+
-					                            project.percent_completed+' %'+
+					                            perComple+' %'+
 					                        '</div>'+
 					                    '</div>'+
 					                '</div>'+
