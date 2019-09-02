@@ -520,7 +520,10 @@ exports.getTimesheet = (req, res) => {
                                 handleResponse.shouldAbort(err, client, done);
                                 handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : [], timesheetList : [],timesheetWeekData : [] , projectList:[], userRoles : [], timeheet_users : [],companyDefaultTimezone:'',user:req.user,error:err},"error","Error in finding timesheet detail data for week.Please Restart.");
                               } else {
-
+                                timesheetListByProject.rows.map(tsProject=>{
+                                  tsProject.project_name = projectList.rows.filter(pList => pList.id == tsProject.project_id)[0].name;
+                                });
+                                
                                 getCompanyAllRoles(req, client, err, done, res, function(userRoles) {
                                   var timeheet_users = [];
                                   // console.log("*************************** user role ********************** ");
