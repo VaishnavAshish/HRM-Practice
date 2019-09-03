@@ -64,7 +64,7 @@
                                             <label class="slds-form-element__label" for="res_bill_rate" >Billable Rate</label>
                                             <div class="slds-form-element__control slds-input-has-fixed-addon">
                                                 <span class="slds-form-element__addon lmr-0" id=""><%= currency_symbols[0].symbol %></span>
-                                                <input type="text" bill-rate id="res_bill_rate" getFormData name="res_bill_rate" class="slds-input" placeholder="0.00">
+                                                <input type="text" bill-rate id="res_bill_rate" getFormData name="res_bill_rate" class="slds-input" placeholder="0.00" decimal>
 
                                                 <span class="slds-form-element__addon slds-no-flex" id="">/hr</span>
                                             </div>
@@ -78,7 +78,7 @@
                                             <label class="slds-form-element__label" for="res_cost_rate">Cost Rate</label>
                                             <div class="slds-form-element__control slds-input-has-fixed-addon">
                                                 <span class="slds-form-element__addon lmr-0" id=""><%= currency_symbols[0].symbol %></span>
-                                                <input type="text" cost-rate id="res_cost_rate" getFormData name="res_cost_rate" class="slds-input" placeholder="0.00">
+                                                <input type="text" cost-rate id="res_cost_rate" getFormData name="res_cost_rate" class="slds-input" placeholder="0.00" decimal>
 
                                                 <span class="slds-form-element__addon slds-no-flex" id="">/hr</span>
                                             </div>

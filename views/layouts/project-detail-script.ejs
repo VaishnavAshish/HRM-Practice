@@ -116,9 +116,10 @@
             } else {
                 clearError('#project_user_role');
                 showLoader('#globalLoader');
+                checkFormValidation(formId);
+                if (!$(formId).hasClass('has-error')) {
                 projectResData.projectId = projectId;
                 projectResData.accountId = accountId;
-
                 $.ajax({
                     type: 'POST',
                     url : '/addProjectResource',
@@ -145,6 +146,9 @@
                             showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
                     }
                 });
+                } else {
+                    hideLoader('#globalLoader');
+                }
             }
         }
     }
