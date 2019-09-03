@@ -483,13 +483,16 @@ exports.getTimesheet = (req, res) => {
 
                       // console.log('SELECT * FROM TIMESHEET_LINE_ITEM WHERE company_id=$1 AND resource_id=$2 AND created_date BETWEEN $3 AND $4 AND project_id is not null ORDER BY created_date, task_id, user_role');
                       console.log(req.user.company_id, userId, week_start_date, week_end_date);
-                      client.query('SELECT tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\'  as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,tl.task_name ,tl.description ,tl.category , EXTRACT(DOW FROM created_date at time zone \''+companyDefaultTimezone+'\') as week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime at time zone \''+companyDefaultTimezone+'\'  as lastruntime ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id FROM TIMESHEET_LINE_ITEM tl WHERE company_id=$1 AND resource_id=$2 AND created_date at time zone \''+companyDefaultTimezone+'\'  BETWEEN $3 AND $4 AND project_id is not null ORDER BY created_date, task_id, user_role',[req.user.company_id, userId, week_start_date, week_end_date], function(err, timesheetListByDate) {
+                      client.query('SELECT tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\'  as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,tl.project_name ,(select name from task where id = tl.task_id) as task_name ,tl.description ,tl.category , EXTRACT(DOW FROM created_date at time zone \''+companyDefaultTimezone+'\') as week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime at time zone \''+companyDefaultTimezone+'\'  as lastruntime ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id FROM TIMESHEET_LINE_ITEM tl WHERE company_id=$1 AND resource_id=$2 AND created_date at time zone \''+companyDefaultTimezone+'\'  BETWEEN $3 AND $4 AND project_id is not null ORDER BY created_date, task_id, user_role',[req.user.company_id, userId, week_start_date, week_end_date], function(err, timesheetListByDate) {
                         if(err) {
                           console.error(err);
                           handleResponse.shouldAbort(err, client, done);
                           handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : [], timesheetList : [],timesheetWeekData : [] , projectList:[], userRoles : [], timeheet_users : [],companyDefaultTimezone:'',user:req.user,error:err},"error","Error in finding timesheet detail data.Please Restart.");
                           /*handleResponse.handleError(res, err, ' Error in finding timesheet detail data');*/
                         } else {
+                          timesheetListByDate.rows.map(tsProject=>{
+                            tsProject.project_name = projectList.rows.filter(pList => pList.id == tsProject.project_id)[0].name;
+                          });                          
                           let taskListsDayArr = getTimesheetForDay(timesheetListByDate,currentTimestamp.rows[0].currentdate);
                           // console.log("timesheetListByDate");
                           // console.log(timesheetListByDate.rows);
@@ -522,6 +525,7 @@ exports.getTimesheet = (req, res) => {
                               } else {
                                 timesheetListByProject.rows.map(tsProject=>{
                                   tsProject.project_name = projectList.rows.filter(pList => pList.id == tsProject.project_id)[0].name;
+                                  tsProject.task_name = timesheetListByDate.rows.filter(tLD => tLD.task_id == tsProject.task_id )[0].task_name;
                                 });
                                 
                                 getCompanyAllRoles(req, client, err, done, res, function(userRoles) {
