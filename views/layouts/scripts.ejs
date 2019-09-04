@@ -275,7 +275,7 @@
 
     }
     function mobileNumber(inputtxt) {
-      var mobileno = /^\d{10}$/;
+      var mobileno = /^([+]?\d{1,3}[-\s]?)?(\d{3}[-]?){2}\d{4}$/;
       if(inputtxt.match(mobileno)) {
           return true;
       }
