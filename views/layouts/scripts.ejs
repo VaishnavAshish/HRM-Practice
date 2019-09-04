@@ -146,14 +146,14 @@
         }
         if(!flag){
           $("[mobile]",formId).each(function(){
-            if($(this).val()!=''){
-              if(!mobileNumber($(this).val())) {
-                addError('#'+$(this).attr('id'), "Please enter valid mobile number");
-                $(formId).addClass('has-error');
-                flag=true;
-                return false;
-              }
-            }
+            // if($(this).val()!=''){
+            //   if(!mobileNumber($(this).val())) {
+            //     addError('#'+$(this).attr('id'), "Please enter valid mobile number");
+            //     $(formId).addClass('has-error');
+            //     flag=true;
+            //     return false;
+            //   }
+            // }
             clearError('#'+$(this).attr('id'));
             $(formId).removeClass('has-error');
             return true;
