@@ -1216,4 +1216,4 @@ alter table invoice_line_item add constraint quantity_nonnegative check (quantit
 ALTER TABLE setting ADD COLUMN last_integration_time TIMESTAMP with time zone;
 
 -- 2019-09-4
-alter table users alter column mobile type varchar(17)
+alter table users alter column mobile type varchar(26)
