@@ -47,7 +47,7 @@
 			showGlobalToast('#globalToast', 'error', 'All Invoice notes cannot be more than 5000 characters', 4000);
 			return false;
 		}
-		if(defaultInvoiceStartNumber <= (<%= setting.invoice_starting_number %>)){
+		if(defaultInvoiceStartNumber < (<%= setting.invoice_starting_number %>)){
 			hideLoader('#globalLoader');
 			addError("#defaultInvoiceStartNumber",'Invoice start number must be greater then previous invoice start number')
 			return false;
