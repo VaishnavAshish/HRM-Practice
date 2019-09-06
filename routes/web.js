@@ -389,4 +389,6 @@ module.exports = function(app) {
         res.redirect('/domain');
     });
 
+    app.post('/resendInvitationEmail',passportConfig.isAuthenticated, resourceController.postResendActivation);
+
 };

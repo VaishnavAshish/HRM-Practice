@@ -178,6 +178,7 @@ exports.postResetPassword = (req, res) => {
   })
  }
 };
+
 exports.postAddResource = (req, res) => {
 
   // console.log('inside post resource ' + req.body.email + req.body.first_name + req.body.last_name + req.body.phone + req.body.mobile + req.body.company);
@@ -290,6 +291,25 @@ exports.postAddResource = (req, res) => {
       }
     });
 };
+
+exports.postResendActivation = (req, res) => { 
+  if(req.body.token==null || !req.user.user_role.includes('ADMIN') ){
+    done();
+    handleResponse.handleError(res, 'User adding error', ' You are not authorized for this. ');
+  }else{
+    req.token = req.body.token;
+    req.company={ name : req.user.company};
+    sendInvitationEmail(req,res,function(error,info){
+      if(error){
+          handleResponse.shouldAbort(error, client, done);
+          handleResponse.handleError(res, error, ' Error in sending invitation email.');
+      }else{
+          handleResponse.sendSuccess(res,'Invitation sent successfully',{});
+      }
+    });
+  }
+};
+
 sendInvitationEmail = (req, res, next) => {
 
     let mailOptions = {

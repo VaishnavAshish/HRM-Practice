@@ -326,7 +326,13 @@
         $('p[alert-message]',modalId).text('Are you sure you want to activate this item?');
         openModal(modalId);
         $('[btn-confirm]', modalId).attr('method', methodName);
+    }
 
+    function resendInviteBeforeConfirm(modalId, methodName) {
+        console.log(methodName);
+        $('p[alert-message]',modalId).text('Are you sure you want to resend invitation link via email ?');
+        openModal(modalId);
+        $('[btn-confirm]', modalId).attr('method', methodName);
     }
 
     function activate(id,objectName){
@@ -345,6 +351,29 @@
 
                location.reload();
 
+            },
+           error: function(response){
+                console.log('error is : '+JSON.stringify(response));
+                hideLoader('#globalLoader');
+                console.log(response.responseJSON.message);
+                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+
+            }
+        });
+    }
+
+    function resendInvitation(email,token){
+      showLoader('#globalLoader');
+        $.ajax({
+          type: 'POST',
+          url : '/resendInvitationEmail',
+          contentType: 'application/json',
+          dataType: 'json',
+          data:JSON.stringify({"email":email,"token":token}),
+           success : function(response){
+                console.log(response);
+                hideLoader('#globalLoader');
+                showGlobalToast('#globalToast', 'success', response.message, 4000);
             },
            error: function(response){
                 console.log('error is : '+JSON.stringify(response));

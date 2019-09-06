@@ -62,7 +62,12 @@
                                                 Activate
                                             </button>
 
-                                        <% }else { %>
+                                        <% }else {
+                                            if(resource.add_status=='Invited'){ %>
+                                                <button class="slds-button slds-button_neutral slds-align-top" onclick="resendInviteBeforeConfirm('#globalAlert', 'resendInvitation(\'<%=resource.email;%>\',\'<%=resource.password_reset_token;%>\')')" >
+                                                    Resend invitation link
+                                                </button>
+                                            <% } %>
                                             <button class="slds-button slds-button_destructive slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteResource(\'<%=resource.id;%>\')','Are you sure you want to deactivate this resource?')">
                                                 Deactivate
                                             </button>
