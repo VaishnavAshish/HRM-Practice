@@ -342,11 +342,11 @@ sendInvitationEmail = (req, res, next) => {
                                                                 '<td valign="top">'+
                                                                     '<h1 style="font-family: arial,sans-serif; font-size:24px; font-weight:normal; line-height: 20px; color: orange;">'+
                                                                         '<strong>'+
-                                                                            'You are invited to join '+req.company.name.toLowerCase()+' on Krow PSA.'+
+                                                                            'You are invited to join '+req.company.name+' on Krow PSA.'+
                                                                         '</strong>'+
                                                                     '</h1>'+
                                                                     '<p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; line-height: 20px;">'+
-                                                                        req.user.email+' has invited you to join the Krow PSA for company '+req.company.name.toLowerCase()+' . <br><br> Click the button below to join!'+
+                                                                        req.user.email+' has invited you to join Krow PSA for company '+req.company.name+' . <br><br> Click the button below to join!'+
                                                                     '</p>'+
                                                                     '<table border="0" cellpadding="0" cellspacing="0" width="100%">'+
                                                                         '<tbody>'+
@@ -379,8 +379,7 @@ sendInvitationEmail = (req, res, next) => {
                             '</tr>'+
                             '<tr>'+
                                 '<td valign="top" align="center" style=" font-family: arial,sans-serif; padding:20px 20px 20px 20px; color: #999; font-size: 14px;">'+
-                                    'For more help and support'+
-                                    '<a href="/" target="_blank" style="color: #4387fd;">contact us</a>'+
+                                    
                                 '</td>'+
                             '</tr>'+
                         '</tbody>'+
@@ -389,6 +388,8 @@ sendInvitationEmail = (req, res, next) => {
             '</body>'+
 
             '</html>';
+            // 'For more help and support'+
+            // '<a href="/" target="_blank" style="color: #4387fd;">contact us</a>'+
             // '<p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; line-height: 20px;">'+
             //     'Join team'+
             // '</p>'+
@@ -493,8 +494,7 @@ sendResetEmail = (req,res,next)=>{
                   '</tr>'+
                   '<tr>'+
                       '<td valign="top" align="center" style=" font-family: arial,sans-serif; padding:20px 20px 20px 20px; color: #999; font-size: 14px;">'+
-                          'For more help and support'+
-                          '<a href="/" target="_blank" style="color: #4387fd;"> contact us</a>'+
+                          
                       '</td>'+
                   '</tr>'+
               '</tbody>'+
@@ -502,6 +502,8 @@ sendResetEmail = (req,res,next)=>{
       '</div>'+
    '</body>'+
    '</html>';
+   // 'For more help and support'+
+   // '<a href="/" target="_blank" style="color: #4387fd;"> contact us</a>'+
    //console.log('html');
    //console.log(html);
    mailOptions.html=html;
