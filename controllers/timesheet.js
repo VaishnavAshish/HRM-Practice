@@ -490,9 +490,11 @@ exports.getTimesheet = (req, res) => {
                           handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : [], timesheetList : [],timesheetWeekData : [] , projectList:[], userRoles : [], timeheet_users : [],companyDefaultTimezone:'',user:req.user,error:err},"error","Error in finding timesheet detail data.Please Restart.");
                           /*handleResponse.handleError(res, err, ' Error in finding timesheet detail data');*/
                         } else {
-                          timesheetListByDate.rows.map(tsProject=>{
-                            tsProject.project_name = projectList.rows.filter(pList => pList.id == tsProject.project_id)[0].name;
-                          });
+                          console.log('timesheetListByDate.rows')
+                          console.log(timesheetListByDate.rows);
+                          // timesheetListByDate.rows.map(tsProject=>{
+                          //   tsProject.project_name = projectList.rows.filter(pList => pList.id == tsProject.project_id)[0].name;
+                          // });
                           let taskListsDayArr = getTimesheetForDay(timesheetListByDate,currentTimestamp.rows[0].currentdate);
                           // console.log("timesheetListByDate");
                           // console.log(timesheetListByDate.rows);
@@ -523,10 +525,10 @@ exports.getTimesheet = (req, res) => {
                                 handleResponse.shouldAbort(err, client, done);
                                 handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : [], timesheetList : [],timesheetWeekData : [] , projectList:[], userRoles : [], timeheet_users : [],companyDefaultTimezone:'',user:req.user,error:err},"error","Error in finding timesheet detail data for week.Please Restart.");
                               } else {
-                                timesheetListByProject.rows.map(tsProject=>{
-                                  tsProject.project_name = projectList.rows.filter(pList => pList.id == tsProject.project_id)[0].name;
-                                  tsProject.task_name = timesheetListByDate.rows.filter(tLD => tLD.task_id == tsProject.task_id )[0].task_name;
-                                });
+                                // timesheetListByProject.rows.map(tsProject=>{
+                                //   tsProject.project_name = projectList.rows.filter(pList => pList.id == tsProject.project_id)[0].name;
+                                //   tsProject.task_name = timesheetListByDate.rows.filter(tLD => tLD.task_id == tsProject.task_id )[0].task_name;
+                                // });
 
                                 getCompanyAllRoles(req, client, err, done, res, function(userRoles) {
                                   var timeheet_users = [];
