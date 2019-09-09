@@ -723,8 +723,7 @@ sendEmailToUser = (req, res, next) => {
     '</tr>' +
     '<tr>' +
     '<td valign="top" align="center" style=" font-family: arial,sans-serif; padding:20px 20px 20px 20px; color: #999; font-size: 14px;">' +
-    'For more help and support' +
-    '<a href="/" target="_blank" style="color: #4387fd;"> contact us</a>' +
+    
     '</td>' +
     '</tr>' +
     '</tbody>' +
@@ -732,6 +731,8 @@ sendEmailToUser = (req, res, next) => {
     '</div>' +
     '</body>' +
     '</html>';
+    // 'For more help and support' +
+    // '<a href="/" target="_blank" style="color: #4387fd;"> contact us</a>' +
   // console.log("Inside send mail " + req.body);
   const mailOptions = {
     to: req.body.adminEmail,
