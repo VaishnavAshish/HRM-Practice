@@ -2527,8 +2527,7 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
                                         <tr>
                                             <td class="" style="vertical-align: text-top;">
                                                 <div class="text-uppercase tmd-small">
-                                                    <img style="display:none" src="data:image/jpeg;base64, ${Buffer.from(companySetting.company_logo).toString('base64')}" alt="company_logo" class="max-w-150">
-                                                    <center>${req.user.company}</center>
+                                                    <img src="data:image/jpeg;base64, ${Buffer.from(companySetting.company_logo).toString('base64')}" alt="company_logo" class="max-w-150">
                                                 </div>
                                             </td>
                                             <td width="15%">
