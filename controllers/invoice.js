@@ -2527,8 +2527,7 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
                                         <tr>
                                             <td class="" style="vertical-align: text-top;">
                                                 <div class="text-uppercase tmd-small">
-                                                    <img style="display:none" src="data:image/jpeg;base64, ${Buffer.from(companySetting.company_logo).toString('base64')}" alt="company_logo" class="max-w-150">
-                                                    <center>${req.user.company}</center>
+                                                    <img src="data:image/jpeg;base64, ${Buffer.from(companySetting.company_logo).toString('base64')}" alt="company_logo" class="max-w-150">
                                                 </div>
                                             </td>
                                             <td width="15%">
@@ -2780,12 +2779,14 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName,companySetting
   console.log(companySetting.company_logo);
   let startDateFormatted=invoiceDetails['created_date']==null?'':moment.tz(invoiceDetails.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
   let dueDateFormatted=invoiceDetails['due_date']==null?'':moment.tz(invoiceDetails.due_date, companyDefaultTimezone).format('MM-DD-YYYY');
+  //<a href="javascript:void(0);" target="_blank"><img src="${process.env.BASE_URL}/getCompanyLogoForEmail/${req.user.company_id}" alt="company_logo" style="max-width:150px;"></a>
+
   let html = `<html><head></head><body><div style="background-color: #f7f8f9;">
             <table border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#f7f8f9">
                 <tbody>
                     <tr>
                         <td valign="top" align="center" style="padding-top: 20px; padding-bottom: 10px;">
-                            ${req.user.company}
+                            <center>${req.user.company}</center>
                         </td>
                     </tr>
                     <tr>
