@@ -494,7 +494,7 @@ exports.getTimesheet = (req, res) => {
                           console.log(timesheetListByDate.rows);
                           timesheetListByDate.rows.map(tsProject=>{
                             let pro=projectList.rows.filter(pList => pList.id == tsProject.project_id);
-                            if(pro){
+                            if(pro.length>0){
                               tsProject.project_name = pro[0].name;
                             }
                           });
@@ -530,11 +530,11 @@ exports.getTimesheet = (req, res) => {
                               } else {
                                 timesheetListByProject.rows.map(tsProject=>{
                                   let pro=projectList.rows.filter(pList => pList.id == tsProject.project_id);
-                                  if(pro){
+                                  if(pro.length>0){
                                     tsProject.project_name = pro[0].name;
                                   }
                                   let tas=timesheetListByDate.rows.filter(tLD => tLD.task_id == tsProject.task_id );
-                                  if(ta){
+                                  if(ta.length>0){
                                     tsProject.task_name = ta[0].task_name;
                                   }
                                 });
