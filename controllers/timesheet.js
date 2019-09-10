@@ -493,7 +493,10 @@ exports.getTimesheet = (req, res) => {
                           console.log('timesheetListByDate.rows')
                           console.log(timesheetListByDate.rows);
                           timesheetListByDate.rows.map(tsProject=>{
-                            tsProject.project_name = projectList.rows.filter(pList => pList.id == tsProject.project_id)[0].name;
+                            let pro=projectList.rows.filter(pList => pList.id == tsProject.project_id);
+                            if(pro){
+                              tsProject.project_name = pro[0].name;
+                            }
                           });
                           let taskListsDayArr = getTimesheetForDay(timesheetListByDate,currentTimestamp.rows[0].currentdate);
                           // console.log("timesheetListByDate");
@@ -526,8 +529,14 @@ exports.getTimesheet = (req, res) => {
                                 handleResponse.responseToPage(res,'pages/timesheet',{daysEnum : [], timesheetList : [],timesheetWeekData : [] , projectList:[], userRoles : [], timeheet_users : [],companyDefaultTimezone:'',user:req.user,error:err},"error","Error in finding timesheet detail data for week.Please Restart.");
                               } else {
                                 timesheetListByProject.rows.map(tsProject=>{
-                                  tsProject.project_name = projectList.rows.filter(pList => pList.id == tsProject.project_id)[0].name;
-                                  tsProject.task_name = timesheetListByDate.rows.filter(tLD => tLD.task_id == tsProject.task_id )[0].task_name;
+                                  let pro=projectList.rows.filter(pList => pList.id == tsProject.project_id);
+                                  if(pro){
+                                    tsProject.project_name = pro[0].name;
+                                  }
+                                  let tas=timesheetListByDate.rows.filter(tLD => tLD.task_id == tsProject.task_id );
+                                  if(ta){
+                                    tsProject.task_name = ta[0].task_name;
+                                  }
                                 });
 
                                 getCompanyAllRoles(req, client, err, done, res, function(userRoles) {
