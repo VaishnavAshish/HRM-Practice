@@ -56,7 +56,7 @@
                                         <button class="slds-button slds-button_dark-green slds-align-top" onclick="submitExpense('<%= expense.id %>')" submitted>
                                             Submit
                                         </button>
-                                        <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteExpense(\'<%= expense.id %>\')','Are you sure you want to delete this expense?')" submitted>
+                                        <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteExpense(\'<%= expense.id %>\')','Are you sure you want to delete this expense?')" submitted <% if(!expense.invoiced){ %>disabled <% } %>></button> 
                                           <span class="slds-button__icon">
                                             <i class=" fa fa-trash text-red" aria-hidden="true"></i>
                                           </span>

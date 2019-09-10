@@ -2527,7 +2527,8 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
                                         <tr>
                                             <td class="" style="vertical-align: text-top;">
                                                 <div class="text-uppercase tmd-small">
-                                                    <img src="data:image/jpeg;base64, ${Buffer.from(companySetting.company_logo).toString('base64')}" alt="company_logo" class="max-w-150">
+                                                    <img style="display:none" src="data:image/jpeg;base64, ${Buffer.from(companySetting.company_logo).toString('base64')}" alt="company_logo" class="max-w-150">
+                                                    <center>${req.user.company}</center>
                                                 </div>
                                             </td>
                                             <td width="15%">
@@ -2784,7 +2785,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName,companySetting
                 <tbody>
                     <tr>
                         <td valign="top" align="center" style="padding-top: 20px; padding-bottom: 10px;">
-                            <a href="javascript:void(0);" target="_blank"><img src="${process.env.BASE_URL}/getCompanyLogoForEmail/${req.user.company_id}" alt="company_logo" style="max-width:150px;"></a>
+                            ${req.user.company}
                         </td>
                     </tr>
                     <tr>

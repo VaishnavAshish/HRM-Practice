@@ -133,21 +133,14 @@
                                                 </div>
                                             </div>
                                         </div>
-
                                         <div class="slds-grid slds-wrap slds-gutters">
                                             <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
                                                 <div class="slds-form-element slds-m-bottom_medium">
                                                     <label class="slds-form-element__label">
-                                                        Tax
+                                                        Tax %
                                                     </label>
                                                     <div class="slds-form-element__control">
-                                                        <div class="slds-select_container">
-                                                            <select class="slds-select" id="tax" reset='value'>
-                                                                <option value=""> </option>
-                                                                <option value="GST">GST</option>
-                                                                <option value="VAT">VAT</option>
-                                                            </select>
-                                                        </div>
+                                                        <input type="number" class="slds-input" id="tax" reset='value' decimal onchange="calculatePerc()"/>
                                                         <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
                                                         </div>
