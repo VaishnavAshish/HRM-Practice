@@ -534,8 +534,8 @@ exports.getTimesheet = (req, res) => {
                                     tsProject.project_name = pro[0].name;
                                   }
                                   let tas=timesheetListByDate.rows.filter(tLD => tLD.task_id == tsProject.task_id );
-                                  if(ta.length>0){
-                                    tsProject.task_name = ta[0].task_name;
+                                  if(tas.length>0){
+                                    tsProject.task_name = tas[0].task_name;
                                   }
                                 });
 
