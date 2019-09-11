@@ -745,8 +745,8 @@ function addRowToTimesheet(timesheetData){
                           </div>
                       </div>
                   </div>`
-    $('#day-tabs').find('.slds-tabs_default__content:not(.hide)').find('.slds-p-around_x-small:last').after(timesheetRowHtml);
-    /*$('#day-tabs').find('.slds-tabs_default__content').not('.hide').append(timesheetRowHtml);*/
+    //$('#day-tabs').find('.slds-tabs_default__content:not(.hide)').find('.slds-p-around_x-small:last').after(timesheetRowHtml);
+    $('#day-tabs').find('.slds-tabs_default__content').not('.hide').append(timesheetRowHtml);
 }
 
 function addTimeLogEntry(modalId,formId){
@@ -802,6 +802,7 @@ function addTimeLogEntry(modalId,formId){
                                                             </div>
                                                           </div>`;
                                               $("#day-tabs").append(divHTML);
+                                              currentDiv=$("#day-tabs > div").not('.hide');
                                           }
                                           if(currentDiv.attr('date')== dateFormat(moment.tz(res.currentDate, companyDefaultTimezone).format())){
                                               addRowToTimesheet(response.line_item);
