@@ -1217,3 +1217,7 @@ ALTER TABLE setting ADD COLUMN last_integration_time TIMESTAMP with time zone;
 
 -- 2019-09-4
 alter table users alter column mobile type varchar(26)
+
+-- 2019-09-10
+ALTER TABLE setting add COLUMN tax_category varchar(255);
+alter table expense add column tax_percent int
