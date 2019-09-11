@@ -558,8 +558,8 @@ exports.postEditExpense = (req, res) => {
                         } else {
                             // console.log('getExpense>>>>>>>>>>>>>');
                             // console.log(expense.rows[0]);
-                            let total_expense_amount = parseFloat(req.body.tax_no) + parseFloat(req.body.amount);
-                            client.query('UPDATE EXPENSE SET tax=$1,tax_amount=$2,note=$3, category =$4,amount=$5,billable=$6,modified_date=$7,expense_date=$8,project_id=$9,account_id=$10,currency=$11,total_amount=$12 WHERE id=$13 AND company_id=$14', [req.body.tax, req.body.tax_no, req.body.note, req.body.category, req.body.amount, req.body.billable,'now()', moment.tz(req.body.expense_date.split('T')[0], companyDefaultTimezone).format(), req.body.project_id, req.body.account_id, req.body.currency,total_expense_amount, req.body.expenseId, req.user.company_id], function(err, updatedData) {
+                            let total_expense_amount = (parseFloat(req.body.tax_perc)/100) * parseFloat(req.body.amount) + parseFloat(req.body.amount);
+                            client.query('UPDATE EXPENSE SET tax_percent=$1,note=$2, category =$3,amount=$4,billable=$5,modified_date=$6,expense_date=$7,project_id=$8,account_id=$9,currency=$10,total_amount=$11 WHERE id=$12 AND company_id=$13', [req.body.tax_perc, req.body.note, req.body.category, req.body.amount, req.body.billable,'now()', moment.tz(req.body.expense_date.split('T')[0], companyDefaultTimezone).format(), req.body.project_id, req.body.account_id, req.body.currency,total_expense_amount, req.body.expenseId, req.user.company_id], function(err, updatedData) {
                                 // console.log('Error >>>>>>>>>>>>>');
                                 // console.log(err);
                                 if (err) {

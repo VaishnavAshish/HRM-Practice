@@ -97,8 +97,9 @@ function updateExpense(expenseId){
                   clearError('#project', '#err-msg-project')
                     let expenseData={};
                     expenseData.expenseId=expenseId;
-                    expenseData.tax = $("#tax option:selected").val();
-                    expenseData.tax_no = ($("#tax_no").val()=="")?0:$("#tax_no").val();
+                    // expenseData.tax = $("#tax option:selected").val();
+                    // expenseData.tax_no = ($("#tax_no").val()=="")?0:$("#tax_no").val();
+                    expenseData.tax_perc=($("#tax_perc").val()=="")?0:$("#tax_perc").val();
                     expenseData.expense_date = moment.tz($("#expense_date").val(), companyDefaultTimezone).format('YYYY-MM-DD');
                     expenseData.category = $('#category option:selected').val();
                     expenseData.currency = $('#currency option:selected').val();
