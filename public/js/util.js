@@ -793,6 +793,16 @@ function addTimeLogEntry(modalId,formId){
                                       let eleToStart=$("#day-tabs");
                                       if(eleToStart.length>0){
                                           let currentDiv=$("#day-tabs > div").not('.hide');
+                                          if(currentDiv.length == 0) {
+                                              let day = moment.tz(res.currentDate, companyDefaultTimezone).format('d');
+                                              let dayFull = moment.tz(res.currentDate, companyDefaultTimezone).format('dddd');
+                                              let date = moment.tz(res.currentDate, companyDefaultTimezone).format('YYYY-MM-DD');
+                                              divHTML = `<div class="slds-tabs_default__content" day=${day} target-tab=' ${dayFull}' date='${date}' >
+                                                            <div class=" slds-p-bottom_medium ">
+                                                            </div>
+                                                          </div>`;
+                                              $("#day-tabs").append(divHTML);
+                                          }
                                           if(currentDiv.attr('date')== dateFormat(moment.tz(res.currentDate, companyDefaultTimezone).format())){
                                               addRowToTimesheet(response.line_item);
                                               if(selectedEle!=null&&selectedEle!=undefined){

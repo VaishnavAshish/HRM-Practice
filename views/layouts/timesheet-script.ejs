@@ -16,6 +16,22 @@
         if(isUserId) {
             reqUserId = url.pathname.substring(((url.pathname).lastIndexOf('/')+1), url.pathname.length);
         }
+
+        // var dayArr=[0,1,2,3,4,5,6];
+        // timesheetDataArr = []
+        // $("#day-tabs > div[day]").each(dayWithTimesheetData => {
+        //     timesheetDataArr.push($(dayWithTimesheetData).attr('day'));
+        // });
+        // let daysEnum = <%= daysEnum %>
+        // dayArr.forEach(arr => {
+        //     if(timesheetDataArr.indexOf(arr) == -1) {
+        //         divHTML = `<div class="slds-tabs_default__content hide" day=${arr} target-tab=' ${daysEnum[arr] }' date='' >
+        //                       <div class=" slds-p-bottom_medium ">
+        //                       </div>
+        //                     </div>`;
+        //     }
+        // })
+
         let currentUserPermission = "<%= user.permissions %>"
         // if(currentUserPermission.indexOf('timesheetApprover')==-1){
           if(reqUserId != '<%= user.id%>') {
