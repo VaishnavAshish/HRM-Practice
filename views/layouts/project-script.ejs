@@ -350,13 +350,13 @@ function findProjectByName(){
     function setDataToCard(project){
         let icon = '';
         if(project.status == "Not Started") {
-        icon = `<i class="fa fa-ban text-dull"></i>`;
+        // icon = `<i class="fa fa-ban text-dull"></i>`;
         } else if(project.status == "In Progress") {
-        icon = `<i class="fa fa-spinner text-orange"></i>`;
+        // icon = `<i class="fa fa-spinner text-orange"></i>`;
         } else if(project.status == "At Risk") {
-        icon = `<i class="fa fa-exclamation-circle text-red"></i>`;
+        // icon = `<i class="fa fa-exclamation-circle text-red"></i>`;
         } else if(project.status == "Completed") {
-        icon = `<i class="fa fa-check-circle text-green"></i>`;
+        // icon = `<i class="fa fa-check-circle text-green"></i>`;
         }
         let deleteBtn = ``;
         if(<%= user.permissions.includes('projectManager') %>) {
@@ -506,7 +506,7 @@ function findProjectByName(){
                             '</td>'+
                             '<td role="gridcell">'+
                                 '<div class="slds-truncate" title="">'+
-                                    project_status+
+                                    // project_status+
                                     ' ' +project.status+
                                 '</div>'+
                             '</td>'+
