@@ -373,7 +373,7 @@ exports.getExpenseDetail = (req, res) => {
             /*handleResponse.handleError(res, 'incorrect expense id', ' Expense id is not correct');*/
         } else {
             pool.connect((err, client, done) => {
-                client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.total_amount,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id,e.submitted,e.content_type,e.document,e.doc_file_name FROM EXPENSE e where id=$1 AND company_id=$2', [req.query.expenseId, req.user.company_id], function(err, expense) {
+                client.query('SELECT e.id ,e.tax_percent ,e.total_amount,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id,e.submitted,e.content_type,e.document,e.doc_file_name FROM EXPENSE e where id=$1 AND company_id=$2', [req.query.expenseId, req.user.company_id], function(err, expense) {
                     if (err) {
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);
@@ -620,8 +620,8 @@ exports.postAddExpense = (req, res) => {
                   handleResponse.shouldAbort(err, client, done);
                   handleResponse.handleError(res, err, ' Error in connecting to the database');
                 } else {
-                    let total_expense_amount = parseFloat(req.body.tax_no) + parseFloat(req.body.amount);
-                    client.query('Insert INTO EXPENSE (tax,tax_amount,note,status,category,amount,billable,created_date,modified_date,expense_date,project_id,account_id,company_id,currency,user_id, total_amount) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING id', [ req.body.tax, req.body.tax_no, req.body.note, "Draft", req.body.category, req.body.amount, req.body.billable, 'now()', 'now()', moment.tz(req.body.expense_date.split('T')[0], companyDefaultTimezone).format(), req.body.project_id, req.body.account_id, req.user.company_id, req.body.currency, req.user.id, total_expense_amount], function(err, insertedExpense) {
+                    let total_expense_amount = (parseFloat(req.body.tax_perc)/100) * parseFloat(req.body.amount) + parseFloat(req.body.amount);
+                    client.query('Insert INTO EXPENSE (note,status,category,amount,billable,created_date,modified_date,expense_date,project_id,account_id,company_id,currency,user_id, total_amount, tax_percent) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING id', [ req.body.note, "Draft", req.body.category, req.body.amount, req.body.billable, 'now()', 'now()', moment.tz(req.body.expense_date.split('T')[0], companyDefaultTimezone).format(), req.body.project_id, req.body.account_id, req.user.company_id, req.body.currency, req.user.id, total_expense_amount, req.body.tax_perc], function(err, insertedExpense) {
                         if (err) {
                             handleResponse.shouldAbort(err, client, done);
                             handleResponse.handleError(res, err, ' Error in adding expense data to the database');

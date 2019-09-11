@@ -46,8 +46,9 @@ function addExpense(modalId) {
             }else{
                 clearError('#project', '#err-msg-project')
                 let expenseData = {};
-                expenseData.tax = $("#tax option:selected").val();
-                expenseData.tax_no = ($("#tax_no").val()=="")?0:$("#tax_no").val();
+                // expenseData.tax = $("#tax option:selected").val();
+                // expenseData.tax_no = ($("#tax_no").val()=="")?0:$("#tax_no").val();
+                expenseData.tax_perc=($("#tax_perc").val()=="")?0:$("#tax_perc").val();
                 expenseData.expense_date =($("#expense_date").val()==""?moment.tz(currentdate, companyDefaultTimezone).format('YYYY-MM-DD'):moment.tz($("#expense_date").val(), companyDefaultTimezone).format('YYYY-MM-DD'));
                 expenseData.category = $('#category option:selected').val();
                 expenseData.currency = $('#currency option:selected').val();
@@ -556,7 +557,4 @@ function setCurrencyOfAccount(){
     }
 }
 
-// function calculatePerc(){
-//     $('#tax_no').val(parseInt($('#amount').val())*parseInt($('#tax').val()/100));
-// }
 </script>

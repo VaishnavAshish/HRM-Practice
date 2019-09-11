@@ -5,6 +5,9 @@
         if($('option:selected', ele).val() == "fixed_fee") {
             $('input[type=number][project-cost]').removeAttr('disabled');
             $('input[type=number][project-cost]').val('');
+        }else{
+            clearError('#project-cost');
+            $('input[type=number][project-cost]').removeClass('has-error');
         }
     }
 
