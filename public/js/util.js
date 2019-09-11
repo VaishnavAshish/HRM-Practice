@@ -745,8 +745,11 @@ function addRowToTimesheet(timesheetData){
                           </div>
                       </div>
                   </div>`
-    //$('#day-tabs').find('.slds-tabs_default__content:not(.hide)').find('.slds-p-around_x-small:last').after(timesheetRowHtml);
-    $('#day-tabs').find('.slds-tabs_default__content').not('.hide').append(timesheetRowHtml);
+    if($('#day-tabs').find('.slds-tabs_default__content:not(.hide)').find('.slds-p-around_x-small:last').length > 0){
+      $('#day-tabs').find('.slds-tabs_default__content:not(.hide)').find('.slds-p-around_x-small:last').after(timesheetRowHtml);
+    }else{
+      $('#day-tabs').find('.slds-tabs_default__content').not('.hide').append(timesheetRowHtml);
+    }
 }
 
 function addTimeLogEntry(modalId,formId){
