@@ -745,8 +745,11 @@ function addRowToTimesheet(timesheetData){
                           </div>
                       </div>
                   </div>`
-    $('#day-tabs').find('.slds-tabs_default__content:not(.hide)').find('.slds-p-around_x-small:last').after(timesheetRowHtml);
-    /*$('#day-tabs').find('.slds-tabs_default__content').not('.hide').append(timesheetRowHtml);*/
+    if($('#day-tabs').find('.slds-tabs_default__content:not(.hide)').find('.slds-p-around_x-small:last').length > 0){
+      $('#day-tabs').find('.slds-tabs_default__content:not(.hide)').find('.slds-p-around_x-small:last').after(timesheetRowHtml);
+    }else{
+      $('#day-tabs').find('.slds-tabs_default__content').not('.hide').append(timesheetRowHtml);
+    }
 }
 
 function addTimeLogEntry(modalId,formId){
@@ -766,7 +769,8 @@ function addTimeLogEntry(modalId,formId){
                 // lineItemData.cost_rate = $('#globalUserRole option:selected').val('cost_rate');
                 lineItemData.day_category = $('#globalTaskBill').is(':checked');
                 // let line_item_date = dateFormat(moment.tz(new Date(), companyDefaultTimezone).format());
-                let line_item_date=$("#logSubmittedDate").text();
+                //let line_item_date=$("#logSubmittedDate").text();
+                let line_item_date=$("#logSubmittedDate").attr('date');
                 // let line_item_date = dateFormat(moment.tz(new Date(), 'America/Los_Angeles').format());
                 lineItemData.timesheet_date = line_item_date;
                 console.log(lineItemData);
@@ -793,6 +797,17 @@ function addTimeLogEntry(modalId,formId){
                                       let eleToStart=$("#day-tabs");
                                       if(eleToStart.length>0){
                                           let currentDiv=$("#day-tabs > div").not('.hide');
+                                          if(currentDiv.length == 0) {
+                                              let day = moment.tz(res.currentDate, companyDefaultTimezone).format('d');
+                                              let dayFull = moment.tz(res.currentDate, companyDefaultTimezone).format('dddd');
+                                              let date = moment.tz(res.currentDate, companyDefaultTimezone).format('YYYY-MM-DD');
+                                              divHTML = `<div class="slds-tabs_default__content" day=${day} target-tab=' ${dayFull}' date='${date}' >
+                                                            <div class=" slds-p-bottom_medium ">
+                                                            </div>
+                                                          </div>`;
+                                              $("#day-tabs").append(divHTML);
+                                              currentDiv=$("#day-tabs > div").not('.hide');
+                                          }
                                           if(currentDiv.attr('date')== dateFormat(moment.tz(res.currentDate, companyDefaultTimezone).format())){
                                               addRowToTimesheet(response.line_item);
                                               if(selectedEle!=null&&selectedEle!=undefined){
@@ -819,6 +834,7 @@ function addTimeLogEntry(modalId,formId){
                                                       }
                                                   });
                                               }
+                                                setTimeout(function(){location.reload()},1000);
                                           }else{
                                               if(selectedEle!=null&&selectedEle!=undefined){
 
@@ -915,6 +931,7 @@ function stopKwTimerWithLogEntry(lineItemId,ele, id, inputId, modalId,currentDat
                 logSubmittedDate=moment.tz(currentDate, companyDefaultTimezone).format('MM-DD-YYYY');
               }
               $("#logSubmittedDate").text(logSubmittedDate);
+              $("#logSubmittedDate").attr('date',currentDate);
               // $(inputId).val($($(id)[0]).text());
               $(inputId).val(response.total_work_hours);
               $("[name=globalStop]").addClass('hide');

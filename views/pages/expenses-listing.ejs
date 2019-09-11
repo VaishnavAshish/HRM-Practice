@@ -300,27 +300,31 @@
                                                                         </span>
                                                                     </a>
                                                                 </li>
-                                                                <li class="slds-has-divider_top-space" role="separator"></li>
-                                                                <li class="slds-dropdown__item" role="presentation">
+
                                                                   <% if(user.permissions.indexOf('expenseApprover')==-1) { %>
-                                                                    <% if(!expense.submitted && !expense.invoiced) { %>
+                                                                    <% if(!expense.submitted) { %>
+                                                                      <li class="slds-has-divider_top-space" role="separator"></li>
+                                                                      <li class="slds-dropdown__item" role="presentation">
+                                                                        <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteExpense(\'<%= expense.id %>\')','Are you sure you want to delete this expense?')">
+                                                                            <span class="slds-truncate" title="">
+                                                                                <i class="fa fa-trash text-red"></i> &nbsp;
+                                                                                Delete
+                                                                            </span>
+                                                                        </a>
+                                                                    </li>
+                                                                    <% } %>
+                                                                  <% } else if(!expense.invoiced) { %>
+                                                                    <% console.log('expense.invoiced '+expense.invoiced); %>
+                                                                    <li class="slds-has-divider_top-space" role="separator"></li>
+                                                                    <li class="slds-dropdown__item" role="presentation">
                                                                       <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteExpense(\'<%= expense.id %>\')','Are you sure you want to delete this expense?')">
                                                                           <span class="slds-truncate" title="">
                                                                               <i class="fa fa-trash text-red"></i> &nbsp;
                                                                               Delete
                                                                           </span>
                                                                       </a>
-                                                                    <% } %>
-                                                                  <% } else if(!expense.invoiced) { %>
-                                                                    <% console.log('expense.invoiced '+expense.invoiced); %>
-                                                                    <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteExpense(\'<%= expense.id %>\')','Are you sure you want to delete this expense?')">
-                                                                        <span class="slds-truncate" title="">
-                                                                            <i class="fa fa-trash text-red"></i> &nbsp;
-                                                                            Delete
-                                                                        </span>
-                                                                    </a>
+                                                                    </li>
                                                                   <% } %>
-                                                                </li>
                                                             </ul>
                                                         </div>
                                                     </div>
@@ -391,7 +395,30 @@
                                                                                 </span>
                                                                             </a>
                                                                         </li>
-                                                                        <% if(!expense.invoiced) {%>
+                                                                        <% if(user.permissions.indexOf('expenseApprover')==-1) { %>
+                                                                          <% if(!expense.submitted) { %>
+                                                                            <li class="slds-has-divider_top-space" role="separator"></li>
+                                                                            <li class="slds-dropdown__item" role="presentation">
+                                                                                <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteExpense(\'<%= expense.id %>\')','Are you sure you want to delete this expense?')">
+                                                                                    <span class="slds-truncate " title="">
+                                                                                        <i class="fa fa-trash text-red"></i> &nbsp;
+                                                                                        Delete
+                                                                                    </span>
+                                                                                </a>
+                                                                            </li>
+                                                                            <% } %>
+                                                                          <% } else if(!expense.invoiced) { %>
+                                                                            <li class="slds-has-divider_top-space" role="separator"></li>
+                                                                            <li class="slds-dropdown__item" role="presentation">
+                                                                                <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteExpense(\'<%= expense.id %>\')','Are you sure you want to delete this expense?')">
+                                                                                    <span class="slds-truncate " title="">
+                                                                                        <i class="fa fa-trash text-red"></i> &nbsp;
+                                                                                        Delete
+                                                                                    </span>
+                                                                                </a>
+                                                                            </li>
+                                                                        <% } %>
+                                                                        <!-- <% if(!expense.invoiced) {%>
                                                                         <li class="slds-has-divider_top-space" role="separator"></li>
                                                                         <li class="slds-dropdown__item" role="presentation">
                                                                             <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteExpense(\'<%= expense.id %>\')','Are you sure you want to delete this expense?')">
@@ -401,7 +428,7 @@
                                                                                 </span>
                                                                             </a>
                                                                         </li>
-                                                                        <% } %>
+                                                                        <% } %> -->
                                                                     </ul>
                                                                 </div>
                                                             </div>
