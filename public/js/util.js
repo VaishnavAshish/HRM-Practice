@@ -770,7 +770,7 @@ function addTimeLogEntry(modalId,formId){
                 lineItemData.day_category = $('#globalTaskBill').is(':checked');
                 // let line_item_date = dateFormat(moment.tz(new Date(), companyDefaultTimezone).format());
                 //let line_item_date=$("#logSubmittedDate").text();
-                let line_item_date=$("#logSubmittedDate").attr(date);
+                let line_item_date=$("#logSubmittedDate").attr('date');
                 // let line_item_date = dateFormat(moment.tz(new Date(), 'America/Los_Angeles').format());
                 lineItemData.timesheet_date = line_item_date;
                 console.log(lineItemData);
