@@ -834,6 +834,7 @@ function addTimeLogEntry(modalId,formId){
                                                       }
                                                   });
                                               }
+                                                setTimeout(function(){location.reload()},1000);
                                           }else{
                                               if(selectedEle!=null&&selectedEle!=undefined){
 
