@@ -1,0 +1,155 @@
+<script>
+    $(document).ready(function () {
+		<% if (setting != undefined) { %>
+            let setting =<%- JSON.stringify(setting) %>;
+            console.log(setting.tax_category);
+            $("#taxCatLength").text('(' + setting.tax_category.length + ')')
+            setting.tax_category.forEach(function (taxCat, index) {
+                addTaxToList(taxCat);
+            });
+		<% } %>
+    })
+
+    function addTaxToList(taxCat){
+//'<a href="javascript:void(0);" title="category-name" onclick="getEditData(this)">'+expenseCat+'</a>'+
+let taxCatLi='<li class="line-top slds-p-vertical_small" category-name="'+taxCat+'">'+
+                '<div class="slds-grid slds-wrap slds-grid_pull-padded">'+
+                    '<div class="slds-size_1-of-1 slds-medium-size_8-of-12 slds-p-horizontal_small sm-bpd-15">'+
+                        '<div class="slds-truncate text-size-11 text-dull">'+
+                            'Category Name'+
+                        '</div>'+
+                        '<div class="max-w-200" >'+
+                                        taxCat+
+                        '</div>'+
+                    '</div>'+
+
+                    '<div class="slds-size_1-of-1 slds-medium-size_4-of-12 slds-p-horizontal_small">'+
+                        '<div class="slds-grid">'+
+                            '<div class="slds-has-flexi-truncate">'+
+
+                            '</div>'+
+                            '<div class="slds-no-flex slds-p-left_small">'+
+                                '<div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">'+
+                                    '<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" title="Show More">'+
+                                    '<span class="slds-button__icon">'+
+                                        '<i class=" fa fa-caret-down" aria-hidden="true"></i>'+
+                                    '</span>'+
+                                    '<span class="slds-assistive-text">Show More</span>'+
+                                    '</button>'+
+                                    '<div class="slds-dropdown slds-dropdown_right slds-dropdown_actions" style="">'+
+                                        '<ul class="slds-dropdown__list" role="menu">'+
+
+                                            '<li class="slds-dropdown__item" role="presentation">'+
+                                                '<a href="javascript:void(0);" role="deleteItem" tabindex="-1" onclick=\'deleteBeforeConfirm("#globalAlert", "deleteTaxCat('+`\`${taxCat}\``+')","Are you sure you want to delete this tax category?")\'>'+
+                                                    '<span class="slds-truncate text-red" title="">'+
+                                                        'Delete'+
+                                                    '</span>'+
+                                                '</a>'+
+                                            '</li>'+
+                                        '</ul>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'+
+                    '</div>'+
+                '</div>'+
+            '</li>';
+    $("#taxCatList").append(taxCatLi);
+}
+
+function addNewTaxCat(modalId){
+		closeModal(modalId);
+		let taxCatData = createJSONForFormData('#addTaxCat');
+		if(taxCatData.taxCat.trim()==''){
+			showGlobalToast('#globalToast', 'error', 'Tax name cannot be blank', 4000);
+			return false;
+		}
+		let taxCatList=$("#taxCatList li[tax-name='"+taxCatData.taxCat.toLowerCase()+"']");
+		if(taxCatList.length>0){
+			showGlobalToast('#globalToast', 'error', 'Tax with this name already exists', 4000);
+			return false;
+		}
+		addTaxToList(taxCatData.taxCat);
+		saveCompanyTaxSetting();
+    }
+    
+    function saveCompanyTaxSetting(){
+		showLoader('#globalLoader');
+		let taxCategory=[];
+		let taxLi=$("#taxCatList li.slds-p-vertical_small[category-name]");
+		$.each(taxLi,function(index,li) {
+			taxCategory.push($(li).attr('category-name'));
+		});
+		console.log(taxCategory);
+		$.ajax({
+		      type: 'POST',
+		      url : '/editCompanySettingTax',
+		      contentType: 'application/json',
+		      dataType: 'json',
+		      data:JSON.stringify({"taxCategory":taxCategory}),
+		       success : function(response){
+				   if(response.success){
+						 $("#taxCatLength").text(`(${taxCategory.length})`);
+							setTimeout(function(){
+								hideLoader('#globalLoader');
+								showGlobalToast('#globalToast', 'success', response.message, 4000);
+							},2000);
+							if(taxCategory.length == 0){
+								location.reload();
+							}
+				   }
+		        },
+		       error: function(response){
+	                console.log('error is : '+JSON.stringify(response));
+	                hideLoader('#globalLoader');
+	                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+		        }
+	    	});
+
+    }
+    
+    function deleteTaxCat(catName){
+		let taxCatLi=$('#taxCatList li[category-name="'+catName+'"]');
+		checkForTaxCatAssginment(catName,(result,message)=>{
+			console.log(result);
+			if(result==true){
+				taxCatLi.remove();
+				saveCompanyTaxSetting();
+			}else{
+				showGlobalToast('#globalToast', 'error', message, 4000);
+			}
+		});
+    }
+    
+
+    function checkForTaxCatAssginment(taxCat,cb){
+		showLoader('#globalLoader');
+		$.ajax({
+		      type: 'POST',
+		      url : '/checkTaxCategoryAssign',
+		      contentType: 'application/json',
+		      dataType: 'json',
+		      data:JSON.stringify({"taxCat":taxCat}),
+		       success : function(response){
+				   if(response.success){
+						hideLoader('#globalLoader');
+						console.log('response is : '+JSON.stringify(response));
+						if(response.result==true){
+							cb(true,response.message);
+						}else{
+							cb(false,response.message);
+						}
+				   }else{
+				   		hideLoader('#globalLoader');
+				   		cb(false,response.message);
+				   }
+		        },
+		       error: function(response){
+	                console.log('error is : '+JSON.stringify(response));
+	                hideLoader('#globalLoader');
+	                cb(false,response.responseJSON.message);
+		        }
+		    });
+	}
+
+</script>

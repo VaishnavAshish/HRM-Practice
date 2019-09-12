@@ -271,6 +271,27 @@
                                                 <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
                                                     <div class="slds-form-element slds-m-bottom_medium">
                                                         <label class="slds-form-element__label">
+                                                            Tax
+                                                        </label>
+                                                        <div class="slds-form-element__control">
+                                                            <div class="slds-select_container">
+                                                                <select class="slds-select" name="tax_category" id="tax_category" required="" getFormData disableWhenPaid>
+                                                                        <% if(companySetting.tax_category.length>0) { %>
+                                                                            <% companySetting.tax_category.forEach(function(taxCat) { %>
+                                                                                <option value="<%= taxCat %>"><%= taxCat %></option>
+                                                                            <% }); %>
+                                                                        <% } %>
+                                                                </select>
+                                                            </div>
+                                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                                    <div class="slds-form-element slds-m-bottom_medium">
+                                                        <label class="slds-form-element__label">
                                                             Tax %
                                                         </label>
                                                         <div class="slds-form-element__control">
@@ -281,28 +302,6 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <!--<div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
-                                                   <div class="slds-form-element slds-m-bottom_medium">
-                                                      <label class="slds-form-element__label">
-                                                          Terms
-                                                      </label>
-                                                      <div class="slds-form-element__control">
-                                                          <div class="slds-select_container">
-                                                              <select class="slds-select" name="terms" id="terms" required="" getFormData disableWhenPaid>
-                                                                  <option value="Due on receipt">Due on receipt</option>
-                                                                  <option value="Net 10">Net 10</option>
-                                                                  <option value="Net 15">Net 15</option>
-                                                                  <option value="Net 30">Net 30</option>
-                                                                  <option value="Net 50">Net 50</option>
-                                                                  <option value="Term Name">Term Name</option>
-                                                              </select>
-                                                          </div>
-                                                          <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
-
-                                                          </div>
-                                                      </div>
-                                                  </div>
-                                                </div>-->
                                             </div>
 
                                         </div>
