@@ -550,7 +550,7 @@ exports.postAddCompany = (req, res) => {
                         handleResponse.handleError(res, err, ' Error in adding company to the database');
                       } else {
                         let company_id = company.rows[0].id;
-                        client.query('Insert into SETTING (expense_category,user_role,company_address,invoice_note,currency,timezone,company_id,weekstartday) values ($1,$2,$3,$4,$5,$6,$7,$8,$9)  RETURNING id', [
+                        client.query('Insert into SETTING (expense_category,user_role,company_address,invoice_note,currency,timezone,company_id,weekstartday,tax_category) values ($1,$2,$3,$4,$5,$6,$7,$8,$9)  RETURNING id', [
                           ['Food'],
                           ['Consultant', 'Project Manager','Customer'], '', '', 'USD', 'America/Los_Angeles', company_id , 'sunday',
                           ['GST']
