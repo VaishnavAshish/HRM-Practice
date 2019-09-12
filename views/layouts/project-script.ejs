@@ -348,16 +348,16 @@ function findProjectByName(){
 
     }
     function setDataToCard(project){
-        let icon = '';
-        if(project.status == "Not Started") {
-        // icon = `<i class="fa fa-ban text-dull"></i>`;
-        } else if(project.status == "In Progress") {
-        // icon = `<i class="fa fa-spinner text-orange"></i>`;
-        } else if(project.status == "At Risk") {
-        // icon = `<i class="fa fa-exclamation-circle text-red"></i>`;
-        } else if(project.status == "Completed") {
-        // icon = `<i class="fa fa-check-circle text-green"></i>`;
-        }
+        // let icon = '';
+        // if(project.status == "Not Started") {
+        //  icon = `<i class="fa fa-ban text-dull"></i>`;
+        // } else if(project.status == "In Progress") {
+        //  icon = `<i class="fa fa-spinner text-orange"></i>`;
+        // } else if(project.status == "At Risk") {
+        //  icon = `<i class="fa fa-exclamation-circle text-red"></i>`;
+        // } else if(project.status == "Completed") {
+        //  icon = `<i class="fa fa-check-circle text-green"></i>`;
+        // }
         let deleteBtn = ``;
         if(<%= user.permissions.includes('projectManager') %>) {
               deleteBtn = `<li class="slds-has-divider_top-space" role="separator"></li>
@@ -413,10 +413,10 @@ function findProjectByName(){
                                         `+project.account_name+`
                                     </div>
                                     <div class="slds-grid slds-p-top_x-small">
-                                        <div class="slds-has-flexi-truncate">
-                                            `+icon+`
-                                            `+project.status+`
-                                        </div>
+                                        <div class="slds-has-flexi-truncate">`
+                                            // +icon
+                                            +project.status+
+                                          `</div>
                                         <div class="slds-col--bump-left">
                                                 `+project.percent_completed+`%
                                         </div>
@@ -453,16 +453,16 @@ function findProjectByName(){
         $("#projectCardView").append(projectCard);
     }
     function setDataToTable(project){
-        let project_status;
-         if(project.status == "Not Started") {
-            project_status='<i class="fa fa-ban text-dull"></i>';
-         } else if(project.status == "In Progress") {
-            project_status='<i class="fa fa-spinner text-orange"></i>';
-         } else if(project.status == "At Risk") {
-            project_status='<i class="fa fa-exclamation-circle text-red"></i>';
-         } else if(project.status == "Completed") {
-            project_status='<i class="fa fa-check-circle text-green"></i>';
-         }
+        // let project_status;
+        //  if(project.status == "Not Started") {
+        //     project_status='<i class="fa fa-ban text-dull"></i>';
+        //  } else if(project.status == "In Progress") {
+        //     project_status='<i class="fa fa-spinner text-orange"></i>';
+        //  } else if(project.status == "At Risk") {
+        //     project_status='<i class="fa fa-exclamation-circle text-red"></i>';
+        //  } else if(project.status == "Completed") {
+        //     project_status='<i class="fa fa-check-circle text-green"></i>';
+        //  }
          let deleteBtn = ``;
          if(<%= user.permissions.includes('projectManager') %>) {
                deleteBtn = '<li class="slds-has-divider_top-space" role="separator"></li>'+
