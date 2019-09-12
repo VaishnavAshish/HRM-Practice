@@ -1,62 +1,41 @@
-<!-- modal add new tax start-->        
-<div id="modalAddNewTax">
-    <section role="dialog" tabindex="-1" class="slds-modal">
-        <div class="slds-modal__container">
-            <header class="slds-modal__header">
-                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="closeModal('#modalAddNewTax');">
-                    <span class="slds-button__icon">
-                        <i class="fa fa-times text-size-21"></i>
-                    </span>
-                </button>
-                <h2  class="slds-text-heading_medium slds-hyphenate">Add New Tax</h2>
-            </header>
-            <div class="slds-modal__content slds-p-around_medium">
-                <div>
-                    <div class="slds-form-element slds-m-bottom_medium">
-                        <label class="slds-form-element__label">
-                            Name
-                            <abbr class="slds-required" title="required">*</abbr>
-                        </label>
-                        <div class="slds-form-element__control">
-                            <input type="text" class="slds-input" placeholder="" required=""/>
-                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
-                                       
+<!-- modal add new Tax category start-->        
+<div id="modalAddNewTaxCate">
+        <section role="dialog" tabindex="-1" class="slds-modal">
+            <form id="addTaxCat">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="closeModal('#modalAddNewTaxCate');">
+                        <span class="slds-button__icon">
+                            <i class="fa fa-times text-size-21"></i>
+                        </span> 
+                    </button>
+                    <h2  class="slds-text-heading_medium slds-hyphenate">Add New Tax Category</h2>
+                </header>
+                
+                <div class="slds-modal__content slds-p-around_medium">
+                    <div>
+                        <div class="slds-form-element slds-m-bottom_medium">
+                            <label class="slds-form-element__label">
+                                Category Name
+                                <abbr class="slds-required" title="required">*</abbr>
+                            </label>
+                            <div class="slds-form-element__control">
+                                <input type="text" class="slds-input" placeholder="" required="" id="taxCat" name="taxCat" getFormData reset='value'/>
+                                <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                           
+                                </div>
                             </div>
-                        </div>
+                        </div>    
                     </div>
-                    <div class="slds-form-element slds-m-bottom_medium">
-                        <label class="slds-form-element__label">
-                            
-                            Description
-                        </label>
-                        <div class="slds-form-element__control">
-                            <input type="text" class="slds-input" placeholder=""/>
-                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
-                                       
-                            </div>
-                        </div>
-                    </div>
-                    <div class="slds-form-element slds-m-bottom_medium">
-                        <label class="slds-form-element__label">
-                            Rate %
-                            <abbr class="slds-required" title="required">*</abbr>
-                        </label>
-                        <div class="slds-form-element__control">
-                            <input type="number" class="slds-input" placeholder="" required=""/>
-                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
-                                       
-                            </div>
-                        </div>
-                    </div>
-                            
                 </div>
+            
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" type="button" onclick="closeModal('#modalAddNewTaxCate');">Cancel</button>
+                    <button class="slds-button slds-button_brand" type="button" onclick="addNewTaxCat('#modalAddNewTaxCate', 'Category Added Successfully')">Add</button>
+                </footer>
             </div>
-            <footer class="slds-modal__footer">
-                <button class="slds-button slds-button_neutral" onclick="closeModal('#modalAddNewTax');">Cancel</button>
-                <button class="slds-button slds-button_brand" onclick="dummyAddItem('#modalAddNewTax', 'Tax Added Successfully')">Add</button>
-            </footer>
-        </div>
-    </section>
-    <div class="slds-backdrop"></div>
-</div>
-<!-- modal add new tax end-->   
+            </form>
+        </section>
+        <div class="slds-backdrop"></div>
+    </div>
+    <!-- modal add new Tax category end-->   

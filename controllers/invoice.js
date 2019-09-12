@@ -1292,13 +1292,13 @@ exports.getInvoiceDetails = (req, res) => {
                       handleResponse.shouldAbort(err, client, done);
                       handleResponse.handleError(res, err, ' error in connecting to database');
                     } else {
-                      client.query('SELECT invoice_email_subject,invoice_email_body FROM setting WHERE company_id=$1', [req.user.company_id], function (err, companySetting) {
+                      client.query('SELECT invoice_email_subject,invoice_email_body,tax_category FROM setting WHERE company_id=$1', [req.user.company_id], function (err, companySetting) {
                           if (err) {
                               console.error(err);
                               handleResponse.shouldAbort(err, client, done);
                               handleResponse.handleError(res, err, ' Error in finding company setting ');
                           } else {
-                            client.query('SELECT i.id ,i.status ,i.account_id ,i.company_id ,i.created_by ,i.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,i.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,i.archived ,i.account_name ,i.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,i.due_date at time zone \''+companyDefaultTimezone+'\' as due_date ,i.description ,i.project_id ,i.project_name ,i.total_amount ,i.record_id ,i.currency ,i.tax,i.final_amount  FROM INVOICE i WHERE company_id=$1 AND id=$2', [req.user.company_id, req.query.invoiceId], function (err, invoiceDetails) {
+                            client.query('SELECT i.id ,i.tax_category ,i.status ,i.account_id ,i.company_id ,i.created_by ,i.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,i.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,i.archived ,i.account_name ,i.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,i.due_date at time zone \''+companyDefaultTimezone+'\' as due_date ,i.description ,i.project_id ,i.project_name ,i.total_amount ,i.record_id ,i.currency ,i.tax,i.final_amount  FROM INVOICE i WHERE company_id=$1 AND id=$2', [req.user.company_id, req.query.invoiceId], function (err, invoiceDetails) {
                                 if (err) {
                                     console.error(err);
                                     handleResponse.shouldAbort(err, client, done);
@@ -1519,7 +1519,7 @@ exports.postInvoiceDetails = (req, res) => {
                     handleResponse.shouldAbort(err, client, done);
                     handleResponse.handleError(res, err, ' Error in finding invoice data');
                 } else {
-                    client.query('UPDATE INVOICE SET  due_date=$1, description=$2, updated_date=$3, currency=$4, total_amount=$7, tax=$8 , status= $9 WHERE id=$5 AND company_id=$6', [moment.tz(req.body.due_date.split('T')[0], companyDefaultTimezone).format(), req.body.description, 'now()',req.body.currency , req.body.invoiceId, req.user.company_id, req.body.total_amount, req.body.tax_per,req.body.status], function (err, updatedData) {
+                    client.query('UPDATE INVOICE SET  due_date=$1, description=$2, updated_date=$3, currency=$4, total_amount=$7, tax=$8 , status= $9, tax_category= $10 WHERE id=$5 AND company_id=$6', [moment.tz(req.body.due_date.split('T')[0], companyDefaultTimezone).format(), req.body.description, 'now()',req.body.currency , req.body.invoiceId, req.user.company_id, req.body.total_amount, req.body.tax_per,req.body.status,req.body.tax_category], function (err, updatedData) {
                         // console.log('Error >>>>>>>>>>>>>');
                         // console.log(err);
                         if (err) {
@@ -2090,7 +2090,7 @@ function invoiceHtmlData (req,res,invoiceHtml,responseType){
        }else{
            companyDefaultTimezone = result.timezone;
             pool.connect((err, client, done) => {
-                client.query('SELECT i.id ,i.status ,i.account_id ,i.company_id ,i.created_by ,i.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,i.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,i.archived ,i.account_name ,i.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,i.due_date at time zone \''+companyDefaultTimezone+'\' as due_date ,i.description ,i.project_id ,i.project_name ,i.total_amount ,i.record_id ,i.currency ,i.tax,i.final_amount  FROM invoice i WHERE id=$1',[invId], function (err, invoiceDetails) {
+                client.query('SELECT i.id ,i.status ,i.account_id ,i.company_id ,i.created_by ,i.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,i.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,i.archived ,i.account_name ,i.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,i.due_date at time zone \''+companyDefaultTimezone+'\' as due_date ,i.description ,i.project_id ,i.project_name ,i.total_amount ,i.record_id ,i.currency ,i.tax,i.final_amount,i.tax_category  FROM invoice i WHERE id=$1',[invId], function (err, invoiceDetails) {
                     if (err) {
                         handleResponse.shouldAbort(err, client, done);
                         if(invoiceHtml==true){
@@ -2398,7 +2398,7 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
     if(invoiceDetails.final_amount-invoiceDetails.total_amount>0){
       taxHTML = `<tr>
                     <td align="right">
-                        Tax
+                        ${invoiceDetails.tax_category}
                     </td>
                     <td align="right" width="20%">
                         ${currency_symbols[0].symbol} ${(invoiceDetails.final_amount-invoiceDetails.total_amount).toFixed(2)}

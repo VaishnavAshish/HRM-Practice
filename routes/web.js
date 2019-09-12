@@ -138,11 +138,13 @@ module.exports = function(app) {
 
     app.post('/editCompanySetting', passportConfig.isAuthenticated,settingController.postEditSetting);
     app.post('/editCompanySettingExpense', passportConfig.isAuthenticated,settingController.postEditSettingExpense);
+    app.post('/editCompanySettingTax', passportConfig.isAuthenticated,settingController.postEditSettingTax);
     app.post('/editCompanySettingUserRole', passportConfig.isAuthenticated,settingController.postEditSettingUserRole);
     app.post('/editCompanySettingInvoice', passportConfig.isAuthenticated,settingController.postEditSettingInvoice);
 
     app.post('/checkUserRoleAssignment', passportConfig.isAuthenticated,settingController.checkUserRoleAssignment);
     app.post('/checkExpenseCategoryAssign', passportConfig.isAuthenticated,settingController.checkExpenseCategoryAssign);
+    app.post('/checkTaxCategoryAssign', passportConfig.isAuthenticated,settingController.checkTaxCategoryAssign);
     app.get('/getCompanyLogo', passportConfig.isAuthenticated,settingController.getCompanyLogo);
     app.get('/getCompanyLogoForEmail/:companyid', settingController.getCompanyLogoForEmail);
 
@@ -321,6 +323,9 @@ module.exports = function(app) {
     });
     app.get('/org-settings-expense', passportConfig.isAuthenticated,roleConfig.permit,roleConfig.nocache, function (req, res) {
         settingController.getSettingExpense(req, res);
+    });
+    app.get('/org-settings-tax', passportConfig.isAuthenticated,roleConfig.permit,roleConfig.nocache, function (req, res) {
+        settingController.getSettingTax(req, res);
     });
     app.get('/org-settings-invoice', passportConfig.isAuthenticated,roleConfig.permit,roleConfig.nocache, function (req, res) {
         settingController.getSettingInvoice(req, res);

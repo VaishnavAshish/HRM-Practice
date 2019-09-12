@@ -1,6 +1,6 @@
 let role={
 	"super_admin":["org-listing","org-details","resource-details"],
-	"admin":["accounts-listing","account-details","resources-listing","resource-details","org-settings","org-settings-userrole","org-settings-invoice","org-settings-expense","org-settings-export","integration-dashboard"],
+	"admin":["accounts-listing","account-details","resources-listing","resource-details","org-settings","org-settings-userrole","org-settings-invoice","org-settings-expense","org-settings-export","org-settings-tax","integration-dashboard"],
 	"user":[]
 };
 let assignment={

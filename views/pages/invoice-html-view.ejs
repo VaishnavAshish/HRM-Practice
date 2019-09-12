@@ -415,7 +415,7 @@
                                             <% if((invoiceDetails.final_amount - invoiceDetails.total_amount) > 0) { %>
                                               <tr>
                                                   <td class=" slds-text-align_right" valign="top">
-                                                      + Tax
+                                                      <%= invoiceDetails.tax_category %>
                                                   </td>
                                                   <td class="slds-cell-wrap slds-text-align_right" width="160px">
                                                       <!-- <% var tax = invoiceDetails.tax;

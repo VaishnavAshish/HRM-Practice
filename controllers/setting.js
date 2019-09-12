@@ -301,6 +301,7 @@ exports.fileupload = (req, res) => {
 
 
 };
+
 exports.postEditSettingExpense = (req, res) => {
   // console.log("Inside edit setting post method");
   // console.log(req.body);
@@ -321,6 +322,67 @@ exports.postEditSettingExpense = (req, res) => {
                     handleResponse.handleError(res, err, ' error in connecting to database');
                   } else {
                   			client.query('UPDATE SETTING set expense_category=$1 where company_id=$2 RETURNING id',[req.body.expCategory,req.user.company_id], function(err, updatedSetting) {
+        			          if (err){
+        			            handleResponse.shouldAbort(err, client, done);
+        			            handleResponse.handleError(res, err, ' Error in updating settings');
+        			          } else {
+                          client.query('COMMIT', (err) => {
+                            if (err) {
+                              // console.log('Error committing transaction', err.stack)
+                              handleResponse.shouldAbort(err, client, done);
+                              handleResponse.handleError(res, err, ' Error in committing transaction');
+                            } else {
+            			            done();
+            			            handleResponse.sendSuccess(res,'settings updated successfully',{});
+                            }
+                          })
+
+        			          }
+        			      });
+                  }
+                })
+          		}else{
+                done();
+                handleResponse.handleError(res, err, ' Error in finding company setting');
+              }/*else{
+      				client.query('Insert INTO SETTING (company_id,expense_category,user_role) values ($1,$2,$3) RETURNING id',[req.user.company_id,req.body.expCategory,['Manager']], function(err, updatedSetting) {
+			          if (err){
+			            handleResponse.shouldAbort(err, client, done);
+			            handleResponse.handleError(res, err, ' Error in inserting settings');
+			          } else {
+			            done();
+			            handleResponse.sendSuccess(res,'settings inserting successfully',{});
+
+			          }
+			      });
+          		}*/
+
+           }
+      });
+  });
+
+};
+
+exports.postEditSettingTax = (req, res) => {
+  // console.log("Inside edit setting post method");
+  // console.log(req.body);
+  pool.connect((err, client, done) => {
+    client.query('SELECT * FROM SETTING where company_id=$1',[req.user.company_id], function(err, selectedSetting) {
+          if (err){
+            handleResponse.shouldAbort(err, client, done);
+            handleResponse.handleError(res, err, ' Error in getting settings');
+          } else {
+  				// console.log('Inside expense category '+req.body.expCategory.length);
+	  			if(req.body.taxCategory.length<=0){
+	  				req.body.taxCategory=['GST'];
+	  			}
+          		if(selectedSetting.rows.length>0){
+                client.query('BEGIN', (err) => {
+                  if (err){
+                    handleResponse.shouldAbort(err, client, done);
+                    handleResponse.handleError(res, err, ' error in connecting to database');
+                  } else {
+                  			client.query('UPDATE SETTING set tax_category=$1 where company_id=$2 RETURNING id',[req.body.taxCategory,req.user.company_id], function(err, updatedSetting) {
         			          if (err){
         			            handleResponse.shouldAbort(err, client, done);
         			            handleResponse.handleError(res, err, ' Error in updating settings');
@@ -607,6 +669,25 @@ exports.getSettingExpense = (req, res) => {
   })
 };
 
+exports.getSettingTax = (req, res) => {
+  pool.connect((err, client, done) => {
+    client.query('SELECT tax_category,stripe_customer_id FROM SETTING WHERE company_id=$1', [req.user.company_id], function (err, companySetting) {
+      if (err) {
+        handleResponse.shouldAbort(err, client, done);
+        handleResponse.responseToPage(res,'pages/org-settings-tax',{setting:{},user:req.user, error:err},"error","  Error in finding setting data");
+      } else {
+        	if(companySetting.rows.length<0){
+			  	done();
+            	handleResponse.responseToPage(res,'pages/org-settings-tax',{setting:{},user:req.user,stripeCustomerId:null},"success","Successfully rendered");
+        	}else{
+		        done();
+		        handleResponse.responseToPage(res,'pages/org-settings-tax',{setting:companySetting.rows[0],user:req.user,stripeCustomerId:companySetting.rows[0].stripe_customer_id},"success","Successfully rendered");
+        	}
+      }
+    });
+  })
+};
+
 exports.checkUserRoleAssignment = (req,res) => {
   pool.connect((err, client, done) => {
     client.query('SELECT * FROM USERS WHERE company_id=$1 AND archived=$2 AND role=$3', [req.user.company_id,false,req.body.role], function (err, assignedUserRole) {
@@ -652,6 +733,25 @@ exports.checkExpenseCategoryAssign = (req,res) => {
           }else{
               done();
               handleResponse.sendSuccess(res,'Expense Category is not assigned to expense.',{result:true});
+        }
+      }
+    });
+  })
+}
+
+exports.checkTaxCategoryAssign = (req,res) => {
+  pool.connect((err, client, done) => {
+    client.query('SELECT * FROM invoice WHERE company_id=$1 AND archived=$2 AND tax_category=$3', [req.user.company_id,false,req.body.taxCat], function (err, assignedTaxCat) {
+      if (err) {
+        handleResponse.shouldAbort(err, client, done);
+        handleResponse.handleError(res, err, ' Error in getting Tax catgory');
+      } else {
+          if(assignedTaxCat.rows.length>0){
+              done();
+              handleResponse.sendSuccess(res,'Tax Category is assigned to existing invoice.',{result:false});
+          }else{
+              done();
+              handleResponse.sendSuccess(res,'Tax Category is not assigned to invoice.',{result:true});
         }
       }
     });
