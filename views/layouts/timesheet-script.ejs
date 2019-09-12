@@ -1742,12 +1742,13 @@
                                         //     ${clockShowing}
                                         // </div>
                                     }
+                                    row.task_name = row.task_name?row.task_name:'';
                                     rowhtm += `<div class="line-top slds-p-around_small" row-div row-id=`+row.id+` saved>
                                                     <div class="text-size-16 text-thick">
                                                         `+row.task_name+`
                                                     </div>
                                                     <div class="text-size-11 text-dull">
-                                                        Role : Consultant
+                                                        Role : ${row.user_role}
                                                     </div>
                                                     <div class="slds-grid slds-wrap">
                                                         <div class="slds-size_1-of-1 slds-medium-size_4-of-12">
