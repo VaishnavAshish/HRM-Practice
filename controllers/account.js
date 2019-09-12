@@ -479,19 +479,51 @@ exports.deleteAccount = (req,res) =>{
       handleResponse.handleError(res, "incorrect account id", "account id is not correct");
     }else{
           pool.connect((err, client, done) => {
-            client.query('UPDATE ACCOUNT SET archived = $1 WHERE id=$2',[true, req.body.accountId], function(err, archivedAccount) {
+            client.query('SELECT count(id) as projectTotalCount FROM PROJECT WHERE account_id=$1',[req.body.accountId], function(err, projectRelatedToAccount) {
               if (err) {
                 console.error(err);
                 handleResponse.shouldAbort(err, client, done);
-                handleResponse.handleError(res, err, ' Error in deleting account.');
+                handleResponse.handleError(res, err, ' Error in finding the project related to account.');
               } else {
-                console.error('Affected ID>>>>>>>>>>>>>');
-                // console.log(archivedAccount.rows[0]);
-                done();
-                handleResponse.sendSuccess(res,'Account deleted successfully',{});
-                /*res.status(200).json({"success": true,"message":"success"});*/
-              }
-            })
+                  console.log('projectRelatedToAccount.rows[0].projectTotalCount')
+                  console.log(projectRelatedToAccount.rows[0].projecttotalcount)
+                  if(projectRelatedToAccount.rows[0].projecttotalcount > 0){
+                    done();
+                    console.error('Account cannot be deleted.There are project associated with this account.');
+                    handleResponse.handleError(res, 'Account cannot be deleted.There are project associated with this account.', 'Account cannot be deleted.There are project associated with this account.');
+                  }else{
+                    client.query('SELECT count(id) as invoiceTotalCount FROM INVOICE WHERE account_id=$1',[req.body.accountId], function(err, invoiceRelatedToAccount) {
+                      if (err) {
+                        console.error(err);
+                        handleResponse.shouldAbort(err, client, done);
+                        handleResponse.handleError(res, err, ' Error in finding invoice related to account.');
+                      } else {
+                        console.log('invoiceRelatedToAccount.rows[0].invoiceTotalCount')
+                        console.log(invoiceRelatedToAccount.rows[0].invoicetotalcount)
+                        if(invoiceRelatedToAccount.rows[0].invoicetotalcount > 0){
+                          done();
+                          console.error('Account cannot be deleted.There are invoices associated with this account.');
+                          handleResponse.handleError(res, 'Account cannot be deleted.There are invoices associated with this account.', 'Account cannot be deleted.There are invoices associated with this account.');
+                        }else{
+                          client.query('UPDATE ACCOUNT SET archived = $1 WHERE id=$2',[true, req.body.accountId], function(err, archivedAccount) {
+                            if (err) {
+                              console.error(err);
+                              handleResponse.shouldAbort(err, client, done);
+                              handleResponse.handleError(res, err, ' Error in deleting account.');
+                            } else {
+                              console.error('Affected ID>>>>>>>>>>>>>');
+                              // console.log(archivedAccount.rows[0]);
+                              done();
+                              handleResponse.sendSuccess(res,'Account deleted successfully',{});
+                              /*res.status(200).json({"success": true,"message":"success"});*/
+                            }
+                          })
+                        }
+                      }
+                    })
+                  }
+                }
+              })
           });
         }
     } else{
