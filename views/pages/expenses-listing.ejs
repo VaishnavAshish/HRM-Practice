@@ -233,12 +233,17 @@
                                                     <div class="slds-truncate" title="">
                                                         <span class="text-uppercase">
 
-                                                            <% if(expense.status == 'Draft') { %>
-                                                                <span class="text-uppercase text-dull">
-                                                            <% } else { %>
+                                                            <% if(expense.invoiced) { %>
                                                                 <span class="text-uppercase text-green">
+                                                                Invoiced
+                                                            <% } else if(expense.submitted) { %>
+                                                                <span class="text-uppercase text-orange">
+                                                                Submitted
+                                                            <% } else {%>
+                                                                <span class="text-uppercase text-dull">
+                                                                Draft
                                                             <% } %>
-                                                                <%= expense.status %>
+
                                                             </span>
                                                         </span>
                                                     </div>
@@ -363,6 +368,7 @@
                                         <div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_3-of-12 slds-p-horizontal_small">
                                             <div class=" slds-m-bottom_medium slds-p-around_small slds-card">
                                                 <div class="">
+<<<<<<< HEAD
                                                     <div class="slds-grid">
                                                         <div class="slds-has-flexi-truncate">
                                                             <% if(expense.status == 'Draft') { %>
@@ -373,6 +379,25 @@
                                                                     Status: Approved
                                                                 </div>
                                                             <% } %>
+=======
+                                                    <div class="slds-grid slds-p-bottom_small">
+
+                                                        <!-- <div class="slds-has-flexi-truncate">
+                                                            <a href="/expense-details?expenseId=<%= expense.id%>" class="text-size-16"> <%= expense.record_id %> </a>
+                                                        </div> -->
+                                                        <div class="slds-has-flexi-truncate">
+                                                          <% if(expense.invoiced) { %>
+                                                              <div class="slds-badge slds-badge_inverse view-inline  bg-green">    Status: Invoiced
+                                                              </div>
+                                                          <% } else if(expense.submitted) { %>
+                                                              <div class="slds-badge slds-badge_inverse view-inline  bg-orange">    Status: Submitted
+                                                              </div>
+                                                          <% } else {%>
+                                                              <div class="slds-badge slds-badge_inverse view-inline">    Status: Draft
+                                                              </div>
+                                                          <% } %>
+
+>>>>>>> 0fcd73bb84aa42027da11ad37e52a461bb7aaa65
                                                         </div>
                                                         <div class="slds-col--bump-left">
                                                             <div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">
@@ -433,7 +458,13 @@
                                                     </div>
                                                 </div>
                                                 <div>
-
+                                                  <div class="slds-p-bottom_x-small">
+                                                      <div class="slds-grid">
+                                                        <div class="slds-has-flexi-truncate">
+                                                            <a href="/expense-details?expenseId=<%= expense.id%>" class="text-size-16"> <%= expense.record_id %> </a>
+                                                        </div>
+                                                      </div>
+                                                    </div>
                                                     <div class="slds-p-bottom_x-small">
                                                             <div class="slds-truncate slds-p-vertical_x-small">
                                                                     <a href="/expense-details?expenseId=<%= expense.id%>" class="text-size-16"> <%= expense.record_id %> </a>

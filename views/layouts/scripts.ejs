@@ -106,6 +106,7 @@
     function checkFormValidation(formId) {
         console.log(formId + " [required='']");
         let flag=false;
+        $(formId).removeClass('has-error');
         $("[required='']",formId).each(function(){
             var eleType = $(this).prop('nodeName');
             if($(this).val() == null || $(this).val().trim() == ''){

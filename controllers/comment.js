@@ -110,23 +110,30 @@ exports.deleteConversation = (req, res) => {
         handleResponse.shouldAbort(err, client, done);
         handleResponse.handleError(res, err, ' error in connecting to database');
       } else {
-          client.query('DELETE FROM PROJECT_COMMENT where id=$1', [req.body.conversation_id], function (err, deletedProjectConversation) {
-            if (err) {
-              handleResponse.shouldAbort(err, client, done);
-              handleResponse.handleError(res, err, ' Error in deleting project conversation in the database');
-            } else {
-                client.query('COMMIT', (err) => {
-                  if (err) {
-                    // console.log('Error committing transaction', err.stack)
-                    handleResponse.shouldAbort(err, client, done);
-                    handleResponse.handleError(res, err, ' Error in committing transaction');
-                  } else {
-                    done();
-                    handleResponse.sendSuccess(res,'Project Conversation deleted successfully',{});
-                  }
-                })
-            }
-          })
+        client.query('DELETE FROM PROJECT_COMMENT where parent_id=$1', [req.body.conversation_id], function (err, deletedProjectConversation) {
+          if (err) {
+            handleResponse.shouldAbort(err, client, done);
+            handleResponse.handleError(res, err, ' Error in deleting project comment related to the conversation in the database');
+          } else {
+            client.query('DELETE FROM PROJECT_COMMENT where id=$1', [req.body.conversation_id], function (err, deletedProjectConversation) {
+              if (err) {
+                handleResponse.shouldAbort(err, client, done);
+                handleResponse.handleError(res, err, ' Error in deleting project conversation in the database');
+              } else {
+                  client.query('COMMIT', (err) => {
+                    if (err) {
+                      // console.log('Error committing transaction', err.stack)
+                      handleResponse.shouldAbort(err, client, done);
+                      handleResponse.handleError(res, err, ' Error in committing transaction');
+                    } else {
+                      done();
+                      handleResponse.sendSuccess(res,'Project Conversation deleted successfully',{});
+                    }
+                  })
+              }
+            })
+          }
+        })
       }
     })
   });

@@ -4,9 +4,11 @@
         var taskData = createJSONForFormData(formId);
         console.log(projectName);
         let taskUserEmail=$("#assigned_user option:selected").text();
-        let userData={ userEmail:'',billRate:'0.00',costRate:'0.00',user_role:''}
+
+        let userData={ userEmail:'',billRate:'0.00',costRate:'0.00',user_role:'',assignment_id:null}
         if(taskUserEmail!=''&&taskUserEmail!=undefined&&taskUserEmail!=null){
-             userData.userEmail= taskUserEmail;
+             userData.userEmail= $("#assigned_user option:selected").attr('email_id');
+             userData.assignment_id = $('#assigned_user option:selected').attr('pr_as_id');
              userData.billRate=$("#assigned_user option:selected").attr('billRate');
              userData.costRate=$("#assigned_user option:selected").attr('costRate');
              taskData.user_role=$("#assigned_user option:selected").attr('role');
@@ -72,7 +74,7 @@
             let taskUserEmail=($("#assigned_user option:selected").text()).trim();
             let userData={ userEmail:'',billRate:'0.00',costRate:'0.00',user_role:''}
             if(taskUserEmail!=''&&taskUserEmail!=undefined&&taskUserEmail!=null){
-                userData.userEmail= taskUserEmail;
+                userData.userEmail= $("#assigned_user option:selected").attr('email_id');
                 userData.billRate=$("#assigned_user option:selected").attr('billRate');
                 userData.costRate=$("#assigned_user option:selected").attr('costRate');
                 //taskDetailsData.user_role=$("#assigned_user option:selected").attr('role');
@@ -126,7 +128,7 @@
                     console.log(response);
                     if(response.success == true) {
                         hideLoader('#globalLoader');
-                        window.location.href = '/project-details?projectId='+projectId;
+                        window.location.href = '/project-details?projectId='+projectId+'#tasks';
                     } else {
                         hideLoader('#globalLoader');
                         showGlobalToast('#globalToast', 'error', response.message, 4000);
