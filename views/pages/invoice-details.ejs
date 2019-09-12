@@ -278,7 +278,7 @@
                                                                 <select class="slds-select" name="tax_category" id="tax_category" required="" getFormData disableWhenPaid>
                                                                         <% if(companySetting.tax_category.length>0) { %>
                                                                             <% companySetting.tax_category.forEach(function(taxCat) { %>
-                                                                                <option value="<%= taxCat %>"><%= taxCat %></option>
+                                                                                <option value="<%= taxCat %>" <% if(invoiceDetails.tax_category== taxCat){ %> selected <% } %>><%= taxCat %></option>
                                                                             <% }); %>
                                                                         <% } %>
                                                                 </select>
