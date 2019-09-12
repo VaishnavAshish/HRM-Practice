@@ -140,7 +140,7 @@
                                                     <option value="" billRate="0.00" costRate="0.00"></option>
                                                     <% if(resUsers.length > 0) { %>
                                                         <% resUsers.forEach(function(resource) { %>
-                                                           <option value="<%= resource.id %>" role="<%= resource.role %>" billrate="<%= resource.bill_rate %>" costrate="<%= resource.cost_rate %>"> <%= resource.first_name %> <%= resource.last_name?resource.last_name:'' %> (<%= resource.role %>)</option>
+                                                           <option value="<%= resource.id %>" role="<%= resource.role %>" billrate="<%= resource.bill_rate %>" costrate="<%= resource.cost_rate %>" email_id = "<%= resource.email %>" pr_as_id="<%= resource.assinment_id %>"> <%= resource.first_name %> <%= resource.last_name?resource.last_name:'' %> (<%= resource.role %>)</option>
                                                         <% }); %>
                                                     <% } %>
                                                 </select>

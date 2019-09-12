@@ -218,10 +218,14 @@ exports.postAddTask = (req, res) => {
                   handleResponse.handleError(res,"Task with same name already exist","Task with same name already exist");
                 } else {
                   let reqData = {};
-                  reqData.assigned_user_id = null;
+                  reqData.assigned_user_id = req.body.userData.assignment_id;
+                  console.log('------req.body.userData.assignment_id');
+                  console.log(req.body.userData.assignment_id)
                   createTaskRecord(req, client, err, done, reqData, res, function (result) {
                     var reqData = req.body.taskData;
                     reqData.project_id = req.body.projectId;
+                    console.log('req.body.taskData.assigned_user')
+                    console.log(req.body.taskData.assigned_user)
                     if(req.body.taskData.assigned_user) {
                       commonController.createTaskAssignment(req, client, err, done, result, req.body.taskData.res_bill_rate, req.body.taskData.res_cost_rate, reqData, res, function (result2) {
                          if(result2) {
