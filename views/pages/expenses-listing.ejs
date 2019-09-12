@@ -284,7 +284,7 @@
                                                             return currency.name == expense.currency;
                                                         })%>
                                                         <span class="text-uppercase text-dull"><%= currency_symbols[0].symbol %></span>
-                                                        <strong class="text-uppercase"> <%= expense.amount %> </strong>
+                                                        <strong class="text-uppercase"> <%= expense.total_amount %> </strong>
                                                     </div>
                                                 </td>
                                                 <td role="gridcell">
@@ -455,9 +455,6 @@
                                                       </div>
                                                     </div>
                                                     <div class="slds-p-bottom_x-small">
-                                                            <div class="slds-truncate slds-p-vertical_x-small">
-                                                                    <a href="/expense-details?expenseId=<%= expense.id%>" class="text-size-16"> <%= expense.record_id %> </a>
-                                                                </div>
                                                         <div class="slds-grid">
                                                             <div class="slds-no-flex slds-p-right_x-small">
                                                                 <i class="fa fa-user-tie text-dull"></i>
@@ -486,7 +483,7 @@
                                                             return currency.name == expense.currency;
                                                         })%>
                                                         <span class="text-uppercase text-dull"><%= currency_symbols[0].symbol %></span>
-                                                        <span><%= expense.amount %></span>
+                                                        <span><%= expense.total_amount %></span>
                                                     </div>
 
                                                     <div class="text-size-11 line-top slds-p-top_xx-small">

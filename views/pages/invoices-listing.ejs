@@ -270,7 +270,7 @@
                                                                     return currency.name == invoice.currency;
                                                                 })%>
                                                                 <span class="text-uppercase text-dull"><%= currency_symbols[0].symbol %></span>
-                                                                <strong class="text-uppercase"><%= invoice.total_amount %></strong>
+                                                                <strong class="text-uppercase"><%= invoice.final_amount %></strong>
                                                             </div>
                                                         </td>
                                                         <td role="gridcell">
@@ -411,7 +411,7 @@
                                                                 return currency.name == invoice.currency;
                                                             })%>
                                                             <span class="text-uppercase text-dull"><%= currency_symbols_invoice[0].symbol %></span>
-                                                            <span><%= invoice.total_amount %></span>
+                                                            <span><%= invoice.final_amount %></span>
                                                         </div>
                                                         <div class="text-size-11 line-top slds-p-top_xx-small">
                                                             <div class="slds-grid">
