@@ -395,21 +395,12 @@ function findExpenseForAccount(){
         let expenseCard='<div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_3-of-12 slds-p-horizontal_small">'+
                             '<div class=" slds-m-bottom_medium slds-p-around_small slds-card">'+
                                 '<div class="">'+
-<<<<<<< HEAD
-                                    '<div class="slds-grid">'+
-                                            '<div class="slds-has-flexi-truncate">';
-                            if(expense.status == 'Draft') { 
-                                expenseCard+='<div class="slds-badge slds-badge_inverse view-inline ">    Status: Draft </div>';
-                                } else {
-                                expenseCard+='<div class="slds-badge slds-badge_inverse view-inline bg-green"> Status: Approved </div>';
-                            }
-                                expenseCard+='</div>'+
-=======
+
                                     '<div class="slds-grid slds-p-bottom_small">'+
                                       '<div class="slds-has-flexi-truncate">'+
                                           status+
                                       '</div>'+
->>>>>>> 0fcd73bb84aa42027da11ad37e52a461bb7aaa65
+
                                         '<div class="slds-col--bump-left">'+
                                             '<div class="slds-dropdown-trigger slds-dropdown-trigger_click" onclick="openDropdown(this, event, true);">'+
                                                 '<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" title="Show More">'+
@@ -521,20 +512,11 @@ function findExpenseForAccount(){
                         '</td>'+
                         '<td role="gridcell">'+
                             '<div class="slds-truncate" title="">'+
-<<<<<<< HEAD
-                                '<span class="text-uppercase">';
-                                    if(expense.status == "Draft") {
-                                        expenseTr+='<span class="text-uppercase text-dull">';
-                                        } else {
-                                        expenseTr+='<span class="text-uppercase text-green">';
-                                        }
-                                        expenseTr+= expense.status;
-                                    expenseTr+='</span>'+
-=======
+
                                 '<span class="text-uppercase">'+
                                       status+
                                     '</span>'+
->>>>>>> 0fcd73bb84aa42027da11ad37e52a461bb7aaa65
+
                                 '</span>'+
                             '</div>'+
                         '</td>'+
