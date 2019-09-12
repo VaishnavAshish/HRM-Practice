@@ -486,6 +486,10 @@
                                                 <!-- <abbr class="slds-required" title="required">*</abbr> -->
                                             </label>
                                             <div class="slds-has-flexi-truncate">
+                                              <% var currency_symbols = currencyWithSymbolArray.filter(function(currency){
+                                                  return currency.name == expense.currency;
+                                              })%>
+                                              <span class="text-uppercase text-dull"><%= currency_symbols[0].symbol %></span>
                                                 <span>
                                                     <%= expense.total_amount %>
                                                 </span>
