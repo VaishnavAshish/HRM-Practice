@@ -1222,3 +1222,4 @@ alter table users alter column mobile type varchar(26)
 ALTER TABLE setting add COLUMN tax_category character varying(255)[] DEFAULT ARRAY[]::character varying[] NOT NULL;
 alter table expense add column tax_percent integer;
 alter table invoice add column tax_category character varying(256);
+UPDATE setting set tax_category = '{GST}';
