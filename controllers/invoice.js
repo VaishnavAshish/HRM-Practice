@@ -2788,7 +2788,7 @@ sendEmail = (req, res, invoiceDetails, accountDetails,companyName,companySetting
                 <tbody>
                     <tr>
                         <td valign="top" align="center" style="padding-top: 20px;padding-bottom:10px">
-                            <h1  style="width:10% ;padding-top: 40px; padding-bottom:40px; background: #eee; border-top: 1px solid #eeeeee;text-transform: uppercase;">${req.user.company}</h1>
+                            <h1  style="padding-top: 25px; padding-bottom:25px;">${req.user.company}</h1>
                         </td>
                     </tr>
                     <tr>
