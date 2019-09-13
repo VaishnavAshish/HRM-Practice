@@ -928,7 +928,7 @@ exports.postEditProject = (req, res) => {
               }
 
               // console.log(start_date +' ************* '+ end_date);
-              client.query('UPDATE PROJECT SET name=$1, start_date=$2, end_date=$3, billable=$4, status=$5, description=$6, global_project=$7, percent_completed=$8, account_id=$11, type=$12, project_cost=$13 WHERE id=$9 AND company_id=$10', [req.body.projectData.project_title, start_date, end_date, req.body.projectData.billable, projectStatus, req.body.projectData.project_desc, req.body.projectData.global_project, projectPer, req.body.projectId, req.user.company_id, req.body.projectData.account, req.body.projectData.project_type, project_cost], function (err, updatedData) {
+              client.query('UPDATE PROJECT SET name=$1, start_date=$2, end_date=$3, billable=$4, status=$5, description=$6, global_project=$7,  account_id=$10, type=$11, project_cost=$12 WHERE id=$8 AND company_id=$9', [req.body.projectData.project_title, start_date, end_date, req.body.projectData.billable, projectStatus, req.body.projectData.project_desc, req.body.projectData.global_project, req.body.projectId, req.user.company_id, req.body.projectData.account, req.body.projectData.project_type, project_cost], function (err, updatedData) {
                 // console.log('Error >>>>>>>>>>>>>');
                 // console.log(err);
                 if (err) {
