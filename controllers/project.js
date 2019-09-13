@@ -789,6 +789,20 @@ exports.getProjectDetail = (req, res) => {
                               }
                             });
                             taskTotalCount=taskList.rows[0].total;
+                            let percent_completed = 0;
+                            if (taskTotalCount > 0) {
+                              percent_completed = parseInt((parseInt(project.rows[0].total_completed_task_count) / parseInt(taskTotalCount)) * 100);
+                            }
+                            if (project.rows[0].percent_completed != percent_completed) {
+                              project.rows[0].percent_completed = percent_completed;
+                              client.query('update project set percent_completed=$1 where id=$2 and company_id=$3', [parseInt(percent_completed), req.query.projectId, req.user.company_id], (err, updatedProjects) => {
+                                if (err) {
+                                  console.error(err);
+                                  handleResponse.shouldAbort(err, client, done);
+                                  handleResponse.responseToPage(res, 'pages/project-details', { project: {}, userRoleList: [], tasks: [], accounts: [], userList: [], resUsers: [], user: req.user, error: err }, "error", " Error in updating project percentage");
+                                }
+                              })
+                            }
                         }
                         client.query('SELECT * FROM ACCOUNT where company_id=$1 AND archived=$2', [req.user.company_id, false], function (err, accountList) {
                           if (err) {
