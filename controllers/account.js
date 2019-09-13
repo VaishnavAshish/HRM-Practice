@@ -479,7 +479,7 @@ exports.deleteAccount = (req,res) =>{
       handleResponse.handleError(res, "incorrect account id", "account id is not correct");
     }else{
           pool.connect((err, client, done) => {
-            client.query('SELECT count(id) as projectTotalCount FROM PROJECT WHERE account_id=$1',[req.body.accountId], function(err, projectRelatedToAccount) {
+            client.query('SELECT count(id) as projectTotalCount FROM PROJECT WHERE account_id=$1 AND archived=$2',[req.body.accountId,false], function(err, projectRelatedToAccount) {
               if (err) {
                 console.error(err);
                 handleResponse.shouldAbort(err, client, done);
@@ -492,7 +492,7 @@ exports.deleteAccount = (req,res) =>{
                     console.error('Account cannot be deleted.There are project associated with this account.');
                     handleResponse.handleError(res, 'Account cannot be deleted.There are project associated with this account.', 'Account cannot be deleted.There are project associated with this account.');
                   }else{
-                    client.query('SELECT count(id) as invoiceTotalCount FROM INVOICE WHERE account_id=$1',[req.body.accountId], function(err, invoiceRelatedToAccount) {
+                    client.query('SELECT count(id) as invoiceTotalCount FROM INVOICE WHERE account_id=$1 AND archived=$2',[req.body.accountId,false], function(err, invoiceRelatedToAccount) {
                       if (err) {
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);

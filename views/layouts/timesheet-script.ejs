@@ -1536,14 +1536,70 @@
                               }
                             }
                             console.log(row.submitted);
-                            if(currentUserPermission.indexOf('timesheetApprover')==-1){
+                            row.task_name = row.task_name?row.task_name:'';
+                            if(row.project_archived){
+                                $("button,textarea,input","#add-record-weekly-timesheet-form").attr('disabled',true);
+                                $("[disableForArchivedProject]").attr('disabled',true);
+                                rowhtm += `<div class="line-top slds-p-around_small" row-div row-id=`+row.id+` submitted>
+                                            <div class="text-size-16 text-thick">
+                                                `+row.task_name+`
+                                            </div>
+                                            <div class="text-size-11 text-dull">
+                                                Role : ${row.user_role}
+                                            </div>
+                                            <div class="slds-grid slds-wrap">
+                                                <div class="slds-size_1-of-1 slds-medium-size_5-of-12">
+                                                    <div class="slds-form-element">
+                                                        <div class="slds-form-element__control">
+                                                            <textarea class="slds-textarea" placeholder="Note" disabled rows="1">`+row.description+` </textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="slds-size_1-of-1 slds-medium-size_2-of-12">
+                                                    <div class="slds-grid slds-grid_vertical-align-center slds-p-top_xx-small">
+                                                        <div class="slds-col--bump-left slds-p-horizontal_medium">
+                                                            <div class="slds-form-element">
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-has-flexi-truncate">
+                                                            <span>`+billable+`</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-size_1-of-1 slds-medium-size_3-of-12">
+                                                    <div class="slds-grid">
+                                                        <div class="slds-p-horizontal_small slds-has-flexi-truncate">
+                                                            <div class="slds-form-element">
+                                                                <div class="slds-form-element__control">
+                                                                    <input type="text" class="slds-input" disabled placeholder="" value="`+minuteToHours(row.total_work_hours)+`">
+                                                                    <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-size_1-of-1 slds-medium-size_2-of-12">
+                                                    <div class="slds-grid slds-grid_vertical-align-center slds-p-top_xx-small">
+                                                        <div class="slds-no-flex">
+                                                            <div class="slds-has-flexi-truncate">
+                                                                <span class="text-green">${row.submitted ? 'Submitted' : ''}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>`;
+                            }else if(currentUserPermission.indexOf('timesheetApprover')==-1){
                                 if(row.submitted) {
                                     rowhtm += `<div class="line-top slds-p-around_small" row-div row-id=`+row.id+` submitted>
                                                 <div class="text-size-16 text-thick">
                                                     `+row.task_name+`
                                                 </div>
                                                 <div class="text-size-11 text-dull">
-                                                    Role : Consultant
+                                                    Role : ${row.user_role}
                                                 </div>
                                                 <div class="slds-grid slds-wrap">
                                                     <div class="slds-size_1-of-1 slds-medium-size_5-of-12">
@@ -1614,7 +1670,7 @@
                                                         `+row.task_name+`
                                                     </div>
                                                     <div class="text-size-11 text-dull">
-                                                        Role : Consultant
+                                                        Role : ${row.user_role}
                                                     </div>
                                                     <div class="slds-grid slds-wrap">
                                                         <div class="slds-size_1-of-1 slds-medium-size_4-of-12">
@@ -1670,7 +1726,7 @@
                                                     `+row.task_name+`
                                                 </div>
                                                 <div class="text-size-11 text-dull">
-                                                    Role : Consultant
+                                                    Role : ${row.user_role}
                                                 </div>
                                                 <div class="slds-grid slds-wrap">
                                                     <div class="slds-size_1-of-1 slds-medium-size_5-of-12">

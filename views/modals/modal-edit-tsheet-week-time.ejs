@@ -96,12 +96,12 @@
                 <div class="slds-grid" >
                     <div class="slds-has-flexi-truncate" >
                         <div class="text-left" remove-on-other-user>
-                        <button class="slds-button slds-button_brand" id="btn-submit-week-timesheet" onclick="submitWeeklyDayTimesheet(this);">Submit</button>
+                        <button class="slds-button slds-button_brand" id="btn-submit-week-timesheet" onclick="submitWeeklyDayTimesheet(this);" disableForArchivedProject>Submit</button>
                         </div>
                     </div>
                     <div class="slds-no-flex">
                         <button class="slds-button slds-button_neutral" onclick="closeModal('#modalEditTsheetTime');">Cancel</button>
-                        <button class="slds-button slds-button_brand" onclick="udpateWeeklyTimesheetData('#modalEditTsheetTime')">Update</button>
+                        <button class="slds-button slds-button_brand" onclick="udpateWeeklyTimesheetData('#modalEditTsheetTime')" disableForArchivedProject>Update</button>
                         <!-- dummyAddItem('#modalEditTsheetTime', 'Save Successfully') -->
                     </div>
                 </div>

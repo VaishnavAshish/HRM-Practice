@@ -381,7 +381,10 @@ function findExpenseForAccount(){
           return currency.name == expense.currency;
       })
       let status = ``;
-      if(expense.invoiced) {
+      if(expense.project_archived) {
+          status = `<div class="slds-badge slds-badge_inverse view-inline  bg-red">    Status: Project Archived
+                    </div>`;
+      } else if(expense.invoiced) {
           status = `<div class="slds-badge slds-badge_inverse view-inline  bg-green">    Status: Invoiced
                     </div>`;
       } else if(expense.submitted) {
@@ -391,6 +394,33 @@ function findExpenseForAccount(){
           status = `<div class="slds-badge slds-badge_inverse view-inline">    Status: Draft
                     </div>`;
       }
+      let deleteBtn = ``;
+      let user = <%- JSON.stringify(user) %>
+      if(!expense.project_archived) {
+        if(user.permissions.indexOf('expenseApprover')==-1) {
+          if(!expense.submitted) {
+              deleteBtn = `<li class="slds-has-divider_top-space" role="separator"></li>
+                              <li class="slds-dropdown__item" role="presentation">
+                                  <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteExpense(\'${expense.id} \')','Are you sure you want to delete this expense?')">
+                                      <span class="slds-truncate " title="">
+                                          <i class="fa fa-trash text-red"></i> &nbsp;
+                                          Delete
+                                      </span>
+                                  </a>
+                              </li>`;
+          }
+        } else if(!expense.invoiced) {
+              deleteBtn = `<li class="slds-has-divider_top-space" role="separator"></li>
+                            <li class="slds-dropdown__item" role="presentation">
+                                <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteExpense(\'${expense.id} \')','Are you sure you want to delete this expense?')">
+                                    <span class="slds-truncate " title="">
+                                        <i class="fa fa-trash text-red"></i> &nbsp;
+                                        Delete
+                                    </span>
+                                </a>
+                            </li>`;
+            }
+        }
         let expenseStatus='';
         let expenseCard='<div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_3-of-12 slds-p-horizontal_small">'+
                             '<div class=" slds-m-bottom_medium slds-p-around_small slds-card">'+
@@ -419,15 +449,7 @@ function findExpenseForAccount(){
                                                                 '</span>'+
                                                             '</a>'+
                                                         '</li>'+
-                                                        '<li class="slds-has-divider_top-space" role="separator"></li>'+
-                                                        '<li class="slds-dropdown__item" role="presentation">'+
-                                                            '<a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteExpense('+expense.id+')">'+
-                                                                '<span class="slds-truncate " title="">'+
-                                                                    '<i class="fa fa-trash text-red"></i> &nbsp;'+
-                                                                    'Delete'+
-                                                                '</span>'+
-                                                            '</a>'+
-                                                        '</li>'+
+                                                          deleteBtn+
                                                     '</ul>'+
                                                 '</div>'+
                                             '</div>'+
@@ -442,7 +464,7 @@ function findExpenseForAccount(){
                                           '</div>'+
                                       '</div>'+
                                   '</div>'+
-                                    '<div class="slds-p-bottom_x-small">'+                                        
+                                    '<div class="slds-p-bottom_x-small">'+
                                         '<div class="slds-grid">'+
                                             '<div class="slds-no-flex slds-p-right_x-small">'+
                                                 '<i class="fa fa-user-tie text-dull"></i>'+
@@ -489,7 +511,10 @@ function findExpenseForAccount(){
           return currency.name == expense.currency;
       })
       let status = ``;
-      if(expense.invoiced) {
+      if(expense.project_archived) {
+            status = `<span class="text-uppercase text-red">
+                      Project Archived`;
+      } else if(expense.invoiced) {
           status = `<span class="text-uppercase text-green">
                     Invoiced`;
       } else if(expense.submitted) {
@@ -499,6 +524,33 @@ function findExpenseForAccount(){
           status = `<span class="text-uppercase text-dull">
                     Draft`;
       }
+      let deleteBtn = ``;
+      let user = <%- JSON.stringify(user) %>
+      if(!expense.project_archived) {
+        if(user.permissions.indexOf('expenseApprover')==-1) {
+          if(!expense.submitted) {
+              deleteBtn = `<li class="slds-has-divider_top-space" role="separator"></li>
+                              <li class="slds-dropdown__item" role="presentation">
+                                  <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteExpense(\'${expense.id} \')','Are you sure you want to delete this expense?')">
+                                      <span class="slds-truncate " title="">
+                                          <i class="fa fa-trash text-red"></i> &nbsp;
+                                          Delete
+                                      </span>
+                                  </a>
+                              </li>`;
+          }
+        } else if(!expense.invoiced) {
+              deleteBtn = `<li class="slds-has-divider_top-space" role="separator"></li>
+                            <li class="slds-dropdown__item" role="presentation">
+                                <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteExpense(\'${expense.id} \')','Are you sure you want to delete this expense?')">
+                                    <span class="slds-truncate " title="">
+                                        <i class="fa fa-trash text-red"></i> &nbsp;
+                                        Delete
+                                    </span>
+                                </a>
+                            </li>`;
+            }
+        }
         let expenseTr='<tr class="">'+
                         '<td role="gridcell">'+
                             '<div class="slds-truncate" title="">'+
@@ -567,15 +619,7 @@ function findExpenseForAccount(){
                                                 '</span>'+
                                             '</a>'+
                                         '</li>'+
-                                        '<li class="slds-has-divider_top-space" role="separator"></li>'+
-                                        '<li class="slds-dropdown__item" role="presentation">'+
-                                            '<a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteExpense('+expense.id+')">'+
-                                                '<span class="slds-truncate" title="">'+
-                                                    '<i class="fa fa-trash text-red"></i> &nbsp;'+
-                                                    'Delete'+
-                                                '</span>'+
-                                            '</a>'+
-                                        '</li>'+
+                                        deleteBtn+
                                     '</ul>'+
                                 '</div>'+
                             '</div>'+

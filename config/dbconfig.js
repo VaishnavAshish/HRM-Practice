@@ -5,6 +5,12 @@ types.setTypeParser(1114, function(stringValue) {
   return stringValue;
 });
 
+const { Client } = require('pg')
+const client = new Client("postgres://postgres:athena@localhost:5432/database")
+client.connect();
+
+console.log(client)
+
 const pool = new Pool({
   connectionString: connectionString,
   max: 100, // max number of connection can be open to database

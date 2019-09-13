@@ -125,7 +125,7 @@ exports.getExpense = (req, res) => {
         // console.log('companyDefaultTimezone');
         // console.log(companyDefaultTimezone);
         pool.connect((err, client, done) => {
-            whereClause='WHERE company_id=$1 AND archived=$2 AND project_id IN (SELECT id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$5) AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND user_id=$6';
+            whereClause='WHERE company_id=$1 AND archived=$2 AND project_id IN (SELECT id FROM PROJECT WHERE company_id=$1 AND isGlobal=$5) AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND user_id=$6';
             // console.log('queryToExec '+'SELECT e.*,(select count(*) from EXPENSE '+whereClause+') as totalCount,(select count(*) from EXPENSE '+whereClause+' AND status ilike $3) as draftCount,(select count(*) from EXPENSE '+whereClause+' AND status ilike $4) as approvedCount FROM EXPENSE e '+whereClause+' ORDER BY expense_date,record_id OFFSET 0 LIMIT ' + process.env.PAGE_RECORD_NO+' searchCrieteriaValue'+req.user.company_id, false, 'Draft', 'Approved',false, user_id);
             client.query('SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id,e.submitted ,(select count(*) from EXPENSE '+whereClause+') as totalCount,(select count(*) from EXPENSE '+whereClause+' AND status ilike $3) as draftCount,(select count(*) from EXPENSE '+whereClause+' AND status ilike $4) as approvedCount FROM EXPENSE e '+whereClause+' ORDER BY expense_date DESC,record_id OFFSET 0 LIMIT ' + process.env.PAGE_RECORD_NO, [req.user.company_id, false, 'Draft', 'Approved',false, user_id], function(err, expense) {
                 if (err) {
@@ -167,7 +167,7 @@ exports.getExpense = (req, res) => {
                                     return ele.id;
                                 });
                             }
-                            client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$3 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)', [req.user.company_id, false, false,req.params.userId], function(err, project) {
+                            client.query('SELECT id,name,account_id,archived FROM PROJECT WHERE company_id=$1 AND isGlobal=$3 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)', [req.user.company_id, false, false,req.params.userId], function(err, project) {
                                 if (err) {
                                     handleResponse.shouldAbort(err, client, done);
                                     handleResponse.responseToPage(res, 'pages/expenses-listing', {
@@ -247,6 +247,7 @@ exports.getExpense = (req, res) => {
                                                                 data["created_date"] = moment.tz(data.expense_date, companyDefaultTimezone).format('MM-DD-YYYY');
                                                                 data["modified_date"] = moment.tz(data.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
                                                                 data["expense_date"] = moment.tz(data.modified_date, companyDefaultTimezone).format('MM-DD-YYYY');
+
                                                                 // data["created_date"] = dateFormat(data.created_date);
                                                                 // data["modified_date"] = dateFormat(data.modified_date);
                                                                 // data["expense_date"] = dateFormat(data.expense_date);
@@ -254,6 +255,7 @@ exports.getExpense = (req, res) => {
                                                                     project.rows.forEach(function(project) {
                                                                         if (project.id == data.project_id) {
                                                                             data["project_name"] = project.name;
+                                                                            data["project_archived"] = project.archived;
                                                                         }
                                                                     })
                                                                 }
@@ -283,6 +285,7 @@ exports.getExpense = (req, res) => {
                                                 // console.log(expense.rows);
                                                 // console.log('----------expenseListArr---------');
                                                 // console.log(expenseListArr);
+                                                projectArr = project.rows.filter(pro => pro.archived == false);
                                                 if(req.user.permissions.includes('expenseApprover')) {
                                                     // console.log("Inside IF Expense");
                                                     timesheetController.getAllCompanyUsers(req, client, err, done, res, function (usersList) {
@@ -296,7 +299,7 @@ exports.getExpense = (req, res) => {
                                                             approvedCount: approvedCount,
                                                             expCatList:expCat,
                                                             accounts: account.rows,
-                                                            projects: project.rows,
+                                                            projects: projectArr,
                                                             user: req.user,
                                                             usersList:usersList,
                                                             companyDefaultTimezone:companyDefaultTimezone,
@@ -314,7 +317,7 @@ exports.getExpense = (req, res) => {
                                                         approvedCount: approvedCount,
                                                         expCatList:expCat,
                                                         accounts: account.rows,
-                                                        projects: project.rows,
+                                                        projects: projectArr,
                                                         user: req.user,
                                                         usersList:[],
                                                         companyDefaultTimezone:companyDefaultTimezone,
@@ -404,7 +407,7 @@ exports.getExpenseDetail = (req, res) => {
                             } else {
                                 // console.log("----------account.rows-------------");
                                 // console.log(account.rows);
-                                client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$3 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)', [req.user.company_id, false, false,expense.rows[0].user_id], function(err, project) {
+                                client.query('SELECT id,name,account_id,archived FROM PROJECT WHERE company_id=$1  AND isGlobal=$3 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)', [req.user.company_id, false, false,expense.rows[0].user_id], function(err, project) {
                                     if (err) {
                                         console.log('expense user id is');
                                         console.log(expense.rows[0].user_id);
@@ -453,14 +456,17 @@ exports.getExpenseDetail = (req, res) => {
                                                     expense.rows[0]["created_date"] = created_date;
                                                     expense.rows[0]["modified_date"] = modified_date;
                                                     expense.rows[0]["expense_date"] = expense_date;
+                                                    expense.rows[0]["project_archived"] = project.rows.filter(pro => pro.id == expense.rows[0].project_id)[0].archived;
+
                                                 }
                                                 console.log('expense');
                                                 console.log(expense.rows[0]);
                                                 done();
+                                                projectArr = project.rows.filter(pro => pro.archived == false);
                                                 handleResponse.responseToPage(res, 'pages/expense-details', {
                                                     expense: expense.rows[0],
                                                     accounts: account.rows,
-                                                    projects: project.rows,
+                                                    projects: projectArr,
                                                     expCatList:expCat,
                                                     user: req.user,
                                                     companyDefaultTimezone:companyDefaultTimezone,
@@ -740,7 +746,7 @@ exports.findExpenseByCriteria = (req, res) => {
         if (req.body.offset) {
             offset = req.body.offset;
         }
-        whereClause+='AND project_id IN (SELECT id FROM PROJECT WHERE company_id=$1 AND archived=$'+(searchCriteriaVal.length+1)+' AND isGlobal=$'+(searchCriteriaVal.length+2)+') AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$'+(searchCriteriaVal.length+1)+')'
+        whereClause+='AND project_id IN (SELECT id FROM PROJECT WHERE company_id=$1 AND isGlobal=$'+(searchCriteriaVal.length+2)+') AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$'+(searchCriteriaVal.length+1)+')'
         searchCriteriaVal.push(false);
         searchCriteriaVal.push(false);
         let queryToExec = 'SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced ,e.invoice_id,e.submitted ,e.total_amount ,e.user_id ,e.record_id,(select count(*) from EXPENSE ' + whereClause + ') as searchCount FROM EXPENSE e ' + whereClause + ' ORDER BY expense_date DESC,record_id OFFSET ' + offset + ' LIMIT ' + process.env.PAGE_RECORD_NO;
@@ -764,7 +770,7 @@ exports.findExpenseByCriteria = (req, res) => {
                                 return ele.id;
                             });
                         }
-                        client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$3 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)', [req.user.company_id, false,false,req.params.userId], function(err, project) {
+                        client.query('SELECT id,name,account_id,archived FROM PROJECT WHERE company_id=$1  AND isGlobal=$3 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)', [req.user.company_id, false,false,req.params.userId], function(err, project) {
                             if (err) {
                                 handleResponse.shouldAbort(err, client, done);
                                 handleResponse.handleError(res, err, ' Error in finding project data');
@@ -794,6 +800,7 @@ exports.findExpenseByCriteria = (req, res) => {
                                                         data["created_date"] = moment.tz(data.expense_date, companyDefaultTimezone).format('MM-DD-YYYY');
                                                         data["modified_date"] = moment.tz(data.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
                                                         data["expense_date"] = moment.tz(data.modified_date, companyDefaultTimezone).format('MM-DD-YYYY');
+
                                                         // data["created_date"] = dateFormat(data.created_date);
                                                         // data["modified_date"] = dateFormat(data.modified_date);
                                                         // data["expense_date"] = dateFormat(data.expense_date);
@@ -801,6 +808,7 @@ exports.findExpenseByCriteria = (req, res) => {
                                                             project.rows.forEach(function(project) {
                                                                 if (project.id == data.project_id) {
                                                                     data["project_name"] = project.name;
+                                                                    data["project_archived"] = project.archived;
                                                                 }
                                                             })
                                                         }
@@ -987,7 +995,7 @@ exports.findExpenseForAccount = (req, res) => {
                                 // console.log('-----------accountId------');
                                 // console.log(accountId);
                                 // let accountName = account.name;
-                                client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND account_id = ANY($3::bigint[]) AND isGlobal=$4 AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$5)', [req.user.company_id, false, accountId,false,req.body.user_id], function(err, project) {
+                                client.query('SELECT id,name,account_id,archived FROM PROJECT WHERE company_id=$1 AND account_id = ANY($2::bigint[]) AND isGlobal=$3 AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)', [req.user.company_id, accountId,false,req.body.user_id], function(err, project) {
                                   if (err) {
                                     handleResponse.shouldAbort(err, client, done);
                                     handleResponse.handleError(res, err, ' Error in finding project for account');
@@ -1000,7 +1008,7 @@ exports.findExpenseForAccount = (req, res) => {
                                       });
                                     }
                                     // console.log(offset);
-                                    whereClause =' WHERE account_id = ANY($1::bigint[]) AND company_id=$2 AND archived=$3 AND project_id IN (SELECT id FROM PROJECT WHERE account_id = ANY($1::bigint[]) AND company_id=$2 AND archived=$3 AND isGlobal=$4) AND user_id=$5'
+                                    whereClause =' WHERE account_id = ANY($1::bigint[]) AND company_id=$2 AND archived=$3 AND project_id IN (SELECT id FROM PROJECT WHERE account_id = ANY($1::bigint[]) AND company_id=$2 AND isGlobal=$4) AND user_id=$5'
                                     queryToExec = 'SELECT e.id ,e.tax ,e.tax_amount ,e.note ,e.status ,e.category ,e.amount ,e.billable ,e.archived ,e.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,e.modified_date at time zone \''+companyDefaultTimezone+'\' as modified_date ,e.company_id ,e.account_id ,e.project_id ,e.expense_date at time zone \''+companyDefaultTimezone+'\' as expense_date ,e.currency ,e.invoiced,e.submitted ,e.invoice_id ,e.total_amount ,e.user_id ,e.record_id,(select count(*) from EXPENSE '+whereClause+') as searchCount FROM EXPENSE e '+whereClause+' ORDER BY expense_date DESC,record_id OFFSET ' + offset + ' LIMIT ' + process.env.PAGE_RECORD_NO;
                                     let searchFieldVal = [accountId, req.user.company_id, false,false, req.body.user_id];
 
@@ -1044,6 +1052,7 @@ exports.findExpenseForAccount = (req, res) => {
                                                     project.rows.forEach(function(project) {
                                                       if (project.id == data.project_id) {
                                                         data["project_name"] = project.name;
+                                                        data["project_archived"] = project.archived;
                                                       }
                                                     })
                                                   }
@@ -1089,7 +1098,7 @@ exports.findExpenseForAccount = (req, res) => {
                 }
             });
         } else {
-            whereClause='WHERE company_id=$1 AND archived=$2 AND project_id IN (SELECT id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$3) AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND user_id=$4'
+            whereClause='WHERE company_id=$1 AND archived=$2 AND project_id IN (SELECT id FROM PROJECT WHERE company_id=$1 AND isGlobal=$3) AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND user_id=$4'
             let innerQuery = 'select count(*) from EXPENSE '+whereClause;
             let queryToExec ='';
             let searchFieldVal = [req.user.company_id, false,false, req.body.user_id];
@@ -1123,7 +1132,7 @@ exports.findExpenseForAccount = (req, res) => {
                                     return ele.id;
                                 });
                             }
-                            client.query('SELECT id,name,account_id FROM PROJECT WHERE company_id=$1 AND archived=$2 AND isGlobal=$3 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)', [req.user.company_id, false,false,req.body.user_id], function(err, project) {
+                            client.query('SELECT id,name,account_id,archived FROM PROJECT WHERE company_id=$1 AND isGlobal=$3 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)', [req.user.company_id, false,false,req.body.user_id], function(err, project) {
                                 if (err) {
                                     handleResponse.shouldAbort(err, client, done);
                                     handleResponse.handleError(res, err, ' Error in finding project data');
@@ -1135,10 +1144,10 @@ exports.findExpenseForAccount = (req, res) => {
                                         handleResponse.responseToPage(res,'pages/resources-listing',{user:req.user, error:err},"error"," Error in finding user role for the company");
                                     }
                                     else {
-                                            // console.log("----------project.rows-------------");
-                                            // console.log(project.rows);
-                                            // console.log("----------expense.rows-------------");
-                                            // console.log(expense.rows);
+                                            console.log("----------project.rows-------------");
+                                            console.log(project.rows);
+                                            console.log("----------expense.rows-------------");
+                                            console.log(expense.rows);
                                             let projectIdArr = [];
                                             if (project.rows.length > 0) {
                                                 projectIdArr = project.rows.map(function(ele) {
@@ -1161,6 +1170,7 @@ exports.findExpenseForAccount = (req, res) => {
                                                                 project.rows.forEach(function(project) {
                                                                     if (project.id == data.project_id) {
                                                                         data["project_name"] = project.name;
+                                                                        data["project_archived"] = project.archived;
                                                                     }
                                                                 })
                                                             }
