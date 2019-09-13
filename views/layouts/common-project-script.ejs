@@ -5,9 +5,12 @@
         if($('option:selected', ele).val() == "fixed_fee") {
             $('input[type=number][project-cost]').removeAttr('disabled');
             $('input[type=number][project-cost]').val('');
+            $('#project-cost').prop('required',true);
+            $('#project-cost').parent().parent().children()[0].innerHTML='Fixed Cost <abbr class="slds-required" title="required">*</abbr>';
         }else{
             clearError('#project-cost');
-            //$('input[type=number][project-cost]').removeClass('has-error');
+            $('input[type=number][project-cost]').removeAttr('required');
+            $('#project-cost').parent().parent().children()[0].innerHTML='Fixed Cost';
         }
     }
 
