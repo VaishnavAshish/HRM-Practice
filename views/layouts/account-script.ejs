@@ -153,11 +153,26 @@ function updateAccount(accountId){
 	}
 function setDataToInvoiceTable(invoice){
 		let invoiceArchive=(invoice.archived==true)?'Deactive':'Active';
+		let invoiceStatus;
+    if(invoice.status == "DRAFT") {
+        invoiceStatus='<span class="text-uppercase text-dull">';
+    } else if(invoice.status == "OVERDUE") {
+        invoiceStatus='<span class="text-uppercase text-red">';
+    } else if(invoice.status == "PAID") {
+        invoiceStatus='<span class="text-uppercase text-green">';
+    } else if(invoice.status == "POSTED") {
+        invoiceStatus='<span class="text-uppercase text-orange">';
+    }
+		let currencyWithSymbolArray= <%- JSON.stringify(currencyWithSymbolArray) %>
+    let currency_symbols = currencyWithSymbolArray.filter(function(currency){
+        return currency.name == invoice.currency;
+    })
+
         let invoiceTr='<tr class="">'+
 					    '<td role="gridcell">'+
 					        '<div class="slds-truncate" title="">'+
 					            '<span class="text-uppercase">'+
-					                '<span class="text-uppercase text-dull">'+
+					                		invoiceStatus+
 					                    invoice.status+
 					                '</span>'+
 					            '</span>'+
@@ -166,7 +181,7 @@ function setDataToInvoiceTable(invoice){
 					    '<th scope="row" tabindex="0">'+
 					        '<div class="slds-truncate" title="">'+
 					            '<a href="/invoice-details?invoiceId='+ invoice.id+'" tabindex="-1">'+
-					                invoice.record_id+
+					                parseInt(invoice.record_id.substring(3))+
 					            '</a>'+
 					        '</div>'+
 					    '</th>'+
@@ -183,12 +198,12 @@ function setDataToInvoiceTable(invoice){
 					    '</td>'+
 					    '<td role="gridcell">'+
 					        '<div class="slds-truncate" title="">'+
-					            '<span class="text-uppercase">USD</span>'+
+					            '<span class="text-uppercase">'+invoice.currency+'</span>'+
 					        '</div>'+
 					    '</td>'+
 					    '<td role="gridcell">'+
 					        '<div class="slds-truncate" title="">'+
-					            '<span class="text-uppercase text-dull">USD</span>'+
+					            '<span class="text-uppercase text-dull">'+currency_symbols[0].symbol+' </span>'+
 					            '<strong class="text-uppercase">'+ invoice.total_amount+'</strong>'+
 					        '</div>'+
 					    '</td>'+
