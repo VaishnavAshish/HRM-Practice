@@ -898,11 +898,11 @@
                                     <table class="slds-table slds-table_bordered slds-table_fixed-layout slds-table_cell-buffer" role="grid">
                                         <thead>
                                             <tr class="slds-text-title_caps">
+                                              <th class="slds-is-sortable" scope="col">
+                                                <span class="slds-truncate" title="Invoice No.">Invoice No.</span>
+                                              </th>
                                                 <th class="slds-is-sortable " scope="col" width="175px">
                                                     <span class="slds-truncate" title="Status">Status</span>
-                                                </th>
-                                                <th class="slds-is-sortable" scope="col">
-                                                    <span class="slds-truncate" title="Invoice No.">Invoice No.</span>
                                                 </th>
                                                 <th class="slds-is-sortable " scope="col">
                                                     <span class="slds-truncate" title="Invoice Date">Invoice Date</span>
@@ -925,6 +925,13 @@
                                         <% if(invoices.length > 0) { %>
                                             <% invoices.forEach(function(invoice) { %>
                                             <tr class="">
+                                              <td scope="row" tabindex="0">
+                                                  <div class="slds-truncate" title="">
+                                                      <a href="/invoice-details?invoiceId=<%= invoice.id %>" tabindex="-1">
+                                                          <%= parseInt(invoice.record_id.substring(3)) %>
+                                                      </a>
+                                                  </div>
+                                              </td>
                                                 <td role="gridcell">
                                                     <div class="slds-truncate" title="">
                                                         <span class="text-uppercase">
@@ -942,13 +949,7 @@
                                                         </span>
                                                     </div>
                                                 </td>
-                                                <th scope="row" tabindex="0">
-                                                    <div class="slds-truncate" title="">
-                                                        <a href="/invoice-details?invoiceId=<%= invoice.id %>" tabindex="-1">
-                                                            <%= parseInt(invoice.record_id.substring(3)) %>
-                                                        </a>
-                                                    </div>
-                                                </th>
+
 
                                                 <td role="gridcell">
                                                     <div class="slds-truncate" title="">

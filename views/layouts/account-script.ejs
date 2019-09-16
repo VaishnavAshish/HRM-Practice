@@ -169,6 +169,13 @@ function setDataToInvoiceTable(invoice){
     })
 
         let invoiceTr='<tr class="">'+
+							'<th scope="row" tabindex="0">'+
+									'<div class="slds-truncate" title="">'+
+											'<a href="/invoice-details?invoiceId='+ invoice.id+'" tabindex="-1">'+
+													parseInt(invoice.record_id.substring(3))+
+											'</a>'+
+									'</div>'+
+							'</th>'+
 					    '<td role="gridcell">'+
 					        '<div class="slds-truncate" title="">'+
 					            '<span class="text-uppercase">'+
@@ -178,13 +185,6 @@ function setDataToInvoiceTable(invoice){
 					            '</span>'+
 					        '</div>'+
 					    '</td>'+
-					    '<th scope="row" tabindex="0">'+
-					        '<div class="slds-truncate" title="">'+
-					            '<a href="/invoice-details?invoiceId='+ invoice.id+'" tabindex="-1">'+
-					                parseInt(invoice.record_id.substring(3))+
-					            '</a>'+
-					        '</div>'+
-					    '</th>'+
 
 					    '<td role="gridcell">'+
 					        '<div class="slds-truncate" title="">'+

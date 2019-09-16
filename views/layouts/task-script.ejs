@@ -248,15 +248,15 @@ function findTaskByName(){
             billable = 'Non Billable';
         }
         var icon = '';
-        if(task.status == 'Not Started') {
-            icon = `<i class="fa fa-ban text-dull"></i>`;
-        } else if(task.status == 'In Progress') {
-            icon = `<i class="fa fa-spinner text-orange"></i>`;
-        } else if(task.status == 'At Risk') {
-            icon = `<i class="fa fa-exclamation-circle text-red"></i>`;
-        } else if(task.status == 'Completed') {
-            icon = `<i class="fa fa-check-circle text-green"></i>`;
-        }
+        // if(task.status == 'Not Started') {
+        //     icon = `<i class="fa fa-ban text-dull"></i>`;
+        // } else if(task.status == 'In Progress') {
+        //     icon = `<i class="fa fa-spinner text-orange"></i>`;
+        // } else if(task.status == 'At Risk') {
+        //     icon = `<i class="fa fa-exclamation-circle text-red"></i>`;
+        // } else if(task.status == 'Completed') {
+        //     icon = `<i class="fa fa-check-circle text-green"></i>`;
+        // }
 
         let taskTr = `<div class=" slds-m-bottom_medium slds-p-around_small line-around">
         <div class="slds-grid slds-wrap slds-grid_pull-padded">
@@ -282,7 +282,6 @@ function findTaskByName(){
                             Status
                         </div>
                         <div>
-                            `+ icon +`
                                 `+ task.status +`
                         </div>
                     </div>
