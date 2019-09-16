@@ -53,7 +53,7 @@ function addExpense(modalId) {
                 expenseData.category = $('#category option:selected').val();
                 expenseData.currency = $('#currency option:selected').val();
                 expenseData.amount = ($('#amount').val()=="")?0:$('#amount').val();
-                expenseData.note = $('#note').val();
+                expenseData.note = $('#expenseNote').val();
                 expenseData.billable = $('#billable').prop('checked');
                 expenseData.project_id = $('#project option:selected').val();
                 expenseData.account_id = $('#project option:selected').attr('accountId');

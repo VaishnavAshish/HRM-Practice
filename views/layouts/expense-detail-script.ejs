@@ -108,7 +108,7 @@ function updateExpense(expenseId){
                     expenseData.category = $('#category option:selected').val();
                     expenseData.currency = $('#currency option:selected').val();
                     expenseData.amount = ($('#amount').val()=="")?0:$('#amount').val();
-                    expenseData.note = $('#note').val();
+                    expenseData.note = $('#expenseNote').val();
                     expenseData.billable = $('#bill1').is(':checked');
                     /*expenseData.account_id = $('#account option:selected').val();*/
                     expenseData.project_id = $('#project option:selected').val();
