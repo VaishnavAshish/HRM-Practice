@@ -382,6 +382,19 @@ function setDataToCard(invoice){
     } else if(invoice.status == "POSTED") {
         invoiceStatus='<div class="slds-badge slds-badge_inverse view-inline  bg-orange">';
     }
+
+    let deleteBtn = ``;
+    if((invoice.status!='PAID'){
+      deleteBtn = '<li class="slds-has-divider_top-space" role="separator"></li>'+
+                    '<li class="slds-dropdown__item" role="presentation">'+
+                        '<a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick=\'deleteBeforeConfirm("#globalAlert", "deleteInvoice('+invoice.id +')","Are you sure you want to delete this invoice?")\'>'+
+                            '<span class="slds-truncate " title="">'+
+                                '<i class="fa fa-trash text-red"></i> &nbsp;'+
+                                'Delete'+
+                            '</span>'+
+                        '</a>'+
+                    '</li>';
+    }
     let invoiceCard='<div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_3-of-12 slds-p-horizontal_small">'+
                         '<div class=" slds-m-bottom_medium slds-p-around_small slds-card">'+
                             '<div class="slds-m-bottom_small">'+
@@ -408,19 +421,9 @@ function setDataToCard(invoice){
                                                                 'View Details'+
                                                             '</span>'+
                                                         '</a>'+
-                                                    '</li>';
-                                                    if(invoice.status!='PAID'){
-                                                        invoiceCard+='<li class="slds-has-divider_top-space" role="separator"></li>'+
-                                                    '<li class="slds-dropdown__item" role="presentation">'+
-                                                        '<a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick=\'deleteBeforeConfirm("#globalAlert", "deleteInvoice('+invoice.id +')","Are you sure you want to delete this invoice?")\'>'+
-                                                            '<span class="slds-truncate " title="">'+
-                                                                '<i class="fa fa-trash text-red"></i> &nbsp;'+
-                                                                'Delete'+
-                                                            '</span>'+
-                                                        '</a>'+
-                                                    '</li>';
-                                                    }
-                                    invoiceCard+='</ul>'+
+                                                    '</li>'+
+                                                      deleteBtn+
+                                                  '</ul>'+
                                             '</div>'+
                                         '</div>'+
                                     '</div>'+
@@ -478,6 +481,19 @@ function setDataToTable(invoice){
     let currency_symbols = currencyWithSymbolArray.filter(function(currency){
         return currency.name == invoice.currency;
     })
+
+    let deleteBtn = ``;
+    if(invoice.status !='PAID') {
+        deleteBtn = '<li class="slds-has-divider_top-space" role="separator"></li>'+
+                      '<li class="slds-dropdown__item" role="presentation">'+
+                          '<a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick=\'deleteBeforeConfirm("#globalAlert", "deleteInvoice('+invoice.id +')","Are you sure you want to delete this invoice?")\'>'+
+                              '<span class="slds-truncate" title="">'+
+                                  '<i class="fa fa-trash text-red"></i>&nbsp;'+
+                                  'Delete'+
+                              '</span>'+
+                          '</a>'+
+                      '</li>';
+    }
     let invoiceTr='<tr class="">'+
                     '<td role="gridcell">'+
                         '<div class="slds-truncate" title="">'+
@@ -533,19 +549,9 @@ function setDataToTable(invoice){
                                                 'View Details'+
                                             '</span>'+
                                         '</a>'+
-                                    '</li>';
-                                    if(invoice.status!='PAID'){
-                        invoiceTr+='<li class="slds-has-divider_top-space" role="separator"></li>'+
-                                    '<li class="slds-dropdown__item" role="presentation">'+
-                                        '<a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick=\'deleteBeforeConfirm("#globalAlert", "deleteInvoice('+invoice.id +')","Are you sure you want to delete this invoice?")\'>'+
-                                            '<span class="slds-truncate" title="">'+
-                                                '<i class="fa fa-trash text-red"></i>&nbsp;'+
-                                                'Delete'+
-                                            '</span>'+
-                                        '</a>'+
-                                    '</li>';
-                                    }
-                    invoiceTr+='</ul>'+
+                                    '</li>'+
+                                      deleteBtn+
+                                    '</ul>'+
                             '</div>'+
                         '</div>'+
                     '</td>'+
