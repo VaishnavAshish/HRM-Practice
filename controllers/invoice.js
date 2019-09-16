@@ -1896,7 +1896,7 @@ exports.findInvoiceByCriteria = (req, res) => {
                   searchCriteriaVal.push(false);
                   req.body.accountArchived = false;
                 }
-                let queryToExec='SELECT i.id ,i.status ,i.account_id ,i.company_id ,i.created_by ,i.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,i.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,i.archived ,i.account_name ,i.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,i.due_date at time zone \''+companyDefaultTimezone+'\' as due_date ,i.description ,i.project_id ,i.project_name ,i.total_amount ,i.record_id ,i.currency ,i.tax ,(SELECT count(*) FROM INVOICE '+whereClause+') as searchCount FROM INVOICE i '+whereClause+' ORDER BY start_date DESC,record_id OFFSET '+offset+' LIMIT ' + process.env.PAGE_RECORD_NO;
+                let queryToExec='SELECT i.id ,i.status ,i.account_id ,i.company_id ,i.created_by ,i.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,i.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,i.archived ,i.account_name ,i.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,i.due_date at time zone \''+companyDefaultTimezone+'\' as due_date ,i.description ,i.project_id ,i.project_name ,i.total_amount ,i.final_amount ,i.record_id ,i.currency ,i.tax ,(SELECT count(*) FROM INVOICE '+whereClause+') as searchCount FROM INVOICE i '+whereClause+' ORDER BY start_date DESC,record_id OFFSET '+offset+' LIMIT ' + process.env.PAGE_RECORD_NO;
                 console.log('queryToExec '+queryToExec+' '+searchCriteriaVal);
                 client.query(queryToExec,searchCriteriaVal, function (err,invoiceList) {
                   if (err) {
