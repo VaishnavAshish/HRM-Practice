@@ -384,7 +384,7 @@ function setDataToCard(invoice){
     }
 
     let deleteBtn = ``;
-    if((invoice.status!='PAID'){
+    if(invoice.status !='PAID'){
       deleteBtn = '<li class="slds-has-divider_top-space" role="separator"></li>'+
                     '<li class="slds-dropdown__item" role="presentation">'+
                         '<a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick=\'deleteBeforeConfirm("#globalAlert", "deleteInvoice('+invoice.id +')","Are you sure you want to delete this invoice?")\'>'+
