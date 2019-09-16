@@ -346,26 +346,26 @@ function updateTaskRecord(req, client, err, done, res, taskData, callback) {
       handleResponse.shouldAbort(err, client, done);
       handleResponse.handleError(res, err, ' Error in updating task.');
     } else {
-      client.query('select (SELECT count(id) from task where project_id = $1 AND status = $2) as total_completed_task_count ,(select count(id) from task where project_id=$1) as total_project_task from project where id=$1', [req.body.taskDetails.project_id, "Completed"], (err, taskProjectDetails) => {
-        if (err) {
-          console.error(err);
-          handleResponse.shouldAbort(err, client, done);
-          handleResponse.handleError(res, err, ' Error in fetching project task details.');
-        }
-        else {
-          let percent_completed = 0;
-          if (taskProjectDetails.rows[0].total_project_task > 0) {
-            percent_completed = (parseInt(taskProjectDetails.rows[0].total_completed_task_count) / parseInt(taskProjectDetails.rows[0].total_project_task)) * 100;
-          }
-          client.query('update project set percent_completed=$1 where id=$2', [percent_completed, req.body.taskDetails.project_id], (err, updatedProject) => {
-            if (err) {
-              console.error(err);
-              handleResponse.shouldAbort(err, client, done);
-              handleResponse.handleError(res, err, ' Error in updating project.');
-            }
-          });
-        }
-      })
+      // client.query('select (SELECT count(id) from task where project_id = $1 AND status = $2) as total_completed_task_count ,(select count(id) from task where project_id=$1) as total_project_task from project where id=$1', [req.body.taskDetails.project_id, "Completed"], (err, taskProjectDetails) => {
+      //   if (err) {
+      //     console.error(err);
+      //     handleResponse.shouldAbort(err, client, done);
+      //     handleResponse.handleError(res, err, ' Error in fetching project task details.');
+      //   }
+      //   else {
+      //     let percent_completed = 0;
+      //     if (taskProjectDetails.rows[0].total_project_task > 0) {
+      //       percent_completed = (parseInt(taskProjectDetails.rows[0].total_completed_task_count) / parseInt(taskProjectDetails.rows[0].total_project_task)) * 100;
+      //     }
+      //     client.query('update project set percent_completed=$1 where id=$2', [percent_completed, req.body.taskDetails.project_id], (err, updatedProject) => {
+      //       if (err) {
+      //         console.error(err);
+      //         handleResponse.shouldAbort(err, client, done);
+      //         handleResponse.handleError(res, err, ' Error in updating project.');
+      //       }
+      //     });
+      //   }
+      // })
       console.log('updated task record')
       console.log(updatedData.rows[0]);
       return callback(updatedData.rows[0].id);
