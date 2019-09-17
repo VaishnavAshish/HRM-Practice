@@ -547,15 +547,18 @@
                                                                 <div class="slds-grid slds-p-vertical_xx-small text-size-11">
                                                                     <div class="slds-has-flexi-truncate">
                                                                         <span>
-                                                                            Task Completion <%= project.taskcompleted %> / <%= project.totaltasks %>
+                                                                            <!-- Task Completion <%= project.taskcompleted %> / <%= project.totaltasks %> -->
+                                                                            Burn <%= project.total_hours %>
                                                                         </span>
                                                                     </div>
                                                                     <div class="slds-no-flex">
-                                                                        <% var perComple = (!isNaN((project.taskcompleted / project.totaltasks)*100))?((project.taskcompleted / project.totaltasks)*100).toFixed(2):0 %>
-                                                                        <%= perComple %> %                                                                 </div>
+                                                                        <!-- <% var perComple = (!isNaN((project.taskcompleted / project.totaltasks)*100))?((project.taskcompleted / project.totaltasks)*100).toFixed(2):0 %>
+                                                                        <%= perComple %> % -->
+                                                                        <%= project.percent_completed %> %
+                                                                    </div>
                                                                 </div>
                                                                 <div class="slds-progress-bar slds-progress-bar_small slds-progress-bar_circular">
-                                                                    <span class="slds-progress-bar__value" style="width: <%= perComple %>%">
+                                                                    <span class="slds-progress-bar__value" style="width: <%= project.percent_completed %>%">
                                                                     </span>
                                                                 </div>
                                                             </div>
@@ -586,7 +589,7 @@
                                                                         Completion
                                                                     </div>
                                                                     <div>
-                                                                        <%= perComple %> %
+                                                                        <%= project.percent_completed %> %
                                                                     </div>
                                                                     <!-- </div> -->
                                                                 </div>
