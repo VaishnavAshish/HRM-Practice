@@ -714,7 +714,7 @@
                                                                 <div class="slds-grid">
                                                                     <div class="slds-no-flex slds-p-right_x-small">
                                                                         <span class="slds-avatar slds-avatar_circle cursor-pointer">
-                                                                            <img alt="Person name" src="/getUserPicture/<%= resUser.id %>" title="<%= resUser.email %>">
+                                                                            <img alt="Person name" src="/getUserPicture/<%= resUser.id %>" title="<%= resUser.first_name %> <%= resUser.last_name?resUser.last_name:''%>">
                                                                         </span>
                                                                     </div>
                                                                     <div class="slds-has-flexi-truncate">
@@ -1169,7 +1169,10 @@
                                                                 </div>
                                                             </div>
                                                             <div class="text-right">
-                                                                <button class="slds-button slds-button_brand" id="addCommentBtn" onclick="addNewComment('<%= conversationData.id %>')">
+                                                                <button class="slds-button slds-button_brand" id="addCommentBtnAndEmail" onclick="addNewComment('<%= conversationData.id %>',true)">
+                                                                    Add & Email
+                                                                </button>
+                                                                <button class="slds-button slds-button_brand" id="addCommentBtn" onclick="addNewComment('<%= conversationData.id %>',false)">
                                                                     Add
                                                                 </button>
                                                             </div>
