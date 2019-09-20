@@ -290,9 +290,9 @@ sendConversationThread = (req, res, conversation_thread, commentList,projectReso
                   <table border="0" cellpadding="0" cellspacing="0"  width="100%" bgcolor="#f7f8f9">
                     <tbody>
                         <tr>
-                            <td  valign="top" align="center" style="padding-top: 20px; padding-bottom: 10px;">
-                                <img src="${process.env.BASE_URL}/img/krow-logo.png" alt=""  width="84" height="29">
-                            </td>
+                            <td valign="top" align="center" style="padding-top: 20px;padding-bottom:10px">
+                                <h1  style="padding-top: 25px; padding-bottom:25px;">${req.user.company}</h1>
+                            </td>                          
                         </tr>
                         <tr>
                             <td  valign="top" align="center">
@@ -324,13 +324,6 @@ sendConversationThread = (req, res, conversation_thread, commentList,projectReso
                                                                 </tbody>
                                                             </table>
 
-
-                                                            <p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; margin-bottom: 5px;">
-                                                                Thanks,
-                                                            </p>
-                                                            <p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; margin-top: 5px;">
-                                                                The Team at Krow
-                                                            </p>
                                                         </td>
                                                     </tr>
 
@@ -350,7 +343,7 @@ sendConversationThread = (req, res, conversation_thread, commentList,projectReso
   const mailOptions = {
     to: projectResourceEmailList,
     from: '"'+req.user.company_info.name+'"support@krowsoftware.com',
-    subject: "New Activity for Project"+projectData.name,
+    subject: "New Activity for Project: "+projectData.name,
     html: html
   };
 

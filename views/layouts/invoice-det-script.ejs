@@ -453,7 +453,7 @@
     let invoice_line_type = $("select[id=invoice-type]").val();
     let invoice_manual_entry_project = $("select[id=invoice-manual-entry-project]").val();
     let invoice_quantity = $("input[id=invoice-quantity]").val();
-    let invoice_unit_price = $("input[id=invoice-unit-price]").val();
+    let invoice_unit_price = parseFloat($("input[id=invoice-unit-price]").val()).toFixed(2);
     let description = $("textarea[id=invoice-description]").val();
     checkFormValidation("#addNewRowItemForm");
     if (invoice_line_type == "" || invoice_line_type == null || invoice_line_type == undefined) {
