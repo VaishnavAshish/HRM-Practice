@@ -886,11 +886,13 @@ exports.isAuthenticated = (req, res, next) => {
                     // handleResponse.handleError(res, err, ' Error in finding user data');
                     res.redirect('/domain');
                   } else {
+                    if(company.rows.length>0){
                       // console.log('------existingUser.rows[0]--------');
                       // console.log(existingUser.rows[0]);
                       if(existingUser.rowCount>0){
 
                         var userData=existingUser.rows[0];
+
                         userData.company = company.rows[0].name;
                         userData.company_id = company.rows[0].id;
                         userData.company_info=company.rows[0];
@@ -963,7 +965,34 @@ exports.isAuthenticated = (req, res, next) => {
                           res.redirect('/domain');
                         }
                       }
+                    } else {
+                      done();
+                      // handleResponse.handleError(res, ' Error in finding user data', ' Error in finding user data');
+                      try {
+                        res.clearCookie('remember_me');
+                        req.logout();
+                        req.session.destroy((error) => {
+                          if (error) {
+                            // console.log('Error : Failed to destroy the session during logout.', err);
+                            // handleResponse.handleError(res, error, ' Failed to destroy the session during logout.');
+                            res.redirect('/domain');
+                          }else{
+                            req.user = null;
+
+                            // handleResponse.handleError(res, err, ' Error in user logout before logging in another user.');
+                            res.redirect('/domain');
+
+                          }
+                        });
+                      } catch (err) {
+                        console.debug("--------3333-" + err);
+
+                        // handleResponse.handleError(res, err, ' Error in user logout');
+                        res.redirect('/domain');
+                      }
+                    }
                   }
+
                })
              }
            })
