@@ -214,7 +214,42 @@ function findCompanyByName(){
 
 }
 function setDataToCard(companyData){
-	let compStatus=(companyData.archived==true)?"Archived":"Active";
+	let companyStatus =''
+	if(companyData.archived==true) {
+			companyStatus=`<span class="text-red">
+												Deactive
+										</span>`
+	} else {
+			companyStatus=`<span class="text-green">
+												Active
+										</span>`
+	}
+	let deleteBtn ='';
+	let user = <%- JSON.stringify(user) %>;
+
+	if(companyData.archived==true) {
+		deleteBtn=`<li class="slds-has-divider_top-space" role="separator"></li>
+									<li class="slds-dropdown__item" role="presentation">
+										<a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="activateBeforeConfirm('#globalAlert', 'activate(${companyData.id},&quot;company&quot;)')">
+												<span class="slds-truncate sf-text-red" title="">
+														<i class="fa fa-check-circle text-green"></i> &nbsp;
+														Restore
+												</span>
+										</a>
+									</li>`;
+	} else if(user.company_id == companyData.id){
+
+	} else {
+		deleteBtn = `<li class="slds-has-divider_top-space" role="separator"></li>
+									<li class="slds-dropdown__item" role="presentation">
+										<a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteCompany(${companyData.id})','Are you sure you want to delete ${companyData.name} company.It will delete selected company and users from database and you will loose all information/data for company')">
+														<span class="slds-truncate sf-text-red" title="">
+																<i class="fa fa-trash text-red"></i> &nbsp;
+																Delete
+														</span>
+												</a>
+											</li>`;
+	}
 	let orgCard='<div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_3-of-12 slds-p-horizontal_small">'+
 				'<div class=" slds-m-bottom_medium slds-p-around_small slds-card">'+
 					'<div class="line-bottom slds-m-bottom_small slds-p-bottom_xx-small">'+
@@ -242,15 +277,7 @@ function setDataToCard(companyData){
 													'</span>'+
 												'</a>'+
 											'</li>'+
-											'<li class="slds-has-divider_top-space" role="separator"></li>'+
-											'<li class="slds-dropdown__item" role="presentation">'+
-												'<a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteCompany('+companyData.id+')">'+
-													'<span class="slds-truncate " title="">'+
-														'<i class="fa fa-trash text-red"></i> &nbsp;'+
-														'Archive'+
-													'</span>'+
-												'</a>'+
-											'</li>'+
+											deleteBtn+
 										'</ul>'+
 									'</div>'+
 								'</div>'+
@@ -273,7 +300,7 @@ function setDataToCard(companyData){
 								'<div class="slds-no-flex slds-p-left_small">'+
 									'<span class="text-uppercase text-dull">Status :</span>'+
 									'<span class="text-green">'+
-										compStatus+
+										companyStatus+
 									'</span>'+
 								'</div>'+
 							'</div>'+
@@ -284,6 +311,41 @@ function setDataToCard(companyData){
 	$("#orgCardView").append(orgCard);
 }
 function setDataToTable(companyData){
+	let companyStatus =''
+	if(companyData.archived==true) {
+			companyStatus=`<span class="text-red">
+												Deactive
+										</span>`
+	} else {
+			companyStatus=`<span class="text-green">
+												Active
+										</span>`
+	}
+	let user = <%- JSON.stringify(user) %>;
+	let deleteBtn ='';
+	if(companyData.archived==true) {
+		deleteBtn=`<li class="slds-has-divider_top-space" role="separator"></li>
+									<li class="slds-dropdown__item" role="presentation">
+										<a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="activateBeforeConfirm('#globalAlert', 'activate(${companyData.id},&quot;company&quot;)')">
+												<span class="slds-truncate sf-text-red" title="">
+														<i class="fa fa-check-circle text-green"></i> &nbsp;
+														Restore
+												</span>
+										</a>
+									</li>`;
+	} else if(user.company_id == companyData.id){
+
+	} else {
+		deleteBtn = `<li class="slds-has-divider_top-space" role="separator"></li>
+									<li class="slds-dropdown__item" role="presentation">
+										<a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteCompany(${companyData.id})','Are you sure you want to delete ${companyData.name} company.It will delete selected company and users from database and you will loose all information/data for company')">
+														<span class="slds-truncate sf-text-red" title="">
+																<i class="fa fa-trash text-red"></i> &nbsp;
+																Delete
+														</span>
+												</a>
+											</li>`;
+	}
 	let orgTr='<tr class="">'+
 				'<th scope="row" tabindex="0">'+
 					'<div class="slds-truncate" title="">'+
@@ -304,7 +366,7 @@ function setDataToTable(companyData){
 				'</td>'+
 				'<td role="gridcell">'+
 					'<div class="slds-truncate" title="">'+
-						companyData.archived+
+						companyStatus+
 					'</div>'+
 				'</td>'+
 				'<td role="gridcell">'+
@@ -325,15 +387,7 @@ function setDataToTable(companyData){
 										'</span>'+
 									'</a>'+
 								'</li>'+
-								'<li class="slds-has-divider_top-space" role="separator"></li>'+
-								'<li class="slds-dropdown__item" role="presentation">'+
-									'<a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteCompany('+companyData.id+')">'+
-										'<span class="slds-truncate sf-text-red" title="">'+
-											'<i class="fa fa-trash text-red"></i> &nbsp;'+
-											'Archive'+
-										'</span>'+
-									'</a>'+
-								'</li>'+
+								deleteBtn+
 							'</ul>'+
 						'</div>'+
 					'</div>'+

@@ -254,7 +254,7 @@ passport.use('user', new LocalStrategy({ usernameField: 'email',passReqToCallbac
               comparePassword(password, user.rows[0].password, (err, isMatch) => {
                 if (err) {
                   poolDone();
-                  return done('Error in password confirmation. Please enter password correctly.',null);
+                  return done('You have entered wrong password. Please enter password correctly.',null);
                 }else if (isMatch) {
                   // console.log('is match '+isMatch);
                   user.rows[0]['company'] = company.rows[0].name;

@@ -466,7 +466,7 @@ exports.getTimesheet = (req, res) => {
                   handleResponse.shouldAbort(err, client, done);
                   handleResponse.handleError(res, err, ' Error in finding current date and time');
                 } else {
-                  client.query('SELECT * FROM PROJECT WHERE  company_id=$1 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND isGlobal=$3 AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)',[req.user.company_id, false, false, userId], function(err, projectList) {
+                  client.query('SELECT * FROM PROJECT WHERE company_id=$1 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND isGlobal=$3 AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)',[req.user.company_id, false, false, userId], function(err, projectList) {
                     if(err) {
                       console.error(err);
                       handleResponse.shouldAbort(err, client, done);
@@ -557,7 +557,7 @@ exports.getTimesheet = (req, res) => {
                                   }else if(timesheetListByDate.rows.length<=0){
                                     timesheetSubmitFlag = false;
                                   }
-                                  let projectListArr = projectList.rows.filter(pro => pro.archived == false);
+                                  let projectListArr = projectList.rows.filter(pro => pro.archived == false && pro.status != 'Completed');
                                   console.log('projectListArr')
                                   console.log(projectListArr)
                                   if(req.user.permissions.includes('timesheetApprover')) {

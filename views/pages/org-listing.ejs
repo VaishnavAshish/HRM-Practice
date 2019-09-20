@@ -192,7 +192,7 @@
                                                     <span class="slds-truncate" title="Start Date">Create Date</span>
                                                 </th>
                                                 <th class="slds-is-sortable" scope="col">
-                                                    <span class="slds-truncate" title="Archived">Archived</span>
+                                                    <span class="slds-truncate" title="Archived">Status</span>
                                                 </th>
                                                 <th class=" " scope="col" style="width: 3.25rem;">
 
@@ -222,8 +222,16 @@
                                                     </div>
                                                 </td>
                                                 <td role="gridcell">
-                                                    <div class="slds-truncate" title="">
-                                                       <%= comp.archived%>
+
+                                                       <% if(comp.archived==true) { %>
+                                                           <span class="text-red">
+                                                               Deactive
+                                                           </span>
+                                                       <% }else { %>
+                                                           <span class="text-green">
+                                                               Active
+                                                           </span>
+                                                       <% } %>
                                                     </div>
                                                 </td>
                                                 <td role="gridcell">
@@ -244,26 +252,29 @@
                                                                         </span>
                                                                     </a>
                                                                 </li>
-                                                                <li class="slds-has-divider_top-space" role="separator"></li>
-                                                                <li class="slds-dropdown__item" role="presentation">
 
                                                                     <% if(comp.archived==true) { %>
+                                                                      <li class="slds-has-divider_top-space" role="separator"></li>
+                                                                      <li class="slds-dropdown__item" role="presentation">
                                                                         <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="activateBeforeConfirm('#globalAlert', 'activate(\'<%= comp.id %>\',\'company\')')">
                                                                             <span class="slds-truncate sf-text-red" title="">
                                                                                 <i class="fa fa-check-circle text-green"></i> &nbsp;
                                                                                 Restore
                                                                             </span>
                                                                         </a>
+                                                                      </li>
                                                                     <% } else if(user.company_id == comp.id){
                                                                     } else { %>
+                                                                      <li class="slds-has-divider_top-space" role="separator"></li>
+                                                                      <li class="slds-dropdown__item" role="presentation">
                                                                         <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteCompany(\'<%= comp.id %>\')','Are you sure you want to delete <%= comp.name %> company.It will delete selected company and users from database and you will loose all information/data for company')">
                                                                                 <span class="slds-truncate sf-text-red" title="">
                                                                                     <i class="fa fa-trash text-red"></i> &nbsp;
                                                                                     Delete
                                                                                 </span>
                                                                             </a>
+                                                                          </li>
                                                                     <% }%>
-                                                                </li>
                                                             </ul>
                                                         </div>
                                                     </div>
@@ -324,7 +335,29 @@
                                                                                     </span>
                                                                                 </a>
                                                                             </li>
-                                                                            <li class="slds-has-divider_top-space" role="separator"></li>
+                                                                            <% if(comp.archived==true) { %>
+                                                                              <li class="slds-has-divider_top-space" role="separator"></li>
+                                                                              <li class="slds-dropdown__item" role="presentation">
+                                                                                <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="activateBeforeConfirm('#globalAlert', 'activate(\'<%= comp.id %>\',\'company\')')">
+                                                                                    <span class="slds-truncate sf-text-red" title="">
+                                                                                        <i class="fa fa-check-circle text-green"></i> &nbsp;
+                                                                                        Restore
+                                                                                    </span>
+                                                                                </a>
+                                                                              </li>
+                                                                            <% } else if(user.company_id == comp.id){
+                                                                            } else { %>
+                                                                              <li class="slds-has-divider_top-space" role="separator"></li>
+                                                                              <li class="slds-dropdown__item" role="presentation">
+                                                                                <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteCompany(\'<%= comp.id %>\')','Are you sure you want to delete <%= comp.name %> company.It will delete selected company and users from database and you will loose all information/data for company')">
+                                                                                        <span class="slds-truncate sf-text-red" title="">
+                                                                                            <i class="fa fa-trash text-red"></i> &nbsp;
+                                                                                            Delete
+                                                                                        </span>
+                                                                                    </a>
+                                                                                  </li>
+                                                                            <% }%>
+                                                                            <!-- <li class="slds-has-divider_top-space" role="separator"></li>
                                                                             <li class="slds-dropdown__item" role="presentation">
                                                                                 <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteCompany(<%=comp.id;%>)">
                                                                                     <span class="slds-truncate " title="">
@@ -332,7 +365,7 @@
                                                                                         Archive
                                                                                     </span>
                                                                                 </a>
-                                                                            </li>
+                                                                            </li> -->
                                                                         </ul>
                                                                     </div>
                                                                 </div>
@@ -356,13 +389,15 @@
                                                                 </div>
                                                                 <div class="slds-no-flex slds-p-left_small">
                                                                     <span class="text-uppercase text-dull">Status :</span>
-                                                                    <span class="text-green">
-                                                                        <% if(comp.archived==true) { %>
-                                                                            Archived
-                                                                        <% }else { %>
+                                                                    <% if(comp.archived==true) { %>
+                                                                        <span class="text-red">
+                                                                            Deactive
+                                                                        </span>
+                                                                    <% }else { %>
+                                                                        <span class="text-green">
                                                                             Active
-                                                                        <% } %>
-                                                                    </span>
+                                                                        </span>
+                                                                    <% } %>
                                                                 </div>
                                                             </div>
                                                         </div>

@@ -292,7 +292,7 @@ exports.postAddResource = (req, res) => {
     });
 };
 
-exports.postResendActivation = (req, res) => { 
+exports.postResendActivation = (req, res) => {
   if(req.body.token==null || !req.user.user_role.includes('ADMIN') ){
     done();
     handleResponse.handleError(res, 'User adding error', ' You are not authorized for this. ');
@@ -379,7 +379,7 @@ sendInvitationEmail = (req, res, next) => {
                             '</tr>'+
                             '<tr>'+
                                 '<td valign="top" align="center" style=" font-family: arial,sans-serif; padding:20px 20px 20px 20px; color: #999; font-size: 14px;">'+
-                                    
+
                                 '</td>'+
                             '</tr>'+
                         '</tbody>'+
@@ -474,7 +474,7 @@ sendResetEmail = (req,res,next)=>{
                                                               '</table>'+
                                                           '</p>'+
                                                           '<p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; line-height: 20px;">'+
-                                                              'If you did not make this request, you can safely ignore this email'+
+                                                              'In case you did not make this request, please ignore this email'+
                                                           '</p>'+
                                                           '<p style="font-family: arial,sans-serif; font-size:14px; font-weight:normal; margin-bottom: 5px;">'+
                                                               'Thanks,'+
@@ -494,7 +494,7 @@ sendResetEmail = (req,res,next)=>{
                   '</tr>'+
                   '<tr>'+
                       '<td valign="top" align="center" style=" font-family: arial,sans-serif; padding:20px 20px 20px 20px; color: #999; font-size: 14px;">'+
-                          
+
                       '</td>'+
                   '</tr>'+
               '</tbody>'+

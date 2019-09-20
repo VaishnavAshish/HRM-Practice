@@ -656,7 +656,16 @@ function setDataToCard(resource){
 						'</div>';
 	$("#resourceCardView").append(resourceCard);
 }
+
 function setDataToTable(resource,companyName){
+	let resourceStatus = '';
+	if(resource.user_status == "Active") {
+		resourceStatus = `<span class="text-green">`;
+	} else if(resource.user_status == "Invited") {
+		resourceStatus = `<span class="text-orange">`;
+	} else {
+		resourceStatus = `<span class="text-red">`;
+	}
 	let resourceRowHTML='<tr class="">'+
 					    '<th scope="row" tabindex="0">'+
 					        '<div class="slds-truncate" title="">'+
@@ -696,7 +705,8 @@ function setDataToTable(resource,companyName){
 					    '</td>'+
 					    '<td role="gridcell">'+
 					        '<div class="slds-truncate" title="">'+
-					            resource.archived+
+					            resourceStatus+
+											resource.user_status+
 					        '</div>'+
 					    '</td>'+
 					    '<td role="gridcell">'+

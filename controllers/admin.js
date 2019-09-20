@@ -172,41 +172,14 @@ exports.getCompanyDetail = (req, res) => {
         } else {
           // console.log('getCompanyDetail-------------' + req.query.companyid)
           pool.connect((err, client, done) => {
-            client.query('SELECT c.id ,c.name ,c.domain ,c.archived ,c.created_date at time zone \'' + companyDefaultTimezone + '\' as created_date ,c.modified_date at time zone \'' + companyDefaultTimezone + '\' as modified_date ,c.street ,c.city ,c.state ,c.country ,c.zip_code ,c.add_status ,c.token FROM company c where c.id=$1', [req.query.companyid], function(err, companies) {
+            client.query('SELECT * FROM SETTING WHERE company_id=$1', [req.query.companyid], function (err, companySetting) {
               if (err) {
-                // console.log(err);
                 handleResponse.shouldAbort(err, client, done);
-                handleResponse.responseToPage(res, 'pages/org-details', {
-                  admin: {},
-                  company: {},
-                  resources: [],
-                  count: 0,
-                  userRoleList: [],
-                  user: req.user,
-                  error: err
-                }, "error", " Error in finding company");
-                /*handleResponse.handleError(res, err, ' Error in finding company');*/
-                /*res.render('pages/org-details', { company: companies.rows[0], user: req.user, error: err });*/
+                handleResponse.responseToPage(res,'pages/org-settings-general',{setting:{},user:req.user, error:err,timezones:timezones,STRIPE_PUBLISH_KEY : process.env.STRIPE_PUBLISH_KEY},"error","  Error in finding setting data");
               } else {
-                console.log('companyDefaultTimezone' + companyDefaultTimezone);
-                client.query('SELECT u.id ,u.email ,u.password ,u.username ,u.company_id ,u.user_role ,u.created_date at time zone \'' + companyDefaultTimezone + '\' as created_date,u.modified_date at time zone \'' + companyDefaultTimezone + '\' as modified_date,u.first_name ,u.last_name ,u.phone ,u.mobile ,u.designation ,u.archived ,u.password_reset_token ,u.add_status ,u.bill_rate ,u.cost_rate ,u.permissions ,u.role ,u.record_id ,(select count(*) from Users where company_id=$1 AND archived=$2) as total FROM Users u where company_id=$1 AND archived=$2 ORDER BY created_date DESC,email OFFSET 0 LIMIT ' + process.env.PAGE_RECORD_NO, [req.query.companyid, false], function(err, resourceList) {
-                  if (err) {
-                    // console.log(err);
-                    handleResponse.shouldAbort(err, client, done);
-                    handleResponse.responseToPage(res, 'pages/org-details', {
-                      admin: {},
-                      company: {},
-                      resources: [],
-                      count: 0,
-                      userRoleList: [],
-                      user: req.user,
-                      error: err
-                    }, "error", " Error in finding users for the company");
-                    /*handleResponse.handleError(res, err, ' Error in finding users for the company');*/
-                  } else {
-                    client.query('SELECT user_role FROM SETTING WHERE company_id=$1', [req.query.companyid], function(err, userRoleList) {
+                    client.query('SELECT c.id ,c.name ,c.domain ,c.archived ,c.created_date at time zone \'' + companyDefaultTimezone + '\' as created_date ,c.modified_date at time zone \'' + companyDefaultTimezone + '\' as modified_date ,c.add_status ,c.token FROM company c where c.id=$1', [req.query.companyid], function(err, companies) {
                       if (err) {
-                        console.error(err);
+                        // console.log(err);
                         handleResponse.shouldAbort(err, client, done);
                         handleResponse.responseToPage(res, 'pages/org-details', {
                           admin: {},
@@ -216,63 +189,111 @@ exports.getCompanyDetail = (req, res) => {
                           userRoleList: [],
                           user: req.user,
                           error: err
-                        }, "error", " Error in finding user role for the company");
+                        }, "error", " Error in finding company");
+                        /*handleResponse.handleError(res, err, ' Error in finding company');*/
+                        /*res.render('pages/org-details', { company: companies.rows[0], user: req.user, error: err });*/
                       } else {
-                        let admin_user = resourceList.rows.filter(function(resource) {
-                          let user_role = resource.user_role;
-                          return user_role.contains("ADMIN");
-                        });
-                        let totalCount = 0;
-                        if (resourceList.rows.length > 0) {
-                          // console.log('created_date'+resourceList.rows[0].created_date+'after conversion '+new Date(resourceList.rows[0].created_date));
-                          // console.log('modified_date'+resourceList.rows[0].modified_date);
-                          resourceList.rows.forEach(function(data) {
-                            let created_date = moment.tz(data.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
-                            let modified_date = moment.tz(data.modified_date, companyDefaultTimezone).format('MM-DD-YYYY');
-                            // let created_date = dateFormat(data.created_date);
-                            // let modified_date = dateFormat(data.modified_date);
-                            data["created_date"] = created_date;
-                            data["modified_date"] = modified_date;
-                          })
-                          totalCount = resourceList.rows[0].total;
-                        }
-                        let userRole = ['Manager'];
-                        if (userRoleList.rows.length > 0) {
-                          userRole = userRoleList.rows[0].user_role;
-                        }
-                        if (companies.rows.length > 0) {
-                          companies.rows.forEach(function(data) {
-                            let created_date = moment.tz(data.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
-                            let modified_date = moment.tz(data.modified_date, companyDefaultTimezone).format('MM-DD-YYYY');
-                            // let created_date = dateFormat(data.created_date);
-                            // let modified_date = dateFormat(data.modified_date);
-                            data["created_date"] = created_date;
-                            data["modified_date"] = modified_date;
-                          })
-                        }
+                        console.log('companyDefaultTimezone' + companyDefaultTimezone);
+                        client.query('SELECT u.id ,u.email ,u.password ,u.username ,u.company_id ,u.user_role ,u.created_date at time zone \'' + companyDefaultTimezone + '\' as created_date,u.modified_date at time zone \'' + companyDefaultTimezone + '\' as modified_date,u.first_name ,u.last_name ,u.phone ,u.mobile ,u.designation ,u.archived ,u.password_reset_token ,u.add_status ,u.bill_rate ,u.cost_rate ,u.permissions ,u.role ,u.record_id ,(select count(*) from Users where company_id=$1 AND archived=$2) as total FROM Users u where company_id=$1 AND archived=$2 ORDER BY created_date DESC,email OFFSET 0 LIMIT ' + process.env.PAGE_RECORD_NO, [req.query.companyid, false], function(err, resourceList) {
+                          if (err) {
+                            // console.log(err);
+                            handleResponse.shouldAbort(err, client, done);
+                            handleResponse.responseToPage(res, 'pages/org-details', {
+                              admin: {},
+                              company: {},
+                              resources: [],
+                              count: 0,
+                              userRoleList: [],
+                              user: req.user,
+                              error: err
+                            }, "error", " Error in finding users for the company");
+                            /*handleResponse.handleError(res, err, ' Error in finding users for the company');*/
+                          } else {
+                            client.query('SELECT user_role FROM SETTING WHERE company_id=$1', [req.query.companyid], function(err, userRoleList) {
+                              if (err) {
+                                console.error(err);
+                                handleResponse.shouldAbort(err, client, done);
+                                handleResponse.responseToPage(res, 'pages/org-details', {
+                                  admin: {},
+                                  company: {},
+                                  resources: [],
+                                  count: 0,
+                                  userRoleList: [],
+                                  user: req.user,
+                                  error: err
+                                }, "error", " Error in finding user role for the company");
+                              } else {
+                                let admin_user = resourceList.rows.filter(function(resource) {
+                                  let user_role = resource.user_role;
+                                  return user_role.contains("ADMIN");
+                                });
+                                let totalCount = 0;
+                                if (resourceList.rows.length > 0) {
+                                  // console.log('created_date'+resourceList.rows[0].created_date+'after conversion '+new Date(resourceList.rows[0].created_date));
+                                  // console.log('modified_date'+resourceList.rows[0].modified_date);
+                                  resourceList.rows.forEach(function(data) {
+                                      if (data.archived) {
+                                        data['user_status'] = "Archived";
+                                      } else if (!data.archived && data.add_status != "Invited") {
+                                        data['user_status'] = "Active"
+                                      } else {
+                                        data['user_status'] = "Invited";
+                                      }
+                                    let created_date = moment.tz(data.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                    let modified_date = moment.tz(data.modified_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                    // let created_date = dateFormat(data.created_date);
+                                    // let modified_date = dateFormat(data.modified_date);
+                                    data["created_date"] = created_date;
+                                    data["modified_date"] = modified_date;
+                                  })
+                                  totalCount = resourceList.rows[0].total;
+                                }
+                                let userRole = ['Manager'];
+                                if (userRoleList.rows.length > 0) {
+                                  userRole = userRoleList.rows[0].user_role;
+                                }
+                                if (companies.rows.length > 0) {
+                                  companies.rows.forEach(function(data) {
+                                    let created_date = moment.tz(data.created_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                    let modified_date = moment.tz(data.modified_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                    // let created_date = dateFormat(data.created_date);
+                                    // let modified_date = dateFormat(data.modified_date);
+                                    data["created_date"] = created_date;
+                                    data["modified_date"] = modified_date;
+                                    data["street"] = companySetting.rows[0].street;
+                                    data["city"] = companySetting.rows[0].city;
+                                    data["state"] = companySetting.rows[0].state;
+                                    data["country"] = companySetting.rows[0].country;
+                                    data["zip_code"] = companySetting.rows[0].zip_code;
+                                  })
+                                }
 
-                        console.error('getAllCompanyResources>>>>>>>>>>>>> ' + JSON.stringify(resourceList.rows));
-                        // console.log('admin user is ' + JSON.stringify(admin_user))
-                        done();
-                        handleResponse.responseToPage(res, 'pages/org-details', {
-                          admin: admin_user[0],
-                          company: companies.rows[0],
-                          resources: resourceList.rows,
-                          user: req.user,
-                          count: totalCount,
-                          userRoleList: userRole,
-                          stripeCustomerId:result.stripe_customer_id
-                        }, "success", "Successfully rendered");
-                        /*res.render('pages/org-details', { admin: admin_user[0], company: companies.rows[0], resources: resourceList.rows, user: req.user, error: err });*/
+                                console.error('getAllCompanyResources>>>>>>>>>>>>> ' + JSON.stringify(resourceList.rows));
+                                // console.log('admin user is ' + JSON.stringify(admin_user))
+                                done();
+                                handleResponse.responseToPage(res, 'pages/org-details', {
+                                  admin: admin_user[0],
+                                  company: companies.rows[0],
+                                  resources: resourceList.rows,
+                                  user: req.user,
+                                  count: totalCount,
+                                  userRoleList: userRole,
+                                  stripeCustomerId:result.stripe_customer_id
+                                }, "success", "Successfully rendered");
+                                /*res.render('pages/org-details', { admin: admin_user[0], company: companies.rows[0], resources: resourceList.rows, user: req.user, error: err });*/
+                              }
+
+                            })
+
+                          }
+
+                        })
                       }
-
                     })
-
                   }
 
-                })
-              }
-            })
+
+                });
           })
         }
       }
@@ -724,7 +745,7 @@ sendEmailToUser = (req, res, next) => {
     '</tr>' +
     '<tr>' +
     '<td valign="top" align="center" style=" font-family: arial,sans-serif; padding:20px 20px 20px 20px; color: #999; font-size: 14px;">' +
-    
+
     '</td>' +
     '</tr>' +
     '</tbody>' +
@@ -980,25 +1001,31 @@ exports.updateCompany = (req, res) => {
             handleResponse.shouldAbort(err, client, done);
             handleResponse.handleError(res, err, err);
           } else {
-            client.query('UPDATE company set name=$1,domain=$2,street=$3,city=$4,state=$5,country=$6,zip_code=$7,modified_date=$8 where id=$9  RETURNING id, domain', [req.body.name, req.body.domain, req.body.street, req.body.city, req.body.state, req.body.country, req.body.zip_code, 'now()', req.body.id], function(err, company) {
+            client.query('UPDATE company set name=$1,modified_date=$2 where id=$3  RETURNING id, domain', [req.body.name,'now()', req.body.id], function(err, company) {
               if (err) {
                 handleResponse.shouldAbort(err, client, done);
                 handleResponse.handleError(res, err, ' Error in updating company data.');
               } else {
-                // console.log("company------------");
-                // console.log(company);
-                client.query('COMMIT', (err) => {
+                client.query('UPDATE SETTING set street=$1,city=$2,state=$3,country=$4,zip_code=$5 where company_id=$6  RETURNING id', [req.body.street, req.body.city, req.body.state, req.body.country, req.body.zip_code, req.body.id], function(err, companySettings) {
                   if (err) {
-                    console.error('Error committing transaction', err.stack)
                     handleResponse.shouldAbort(err, client, done);
-                    handleResponse.handleError(res, err, ' Error in committing transaction');
+                    handleResponse.handleError(res, err, ' Error in updating company settings data.');
                   } else {
-                    done();
-                    handleResponse.sendSuccess(res, 'Company updated successfully', {});
-                    /*res.status(200).json({ "success": true, "message": "success" });*/
-                  }
-                })
-
+                      // console.log("company------------");
+                      // console.log(company);
+                      client.query('COMMIT', (err) => {
+                        if (err) {
+                          console.error('Error committing transaction', err.stack)
+                          handleResponse.shouldAbort(err, client, done);
+                          handleResponse.handleError(res, err, ' Error in committing transaction');
+                        } else {
+                          done();
+                          handleResponse.sendSuccess(res, 'Company updated successfully', {});
+                          /*res.status(200).json({ "success": true, "message": "success" });*/
+                        }
+                      })
+                    }
+                  })
               }
             });
           }

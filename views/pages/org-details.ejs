@@ -313,7 +313,7 @@
                                                         <span class="slds-truncate" title="Team">Created Date</span>
                                                     </th>
                                                     <th class="slds-is-sortable" scope="col">
-                                                        <span class="slds-truncate" title="Team">Archived</span>
+                                                        <span class="slds-truncate" title="Team">Status</span>
                                                     </th>
                                                     <th class=" " scope="col" style="width: 3.25rem;">
 
@@ -362,7 +362,14 @@
                                                     </td>
                                                     <td role="gridcell">
                                                         <div class="slds-truncate" title="">
-                                                            <%= resource.archived%>
+                                                            <% if(resource.user_status == "Active") { %>
+                                                                <span class="text-green">
+                                                            <% } else if(resource.user_status == "Invited") { %>
+                                                                <span class="text-orange">
+                                                            <% } else { %>
+                                                                <span class="text-red">
+                                                            <% } %>
+                                                                <%= resource.user_status%>
                                                         </div>
                                                     </td>
                                                     <td role="gridcell">

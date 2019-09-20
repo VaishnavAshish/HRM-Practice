@@ -183,23 +183,26 @@ exports.postAddComment = (req, res) => {
                             handleResponse.handleError(res, err, ' Error in committing transaction');
                           } else {
                             if(req.body.sendemail == true){
-                              // client.query('SELECT user_id FROM PROJECT_ASSIGNMENT where project_id =$1', [req.body.project_id],function (err, projectResourceIdList) {
-                              //   if (err) {
-                              //     handleResponse.shouldAbort(err, client, done);
-                              //     handleResponse.handleError(res, err, ' Error in finding project assignment users in the database');
-                              //   } else {
+                              client.query('SELECT user_id FROM PROJECT_ASSIGNMENT where project_id =$1', [req.body.project_id],function (err, projectResourceIdList) {
+                                if (err) {
+                                  handleResponse.shouldAbort(err, client, done);
+                                  handleResponse.handleError(res, err, ' Error in finding project assignment users in the database');
+                                } else {
                                   client.query('SELECT name FROM PROJECT where id =$1', [req.body.project_id],function (err, projectData) {
                                     if (err) {
                                       handleResponse.shouldAbort(err, client, done);
                                       handleResponse.handleError(res, err, ' Error in finding project data in the database');
                                     } else {
-                                      //let userIdList = projectResourceIdList.rows.concat(updatedProjectConversation.rows[0].resource_id);
+                                      let userIdList = projectResourceIdList.rows.concat(updatedProjectConversation.rows[0].resource_id);
                                       client.query('SELECT id,email ,first_name ,last_name from users where id In (SELECT user_id FROM PROJECT_ASSIGNMENT where project_id =$1)', [req.body.project_id],function (err, selectedProjectUserList) {
                                         if (err) {
                                           handleResponse.shouldAbort(err, client, done);
                                           handleResponse.handleError(res, err, ' Error in finding project user in the database');
                                         } else {
                                             let selectedProjectConverationUser = selectedProjectUserList.rows.filter(user => user.id == updatedProjectConversation.rows[0].resource_id)[0];
+                                            if(projectResourceIdList.rows.indexOf(updatedProjectConversation.rows[0].resource_id)==-1){
+                                              projectResourceIdList.rows = projectResourceIdList.rows.filter(projectResource => projectResource != updatedProjectConversation.rows[0].resource_id);
+                                            }
                                             updatedProjectConversation.rows[0].email = selectedProjectConverationUser.email
                                             updatedProjectConversation.rows[0].first_name = selectedProjectConverationUser.first_name
                                             updatedProjectConversation.rows[0].last_name = selectedProjectConverationUser.last_name
@@ -231,8 +234,8 @@ exports.postAddComment = (req, res) => {
                                       })
                                     }
                                   })
-                              //   }
-                              // })
+                                }
+                              })
                             }else{
                                 done();
                                 handleResponse.sendSuccess(res,'Project Comment added successfully',{});
@@ -292,7 +295,7 @@ sendConversationThread = (req, res, conversation_thread, commentList,projectReso
                         <tr>
                             <td valign="top" align="center" style="padding-top: 20px;padding-bottom:10px">
                                 <h1  style="padding-top: 25px; padding-bottom:25px;">${req.user.company}</h1>
-                            </td>                          
+                            </td>
                         </tr>
                         <tr>
                             <td  valign="top" align="center">

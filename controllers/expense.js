@@ -167,7 +167,7 @@ exports.getExpense = (req, res) => {
                                     return ele.id;
                                 });
                             }
-                            client.query('SELECT id,name,account_id,archived FROM PROJECT WHERE company_id=$1 AND isGlobal=$3 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)', [req.user.company_id, false, false,req.params.userId], function(err, project) {
+                            client.query('SELECT id,name,account_id,archived,status FROM PROJECT WHERE company_id=$1 AND isGlobal=$3 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)', [req.user.company_id, false, false,req.params.userId], function(err, project) {
                                 if (err) {
                                     handleResponse.shouldAbort(err, client, done);
                                     handleResponse.responseToPage(res, 'pages/expenses-listing', {
@@ -285,7 +285,7 @@ exports.getExpense = (req, res) => {
                                                 // console.log(expense.rows);
                                                 // console.log('----------expenseListArr---------');
                                                 // console.log(expenseListArr);
-                                                projectArr = project.rows.filter(pro => pro.archived == false);
+                                                projectArr = project.rows.filter(pro => pro.archived == false && pro.status != 'Completed');
                                                 if(req.user.permissions.includes('expenseApprover')) {
                                                     // console.log("Inside IF Expense");
                                                     timesheetController.getAllCompanyUsers(req, client, err, done, res, function (usersList) {
