@@ -489,8 +489,8 @@ exports.deleteAccount = (req,res) =>{
                   console.log(projectRelatedToAccount.rows[0].projecttotalcount)
                   if(projectRelatedToAccount.rows[0].projecttotalcount > 0){
                     done();
-                    console.error('Account cannot be deleted.There are project associated with this account.');
-                    handleResponse.handleError(res, 'Account cannot be deleted. There are project associated with this account.', 'Account cannot be deleted.There are project associated with this account.');
+                    console.error('Account cannot be deleted. There are project associated with this account.');
+                    handleResponse.handleError(res, 'Account cannot be deleted. There are project associated with this account.', 'Account cannot be deleted. There are project associated with this account.');
                   }else{
                     client.query('SELECT count(id) as invoiceTotalCount FROM INVOICE WHERE account_id=$1 AND archived=$2',[req.body.accountId,false], function(err, invoiceRelatedToAccount) {
                       if (err) {
@@ -502,8 +502,8 @@ exports.deleteAccount = (req,res) =>{
                         console.log(invoiceRelatedToAccount.rows[0].invoicetotalcount)
                         if(invoiceRelatedToAccount.rows[0].invoicetotalcount > 0){
                           done();
-                          console.error('Account cannot be deleted.There are invoices associated with this account.');
-                          handleResponse.handleError(res, 'Account cannot be deleted. There are invoices associated with this account.', 'Account cannot be deleted.There are invoices associated with this account.');
+                          console.error('Account cannot be deleted. There are invoices associated with this account.');
+                          handleResponse.handleError(res, 'Account cannot be deleted. There are invoices associated with this account.', 'Account cannot be deleted. There are invoices associated with this account.');
                         }else{
                           client.query('UPDATE ACCOUNT SET archived = $1 WHERE id=$2',[true, req.body.accountId], function(err, archivedAccount) {
                             if (err) {

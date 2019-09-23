@@ -75,6 +75,57 @@
         line-height: 2rem;
         text-align: center;
     }
+    /* -------------drag and droop style start---------------- */
+    .dragged {
+      position: absolute;
+      opacity: 0.9;
+      z-index: 2000;
+      box-shadow: 0 0 5px rgba(0,0,0,.2);
+    }
+
+
+
+    li.placeholder {
+      position: relative;
+      background: #f7f8f9;
+      border: 1px dashed #eee;
+
+    }
+    li.placeholder:before {
+      position: absolute;
+      /** Define arrowhead **/
+    }
+    .kw-drag-handle{
+        display: inline-block;
+        cursor: move;
+        background: #f7f8f9;
+        font-size: 16px;
+        border-radius: .25rem;
+        background-image: -webkit-repeating-radial-gradient(center center, rgba(0,0,0,.2), rgba(0,0,0,.2) 2px, transparent 2px, transparent 100%);
+        background-image: -moz-repeating-radial-gradient(center center, rgba(0,0,0,.2), rgba(0,0,0,.2) 2px, transparent 2px, transparent 100%);
+        background-image: -ms-repeating-radial-gradient(center center, rgba(0,0,0,.2), rgba(0,0,0,.2) 2px, transparent 2px, transparent 100%);
+        background-image: repeating-radial-gradient(center center, rgba(0,0,0,.2), rgba(0,0,0,.2) 2px, transparent 2px, transparent 100%);
+        -webkit-background-size: 8px 8px;
+        -moz-background-size: 8px 8px;
+        background-size: 8px 8px;
+    }
+    .kw-task-item{
+        position: relative;
+        background: white;
+    }
+    .kw-task-sort-wrapper .kw-drag-handle{
+        position: absolute;
+        top: 8px;
+        left: -12px;
+        display: none;
+    }
+    .kw-task-item:hover .kw-drag-handle{
+        display: block;
+    }
+    .kw-task-sort-wrapper   li.placeholder {
+        min-height: 68px;
+    }
+    /* -------------drag and droop style end---------------- */
 
     </style>
     <script>

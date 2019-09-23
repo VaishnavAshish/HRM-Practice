@@ -194,15 +194,20 @@ exports.postAddComment = (req, res) => {
                                       handleResponse.handleError(res, err, ' Error in finding project data in the database');
                                     } else {
                                       let userIdList = projectResourceIdList.rows.concat(updatedProjectConversation.rows[0].resource_id);
-                                      client.query('SELECT id,email ,first_name ,last_name from users where id In (SELECT user_id FROM PROJECT_ASSIGNMENT where project_id =$1)', [req.body.project_id],function (err, selectedProjectUserList) {
+                                      console.log('userIdList');
+                                      console.log(userIdList);
+                                      client.query('SELECT id,email ,first_name ,last_name from users where id In (SELECT user_id FROM PROJECT_ASSIGNMENT where project_id =$1) OR id IN (SELECT resource_id FROM PROJECT_COMMENT where id =$2 OR parent_id = $2)', [req.body.project_id,req.body.conversation_id],function (err, selectedProjectUserList) {
                                         if (err) {
                                           handleResponse.shouldAbort(err, client, done);
                                           handleResponse.handleError(res, err, ' Error in finding project user in the database');
                                         } else {
                                             let selectedProjectConverationUser = selectedProjectUserList.rows.filter(user => user.id == updatedProjectConversation.rows[0].resource_id)[0];
-                                            if(projectResourceIdList.rows.indexOf(updatedProjectConversation.rows[0].resource_id)==-1){
-                                              projectResourceIdList.rows = projectResourceIdList.rows.filter(projectResource => projectResource != updatedProjectConversation.rows[0].resource_id);
-                                            }
+                                            // if(projectResourceIdList.rows.indexOf(updatedProjectConversation.rows[0].resource_id)==-1){
+                                            //   projectResourceIdList.rows = projectResourceIdList.rows.filter(projectResource => projectResource != updatedProjectConversation.rows[0].resource_id);
+                                            // }
+                                            console.log('selectedProjectConverationUser');
+                                            console.log(selectedProjectUserList.rows)
+                                            console.log(selectedProjectConverationUser);
                                             updatedProjectConversation.rows[0].email = selectedProjectConverationUser.email
                                             updatedProjectConversation.rows[0].first_name = selectedProjectConverationUser.first_name
                                             updatedProjectConversation.rows[0].last_name = selectedProjectConverationUser.last_name
@@ -255,11 +260,13 @@ exports.postAddComment = (req, res) => {
 }
 
 function getRandomColor() {
-     var letters = 'BCDEF'.split('');
-     var color = '#';
-     for (var i = 0; i < 6; i++ ) {
-         color += letters[Math.floor(Math.random() * letters.length)];
-     }
+     // var letters = 'BCDEF'.split('');
+     // var color = '#';
+     // for (var i = 0; i < 6; i++ ) {
+     //     color += letters[Math.floor(Math.random() * letters.length)];
+     // }
+     // return color;
+     color = "hsl(" + Math.random() * 360 + ", 100%, 75%)";
      return color;
  }
 
@@ -267,10 +274,14 @@ function getRandomColor() {
 sendConversationThread = (req, res, conversation_thread, commentList,projectResourceEmailList,projectData,next) => {
   let serverName = process.env.BASE_URL;
   let commentListHTML = ``;
+  let colorMap = new Map();
   commentList.forEach(commentData => {
+    if(!colorMap.has(commentData.email)){
+      colorMap.set(commentData.email,getRandomColor());
+    }
     commentHTML = `<tr>
                       <td  valign="top" style=" font-size:14px;font-family: arial,sans-serif; padding-top:10px; border-top: 1px solid #eee; color: #999; width:50px;">
-                          <span style="border-radius: 50%; height:48px; width: 48px; text-align:center; line-height: 48px; background-color:${getRandomColor()}; display: inline-block; text-transform: uppercase; letter-spacing: 1px; color: white; font-size: 16px;">
+                          <span style="border-radius: 50%; height:48px; width: 48px; text-align:center; line-height: 48px; background-color:${colorMap.get(commentData.email)}; display: inline-block; text-transform: uppercase; letter-spacing: 1px; color: white; font-size: 16px;">
                               ${commentData.first_name.substring(0,1).toUpperCase()}${commentData.last_name?commentData.last_name.substring(0,1).toUpperCase():''}
                           </span>
                       </td>

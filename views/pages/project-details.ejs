@@ -276,13 +276,16 @@
                                     </div>
                                     <!-- task header end -->
                                     <div class="slds-p-horizontal_small slds-p-bottom_small" id="taskCardView">
+                                      <ul id="taskSortWrapper" class="kw-task-sort-wrapper">
                                         <% if(tasks.length > 0) { %>
                                             <% tasks.forEach(function(task) {%>
                                                 <!-- row start -->
-                                                    <div class=" slds-m-bottom_medium slds-p-around_small line-around">
+                                                <li>
+                                                    <div class=" slds-m-bottom_medium slds-p-around_small line-around kw-task-item">
                                                         <div class="slds-grid slds-wrap slds-grid_pull-padded">
                                                             <div class="slds-size_1-of-1 slds-medium-size_1-of-1  slds-large-size_5-of-12 slds-p-horizontal_small">
                                                                 <div class="text-size-11 text-dull text-uppercase slds-p-bottom_xx-small">
+                                                                    <span class="kw-drag-handle slds-p-around_small" title="Drag & Drop to Reorder"> </span>
                                                                     <%= task.record_id %>
                                                                     <span class="slds-badge slds-m-left_small">
                                                                         <% if(task.billable) { %>
@@ -372,11 +375,11 @@
                                                             </div>
                                                         </div>
                                                     </div>
-
+                                                </li>
                                                 <!-- row end -->
                                              <% }); %>
                                         <% } %>
-
+                                      </ul>
                                     </div>
                                     <div class="slds-text-align_center slds-p-vertical_medium">
                                         <button class="slds-button" loadItemId="loadMoreBtn" onclick="loadMoreTask()">&nbsp;</button>
@@ -1314,7 +1317,15 @@
     <% include ../layouts/project-comment-script %>
 
     <script>
+
         $(document).ready(function(){
+          $("#taskSortWrapper").sortable({
+              handle: '.kw-drag-handle',
+              onDrop: function($item, container, _super) {
+                _super($item, container);
+                alert('yo done');
+              }
+        });
             /* $('#taskDescription').summernote({
                 placeholder: 'Comment',
                 height: 100,
