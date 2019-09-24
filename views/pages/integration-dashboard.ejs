@@ -10,6 +10,11 @@
     <main class="main-body-space tpd-60 bpd-100">
         <div>
             <div class=" slds-p-around_small">
+                <% if(!user.company_info.stripe_customer_id) {%>
+                    <div class="slds-card slds-p-around_small slds-m-bottom_medium">
+                        <img src="\img\integration.png" alt="Upgrade to enable integration">
+                    </div>
+                <% } else { %>
                 <!-- Integrations header start end -->
                 <div class="slds-card slds-p-around_small slds-m-bottom_medium">
                     <div class="slds-grid slds-wrap">
@@ -148,7 +153,7 @@
                     </ul>
                 </div>
                 <!-- list end -->
-
+                <% } %>
             </div>
         </div>
         <% include ../modals/modal-quickbook-setting %>

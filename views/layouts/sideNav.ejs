@@ -94,16 +94,11 @@
 			<ul>
 				<% for(var i=0; i<user.pages.length; i++) { %>
           <% if(user.pages[i].url == '/integration-dashboard'){ %>
-            <% if(user.company_info.stripe_customer_id){ %>
-              <li class="slds-nav-vertical__item" id="integration-dashboard">
-            <% } else{ %>
-  					       <li class="slds-nav-vertical__item hide" id="integration-dashboard">
-            <% } %>
-
+			<li class="slds-nav-vertical__item" id="integration-dashboard">
           <% } else{ %>
 					       <li class="slds-nav-vertical__item">
-          <% } %>
-						<a href="<%=user.pages[i].url %>#default" class="slds-nav-vertical__action" onclick=<%=user.pages[i].onclick %>>
+		  <% } %>
+				<a href="<%=user.pages[i].url %>#default" class="slds-nav-vertical__action" onclick=<%=user.pages[i].onclick %>>
 							<div class="slds-grid">
 								<div class="slds-no-flex rpd-10">
 								<% if(user.pages[i].url == '/org-listing'){ %>
@@ -131,14 +126,25 @@
 									<i class="fa fa-wrench text-blue fa-fw"></i>
 
 								<% } %>
-                <% if(user.pages[i].url == '/integration-dashboard'){ %>
+								<% if(user.pages[i].url == '/integration-dashboard'){ if(!user.company_info.stripe_customer_id){%>
+									<i class="fa fa-puzzle-piece text-grey fa-fw"></i>
+									</div>
+									<div class="slds-has-flexi-truncate side-nav-text">
+										Upgrade account to integrate
+									</div>
+									<% }else{ %>
 									<i class="fa fa-puzzle-piece text-blue fa-fw"></i>
-
+									</div>
+									<div class="slds-has-flexi-truncate side-nav-text">
+											<%=user.pages[i].label %>
+									</div>
+									<% } %>
+								<% } else{ %>
+									</div>
+									<div class="slds-has-flexi-truncate side-nav-text">
+										<%=user.pages[i].label %>
+									</div>
 								<% } %>
-								</div>
-								<div class="slds-has-flexi-truncate side-nav-text">
-									<%=user.pages[i].label %>
-								</div>
 							</div>
 						</a>
 					</li>

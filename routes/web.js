@@ -266,11 +266,7 @@ module.exports = function(app) {
 
     app.get('/integration-dashboard', passportConfig.isAuthenticated,roleConfig.permit, roleConfig.nocache, function(req, res) {
         // res.render('pages/integration-dashboard');
-        if(req.user.company_info.stripe_customer_id){
           stripeController.getIntegrationDashboard(req, res);
-        }else{
-          res.redirect('/');
-        }
     });
 
 

@@ -162,11 +162,19 @@
                                             Tasks (<%= taskTotalCount %>)
                                         </a>
                                     </li>
+                                    <% if(user.company_info.stripe_customer_id){ %>
                                     <li data-navigation="activity" class="slds-tabs_default__item" onclick="openTab(this, 'task-forums')">
                                         <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="0">
                                             Activity (<%= projectConversationThread.length %>)
                                         </a>
                                     </li>
+                                    <% } else { %>
+                                        <li data-navigation="activity" class="slds-tabs_default__item" onclick="openTab(this,'activity-preview')">
+                                            <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="0">
+                                                Upgrade account to unlock activity
+                                            </a>
+                                        </li>
+                                    <% } %>
                                     <!-- <li class="slds-tabs_default__item" onclick="openTab(this, 'project-files')">
                                         <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="-1">
                                             Files (3)
@@ -978,6 +986,15 @@
                             <!-- settings tab end -->
 
                             <!-- task-forums tab start -->
+                            <div class="slds-tabs_default__content hide" target-tab="activity-preview">
+                                <div class=" slds-card bmr-15" id="newConversationSection">
+                                    <div class="slds-p-around_small">
+                                        <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                            <img src="\img\activity.png">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="slds-tabs_default__content hide" target-tab="task-forums">
 
                                 <!-- conversation form start -->
