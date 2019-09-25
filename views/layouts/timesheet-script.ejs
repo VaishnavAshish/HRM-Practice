@@ -1447,7 +1447,7 @@
         for (let i = 0; i < 7; i++) {
             inpt += `<div class="slds-col hpd-2">
                         <div class="slds-form-element__control text-center">
-                            <input type="text" class="slds-input hpd-2 text-center time-hhmm" placeholder="0:00" onchange="isDataModified(this);" onblur="formateTime(this);" week_start_date=`+dateFormat(moment.tz(weekStartDate, companyDefaultTimezone).format())+` pr_id=`+formData.project_id+` task_id=`+formData.task_id+` index=`+i+` pr_name='`+formData.project_name+`' task_name='`+formData.task_name+`' user_role='`+formData.user_role+`'
+                            <input type="text" class="slds-input hpd-2 text-center time-hhmm" placeholder="0:00" onchange="isDataModified(this);" onfocusout="formateTime(this);" week_start_date=`+dateFormat(moment.tz(weekStartDate, companyDefaultTimezone).format())+` pr_id=`+formData.project_id+` task_id=`+formData.task_id+` index=`+i+` pr_name='`+formData.project_name+`' task_name='`+formData.task_name+`' user_role='`+formData.user_role+`'
                             billable='`+formData.timesheet_category+`' added>
                         </div>
                     </div>`;
