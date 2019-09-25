@@ -94,61 +94,49 @@
 			<ul>
 				<% for(var i=0; i<user.pages.length; i++) { %>
           <% if(user.pages[i].url == '/integration-dashboard'){ %>
-			<li class="slds-nav-vertical__item" id="integration-dashboard">
-          <% } else{ %>
+			         <li class="slds-nav-vertical__item" id="integration-dashboard">
+          <% } else  { %>
 					       <li class="slds-nav-vertical__item">
-		  <% } %>
-				<a href="<%=user.pages[i].url %>#default" class="slds-nav-vertical__action" onclick=<%=user.pages[i].onclick %>>
-							<div class="slds-grid">
-								<div class="slds-no-flex rpd-10">
-								<% if(user.pages[i].url == '/org-listing'){ %>
-									<i class="fa fa-building text-blue fa-fw"></i>
-								<% } %>
-								<% if(user.pages[i].url == '/accounts-listing'){ %>
-									<i class="fa fa-user-tie text-blue fa-fw"></i>
-								<% } %>
-								<% if(user.pages[i].url == '/resources-listing'){ %>
-									<i class="fa fa-users text-blue fa-fw"></i>
-								<% } %>
-								<% if(user.pages[i].url == '/projects-listing'){ %>
-									<i class="fa fa-folder-open text-blue fa-fw"></i>
-								<% } %>
-								<% if(user.pages[i].url == '/timesheet/'+user.id){ %>
-									<i class="fa fa-clock text-blue fa-fw"></i>
-								<% } %>
-								<% if(user.pages[i].url == '/expenses-listing/'+user.id){ %>
-									<i class="fa fa-dollar-sign text-blue fa-fw"></i>
-								<% } %>
-								<% if(user.pages[i].url == '/invoices-listing'){ %>
-									<i class="fa fa-receipt text-blue fa-fw"></i>
-								<% } %>
-								<% if(user.pages[i].url == '/org-settings'){ %>
-									<i class="fa fa-wrench text-blue fa-fw"></i>
+           <% } %>
+           <a href="<%=user.pages[i].url %>#default" class="slds-nav-vertical__action" onclick=<%=user.pages[i].onclick %>>
+             <div class="slds-grid">
+               <div class="slds-no-flex rpd-10">
+               <% if(user.pages[i].url == '/org-listing'){ %>
+                 <i class="fa fa-building text-blue fa-fw"></i>
+               <% } %>
+               <% if(user.pages[i].url == '/accounts-listing'){ %>
+                 <i class="fa fa-user-tie text-blue fa-fw"></i>
+               <% } %>
+               <% if(user.pages[i].url == '/resources-listing'){ %>
+                 <i class="fa fa-users text-blue fa-fw"></i>
+               <% } %>
+               <% if(user.pages[i].url == '/projects-listing'){ %>
+                 <i class="fa fa-folder-open text-blue fa-fw"></i>
+               <% } %>
+               <% if(user.pages[i].url == '/timesheet/'+user.id){ %>
+                 <i class="fa fa-clock text-blue fa-fw"></i>
+               <% } %>
+               <% if(user.pages[i].url == '/expenses-listing/'+user.id){ %>
+                 <i class="fa fa-dollar-sign text-blue fa-fw"></i>
+               <% } %>
+               <% if(user.pages[i].url == '/invoices-listing'){ %>
+                 <i class="fa fa-receipt text-blue fa-fw"></i>
+               <% } %>
+               <% if(user.pages[i].url == '/org-settings'){ %>
+                 <i class="fa fa-wrench text-blue fa-fw"></i>
 
-								<% } %>
-								<% if(user.pages[i].url == '/integration-dashboard'){ if(!user.company_info.stripe_customer_id){%>
-									<i class="fa fa-puzzle-piece text-grey fa-fw"></i>
-									</div>
-									<div class="slds-has-flexi-truncate side-nav-text">
-										Upgrade account to integrate
-									</div>
-									<% }else{ %>
-									<i class="fa fa-puzzle-piece text-blue fa-fw"></i>
-									</div>
-									<div class="slds-has-flexi-truncate side-nav-text">
-											<%=user.pages[i].label %>
-									</div>
-									<% } %>
-								<% } else{ %>
-									</div>
-									<div class="slds-has-flexi-truncate side-nav-text">
-										<%=user.pages[i].label %>
-									</div>
-								<% } %>
-							</div>
-						</a>
-					</li>
-				<% } %>
+               <% } %>
+               <% if(user.pages[i].url == '/integration-dashboard'){ %>
+                 <i class="fa fa-puzzle-piece text-blue fa-fw"></i>
+               <% } %>
+               </div>
+               <div class="slds-has-flexi-truncate side-nav-text">
+                 <%=user.pages[i].label %>
+               </div>
+             </div>
+           </a>
+         </li>
+       <% } %>
 
 				<!-- <li class="slds-nav-vertical__item">
 					<a href="javascript:void(0);" class="slds-nav-vertical__action" onclick="openModal('#modalOrgSettings');">

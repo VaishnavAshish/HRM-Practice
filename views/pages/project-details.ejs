@@ -162,19 +162,12 @@
                                             Tasks (<%= taskTotalCount %>)
                                         </a>
                                     </li>
-                                    <% if(user.company_info.stripe_customer_id){ %>
+
                                     <li data-navigation="activity" class="slds-tabs_default__item" onclick="openTab(this, 'task-forums')">
                                         <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="0">
                                             Activity (<%= projectConversationThread.length %>)
                                         </a>
                                     </li>
-                                    <% } else { %>
-                                        <li data-navigation="activity" class="slds-tabs_default__item" onclick="openTab(this,'activity-preview')">
-                                            <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="0">
-                                                Upgrade account to unlock activity
-                                            </a>
-                                        </li>
-                                    <% } %>
                                     <!-- <li class="slds-tabs_default__item" onclick="openTab(this, 'project-files')">
                                         <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="-1">
                                             Files (3)
@@ -986,7 +979,7 @@
                             <!-- settings tab end -->
 
                             <!-- task-forums tab start -->
-                            <div class="slds-tabs_default__content hide" target-tab="activity-preview">
+                            <!-- <div class="slds-tabs_default__content hide" target-tab="activity-preview">
                                 <div class=" slds-card bmr-15" id="newConversationSection">
                                     <div class="slds-p-around_small">
                                         <div class="slds-grid slds-wrap slds-grid_pull-padded">
@@ -994,40 +987,47 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="slds-tabs_default__content hide" target-tab="task-forums">
 
                                 <!-- conversation form start -->
                                 <div class=" slds-card bmr-15" id="newConversationSection">
                                     <div class="slds-p-around_small">
-                                        <div class="slds-grid slds-wrap slds-grid_pull-padded">
-                                            <div class="slds-size_1-of-1 slds-medium-size_10-of-12  slds-p-horizontal_small">
-                                                <div>
-                                                    <div class="slds-form-element ">
-                                                        <label class="slds-form-element__label" for="">New Conversation</label>
-                                                        <div class="slds-form-element__control">
-                                                            <textarea id="newConversationTitle" class="slds-textarea" required=""  placeholder="" rows="1" reset="value"></textarea>
-                                                            <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+                                      <% if(user.company_info.stripe_customer_id){ %>
+                                          <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                              <div class="slds-size_1-of-1 slds-medium-size_10-of-12  slds-p-horizontal_small">
+                                                  <div>
+                                                      <div class="slds-form-element ">
+                                                          <label class="slds-form-element__label" for="">New Conversation</label>
+                                                          <div class="slds-form-element__control">
+                                                              <textarea id="newConversationTitle" class="slds-textarea" required=""  placeholder="" rows="1" reset="value"></textarea>
+                                                              <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
 
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="slds-size_1-of-1 slds-medium-size_2-of-12 slds-p-horizontal_small">
-                                                <div class="">
-                                                     <label class="slds-form-element__label sm-hide" for="">&nbsp;</label>
-                                                    <button class="slds-button slds-button_brand slds-align-top w-full" onclick="createNewConversationThread()">
-                                                        <i class="fa fa-plus"></i>
-                                                        <span class="">Create</span>
-                                                    </button>
-                                                </div>
-                                            </div>
+                                                              </div>
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                              <div class="slds-size_1-of-1 slds-medium-size_2-of-12 slds-p-horizontal_small">
+                                                  <div class="">
+                                                       <label class="slds-form-element__label sm-hide" for="">&nbsp;</label>
+                                                      <button class="slds-button slds-button_brand slds-align-top w-full" onclick="createNewConversationThread()">
+                                                          <i class="fa fa-plus"></i>
+                                                          <span class="">Create</span>
+                                                      </button>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      <% } else { %>
+                                        <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                                            <img src="\img\activity.png">
                                         </div>
+                                      <% } %>
                                     </div>
                                 </div>
                                  <!-- conversation form end -->
-
+                             <% console.log('user.company_info.stripe_customer_id in ejs '+ user.company_info.stripe_customer_id ) %>
+                             <% if(!(user.company_info.stripe_customer_id == null)){ %>
                                 <div class="bpd-50" id="converWrapper">
 
                                   <% if(projectConversationThread.length > 0) { %>
@@ -1306,6 +1306,7 @@
                                     <% } %>
 
                                 </div>
+                            <% } %>
                             </div>
                             <!-- task-forums tab end -->
 

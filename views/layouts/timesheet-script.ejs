@@ -1447,7 +1447,7 @@
         for (let i = 0; i < 7; i++) {
             inpt += `<div class="slds-col hpd-2">
                         <div class="slds-form-element__control text-center">
-                            <input type="text" maxlength="5"  autocomplete="off" class="slds-input hpd-2 text-center" placeholder="0:00" onchange="isDataModified(this);" onblur="formateTime(this);" week_start_date=`+dateFormat(moment.tz(weekStartDate, companyDefaultTimezone).format())+` pr_id=`+formData.project_id+` task_id=`+formData.task_id+` index=`+i+` pr_name='`+formData.project_name+`' task_name='`+formData.task_name+`' user_role='`+formData.user_role+`'
+                            <input type="text" class="slds-input hpd-2 text-center" placeholder="0:00" onchange="isDataModified(this);" onblur="formateTime(this);" week_start_date=`+dateFormat(moment.tz(weekStartDate, companyDefaultTimezone).format())+` pr_id=`+formData.project_id+` task_id=`+formData.task_id+` index=`+i+` pr_name='`+formData.project_name+`' task_name='`+formData.task_name+`' user_role='`+formData.user_role+`'
                             billable='`+formData.timesheet_category+`' added>
                         </div>
                     </div>`;
@@ -1486,7 +1486,6 @@
         $('#week-timesheet-ul').append(row);
         closeModal(modalId);
         $("button[saveWeeklyTimesheet]").removeAttr('disabled');
-        initTimeHHMM();
    }
 
 
@@ -1932,23 +1931,15 @@
         var currVal = $(ele).val();
         if(currVal != '') {
             if(!currVal.includes('.') && !currVal.includes(':')) {
-                if(currVal<25 && currVal>-1)
-                    $(ele).val(currVal+":00");
-                else
-                    $(ele).val("");
+                $(ele).val(currVal+":00");
             } else {
                 var valArr = currVal.includes('.') ? currVal.split('.') : currVal.split(':');
-                if(valArr[0]<25 && valArr[0]>-1 && valArr[1]<60 && valArr[1]>-1){
-                    if(valArr[1].length<2)
-                        $(ele).val(valArr[0]+":0"+valArr[1]);
-                    else
-                        $(ele).val(valArr[0]+":"+valArr[1]);
-                } else if(valArr[1].length < 2 && valArr[1]<60) {
+                if(valArr[1].length < 2) {
                     $(ele).val(valArr[0]+":"+valArr[1]+"0");
-                } else if(valArr[1].length > 2 && valArr[1].substring(0,2)<60) {
+                } else if(valArr[1].length > 2) {
                     $(ele).val(valArr[0]+":"+valArr[1].substring(0,2));
                 } else {
-                    $(ele).val("");
+                    $(ele).val(valArr[0]+":"+valArr[1]);
                 }
             }
             calculateTotalHours(ele);
