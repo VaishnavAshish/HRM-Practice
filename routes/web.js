@@ -163,10 +163,6 @@ module.exports = function(app) {
     app.get('/generatePdfFromHtml/:invoiceId', passportConfig.isAuthenticated,invoiceController.generatePdfFromHtml);
     app.post('/sendInvoiceEmail', passportConfig.isAuthenticated,invoiceController.sendInvoiceEmail);
 
-
-
-
-
     //filter on page url
     app.post('/findAccountByCriteria', passportConfig.isAuthenticated,accountController.findAccountByCriteria);
     app.post('/findResourceByCriteria', passportConfig.isAuthenticated,resourceController.findResourceByCriteria);
@@ -201,6 +197,8 @@ module.exports = function(app) {
     app.post('/checkAndCreateProjectAssignment', passportConfig.isAuthenticated, projectController.checkAndCreateProjectAssignment);
     app.get('/generateProjectCsv', passportConfig.isAuthenticated, projectController.generateProjectCsv);
     app.get('/generateProjectDetailCsv/:projectId', passportConfig.isAuthenticated, projectController.generateProjectDetailCsv);
+
+    app.post('/updateTaskSortOrder', passportConfig.isAuthenticated, projectController.updateTaskSortOrder);
 
 
     app.post('/addProjectResource', passportConfig.isAuthenticated, projectResourceController.postAddProjectRes);

@@ -1352,19 +1352,19 @@
         				url : '/updateTaskSortOrder',
         				contentType: 'application/json',
         				dataType: 'json',
-        				data:JSON.stringify({project_id:<%= project.id %>,dropTaskId:droppedTaskId,targetContainerId:targetContainerId,prevSortOrder:<%= project.task_sort_order %>}),
+        				data:JSON.stringify({project_id:"<%= project.id %>",dropTaskId:droppedTaskId,targetContainerId:targetContainerId,prevSortOrder:"<%= project.task_sort_order %>"}),
         				success : function(response){
         					if(response.success){
         							hideLoader('#globalLoader');
-        							closeModal(modalId);
+        							//closeModal(modalId);
         							showGlobalToast('#globalToast', 'success', response.message, 4000);
-        							location.reload();
+        							//setTimeout(location.reload(),5000);
         					}
-        					},
+      					},
         				error: function(response){
         						console.log('error is : '+JSON.stringify(response));
         						hideLoader('#globalLoader');
-        						closeModal(modalId);
+        						//closeModal(modalId);
         						showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
         					}
         				});

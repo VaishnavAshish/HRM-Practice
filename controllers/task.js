@@ -226,7 +226,7 @@ exports.postAddTask = (req, res) => {
                     reqData.project_id = req.body.projectId;
                     console.log('req.body.taskData.assigned_user')
                     console.log(req.body.taskData.assigned_user)
-                    
+
                     if(req.body.taskData.assigned_user) {
                       commonController.createTaskAssignment(req, client, err, done, result, req.body.taskData.res_bill_rate, req.body.taskData.res_cost_rate, reqData, res, function (result2) {
                          if(result2) {
@@ -312,12 +312,21 @@ exports.postAddTask = (req, res) => {
 };
 
 function createTaskRecord(req, client, err, done, taskData, res, callback) {
+
   client.query('Insert INTO TASK (project_id, name, start_date, end_date, estimated_hours, description, company_id, percent_completed, status, billable,project_name, assigned_user_id) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING id', [req.body.projectId, req.body.taskData.task_name, req.body.taskData.start_date, req.body.taskData.due_date, req.body.taskData.estimate_hours, req.body.taskData.task_desc, req.user.company_id, 0, 'Not Started', req.body.taskData.billable, req.body.projectName,taskData.assigned_user_id], function (err, insertedTask) {
     if(err) {
       handleResponse.shouldAbort(err, client, done);
       handleResponse.handleError(res, err, ' Error in adding task to the database');
     } else {
-      return callback(insertedTask.rows[0].id);
+      client.query('UPDATE Project p SET task_sort_order = (CASE WHEN task_sort_order IS NULL THEN $1 ELSE p.task_sort_order || $2 END)',[insertedTask.rows[0].id,','+insertedTask.rows[0].id], function (err, updatedProjectWithSortOrder) {
+        if(err) {
+          handleResponse.shouldAbort(err, client, done);
+          handleResponse.handleError(res, err, ' Error in adding updating task sort order to the database');
+        } else {
+          return callback(insertedTask.rows[0].id);
+        }
+      });
+      //return callback(insertedTask.rows[0].id);
     }
   });
 }

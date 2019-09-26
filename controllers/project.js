@@ -191,6 +191,65 @@ exports.generateProjectCsv = (req, res) => {
 
 }
 
+exports.updateTaskSortOrder = (req,res) => {
+  pool.connect((err, client, done) => {
+    client.query('BEGIN', (err) => {
+      if (err){
+        handleResponse.shouldAbort(err, client, done);
+        handleResponse.handleError(res, err, ' error in connecting to database');
+      } else {
+        // client.query('SELECT p.id ,p.name,p.task_sort_order ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id FROM PROJECT p where id=$1 AND company_id=$2', [req.body.projectId, req.user.company_id], function (err, project) {
+        //   if (err) {
+        //     console.error(err);
+        //     handleResponse.shouldAbort(err, client, done);
+        //     handleResponse.handleError(res, err, ' Error in finding project data');
+        //   } else {
+        //     console.log(project.rows[0].task_sort_order);
+            let prevSortOrder = req.body.prevSortOrder;
+            let dropTaskId = req.body.dropTaskId;
+            let targetContainerId = req.body.targetContainerId;
+            let newTaskSortOrder = ``;
+
+            let afterString = prevSortOrder.substring(prevSortOrder.indexOf(dropTaskId)+dropTaskId.length+1)
+            let previousString = prevSortOrder.substring(0,prevSortOrder.indexOf(dropTaskId)-1)
+            let finalSortString = (previousString!=""&&afterString!=""?(previousString+','+afterString):(previousString+afterString))
+            if(targetContainerId == null){
+                newTaskSortOrder = finalSortString+','+dropTaskId;
+            }else{
+                newTaskSortOrder = finalSortString.substring(0,finalSortString.indexOf(targetContainerId))+dropTaskId+','+finalSortString.substring(finalSortString.indexOf(targetContainerId))
+            }
+            console.log('------newTaskSortOrder--------');
+            console.log(newTaskSortOrder);
+            client.query('UPDATE PROJECT SET task_sort_order=$1 WHERE id=$2 AND company_id=$3 RETURNING *', [newTaskSortOrder,req.body.project_id, req.user.company_id], function (err, updatedProjectSortOrder) {
+              // console.log('Error >>>>>>>>>>>>>');
+              // console.log(err);
+              if (err) {
+                console.error(err);
+                handleResponse.shouldAbort(err, client, done);
+                handleResponse.handleError(res, err, ' Error in updating task sort order');
+              } else {
+                client.query('COMMIT', (err) => {
+                  if (err) {
+                    // console.log('Error committing transaction', err.stack)
+                    handleResponse.shouldAbort(err, client, done);
+                    handleResponse.handleError(res, err, ' Error in committing transaction');
+                  } else {
+                    done();
+                    console.log('Updated project >>>>>>>>>>>>>');
+                    console.log(updatedProjectSortOrder.rows[0]);
+                    handleResponse.sendSuccess(res,'Task sort order updated successfully.',{});
+                    /*res.status(200).json({ "success": true, "message": "success" });*/
+                  }
+                })
+              }
+            });
+        //   }
+        // })
+      }
+    })
+  });
+}
+
 exports.findProjectByCriteria = (req, res) => {
   // console.log("findProjectByCriteria----------------------------------"+req.body.searchField);
   setting.getCompanySetting(req, res ,(err,result)=>{
@@ -738,6 +797,8 @@ exports.getProjectDetail = (req, res) => {
                         project.rows[0]["total_invoice_time"] = minuteToHours(project.rows[0]["total_invoice_time"]);
 
                         let taskTotalCount=0;
+                        let projectTaskSortOrder = project.rows[0].task_sort_order?project.rows[0].task_sort_order.split(','):[];
+                        let taskSortedArr = [];
                         if(taskList.rows.length>0){
                             taskList.rows.forEach(function (data) {
                               let startDateFormatted = '';
@@ -752,9 +813,9 @@ exports.getProjectDetail = (req, res) => {
                               }
                               data["startDateFormatted"] = startDateFormatted;
                               data["endDateFormatted"] = endDateFormatted;
-                              console.log('task assignment detail')
-                              console.log(data.id)
-                              console.log(data.assigned_user_id)
+                              // console.log('task assignment detail')
+                              // console.log(data.id)
+                              // console.log(data.assigned_user_id)
                               data["user_id"]='';
                               data["user_role"]='';
                               data["user_email"]='';
@@ -787,8 +848,17 @@ exports.getProjectDetail = (req, res) => {
                                   }
                                 })
                               }
+                              //Set Task According To Sort Order
+                              if(projectTaskSortOrder.length > 0){
+                                  taskSortedArr[(projectTaskSortOrder.indexOf(data.id))] = data
+                              } else {
+                                  taskSortedArr.push(data);
+                              }
+
                             });
                             taskTotalCount=taskList.rows[0].total;
+
+
                             // let percent_completed = 0;
                             // if (taskTotalCount > 0) {
                             //   percent_completed = parseInt((parseInt(project.rows[0].total_completed_task_count) / parseInt(taskTotalCount)) * 100);
@@ -804,6 +874,8 @@ exports.getProjectDetail = (req, res) => {
                             //   })
                             // }
                         }
+                        console.log('sorted task array')
+                        console.log(taskSortedArr);
                         client.query('SELECT * FROM ACCOUNT where company_id=$1 AND archived=$2', [req.user.company_id, false], function (err, accountList) {
                           if (err) {
                             console.error(err);
@@ -854,7 +926,7 @@ exports.getProjectDetail = (req, res) => {
                                               // console.log('projectConversationThread')
                                               // console.log(projectConversationThread.rows)
                                               done();
-                                              handleResponse.responseToPage(res,'pages/project-details',{ project: project.rows[0], userRoleList:userRole ,tasks: taskList.rows, accounts: accountList.rows, userList: userList.rows, user: req.user, resUsers: resUsers.rows ,taskTotalCount:taskTotalCount,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD'),stripeCustomerId:result.stripe_customer_id,"projectConversationThread":projectConversationThread.rows },"success","Successfully rendered");
+                                              handleResponse.responseToPage(res,'pages/project-details',{ project: project.rows[0], userRoleList:userRole ,tasks: taskSortedArr, accounts: accountList.rows, userList: userList.rows, user: req.user, resUsers: resUsers.rows ,taskTotalCount:taskTotalCount,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD'),stripeCustomerId:result.stripe_customer_id,"projectConversationThread":projectConversationThread.rows },"success","Successfully rendered");
                                               /*res.render('pages/project-details', { project: project.rows[0], tasks: taskList.rows, accounts: accountList.rows, userList: userList.rows, user: req.user, error: err, resUsers: resUsers.rows });*/
                                             }
                                           })

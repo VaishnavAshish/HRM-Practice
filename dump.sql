@@ -1223,3 +1223,7 @@ ALTER TABLE setting add COLUMN tax_category character varying(255)[] DEFAULT ARR
 alter table expense add column tax_percent integer;
 alter table invoice add column tax_category character varying(256);
 UPDATE setting set tax_category = '{GST}';
+
+--2019-09-26
+ALTER TABLE project add column task_sort_order character varying(65525);
+UPDATE Project p set task_sort_order = (select string_agg(CAST(id as varchar), ',') from task t where project_id= p.id)
