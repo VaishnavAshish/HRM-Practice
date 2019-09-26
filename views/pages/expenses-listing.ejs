@@ -236,6 +236,9 @@
                                                             <% if(expense.project_archived) { %>
                                                                 <span class="text-uppercase text-red">
                                                                 Project Archived
+                                                            <% } else if(expense.project_status=='Completed') { %>
+                                                                <span class="text-uppercase text-green">
+                                                                Project Completed
                                                             <% } else if(expense.invoiced) { %>
                                                                 <span class="text-uppercase text-green">
                                                                 Invoiced
@@ -308,7 +311,7 @@
                                                                         </span>
                                                                     </a>
                                                                 </li>
-                                                                <% if(!expense.project_archived) { %>
+                                                                <% if(!expense.project_archived || expense.project_status!='Completed') { %>
                                                                   <% if(user.permissions.indexOf('expenseApprover')==-1) { %>
                                                                     <% if(!expense.submitted) { %>
                                                                       <li class="slds-has-divider_top-space" role="separator"></li>
@@ -382,6 +385,9 @@
                                                           <% if(expense.project_archived) { %>
                                                               <div class="slds-badge slds-badge_inverse view-inline  bg-red">    Status: Project Archived
                                                               </div>
+                                                          <% } else if(expense.project_status=='Completed') { %>
+                                                              <div class="slds-badge slds-badge_inverse view-inline  bg-red">    Status: Project Completed
+                                                              </div>
                                                           <% } else if(expense.invoiced) { %>
                                                               <div class="slds-badge slds-badge_inverse view-inline  bg-green">    Status: Invoiced
                                                               </div>
@@ -413,7 +419,7 @@
                                                                                 </span>
                                                                             </a>
                                                                         </li>
-                                                                        <% if(!expense.project_archived) { %>
+                                                                        <% if(!expense.project_archived || expense.project_status!='Completed') { %>
                                                                           <% if(user.permissions.indexOf('expenseApprover')==-1) { %>
                                                                             <% if(!expense.submitted) { %>
                                                                               <li class="slds-has-divider_top-space" role="separator"></li>

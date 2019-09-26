@@ -255,6 +255,7 @@ exports.getExpense = (req, res) => {
                                                                     project.rows.forEach(function(project) {
                                                                         if (project.id == data.project_id) {
                                                                             data["project_name"] = project.name;
+                                                                            data["project_status"] = project.status;
                                                                             data["project_archived"] = project.archived;
                                                                         }
                                                                     })

@@ -158,6 +158,7 @@ function createTimesheetWeekObj(timesheetObj,previousTaskId,currentTaskId,previo
       }
       timesheetObj.task_id=currentTaskId;
       timesheetObj.project_id=timesheetList.project_id;
+      timesheetObj.project_status=timesheetList.project_status;
       timesheetObj.week_start_date = week_start_date;
       // timesheetObj.created_date = adjustDaysForDate(week_start_date,'ADD',timesheetList.week_day);
       // timesheetObj.created_date=timesheetList.created_date;
@@ -322,6 +323,7 @@ function getTimesheetForDay(timesheetList,currentDateTime) {
       subObjDay.total_work_hours = minuteToHours(tsData[i].total_work_hours);
       subObjDay.project_id = tsData[i].project_id;
       subObjDay.project_name = tsData[i].project_name;
+      subObjDay.project_status = tsData[i].project_status;
       subObjDay.project_archived = tsData[i].project_archived;
       subObjDay.description = tsData[i].description;
       subObjDay.invoiced = tsData[i].invoiced;
@@ -360,6 +362,7 @@ function getTimesheetForDay(timesheetList,currentDateTime) {
       }
       subObjDay.total_work_hours = minuteToHours(tsData[i].total_work_hours);
       subObjDay.project_id = tsData[i].project_id;
+      subObjDay.project_status = tsData[i].project_status;
       subObjDay.project_name = tsData[i].project_name;
       subObjDay.project_archived = tsData[i].project_archived;
       subObjDay.description = tsData[i].description;
@@ -499,6 +502,7 @@ exports.getTimesheet = (req, res) => {
                             let pro=projectList.rows.filter(pList => pList.id == tsProject.project_id);
                             if(pro.length>0){
                               tsProject.project_name = pro[0].name;
+                              tsProject.project_status = pro[0].status;
                               tsProject.project_archived = pro[0].archived;
                             }
                           });
@@ -536,6 +540,7 @@ exports.getTimesheet = (req, res) => {
                                   let pro=projectList.rows.filter(pList => pList.id == tsProject.project_id);
                                   if(pro.length>0){
                                     tsProject.project_name = pro[0].name;
+                                    tsProject.project_status = pro[0].status;
                                     //tsProject.project_archived = pro[0].archived;
                                   }
                                   let tas=timesheetListByDate.rows.filter(tLD => tLD.task_id == tsProject.task_id );
@@ -1841,7 +1846,7 @@ exports.getDayTimesheetWithTaskId = (req, res) => {
             console.log(req.user.company_id, req.body.user_id, req.body.project_id, moment.tz(req.body.created_date.split('T')[0], companyDefaultTimezone).format(), moment.tz(req.body.created_date.split('T')[0]+' 23:59:59', companyDefaultTimezone).format(), req.body.user_role);
             // console.log(req.user.company_id+' '+req.body.user_id+' '+req.body.project_id+' '+req.body.task_id+' '+moment.tz(req.body.created_date.split('T')[0], companyDefaultTimezone).format()+' '+moment.tz(req.body.created_date.split('T')[0]+' 23:59:59', companyDefaultTimezone).format()+' '+req.body.user_role);
             let queryParamArr = [req.user.company_id, req.body.user_id, req.body.project_id, moment.tz(req.body.created_date.split('T')[0], companyDefaultTimezone).format(), moment.tz(req.body.created_date.split('T')[0]+' 23:59:59', companyDefaultTimezone).format(), req.body.user_role];
-            let queryToExec = 'SELECT tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,(select name from project where id = tl.project_id) as project_name,(select archived from project where id = tl.project_id) as project_archived ,(select name from task where id = tl.task_id) as task_name ,tl.description ,tl.category ,EXTRACT(DOW FROM tl.created_date at time zone \''+companyDefaultTimezone+'\') as week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime at time zone \''+companyDefaultTimezone+'\'  as lastruntime  ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id FROM TIMESHEET_LINE_ITEM tl WHERE company_id=$1 AND resource_id=$2 AND project_id=$3 AND created_date at time zone \''+companyDefaultTimezone+'\'  BETWEEN $4 AND $5 AND user_role=$6';
+            let queryToExec = 'SELECT tl.id ,tl.resource_name ,tl.resource_id ,tl.project_id ,tl.task_id ,tl.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,tl.start_time at time zone \''+companyDefaultTimezone+'\' as start_time ,tl.end_time at time zone \''+companyDefaultTimezone+'\' as end_time ,tl.total_work_hours ,tl.company_id ,(select name from project where id = tl.project_id) as project_name,(select archived from project where id = tl.project_id) as project_archived ,(select status from project where id = tl.project_id) as project_status,(select name from task where id = tl.task_id) as task_name ,tl.description ,tl.category ,EXTRACT(DOW FROM tl.created_date at time zone \''+companyDefaultTimezone+'\') as week_day ,tl.timesheet_id ,tl.billable ,tl.submitted ,tl.isrunning ,tl.lastruntime at time zone \''+companyDefaultTimezone+'\'  as lastruntime  ,tl.user_role ,tl.invoiced ,tl.record_id ,tl.invoice_id FROM TIMESHEET_LINE_ITEM tl WHERE company_id=$1 AND resource_id=$2 AND project_id=$3 AND created_date at time zone \''+companyDefaultTimezone+'\'  BETWEEN $4 AND $5 AND user_role=$6';
             if(req.body.task_id == undefined||req.body.task_id == ""||req.body.task_id == null){
               queryToExec += ' AND task_id is null';
             }else{

@@ -1538,7 +1538,7 @@
                             }
                             console.log(row.submitted);
                             row.task_name = row.task_name?row.task_name:'';
-                            if(row.project_archived){
+                            if(row.project_archived || row.project_status=='Completed'){
                                 $("button,textarea,input","#add-record-weekly-timesheet-form").attr('disabled',true);
                                 $("[disableForArchivedProject]").attr('disabled',true);
                                 rowhtm += `<div class="line-top slds-p-around_small" row-div row-id=`+row.id+` submitted>
@@ -1586,7 +1586,7 @@
                                                     <div class="slds-grid slds-grid_vertical-align-center slds-p-top_xx-small">
                                                         <div class="slds-no-flex">
                                                             <div class="slds-has-flexi-truncate">
-                                                                <span class="text-green">${row.submitted ? 'Submitted' : ''}</span>
+                                                                <span class="text-green">${row.submitted ? 'Submitted' : row.project_status=='Completed' ? 'Project Completed' : ''}</span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1958,7 +1958,7 @@
        $.each(modifiedInputArr, function (index, val) {
            totalHours += hoursToMinutes($(val).val());
        });
-       $(ele).closest('li').find('#total-weekly-hours').html(minuteToHours(totalHours));
+       $(ele).closest('li').find('#total-weekly-hours').html(minuteToHours(totalHours)+'<small class="text-dull"> hr</small>');
    }
 
    var weekStartDate;
