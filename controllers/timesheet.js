@@ -540,7 +540,7 @@ exports.getTimesheet = (req, res) => {
                                   let pro=projectList.rows.filter(pList => pList.id == tsProject.project_id);
                                   if(pro.length>0){
                                     tsProject.project_name = pro[0].name;
-                                    tsProject.project_status = pro[0].status;
+                                    //tsProject.project_status = pro[0].status;
                                     //tsProject.project_archived = pro[0].archived;
                                   }
                                   let tas=timesheetListByDate.rows.filter(tLD => tLD.task_id == tsProject.task_id );

@@ -281,7 +281,7 @@
                                         <% if(tasks.length > 0) { %>
                                             <% tasks.forEach(function(task) {%>
                                                 <!-- row start -->
-                                                <li>
+                                                <li id="<%= task.id %>" >
                                                     <div class=" slds-m-bottom_medium slds-p-around_small line-around kw-task-item">
                                                         <div class="slds-grid slds-wrap slds-grid_pull-padded">
                                                             <div class="slds-size_1-of-1 slds-medium-size_1-of-1  slds-large-size_5-of-12 slds-p-horizontal_small">
@@ -1341,7 +1341,37 @@
               handle: '.kw-drag-handle',
               onDrop: function($item, container, _super) {
                 _super($item, container);
-                alert('yo done');
+                let droppedTaskId = $item[0].id;
+                let targetContainer = $($item).next('li')
+                let targetContainerId = null
+                if(targetContainer.length > 0) {
+                  targetContainerId = targetContainer[0].id
+                }
+                $.ajax({
+        				type: 'POST',
+        				url : '/updateTaskSortOrder',
+        				contentType: 'application/json',
+        				dataType: 'json',
+        				data:JSON.stringify({project_id:<%= project.id %>,dropTaskId:droppedTaskId,targetContainerId:targetContainerId,prevSortOrder:<%= project.task_sort_order %>}),
+        				success : function(response){
+        					if(response.success){
+        							hideLoader('#globalLoader');
+        							closeModal(modalId);
+        							showGlobalToast('#globalToast', 'success', response.message, 4000);
+        							location.reload();
+        					}
+        					},
+        				error: function(response){
+        						console.log('error is : '+JSON.stringify(response));
+        						hideLoader('#globalLoader');
+        						closeModal(modalId);
+        						showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+        					}
+        				});
+
+
+
+                // alert('yo done');
               }
         });
             /* $('#taskDescription').summernote({

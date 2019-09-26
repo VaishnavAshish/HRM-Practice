@@ -21,7 +21,7 @@ $(document).ready(function(){
     if($("[expenseSubmit]").attr("expenseSubmit")=="true"){
       disableInput($("[expenseSubmit]"));
     }
-    if(<%= expense.project_archived || expense.project_status!='Completed' %>){
+    if(<%= expense.project_archived %> || "<%= expense.project_status %>" == 'Completed'){
       disableInput($("[expenseSubmit]"));
       $('button[submitted]').attr('disabled',true);
     }

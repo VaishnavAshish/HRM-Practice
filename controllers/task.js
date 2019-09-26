@@ -226,6 +226,7 @@ exports.postAddTask = (req, res) => {
                     reqData.project_id = req.body.projectId;
                     console.log('req.body.taskData.assigned_user')
                     console.log(req.body.taskData.assigned_user)
+                    
                     if(req.body.taskData.assigned_user) {
                       commonController.createTaskAssignment(req, client, err, done, result, req.body.taskData.res_bill_rate, req.body.taskData.res_cost_rate, reqData, res, function (result2) {
                          if(result2) {

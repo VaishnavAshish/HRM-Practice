@@ -508,7 +508,7 @@
                                                                             <div class="slds-size_7-of-12  slds-p-horizontal_small">
                                                                                 <div class="slds-grid">
                                                                                     <div class="slds-no-flex slds-size_1-of-6" remove-on-other-user>
-                                                                                    <% if(!timesheetRow.project_archived) {  %>
+                                                                                    <% if(!timesheetRow.project_archived && timesheetRow.project_status!='Completed') {  %>
                                                                                         <% if(user.permissions.indexOf('timesheetApprover')==-1) { %>
                                                                                           <% if(!timesheetRow.submitted) { %>
                                                                                               <button class="slds-button slds-button_icon slds-button_icon-border-filled" title="start" start line_item_id="<%= timesheetRow.id %>"    onclick="startTimer(this);">
@@ -523,7 +523,7 @@
                                                                                               </button>
                                                                                           <% } %>
                                                                                         <% } else { %>
-                                                                                          <% if(!timesheetRow.invoiced && timesheetRow.project_status!='Completed') { %>
+                                                                                          <% if(!timesheetRow.invoiced) { %>
                                                                                               <button class="slds-button slds-button_icon slds-button_icon-border-filled" title="start" start line_item_id="<%= timesheetRow.id %>"    onclick="startTimer(this);">
                                                                                                   <span class="slds-button__icon">
                                                                                                       <i class=" fa fa-play text-blue" aria-hidden="true"></i>
@@ -553,8 +553,6 @@
                                                                                               <% } %>
                                                                                             <% if(timesheetRow.submitted) { %>
                                                                                                 <li class="slds-item text-green">Submitted</li>
-                                                                                            <% } else if(timesheetRow.project_status=='Completed') { %>
-                                                                                                <li class="slds-item text-green">Project Completed</li>
                                                                                             <% } %>
                                                                                         </ul>
                                                                                     </div>
@@ -571,7 +569,7 @@
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
-                                                                            <% if(!timesheetRow.project_archived) {  %>
+                                                                          <% if(!timesheetRow.project_archived && timesheetRow.project_status!='Completed') {  %>
                                                                                 <% if(user.permissions.indexOf('timesheetApprover')==-1) { %>
                                                                                   <% if(!timesheetRow.submitted) { %>
                                                                                       <div class="slds-size_5-of-12  slds-p-horizontal_small">
@@ -593,7 +591,7 @@
                                                                                       </div>
                                                                                   <% } %>
                                                                                 <% } else { %>
-                                                                                  <% if(!timesheetRow.invoiced && timesheetRow.project_status!='Completed') { %>
+                                                                                  <% if(!timesheetRow.invoiced) { %>
                                                                                     <div class="slds-size_5-of-12  slds-p-horizontal_small">
                                                                                         <div class="text-right" >
 

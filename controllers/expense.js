@@ -408,7 +408,7 @@ exports.getExpenseDetail = (req, res) => {
                             } else {
                                 // console.log("----------account.rows-------------");
                                 // console.log(account.rows);
-                                client.query('SELECT id,name,account_id,archived FROM PROJECT WHERE company_id=$1  AND isGlobal=$3 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)', [req.user.company_id, false, false,expense.rows[0].user_id], function(err, project) {
+                                client.query('SELECT id,name,account_id,archived,status FROM PROJECT WHERE company_id=$1  AND isGlobal=$3 AND account_id IN (SELECT id FROM ACCOUNT WHERE company_id=$1 AND archived=$2) AND id in (SELECT project_id FROM PROJECT_ASSIGNMENT WHERE company_id=$1 AND user_id=$4)', [req.user.company_id, false, false,expense.rows[0].user_id], function(err, project) {
                                     if (err) {
                                         console.log('expense user id is');
                                         console.log(expense.rows[0].user_id);
@@ -457,13 +457,17 @@ exports.getExpenseDetail = (req, res) => {
                                                     expense.rows[0]["created_date"] = created_date;
                                                     expense.rows[0]["modified_date"] = modified_date;
                                                     expense.rows[0]["expense_date"] = expense_date;
-                                                    expense.rows[0]["project_archived"] = project.rows.filter(pro => pro.id == expense.rows[0].project_id)[0].archived;
+                                                    let projectRelatedToExpense = project.rows.filter(pro => pro.id == expense.rows[0].project_id)[0];
+                                                    expense.rows[0]["project_archived"] = projectRelatedToExpense.archived;
+                                                    expense.rows[0]["project_status"] = projectRelatedToExpense.status;
 
                                                 }
                                                 console.log('expense');
                                                 console.log(expense.rows[0]);
                                                 done();
                                                 projectArr = project.rows.filter(pro => pro.archived == false);
+                                                console.log('projectArr');
+                                                console.log(projectArr);
                                                 handleResponse.responseToPage(res, 'pages/expense-details', {
                                                     expense: expense.rows[0],
                                                     accounts: account.rows,

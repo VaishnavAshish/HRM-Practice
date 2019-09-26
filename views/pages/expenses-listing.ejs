@@ -237,7 +237,7 @@
                                                                 <span class="text-uppercase text-red">
                                                                 Project Archived
                                                             <% } else if(expense.project_status=='Completed') { %>
-                                                                <span class="text-uppercase text-green">
+                                                                <span class="text-uppercase text-red">
                                                                 Project Completed
                                                             <% } else if(expense.invoiced) { %>
                                                                 <span class="text-uppercase text-green">
@@ -311,7 +311,7 @@
                                                                         </span>
                                                                     </a>
                                                                 </li>
-                                                                <% if(!expense.project_archived || expense.project_status!='Completed') { %>
+                                                              <% if(!(expense.project_archived || expense.project_status=='Completed')) { %>
                                                                   <% if(user.permissions.indexOf('expenseApprover')==-1) { %>
                                                                     <% if(!expense.submitted) { %>
                                                                       <li class="slds-has-divider_top-space" role="separator"></li>
@@ -419,7 +419,7 @@
                                                                                 </span>
                                                                             </a>
                                                                         </li>
-                                                                        <% if(!expense.project_archived || expense.project_status!='Completed') { %>
+                                                                        <% if(!(expense.project_archived || expense.project_status=='Completed')) { %>
                                                                           <% if(user.permissions.indexOf('expenseApprover')==-1) { %>
                                                                             <% if(!expense.submitted) { %>
                                                                               <li class="slds-has-divider_top-space" role="separator"></li>
