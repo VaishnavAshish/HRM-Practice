@@ -142,16 +142,22 @@
             });
         }
     }
-function loadMoreTask(){
+function loadMoreTask(isClearSearch){
     showLoader('#globalLoader');
-    let offset=$("#offset").text();
+    let offset;
+    if(isClearSearch==true){
+        offset=0;
+        $('#taskSortWrapper').html('');
+    }else{
+        offset=$("#offset").text();
+    }
     showLoader('#globalLoader');
     let searchText=$("#searchTaskName").val();
     let url = new URL(window.location.href);
     let projectId=getURLParameter("projectId");
     $.ajax({
           type: 'POST',
-          url : '/findTaskByName',
+          url : '/loadMoreTasks',
           contentType: 'application/json',
           dataType: 'json',
           data:JSON.stringify({"searchText":searchText,"searchField":"name","project_id":projectId,"offset":offset}),
@@ -162,7 +168,8 @@ function loadMoreTask(){
                     if(response.tasks.length>0){
                         /*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
                         response.tasks.forEach(function(task){
-                            setDataToCard(task);
+                            if(task)
+                                setDataToCard(task,true,isClearSearch);
                         })
                     }else{
                         $("#noTaskFound").removeClass('slds-hide').text('No task found with this search crieteria');
@@ -209,11 +216,14 @@ function findTaskByName(){
                    if(response.success){
                         hideLoader('#globalLoader');
                         console.log(response.tasks);
-                        $("#taskCardView").html('');
+                        $("#taskSortWrapper").html('');
                         if(response.tasks.length>0){
                             /*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
                             response.tasks.forEach(function(task){
-                                setDataToCard(task);
+                                if(searchText=='')
+                                    setDataToCard(task,true);
+                                else
+                                    setDataToCard(task);
                             })
                         }else{
                             $("#noTaskFound").removeClass('slds-hide').text('No task found with this search crieteria');
@@ -240,7 +250,7 @@ function findTaskByName(){
             });
 
     }
-    function setDataToCard(task){
+    function setDataToCard(task,isDraggable){
         var billable = '';
         if(task.billable) {
             billable = 'Billable';
@@ -258,10 +268,33 @@ function findTaskByName(){
         //     icon = `<i class="fa fa-check-circle text-green"></i>`;
         // }
 
-        let taskTr = `<div class=" slds-m-bottom_medium slds-p-around_small line-around">
+        let imgSrc,title;
+        if(task.user_id){
+            imgSrc = "/getUserPicture/${task.user_id}";
+            title = 'title="'+task.user_first_name;
+            if(task.user_last_name){
+                title+=" "+task.user_last_name;
+            }
+            title+='('+task.user_role+')"';
+        }else{
+            imgSrc = 'img/avatar1.jpg';
+            title = 'title="Person"';
+        }
+
+        let liOpen=liClose=kwClass=kwSpan='';
+        if(isDraggable==true){
+            liOpen='<li id="'+task.id+'" >';
+            liClose = '</li>';
+            kwClass = 'kw-task-item';
+            kwSpan = '<span class="kw-drag-handle slds-p-around_small" title="Drag & Drop to Reorder"> </span>';
+        }
+
+        let taskTr = `${liOpen}
+        <div class=" slds-m-bottom_medium slds-p-around_small line-around ${kwClass}">
         <div class="slds-grid slds-wrap slds-grid_pull-padded">
             <div class="slds-size_1-of-1 slds-medium-size_1-of-1  slds-large-size_5-of-12 slds-p-horizontal_small">
                 <div class="text-size-11 text-dull text-uppercase slds-p-bottom_xx-small">
+                    ${kwSpan}
                     `+ task.record_id +`
                     <span class="slds-badge slds-m-left_small">
                         `+ billable +`
@@ -312,7 +345,16 @@ function findTaskByName(){
 
                     <div class="slds-size_1-of-1 slds-medium-size_3-of-12 slds-p-horizontal_small sm-tpd-15">
                         <div class="slds-grid">
-
+                            <div class="slds-has-flexi-truncate">
+                                <div class="slds-truncate text-dull slds-p-bottom_xx-small text-size-11 text-uppercase">
+                                                    Assigned
+                                </div>
+                                <div>
+                                    <span class="slds-avatar slds-avatar_small slds-avatar_circle cursor-pointer">
+                                        <img alt="Person name" src="${imgSrc}" ${title}>    
+                                        </span>
+                                </div>
+                            </div>
                             <div class="slds-col--bump-left slds-p-left_x-small">
                                 <a href="/task-details?taskId=`+ task.id +`" class="slds-button slds-button_icon" title="Edit">
                                     <i class="fa fa-edit text-blue fs-lg text-size-18"></i>
@@ -323,17 +365,10 @@ function findTaskByName(){
                 </div>
             </div>
         </div>
-    </div>`;
-    // <div class="slds-has-flexi-truncate">
-    //     <div class="slds-truncate text-dull slds-p-bottom_xx-small text-size-11 text-uppercase">
-    //         Assign To
-    //     </div>
-    //     <div>
-    //         <span class="slds-avatar slds-avatar_small slds-avatar_circle cursor-pointer">
-    //             <img alt="Person name" src="img/avatar1.jpg" title="`+ task.user_email +`">
-    //         </span>
-    //     </div>
-    // </div>
-        $("#taskCardView").append(taskTr);
+    </div>
+    ${liClose}`;
+        $("#taskSortWrapper").append(taskTr);
+        if(isDraggable==true)
+            bindTaskDragEventListner();
     }
 </script>

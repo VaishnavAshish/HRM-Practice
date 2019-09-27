@@ -13,7 +13,45 @@
         $('#project_type').val(type);
         $('#account').val('<%= project.account_id %>');
         console.log(status+' '+projectName);
+        bindTaskDragEventListner();
     });
+
+    function bindTaskDragEventListner() {
+        $("#taskSortWrapper").sortable({
+            handle: '.kw-drag-handle',
+            onDrop: function ($item, container, _super) {
+                _super($item, container);
+                let droppedTaskId = $item[0].id;
+                let targetContainer = $($item).next('li')
+                let targetContainerId = null
+                if (targetContainer.length > 0) {
+                    targetContainerId = targetContainer[0].id
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/updateTaskSortOrder',
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    data: JSON.stringify({ project_id: "<%= project.id %>", dropTaskId: droppedTaskId, targetContainerId: targetContainerId, prevSortOrder: "<%= project.task_sort_order %>" }),
+                    success: function (response) {
+                        if (response.success) {
+                            hideLoader('#globalLoader');
+                            //closeModal(modalId);
+                            showGlobalToast('#globalToast', 'success', response.message, 4000);
+                            //setTimeout(location.reload(),5000);
+                        }
+                    },
+                    error: function (response) {
+                        console.log('error is : ' + JSON.stringify(response));
+                        hideLoader('#globalLoader');
+                        //closeModal(modalId);
+                        showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+                    }
+                });
+            }
+        });
+    }
+
     function setBillCostRate(ele, fromModal){
         var billRate = 0.0;
         var costRate = 0.0;
@@ -199,6 +237,5 @@
             }
         });
     }
-
     </script>
 </script>
