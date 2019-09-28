@@ -859,7 +859,10 @@ exports.getProjectDetail = (req, res) => {
                               }
                               taskSortedArr.push(data);
                             });
-                            taskTotalCount=project.rows[0].total_task_count;
+                            let taskTotalCount=0;
+                            if(project.rows[0].total_task_count){
+                              taskTotalCount=project.rows[0].total_task_count;
+                            }
                             console.log('taskTotalCount')
                             console.log(taskTotalCount)
 
