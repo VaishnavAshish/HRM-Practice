@@ -772,7 +772,7 @@ exports.getProjectDetail = (req, res) => {
                     console.log(project.rows[0]);
                     // console.log('queryToExec in project details: SELECT t.*,(select count(*) from TASK where company_id=$1 AND project_id=$2 AND archived=$3) as total FROM TASK t where company_id=$1 AND project_id=$2 AND archived=$3 ORDER BY project_id,name OFFSET 0 LIMIT '+process.env.PAGE_RECORD_NO+' '+req.user.company_id+' '+ req.query.projectId+' '+ false);
                     // client.query('SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date ,t.updated_date ,t.archived ,t.project_name ,t.record_id ,(select count(*) from TASK where company_id=$1 AND project_id=$2 AND archived=$3) as total FROM TASK t where company_id=$1 AND project_id=$2 AND archived=$3 ORDER BY id,project_id,start_date DESC,name LIMIT '+process.env.PAGE_RECORD_NO+' OFFSET 0', [req.user.company_id, req.query.projectId, false], function (err, taskList) {
-                    let requiredTasks = ``;
+                    let requiredTasks = null;
                     console.log(project.rows[0].task_sort_order);
                     if(project.rows[0].task_sort_order){
                       requiredTasks= project.rows[0].task_sort_order.substring(0,project.rows[0].task_sort_order.split(',',process.env.PAGE_RECORD_NO).join(',').length);
@@ -782,8 +782,12 @@ exports.getProjectDetail = (req, res) => {
                       FROM TASK t 
                       where id in (${requiredTasks}) 
                       ORDER BY position(id::text in '${requiredTasks}')`;
+                    if(requiredTasks!=null){
+                      qry='SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date ,t.updated_date ,t.archived ,t.project_name ,t.record_id FROM TASK t where company_id='+req.user.company_id+' AND project_id='+req.query.projectId+' AND archived=false ORDER BY id,project_id,start_date DESC,name LIMIT '+process.env.PAGE_RECORD_NO+' OFFSET 0';
+                    }
                       client.query(qry, [], function (err, taskList) {
                       if (err) {
+
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);
                         handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [],user:req.user, error:err},"error"," Error in finding task data");
