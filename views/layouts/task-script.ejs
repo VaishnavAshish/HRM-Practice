@@ -169,7 +169,7 @@ function loadMoreTask(isClearSearch){
                         /*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
                         response.tasks.forEach(function(task){
                             if(task)
-                                setDataToCard(task,true,isClearSearch);
+                                setDataToCard(task,true);
                         })
                     }else{
                         $("#noTaskFound").removeClass('slds-hide').text('No task found with this search crieteria');
@@ -369,7 +369,7 @@ function findTaskByName(){
     ${liClose}`;
         $("#taskSortWrapper").append(taskTr);
         if(isDraggable==true){
-            bindTaskDragEventListner("#taskSortWrapper #"+task.id);
+            bindTaskDragEventListner("#taskSortWrapper");
         }
     }
 </script>
