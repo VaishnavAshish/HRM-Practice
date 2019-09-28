@@ -171,6 +171,7 @@ function loadMoreTask(isClearSearch){
                             if(task)
                                 setDataToCard(task,true);
                         })
+                        location.reload(true);
                     }else{
                         $("#noTaskFound").removeClass('slds-hide').text('No task found with this search crieteria');
                         /*showGlobalToast('#globalToast', 'error','No task found with this search crieteria', 4000);*/
