@@ -793,6 +793,7 @@ exports.getProjectDetail = (req, res) => {
                         // console.log(taskList.rows);
                         let startDateFormatted = '';
                         let endDateFormatted = '';
+                        let taskTotalCount=0;
                         if(project.rows[0].start_date != null) {
                           // startDateFormatted = dateFormat(moment.tz(project.rows[0].start_date, companyDefaultTimezone).format());
                           startDateFormatted = dateFormat(project.rows[0].start_date);
@@ -861,7 +862,7 @@ exports.getProjectDetail = (req, res) => {
                               }
                               taskSortedArr.push(data);
                             });
-                            let taskTotalCount=0;
+                            
                             if(project.rows[0].total_task_count){
                               taskTotalCount=project.rows[0].total_task_count;
                             }
