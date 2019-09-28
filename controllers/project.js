@@ -785,8 +785,8 @@ exports.getProjectDetail = (req, res) => {
                         handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [],user:req.user, error:err},"error"," Error in finding task data");
                         /*handleResponse.handleError(res, err, ' Error in finding task data');*/
                       } else {
-                        // // console.log("-------------taskList------------");
-                        // // console.log(taskList.rows);
+                        console.log("-------------taskList------------");
+                        console.log(taskList.rows);
                         let startDateFormatted = '';
                         let endDateFormatted = '';
                         if(project.rows[0].start_date != null) {
