@@ -778,7 +778,7 @@ exports.getProjectDetail = (req, res) => {
                       FROM TASK t 
                       where id in (${requiredTasks}) 
                       ORDER BY position(id::text in '${requiredTasks}')`;
-                      client.query(qry, [req.user.company_id, req.query.projectId, false], function (err, taskList) {
+                      client.query(qry, [], function (err, taskList) {
                       if (err) {
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);
