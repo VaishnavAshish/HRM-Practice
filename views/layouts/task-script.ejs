@@ -368,7 +368,8 @@ function findTaskByName(){
     </div>
     ${liClose}`;
         $("#taskSortWrapper").append(taskTr);
-        if(isDraggable==true)
-            bindTaskDragEventListner();
+        if(isDraggable==true){
+            bindTaskDragEventListner("#taskSortWrapper #"+task.id);
+        }
     }
 </script>

@@ -13,11 +13,11 @@
         $('#project_type').val(type);
         $('#account').val('<%= project.account_id %>');
         console.log(status+' '+projectName);
-        bindTaskDragEventListner();
+        bindTaskDragEventListner("#taskSortWrapper");
     });
 
-    function bindTaskDragEventListner() {
-        $("#taskSortWrapper").sortable({
+    function bindTaskDragEventListner(element) {
+        $(element).sortable({
             handle: '.kw-drag-handle',
             onDrop: function ($item, container, _super) {
                 _super($item, container);
