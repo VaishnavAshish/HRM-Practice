@@ -782,7 +782,7 @@ exports.getProjectDetail = (req, res) => {
                       FROM TASK t 
                       where id in (${requiredTasks}) 
                       ORDER BY position(id::text in '${requiredTasks}')`;
-                    if(requiredTasks!=null){
+                    if(requiredTasks==null){
                       qry='SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date ,t.updated_date ,t.archived ,t.project_name ,t.record_id FROM TASK t where company_id='+req.user.company_id+' AND project_id='+req.query.projectId+' AND archived=false ORDER BY id,project_id,start_date DESC,name LIMIT '+process.env.PAGE_RECORD_NO+' OFFSET 0';
                     }
                       client.query(qry, [], function (err, taskList) {
