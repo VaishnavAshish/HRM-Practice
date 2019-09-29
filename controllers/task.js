@@ -774,7 +774,10 @@ exports.deleteTask = (req, res) => {
                             let updatedSortOrder = taskDetail.rows[0].projecttasksortorder;
                             console.log(updatedSortOrder);
                             updatedSortOrder = updatedSortOrder.split(',');
-                            delete updatedSortOrder[updatedSortOrder.indexOf(req.body.taskId)];
+                            // delete updatedSortOrder[updatedSortOrder.indexOf(req.body.taskId)];
+                            updatedSortOrder = updatedSortOrder.filter(function(item) {
+                                  return item !== req.body.taskId;
+                              })
                             console.log(updatedSortOrder.join(','));
                             updatedSortOrder = updatedSortOrder.join(',');
                             client.query('UPDATE PROJECT SET task_sort_order = $1 WHERE id=$2 AND company_id=$3', [updatedSortOrder, taskDetail.rows[0].project_id, req.user.company_id], function (err, archivedTask) {
