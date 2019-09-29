@@ -232,6 +232,7 @@ function loadMoreTask(isClearSearch){
                         $("#noTaskFound").removeClass('slds-hide').text('No task found with this search crieteria');
                         /*showGlobalToast('#globalToast', 'error','No task found with this search crieteria', 4000);*/
                     }
+                    $("#totalRecordCount").text(response.count);
                     $("#offset").text(parseInt($("#offset").text())+parseInt($("#pageRecordNo").text()));
                     let noOfRecord=parseInt($("#offset").text());
                     if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
