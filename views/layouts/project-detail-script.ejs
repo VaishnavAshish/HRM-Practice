@@ -27,18 +27,19 @@
                 if (targetContainer.length > 0) {
                     targetContainerId = targetContainer[0].id
                 }
+                //prevSortOrder: "<%= project.task_sort_order %>"
                 $.ajax({
                     type: 'POST',
                     url: '/updateTaskSortOrder',
                     contentType: 'application/json',
                     dataType: 'json',
-                    data: JSON.stringify({ project_id: "<%= project.id %>", dropTaskId: droppedTaskId, targetContainerId: targetContainerId, prevSortOrder: "<%= project.task_sort_order %>" }),
+                    data: JSON.stringify({ project_id: "<%= project.id %>", dropTaskId: droppedTaskId, targetContainerId: targetContainerId }),
                     success: function (response) {
                         if (response.success) {
                             hideLoader('#globalLoader');
                             //closeModal(modalId);
                             showGlobalToast('#globalToast', 'success', response.message, 4000);
-                            location.reload(true);
+                            //location.reload(true);
                             //setTimeout(location.reload(),5000);
                         }
                     },
