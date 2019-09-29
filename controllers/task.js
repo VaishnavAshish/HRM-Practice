@@ -143,12 +143,12 @@ exports.loadMoreTasks = (req,res) => {
                         // console.log("tasks.rows");
                         // console.log(tasks.rows);
                         done();
-                        handleResponse.sendSuccess(res,'Tasks searched successfully',{tasks: tasks.rows,count:searchCount});
+                        handleResponse.sendSuccess(res,'Tasks searched successfully',{tasks: tasks.rows,count:task_sort_order.rows[0].task_sort_order.split(',').length});
                       }
                     });
                   } else {
                     done();
-                    handleResponse.sendSuccess(res,'Tasks searched successfully',{tasks: tasks.rows,count:searchCount});
+                    handleResponse.sendSuccess(res,'Tasks searched successfully',{tasks: tasks.rows,count:task_sort_order.rows[0].task_sort_order.split(',').length});
                   }
                 }
               })
