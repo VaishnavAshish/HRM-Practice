@@ -195,8 +195,8 @@ function loadMoreTaskWithSerachCrieteria(){
 }
 
 function loadMoreTask(isClearSearch){
-    let searchTextData  = $("#searchTaskName").val();
-    if(searchTextData != '' && searchTextData != null && searchTextData != undefined){
+    let searchTextDaa  = $("#searchTaskName").val();
+    if(searchText != '' && searchText != null && searchText != undefined){
         return loadMoreTaskWithSerachCrieteria()
     } 
     showLoader('#globalLoader');
@@ -208,7 +208,7 @@ function loadMoreTask(isClearSearch){
         offset=$("#offset").text();
     }
     showLoader('#globalLoader');
-    let searchText=$("#searchTaskName").val();
+    //let searchText=$("#searchTaskName").val();
     let url = new URL(window.location.href);
     let projectId=getURLParameter("projectId");
     $.ajax({
