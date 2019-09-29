@@ -142,7 +142,63 @@
             });
         }
     }
+
+function loadMoreTaskWithSerachCrieteria(){
+    showLoader('#globalLoader');
+
+    let offset=$("#offset").text();
+
+    showLoader('#globalLoader');
+
+    let searchText=$("#searchTaskName").val();
+    let url = new URL(window.location.href);
+    let projectId=getURLParameter("projectId");
+    $.ajax({
+          type: 'POST',
+          url : '/findTaskByName',
+          contentType: 'application/json',
+          dataType: 'json',
+          data:JSON.stringify({"searchText":searchText,"searchField":"name","project_id":projectId,"offset":offset}),
+           success : function(response){
+               if(response.success){
+                    hideLoader('#globalLoader');
+                    console.log(response.tasks);
+                    if(response.tasks.length>0){
+                        /*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
+                        response.tasks.forEach(function(task){
+                            setDataToCard(task,false);
+                        })
+                    }else{
+                        $("#noTaskFound").removeClass('slds-hide').text('No task found with this search crieteria');
+                        /*showGlobalToast('#globalToast', 'error','No task found with this search crieteria', 4000);*/
+                    }
+                    $("#offset").text(parseInt($("#offset").text())+parseInt($("#pageRecordNo").text()));
+                    let noOfRecord=parseInt($("#offset").text());
+                    if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
+                        $(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
+                    }else{
+                        $(".slds-button[loadItemId]").hide();
+                    }
+                    hideLoader('#globalLoader');
+               }
+
+            },
+           error: function(response){
+                console.log('error is : '+response);
+                hideLoader('#globalLoader');
+                $("#noTaskFound").removeClass('slds-hide').text(response.responseJSON.message);
+                showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+            }
+        });
+
+
+}
+
 function loadMoreTask(isClearSearch){
+    let searchText  = $("#searchTaskName").val();
+    if(searchText != '' && searchText! = null && searchText != undefined){
+        return loadMoreTaskWithSerachCrieteria()
+    } 
     showLoader('#globalLoader');
     let offset;
     if(isClearSearch==true){
