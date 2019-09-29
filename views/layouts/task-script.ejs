@@ -203,6 +203,7 @@ function loadMoreTask(isClearSearch){
     let offset;
     if(isClearSearch==true){
         offset=0;
+        $("#offset").text('0');
         $('#taskSortWrapper').html('');
     }else{
         offset=$("#offset").text();
