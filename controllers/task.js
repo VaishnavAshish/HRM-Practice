@@ -770,7 +770,7 @@ exports.deleteTask = (req, res) => {
                             handleResponse.handleError(res, err, ' Error in deleting task');
                           } else {
                             let updatedSortOrder = taskDetail.rows[0].projectTaskSortOrder;
-                            updatedSortOrder = updatedSortOrder.split(,);
+                            updatedSortOrder = updatedSortOrder.split(',');
                             delete updatedSortOrder[updatedSortOrder.indexOf(req.body.taskId)];
                             console.log(updatedSortOrder.join(','));
                             updatedSortOrder = updatedSortOrder.join(',');
