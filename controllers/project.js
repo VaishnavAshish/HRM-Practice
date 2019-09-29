@@ -198,7 +198,7 @@ exports.updateTaskSortOrder = (req,res) => {
         handleResponse.shouldAbort(err, client, done);
         handleResponse.handleError(res, err, ' error in connecting to database');
       } else {
-        client.query('SELECT p.id ,p.name,p.task_sort_order ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id FROM PROJECT p where id=$1 AND company_id=$2', [req.body.projectId, req.user.company_id], function (err, project) {
+        client.query('SELECT p.id ,p.name,p.task_sort_order ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id FROM PROJECT p where id=$1 AND company_id=$2', [req.body.project_id, req.user.company_id], function (err, project) {
           if (err) {
             console.error(err);
             handleResponse.shouldAbort(err, client, done);
