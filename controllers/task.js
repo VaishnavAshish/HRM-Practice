@@ -771,7 +771,7 @@ exports.deleteTask = (req, res) => {
                           } else {
                             console.log('task details');
                             console.log(taskDetail.rows[0]);
-                            let updatedSortOrder = taskDetail.rows[0].projectTaskSortOrder;
+                            let updatedSortOrder = taskDetail.rows[0].projecttasksortorder;
                             console.log(updatedSortOrder);
                             updatedSortOrder = updatedSortOrder.split(',');
                             delete updatedSortOrder[updatedSortOrder.indexOf(req.body.taskId)];
