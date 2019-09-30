@@ -404,10 +404,19 @@ function findTaskByName(){
                 </div>
 
 
-
                 <div class="slds-size_1-of-1 slds-medium-size_3-of-12 slds-p-horizontal_small sm-tpd-15">
                     <div class="slds-grid">
 
+                        <div class="slds-has-flexi-truncate">
+                            <div class="slds-truncate text-dull slds-p-bottom_xx-small text-size-11 text-uppercase">
+                                                Assigned
+                            </div>
+                            <div>
+                                <span class="slds-avatar slds-avatar_small slds-avatar_circle cursor-pointer">
+                                    <img alt="Person name" src="${imgSrc}" ${title}>
+                                    </span>
+                            </div>
+                        </div>
                         <div class="slds-col--bump-left slds-p-left_x-small">
                             <a href="/task-details?taskId=`+ task.id +`" class="slds-button slds-button_icon" title="Edit">
                                 <i class="fa fa-edit text-blue fs-lg text-size-18"></i>
@@ -432,105 +441,5 @@ ${liClose}`;
 // </div>
     $("#taskSortWrapper").append(taskTr);
 }
-function setDataToCardSortable(task){
-    var billable = '';
-    if(task.billable) {
-        billable = 'Billable';
-    } else {
-        billable = 'Non Billable';
-    }
-    var icon = '';
-    // if(task.status == 'Not Started') {
-    //     icon = `<i class="fa fa-ban text-dull"></i>`;
-    // } else if(task.status == 'In Progress') {
-    //     icon = `<i class="fa fa-spinner text-orange"></i>`;
-    // } else if(task.status == 'At Risk') {
-    //     icon = `<i class="fa fa-exclamation-circle text-red"></i>`;
-    // } else if(task.status == 'Completed') {
-    //     icon = `<i class="fa fa-check-circle text-green"></i>`;
-    // }
 
-    let taskTr = `<li id="${task.id}" >
-      <div class=" slds-m-bottom_medium slds-p-around_small line-around kw-task-item">
-    <div class="slds-grid slds-wrap slds-grid_pull-padded">
-        <div class="slds-size_1-of-1 slds-medium-size_1-of-1  slds-large-size_5-of-12 slds-p-horizontal_small">
-            <div class="text-size-11 text-dull text-uppercase slds-p-bottom_xx-small">
-              <span class="kw-drag-handle slds-p-around_small" title="Drag & Drop to Reorder"> </span>
-                `+ task.record_id +`
-                <span class="slds-badge slds-m-left_small">
-                    `+ billable +`
-                </span>
-            </div>
-            <div class="sm-bpd-15">
-                <a href="/task-details?taskId=`+task.id+`#details">
-                     `+ task.name +`
-                </a>
-            </div>
-        </div>
-
-        <div class="slds-size_1-of-1 slds-medium-size_1-of-1  slds-large-size_7-of-12 slds-p-horizontal_small">
-            <div class="slds-grid slds-wrap slds-grid_pull-padded">
-
-                <div class="slds-size_1-of-1 slds-medium-size_3-of-12 slds-p-horizontal_small sm-tpd-15">
-                    <div class="slds-truncate text-dull slds-p-bottom_xx-small text-size-11 text-uppercase">
-                        Status
-                    </div>
-                    <div>
-                            `+ task.status +`
-                    </div>
-                </div>
-
-                <div class="slds-size_1-of-1 slds-medium-size_6-of-12 slds-p-horizontal_small">
-                    <div class="slds-grid slds-grid_pull-padded">
-                        <div class="slds-size_1-of-2 slds-p-horizontal_small">
-                            <div class="slds-truncate text-dull slds-p-bottom_xx-small text-size-11 text-uppercase">
-                                Start Date
-                            </div>
-                            <div>
-
-                                    `+ task.startDateFormatted +`
-                            </div>
-                        </div>
-                        <div class="slds-size_1-of-2 slds-p-horizontal_small">
-                            <div class="slds-truncate text-dull slds-p-bottom_xx-small text-size-11 text-uppercase">
-                                Due Date
-                            </div>
-                            <div>
-                                    `+ task.endDateFormatted +`
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
-
-                    <div class="slds-size_1-of-1 slds-medium-size_3-of-12 slds-p-horizontal_small sm-tpd-15">
-                        <div class="slds-grid">
-                            <div class="slds-has-flexi-truncate">
-                                <div class="slds-truncate text-dull slds-p-bottom_xx-small text-size-11 text-uppercase">
-                                                    Assigned
-                                </div>
-                                <div>
-                                    <span class="slds-avatar slds-avatar_small slds-avatar_circle cursor-pointer">
-                                        <img alt="Person name" src="${imgSrc}" ${title}>
-                                        </span>
-                                </div>
-                            </div>
-                            <div class="slds-col--bump-left slds-p-left_x-small">
-                                <a href="/task-details?taskId=`+ task.id +`" class="slds-button slds-button_icon" title="Edit">
-                                    <i class="fa fa-edit text-blue fs-lg text-size-18"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    ${liClose}`;
-        $("#taskSortWrapper").append(taskTr);
-        if(isDraggable==true){
-            bindTaskDragEventListner("#taskSortWrapper");
-        }
-    }
 </script>
