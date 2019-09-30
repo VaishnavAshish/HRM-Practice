@@ -418,7 +418,8 @@ function findTaskByName(){
             </div>
         </div>
     </div>
-</div>`;
+</div>
+${liClose}`;
 // <div class="slds-has-flexi-truncate">
 //     <div class="slds-truncate text-dull slds-p-bottom_xx-small text-size-11 text-uppercase">
 //         Assign To
@@ -429,7 +430,7 @@ function findTaskByName(){
 //         </span>
 //     </div>
 // </div>
-    $("#taskCardView").append(taskTr);
+    $("#taskSortWrapper").append(taskTr);
 }
 function setDataToCardSortable(task){
     var billable = '';
