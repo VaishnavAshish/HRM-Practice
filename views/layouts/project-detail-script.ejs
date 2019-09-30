@@ -1,7 +1,7 @@
 <script>
     var projectId,projectName,projectBillable;
     $(document).ready(function(){
-		var url_string = window.location.href;
+		    var url_string = window.location.href;
         // var url = new URL(url_string);
         // projectId = url.searchParams.get("projectId");
         projectId = getURLParameter("projectId");
@@ -28,12 +28,16 @@
                     targetContainerId = targetContainer[0].id
                 }
                 //prevSortOrder: "<%= project.task_sort_order %>"
+                indexToPushItemWithNullTarget = parseInt($("#offset").text());
+                if(parseInt($("#totalRecordCount").text()) <= parseInt($("#offset").text())){
+                    indexToPushItemWithNullTarget = null;
+                }
                 $.ajax({
                     type: 'POST',
                     url: '/updateTaskSortOrder',
                     contentType: 'application/json',
                     dataType: 'json',
-                    data: JSON.stringify({ project_id: "<%= project.id %>", dropTaskId: droppedTaskId, targetContainerId: targetContainerId }),
+                    data: JSON.stringify({ project_id: "<%= project.id %>", dropTaskId: droppedTaskId, targetContainerId: targetContainerId , indexToPushItemWithNullTarget : indexToPushItemWithNullTarget  }),
                     success: function (response) {
                         if (response.success) {
                             hideLoader('#globalLoader');

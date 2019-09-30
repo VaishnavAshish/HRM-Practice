@@ -191,7 +191,12 @@ exports.generateProjectCsv = (req, res) => {
 
 }
 
+function getPosition(string, subString, index) {
+   return string.split(subString, index).join(subString).length;
+}
+
 exports.updateTaskSortOrder = (req,res) => {
+  console.log(req.body.indexToPushItemWithNullTarget,req.body.targetContainerId);
   pool.connect((err, client, done) => {
     client.query('BEGIN', (err) => {
       if (err){
@@ -213,11 +218,20 @@ exports.updateTaskSortOrder = (req,res) => {
             let afterString = prevSortOrder.substring(prevSortOrder.indexOf(dropTaskId)+dropTaskId.length+1)
             let previousString = prevSortOrder.substring(0,prevSortOrder.indexOf(dropTaskId)-1)
             let finalSortString = (previousString!=""&&afterString!=""?(previousString+','+afterString):(previousString+afterString))
-            if(targetContainerId == null){
+            if(targetContainerId == null && req.body.indexToPushItemWithNullTarget == null){
                 console.log('---------finalSortString----------')
                 console.log(finalSortString);
                 newTaskSortOrder = (finalSortString?finalSortString+',':'')+dropTaskId;
 
+            }else if( targetContainerId == null && req.body.indexToPushItemWithNullTarget != null){
+                let indexToPush = req.body.indexToPushItemWithNullTarget;
+                console.log('newTaskSortOrder')
+                console.log(req.body.indexToPushItemWithNullTarget);
+                console.log(finalSortString.substring(0,(getPosition(finalSortString,",",(indexToPush-1))+1)))
+                console.log(dropTaskId)
+                console.log(finalSortString.substring(getPosition(finalSortString,",",(indexToPush-1))))
+                console.log(newTaskSortOrder)
+                newTaskSortOrder = finalSortString.substring(0,(getPosition(finalSortString,",",(indexToPush-1))+1))+dropTaskId+finalSortString.substring(getPosition(finalSortString,",",(indexToPush-1)))
             }else{
                 newTaskSortOrder = finalSortString.substring(0,finalSortString.indexOf(targetContainerId))+dropTaskId+','+finalSortString.substring(finalSortString.indexOf(targetContainerId))
             }
