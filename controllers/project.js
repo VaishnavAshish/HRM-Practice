@@ -254,7 +254,7 @@ exports.updateTaskSortOrder = (req,res) => {
                     done();
                     console.log('Updated project >>>>>>>>>>>>>');
                     console.log(updatedProjectSortOrder.rows[0]);
-                    handleResponse.sendSuccess(res,'Task sort order updated successfully.',{});
+                    handleResponse.sendSuccess(res,'Task order updated successfully.',{});
                     /*res.status(200).json({ "success": true, "message": "success" });*/
                   }
                 })
