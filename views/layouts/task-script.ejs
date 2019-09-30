@@ -181,7 +181,7 @@ function loadMoreTaskWithSearchCrieteria(){
                         $(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
                     }else{
                         $(".slds-button[loadItemId]").hide();
-                        $('#noTaskFound').show();
+                        $('#noTaskFound').hide();
                     }
                     hideLoader('#globalLoader');
                }
@@ -245,7 +245,7 @@ function loadMoreTask(isClearSearch){
                         $(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
                     }else{
                         $(".slds-button[loadItemId]").hide();
-                        $('#noTaskFound').show();
+                        $('#noTaskFound').hide();
                     }
                     hideLoader('#globalLoader');
                }
