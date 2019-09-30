@@ -198,14 +198,14 @@ exports.updateTaskSortOrder = (req,res) => {
         handleResponse.shouldAbort(err, client, done);
         handleResponse.handleError(res, err, ' error in connecting to database');
       } else {
-        // client.query('SELECT p.id ,p.name,p.task_sort_order ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id FROM PROJECT p where id=$1 AND company_id=$2', [req.body.projectId, req.user.company_id], function (err, project) {
-        //   if (err) {
-        //     console.error(err);
-        //     handleResponse.shouldAbort(err, client, done);
-        //     handleResponse.handleError(res, err, ' Error in finding project data');
-        //   } else {
-        //     console.log(project.rows[0].task_sort_order);
-            let prevSortOrder = req.body.prevSortOrder;
+        client.query('SELECT p.id ,p.name,p.task_sort_order ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id FROM PROJECT p where id=$1 AND company_id=$2', [req.body.project_id, req.user.company_id], function (err, project) {
+          if (err) {
+            console.error(err);
+            handleResponse.shouldAbort(err, client, done);
+            handleResponse.handleError(res, err, ' Error in finding project data');
+          } else {
+            console.log(project.rows[0].task_sort_order);
+            let prevSortOrder = project.rows[0].task_sort_order;
             let dropTaskId = req.body.dropTaskId;
             let targetContainerId = req.body.targetContainerId;
             let newTaskSortOrder = ``;
@@ -243,8 +243,8 @@ exports.updateTaskSortOrder = (req,res) => {
                 })
               }
             });
-        //   }
-        // })
+          }
+        })
       }
     })
   });
@@ -760,7 +760,7 @@ exports.getProjectDetail = (req, res) => {
             /*handleResponse.handleError(res, "incorrect project id", " Project id is not correct");*/
           } else {
             pool.connect((err, client, done) => {
-              client.query('SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id,p.total_hours,p.total_invoice_amount,p.total_expense_amount,p.task_sort_order,p.total_invoice_time,p.total_invoice_expense,(SELECT count(id) from task where project_id = $1 AND status = $3) as total_completed_task_count FROM PROJECT p where id=$1 AND company_id=$2', [req.query.projectId, req.user.company_id,"Completed"], function (err, project) {
+              client.query('SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id,p.total_hours,p.total_invoice_amount,p.total_expense_amount,p.task_sort_order,p.total_invoice_time,p.total_invoice_expense,(SELECT count(id) from task where project_id = $1 AND status = $3) as total_completed_task_count,(SELECT count(id) from task where project_id = $1 AND company_id = $2 AND archived = $4) as total_task_count FROM PROJECT p where id=$1 AND company_id=$2', [req.query.projectId, req.user.company_id,"Completed",false], function (err, project) {
                 if (err) {
                   console.error(err);
                   handleResponse.shouldAbort(err, client, done);
@@ -768,20 +768,36 @@ exports.getProjectDetail = (req, res) => {
                   /*handleResponse.handleError(res, err, ' Error in finding project data');*/
                 } else {
                   if(project.rowCount > 0) {
-                    // console.error('getProject>>>>>>>>>>>>>');
-                    // // console.log(project.rows[0]);
+                    console.error('getProject>>>>>>>>>>>>>');
+                    console.log(project.rows[0]);
                     // console.log('queryToExec in project details: SELECT t.*,(select count(*) from TASK where company_id=$1 AND project_id=$2 AND archived=$3) as total FROM TASK t where company_id=$1 AND project_id=$2 AND archived=$3 ORDER BY project_id,name OFFSET 0 LIMIT '+process.env.PAGE_RECORD_NO+' '+req.user.company_id+' '+ req.query.projectId+' '+ false);
-                    client.query('SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date ,t.updated_date ,t.archived ,t.project_name ,t.record_id ,(select count(*) from TASK where company_id=$1 AND project_id=$2 AND archived=$3) as total FROM TASK t where company_id=$1 AND project_id=$2 AND archived=$3 ORDER BY id,project_id,start_date DESC,name OFFSET 0 LIMIT '+process.env.PAGE_RECORD_NO, [req.user.company_id, req.query.projectId, false], function (err, taskList) {
+                    // client.query('SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date ,t.updated_date ,t.archived ,t.project_name ,t.record_id ,(select count(*) from TASK where company_id=$1 AND project_id=$2 AND archived=$3) as total FROM TASK t where company_id=$1 AND project_id=$2 AND archived=$3 ORDER BY id,project_id,start_date DESC,name LIMIT '+process.env.PAGE_RECORD_NO+' OFFSET 0', [req.user.company_id, req.query.projectId, false], function (err, taskList) {
+                    let requiredTasks = null;
+                    console.log(project.rows[0].task_sort_order);
+                    if(project.rows[0].task_sort_order){
+                      requiredTasks= project.rows[0].task_sort_order.substring(0,project.rows[0].task_sort_order.split(',',process.env.PAGE_RECORD_NO).join(',').length);
+                    }
+                    console.log(requiredTasks);
+                    let qry=`SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone '${companyDefaultTimezone}' as start_date ,t.end_date at time zone '${companyDefaultTimezone}' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone '${companyDefaultTimezone}' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date ,t.updated_date ,t.archived ,t.project_name ,t.record_id  
+                      FROM TASK t 
+                      where id in (${requiredTasks}) 
+                      ORDER BY position(id::text in '${requiredTasks}')`;
+                    if(requiredTasks==null){
+                      qry='SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date ,t.updated_date ,t.archived ,t.project_name ,t.record_id FROM TASK t where company_id='+req.user.company_id+' AND project_id='+req.query.projectId+' AND archived=false ORDER BY id,project_id,start_date DESC,name LIMIT '+process.env.PAGE_RECORD_NO+' OFFSET 0';
+                    }
+                      client.query(qry, [], function (err, taskList) {
                       if (err) {
+
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);
                         handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [],user:req.user, error:err},"error"," Error in finding task data");
                         /*handleResponse.handleError(res, err, ' Error in finding task data');*/
                       } else {
-                        // // console.log("-------------taskList------------");
-                        // // console.log(taskList.rows);
+                        // console.log("-------------taskList------------");
+                        // console.log(taskList.rows);
                         let startDateFormatted = '';
                         let endDateFormatted = '';
+                        let taskTotalCount=0;
                         if(project.rows[0].start_date != null) {
                           // startDateFormatted = dateFormat(moment.tz(project.rows[0].start_date, companyDefaultTimezone).format());
                           startDateFormatted = dateFormat(project.rows[0].start_date);
@@ -796,11 +812,11 @@ exports.getProjectDetail = (req, res) => {
                         project.rows[0]["total_hours"] = minuteToHours(project.rows[0]["total_hours"]);
                         project.rows[0]["total_invoice_time"] = minuteToHours(project.rows[0]["total_invoice_time"]);
 
-                        let taskTotalCount=0;
-                        let projectTaskSortOrder = project.rows[0].task_sort_order?project.rows[0].task_sort_order.split(','):[];
+                        //let taskTotalCount=0;
+                        //let projectTaskSortOrder = project.rows[0].task_sort_order?project.rows[0].task_sort_order.split(','):[];
                         let taskSortedArr = [];
                         if(taskList.rows.length>0){
-                            taskList.rows.forEach(function (data) {
+                            taskList.rows.forEach(function (data,index) {
                               let startDateFormatted = '';
                               let endDateFormatted = '';
                               if(data.start_date != null) {
@@ -848,16 +864,14 @@ exports.getProjectDetail = (req, res) => {
                                   }
                                 })
                               }
-                              //Set Task According To Sort Order
-                              if(projectTaskSortOrder.length > 0){
-                                  taskSortedArr[(projectTaskSortOrder.indexOf(data.id))] = data
-                              } else {
-                                  taskSortedArr.push(data);
-                              }
-
+                              taskSortedArr.push(data);
                             });
-                            taskTotalCount=taskList.rows[0].total;
-
+                            
+                            if(project.rows[0].total_task_count){
+                              taskTotalCount=project.rows[0].total_task_count;
+                            }
+                            console.log('taskTotalCount')
+                            console.log(taskTotalCount)
 
                             // let percent_completed = 0;
                             // if (taskTotalCount > 0) {
@@ -1270,3 +1284,4 @@ exports.checkAndCreateProjectAssignment = (req, res) => {
     });
   });
 }
+

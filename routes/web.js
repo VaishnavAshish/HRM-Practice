@@ -157,6 +157,7 @@ module.exports = function(app) {
 
     app.post('/findProjectByName', passportConfig.isAuthenticated,projectController.findProjectByName);
     app.post('/findTaskByName', passportConfig.isAuthenticated,taskController.findTaskByName);
+    app.post('/loadMoreTasks', passportConfig.isAuthenticated,taskController.loadMoreTasks);
     app.post('/findExpenseForAccount', passportConfig.isAuthenticated,expenseController.findExpenseForAccount);
     app.post('/findInvoiceForAccount', passportConfig.isAuthenticated,invoiceController.findInvoiceForAccount);
 
