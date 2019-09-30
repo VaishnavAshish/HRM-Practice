@@ -214,7 +214,10 @@ exports.updateTaskSortOrder = (req,res) => {
             let previousString = prevSortOrder.substring(0,prevSortOrder.indexOf(dropTaskId)-1)
             let finalSortString = (previousString!=""&&afterString!=""?(previousString+','+afterString):(previousString+afterString))
             if(targetContainerId == null){
+                console.log('---------finalSortString----------')
+                console.log(finalSortString);
                 newTaskSortOrder = (finalSortString?finalSortString+',':'')+dropTaskId;
+
             }else{
                 newTaskSortOrder = finalSortString.substring(0,finalSortString.indexOf(targetContainerId))+dropTaskId+','+finalSortString.substring(finalSortString.indexOf(targetContainerId))
             }
