@@ -176,9 +176,12 @@ function loadMoreTaskWithSearchCrieteria(){
                     $("#offset").text(parseInt($("#offset").text())+parseInt($("#pageRecordNo").text()));
                     let noOfRecord=parseInt($("#offset").text());
                     if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
+                        $(".slds-button[loadItemId]").show();
+                        $('#noTaskFound').hide();
                         $(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
                     }else{
                         $(".slds-button[loadItemId]").hide();
+                        $('#noTaskFound').show();
                     }
                     hideLoader('#globalLoader');
                }
@@ -238,9 +241,11 @@ function loadMoreTask(isClearSearch){
                     let noOfRecord=parseInt($("#offset").text());
                     if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
                         $(".slds-button[loadItemId]").show();
+                        $('#noTaskFound').hide();
                         $(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
                     }else{
                         $(".slds-button[loadItemId]").hide();
+                        $('#noTaskFound').show();
                     }
                     hideLoader('#globalLoader');
                }
