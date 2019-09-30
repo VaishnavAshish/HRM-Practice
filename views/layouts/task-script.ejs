@@ -143,7 +143,7 @@
         }
     }
 
-function loadMoreTaskWithSerachCrieteria(){
+function loadMoreTaskWithSearchCrieteria(){
     showLoader('#globalLoader');
 
     let offset=$("#offset").text();
@@ -172,6 +172,7 @@ function loadMoreTaskWithSerachCrieteria(){
                         $("#noTaskFound").removeClass('slds-hide').text('No task found with this search crieteria');
                         /*showGlobalToast('#globalToast', 'error','No task found with this search crieteria', 4000);*/
                     }
+                    $("#totalRecordCount").text(response.count);
                     $("#offset").text(parseInt($("#offset").text())+parseInt($("#pageRecordNo").text()));
                     let noOfRecord=parseInt($("#offset").text());
                     if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
@@ -197,7 +198,7 @@ function loadMoreTaskWithSerachCrieteria(){
 function loadMoreTask(isClearSearch){
     let searchText  = $("#searchTaskName").val();
     if(searchText != '' && searchText != null && searchText != undefined){
-        return loadMoreTaskWithSerachCrieteria()
+        return loadMoreTaskWithSearchCrieteria()
     }
     showLoader('#globalLoader');
     let offset;
@@ -256,59 +257,62 @@ function loadMoreTask(isClearSearch){
 
 }
 function findTaskByName(){
-        $("#noTaskFound").addClass('slds-hide');
-        showLoader('#globalLoader');
-
-        $(".slds-button[loadItemId]").show();
         $("#offset").text("0");
-
-        let searchText=$("#searchTaskName").val();
-        let url = new URL(window.location.href);
-        let projectId=getURLParameter("projectId");
-        $.ajax({
-              type: 'POST',
-              url : '/findTaskByName',
-              contentType: 'application/json',
-              dataType: 'json',
-              data:JSON.stringify({"searchText":searchText,"searchField":"name","project_id":projectId}),
-               success : function(response){
-                   if(response.success){
-                        hideLoader('#globalLoader');
-                        console.log(response.tasks);
-                        $("#taskSortWrapper").html('');
-                        if(response.tasks.length>0){
-                            /*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
-                            response.tasks.forEach(function(task){
-                                if(searchText=='')
-                                    setDataToCard(task,true);
-                                else
-                                    setDataToCard(task);
-                            })
-                        }else{
-                            $("#noTaskFound").removeClass('slds-hide').text('No task found with this search crieteria');
-                            /*showGlobalToast('#globalToast', 'error','No task found with this search crieteria', 4000);*/
-                        }
-                        $("#totalRecordCount").text(response.count);
-                        $("#offset").text(parseInt($("#offset").text())+parseInt($("#pageRecordNo").text()));
-                        /*let searchFilter=$("#selectedFilter").text();*/
-                        let noOfRecord=parseInt($("#offset").text());
-                        if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
-
-                            $(".slds-button[loadItemId]").show();
-                            $(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
-                        }else{
-                            $(".slds-button[loadItemId]").hide();
-                        }
-                   }
-
-                },
-               error: function(response){
-                    console.log('error is : '+response);
-                    hideLoader('#globalLoader');
-                    $("#noTaskFound").removeClass('slds-hide').text(response.responseJSON.message);
-                    showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
-                }
-            });
+        $("#taskSortWrapper").html('')
+        loadMoreTask(true);
+        // $("#noTaskFound").addClass('slds-hide');
+        // showLoader('#globalLoader');
+        //
+        // $(".slds-button[loadItemId]").show();
+        // $("#offset").text("0");
+        //
+        // let searchText=$("#searchTaskName").val();
+        // let url = new URL(window.location.href);
+        // let projectId=getURLParameter("projectId");
+        // $.ajax({
+        //       type: 'POST',
+        //       url : '/findTaskByName',
+        //       contentType: 'application/json',
+        //       dataType: 'json',
+        //       data:JSON.stringify({"searchText":searchText,"searchField":"name","project_id":projectId}),
+        //        success : function(response){
+        //            if(response.success){
+        //                 hideLoader('#globalLoader');
+        //                 console.log(response.tasks);
+        //                 $("#taskSortWrapper").html('');
+        //                 if(response.tasks.length>0){
+        //                     /*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
+        //                     response.tasks.forEach(function(task){
+        //                         if(searchText=='')
+        //                             setDataToCard(task,true);
+        //                         else
+        //                             setDataToCard(task);
+        //                     })
+        //                 }else{
+        //                     $("#noTaskFound").removeClass('slds-hide').text('No task found with this search crieteria');
+        //                     /*showGlobalToast('#globalToast', 'error','No task found with this search crieteria', 4000);*/
+        //                 }
+        //                 $("#totalRecordCount").text(response.count);
+        //                 $("#offset").text(parseInt($("#offset").text())+parseInt($("#pageRecordNo").text()));
+        //                 /*let searchFilter=$("#selectedFilter").text();*/
+        //                 let noOfRecord=parseInt($("#offset").text());
+        //                 if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
+        //
+        //                     $(".slds-button[loadItemId]").show();
+        //                     $(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
+        //                 }else{
+        //                     $(".slds-button[loadItemId]").hide();
+        //                 }
+        //            }
+        //
+        //         },
+        //        error: function(response){
+        //             console.log('error is : '+response);
+        //             hideLoader('#globalLoader');
+        //             $("#noTaskFound").removeClass('slds-hide').text(response.responseJSON.message);
+        //             showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+        //         }
+        //     });
 
     }
     function setDataToCard(task,isDraggable){
@@ -413,7 +417,7 @@ function findTaskByName(){
                             <div>
 
                                     ${imgSrc}
-                                
+
                             </div>
                         </div>
                         <div class="slds-col--bump-left slds-p-left_x-small">
