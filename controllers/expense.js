@@ -230,10 +230,10 @@ exports.getExpense = (req, res) => {
                                                         return ele.id;
                                                     });
                                                 }
-                                                // console.log("----------project.rows-------------");
-                                                // console.log(project.rows);
-                                                // console.log("----------expense.rows-------------");
-                                                // console.log(expense.rows);
+                                                console.log("----------project.rows-------------");
+                                                console.log(project.rows);
+                                                console.log("----------expense.rows-------------");
+                                                console.log(expense.rows);
                                                 let expenseListArr = [];
                                                 /*let draftExpense=[];
                                                 let approvedExpense=[];*/
@@ -284,8 +284,8 @@ exports.getExpense = (req, res) => {
                                                 /*draftExpense=expenseListArr.filter(exp => exp.status=="Draft");
                                                 approvedExpense=expenseListArr.filter(exp => exp.status=="Approved");*/
                                                 // console.log(expense.rows);
-                                                // console.log('----------expenseListArr---------');
-                                                // console.log(expenseListArr);
+                                                console.log('----------expenseListArr---------');
+                                                console.log(expenseListArr);
                                                 projectArr = project.rows.filter(pro => pro.archived == false && pro.status != 'Completed');
                                                 if(req.user.permissions.includes('expenseApprover')) {
                                                     // console.log("Inside IF Expense");
