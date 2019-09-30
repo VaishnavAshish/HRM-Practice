@@ -114,8 +114,8 @@ exports.loadMoreTasks = (req,res) => {
               handleResponse.shouldAbort(err, client, done);
               handleResponse.handleError(res, err, ' Error in finding task data');
             } else {
-              let queryToExec=`SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone '${companyDefaultTimezone}' as start_date ,t.end_date at time zone '${companyDefaultTimezone}' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone '${companyDefaultTimezone}' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date at time zone '${companyDefaultTimezone}' as created_date ,t.updated_date at time zone '${companyDefaultTimezone}' as updated_date ,t.archived ,t.record_id 
-              FROM task t 
+              let queryToExec=`SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone '${companyDefaultTimezone}' as start_date ,t.end_date at time zone '${companyDefaultTimezone}' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone '${companyDefaultTimezone}' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date at time zone '${companyDefaultTimezone}' as created_date ,t.updated_date at time zone '${companyDefaultTimezone}' as updated_date ,t.archived ,t.record_id
+              FROM task t
               WHERE id in(${requiredIDs})
               ORDER BY position(id::text in '${requiredIDs}')`;
               client.query(queryToExec,[], function (err, tasks) {
@@ -390,7 +390,7 @@ function createTaskRecord(req, client, err, done, taskData, res, callback) {
       handleResponse.shouldAbort(err, client, done);
       handleResponse.handleError(res, err, ' Error in adding task to the database');
     } else {
-      client.query('UPDATE Project p SET task_sort_order = (CASE WHEN task_sort_order IS NULL THEN $1 ELSE p.task_sort_order || $2 END)',[insertedTask.rows[0].id,','+insertedTask.rows[0].id], function (err, updatedProjectWithSortOrder) {
+      client.query('UPDATE Project p SET task_sort_order = (CASE WHEN task_sort_order IS NULL THEN $1 ELSE p.task_sort_order || $2 END) WHERE id=$3',[insertedTask.rows[0].id,','+insertedTask.rows[0].id,req.body.projectId], function (err, updatedProjectWithSortOrder) {
         if(err) {
           handleResponse.shouldAbort(err, client, done);
           handleResponse.handleError(res, err, ' Error in adding updating task sort order to the database');
