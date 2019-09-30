@@ -331,15 +331,12 @@ function findTaskByName(){
 
         let imgSrc,title;
         if(task.user_id){
-            imgSrc = "/getUserPicture/${task.user_id}";
             title = 'title="'+task.user_first_name;
             if(task.user_last_name){
                 title+=" "+task.user_last_name;
             }
             title+='('+task.user_role+')"';
-        }else{
-            imgSrc = 'img/avatar1.jpg';
-            title = 'title="Person"';
+            imgSrc = `<img alt="Person name" src="/getUserPicture/${task.user_id}" ${title}>`;
         }
 
         let liOpen=liClose=kwClass=kwSpan='';
@@ -413,7 +410,7 @@ function findTaskByName(){
                             </div>
                             <div>
                                 <span class="slds-avatar slds-avatar_small slds-avatar_circle cursor-pointer">
-                                    <img alt="Person name" src="${imgSrc}" ${title}>
+                                    ${imgSrc}
                                     </span>
                             </div>
                         </div>
