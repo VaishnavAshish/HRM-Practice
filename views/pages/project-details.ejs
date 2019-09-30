@@ -355,11 +355,11 @@
                                                                                                     Assigned
                                                                                 </div>
                                                                                 <div>
+                                                                                  <% if(task.user_id) { %>
                                                                                     <span class="slds-avatar slds-avatar_small slds-avatar_circle cursor-pointer">
-                                                                                      <% if(task.user_id) { %>
                                                                                         <img alt="Person name" src="/getUserPicture/<%= task.user_id %>" title="<%= task.user_first_name %> <%= task.user_last_name?task.user_last_name:'' %> (<%= task.user_role %>)">
-                                                                                      <% } %>
                                                                                      </span>
+                                                                                   <% } %>
                                                                                 </div>
                                                                             </div>
                                                                             <div class="slds-col--bump-left slds-p-left_x-small">

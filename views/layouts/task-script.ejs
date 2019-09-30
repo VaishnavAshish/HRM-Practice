@@ -329,14 +329,16 @@ function findTaskByName(){
         //     icon = `<i class="fa fa-check-circle text-green"></i>`;
         // }
 
-        let imgSrc,title;
+        let imgSrc = ``,title;
         if(task.user_id){
-            title = 'title="'+task.user_first_name;
-            if(task.user_last_name){
-                title+=" "+task.user_last_name;
-            }
-            title+='('+task.user_role+')"';
-            imgSrc = `<img alt="Person name" src="/getUserPicture/${task.user_id}" ${title}>`;
+            // title = 'title="'+task.user_first_name;
+            // if(task.user_last_name){
+            //     title+=" "+task.user_last_name;
+            // }
+            // title+='('+task.user_role+')"';
+            imgSrc = `<span class="slds-avatar slds-avatar_small slds-avatar_circle cursor-pointer">
+                        <img alt="Person name" src="/getUserPicture/${task.user_id}" title="${task.user_first_name}${task.user_last_name?task.user_last_name:''}(${task.user_role})">
+                      </span>`;
         }
 
         let liOpen=liClose=kwClass=kwSpan='';
@@ -409,9 +411,9 @@ function findTaskByName(){
                                                 Assigned
                             </div>
                             <div>
-                                <span class="slds-avatar slds-avatar_small slds-avatar_circle cursor-pointer">
+
                                     ${imgSrc}
-                                    </span>
+                                
                             </div>
                         </div>
                         <div class="slds-col--bump-left slds-p-left_x-small">
