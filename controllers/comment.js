@@ -266,8 +266,10 @@ function getRandomColor() {
      //     color += letters[Math.floor(Math.random() * letters.length)];
      // }
      // return color;
-     color = "hsl(" + Math.random() * 360 + ", 100%, 75%)";
-     return color;
+
+     // color = "hsl(" + Math.random() * 360 + ", 100%, 75%)";
+     // return color;
+    return "#"+((1<<24)*Math.random()|0).toString(16);
  }
 
 
@@ -278,6 +280,7 @@ sendConversationThread = (req, res, conversation_thread, commentList,projectReso
   commentList.forEach(commentData => {
     if(!colorMap.has(commentData.email)){
       colorMap.set(commentData.email,getRandomColor());
+      // colorMap.set(commentData.email,"#DDDDDD");
     }
     commentHTML = `<tr>
                       <td  valign="top" style=" font-size:14px;font-family: arial,sans-serif; padding-top:10px; border-top: 1px solid #eee; color: #999; width:50px;">
@@ -354,6 +357,7 @@ sendConversationThread = (req, res, conversation_thread, commentList,projectReso
 
 
 
+
   const mailOptions = {
     to: projectResourceEmailList,
     from: '"'+req.user.company_info.name+'"support@krowsoftware.com',
@@ -362,6 +366,8 @@ sendConversationThread = (req, res, conversation_thread, commentList,projectReso
   };
 
   req.mailOptions = mailOptions;
+  console.log('html of conversation is:')
+  console.log(html);
   // console.log('transpoter');
   email.sendMail(req, res, function(error, info) {
     // console.log('transpoter');
