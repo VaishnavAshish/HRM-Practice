@@ -4,6 +4,7 @@ exports.sendMail = (req, res, next) => {
     // console.log('called');
     const transporter = nodemailer.createTransport({
       name: 'www.krowsoftware.com',
+      pool: true,
       host: 'smtp.gmail.com',
       port: 465,
       secure: true,
