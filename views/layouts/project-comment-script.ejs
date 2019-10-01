@@ -1,4 +1,5 @@
 <script>
+  let colorMap = new Map();
     $(document).ready(function(){
         $("#converWrapper .conver-accord-title:first .expandDiv:first").click();
 
@@ -52,17 +53,19 @@
         });
     }
     function getRandomColor() {
-         var letters = 'BCDEF'.split('');
-         var color = '#';
-         for (var i = 0; i < 6; i++ ) {
-             color += letters[Math.floor(Math.random() * letters.length)];
-         }
-         return color;
+         // var letters = 'BCDEF'.split('');
+         // var color = '#';
+         // for (var i = 0; i < 6; i++ ) {
+         //     color += letters[Math.floor(Math.random() * letters.length)];
+         // }
+         // return color;
+         return "#"+((1<<24)*Math.random()|0).toString(16);
      }
 
     function addCommentToList(parentElement,commentData){
       let userDataRole = '<%= user.user_role %>';
       let editableHTML = ``;
+
       if(commentData.resource_id == <%= user.id %> || userDataRole.includes('ADMIN') ){
         editableHTML = `<div class="slds-no-flex">
                               <a href="javascript:void(0)" onclick="editCommentData('${commentData.id}', \`${commentData.message}\`,'${commentData.parent_id}')">
@@ -73,7 +76,12 @@
                               </a>
                           </div>`;
       }
-      let user_image_data = `<span class="slds-avatar slds-avatar_circle user-name-initials" style="background-color:${getRandomColor()}" title="${commentData.first_name} ${commentData.last_name} By: ${commentData.email}">
+      if(!colorMap.has(commentData.email)){
+        console.log(commentData.email);
+        colorMap.set(commentData.email,getRandomColor());
+        // colorMap.set(commentData.email,"#DDDDDD");
+      }
+      let user_image_data = `<span class="slds-avatar slds-avatar_circle user-name-initials" style="background-color:${colorMap.get(commentData.email)}" title="${commentData.first_name} ${commentData.last_name} By: ${commentData.email}">
                                   ${commentData.first_name.substring(0,1).toUpperCase()}${commentData.last_name?commentData.last_name.substring(0,1).toUpperCase():''}
                                 </span>`;
       if(commentData.user_img){
