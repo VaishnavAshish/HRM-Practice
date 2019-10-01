@@ -127,6 +127,21 @@
     }
     /* -------------drag and droop style end---------------- */
 
+    .kw-ad-grd-overlay{
+        background: #fff;
+        background: -moz-linear-gradient(right,  rgba(255,255,255,1) 35%, rgba(255,255,255,0) 100%); /* FF3.6-15 */
+        background: -webkit-linear-gradient(right,  rgba(255,255,255,1) 35%,rgba(255,255,255,0) 100%); /* Chrome10-25,Safari5.1-6 */
+        background: linear-gradient(to left,  rgba(255,255,255,1) 35%,rgba(255,255,255,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#00ffffff',GradientType=1 ); /* IE6-9 */
+    }
+    @media only screen and (max-width: 768px) {
+      .kw-ad-grd-overlay{
+            background: -moz-linear-gradient(bottom,  rgba(255,255,255,1) 35%, rgba(255,255,255,.2) 100%); /* FF3.6-15 */
+            background: -webkit-linear-gradient(bottom,  rgba(255,255,255,1) 35%,rgba(255,255,255,.2) 100%); /* Chrome10-25,Safari5.1-6 */
+            background: linear-gradient(to top,  rgba(255,255,255,1) 35%,rgba(255,255,255,.2) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#00ffffff',GradientType=1 ); /* IE6-9 */
+        }
+    }
     </style>
     <script>
       let url = window.location.href.split(':');
