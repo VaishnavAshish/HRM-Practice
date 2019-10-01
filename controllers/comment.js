@@ -368,6 +368,7 @@ sendConversationThread = (req, res, conversation_thread, commentList,projectReso
   req.mailOptions = mailOptions;
   console.log('html of conversation is:')
   console.log(html);
+  console.log(mailOptions)
   // console.log('transpoter');
   email.sendMail(req, res, function(error, info) {
     // console.log('transpoter');
