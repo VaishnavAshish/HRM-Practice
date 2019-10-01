@@ -3,6 +3,7 @@ const nodemailer = require('nodemailer');
 exports.sendMail = (req, res, next) => {
     // console.log('called');
     const transporter = nodemailer.createTransport({
+      pool: true,
       host: 'smtp.gmail.com',
       port: 465,
       secure: true,
