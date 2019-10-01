@@ -227,7 +227,7 @@
         								showGlobalToast('#globalToast', 'success', response.message, 4000);
         								$("button[enableIntegration]").hide();
         								$("button[disableIntegration]").show();
-        								$("#integration-dashboard").show();
+        								location.reload();
         								console.log('response is : '+JSON.stringify(response));
         						},
         						error: function(response){
