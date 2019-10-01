@@ -163,7 +163,8 @@ function loadMoreTaskWithSearchCrieteria(){
                if(response.success){
                     hideLoader('#globalLoader');
                     console.log(response.tasks);
-                    if(response.tasks.length>0){
+                    if(response.tasks.length > 0){
+                        $("#noTaskFound").addClass('slds-hide');
                         /*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
                         response.tasks.forEach(function(task){
                             setDataToCard(task,false);
@@ -175,13 +176,13 @@ function loadMoreTaskWithSearchCrieteria(){
                     $("#totalRecordCount").text(response.count);
                     $("#offset").text(parseInt($("#offset").text())+parseInt($("#pageRecordNo").text()));
                     let noOfRecord=parseInt($("#offset").text());
-                    if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
+                    if(parseInt($("#totalRecordCount").text()) > parseInt($("#offset").text())){
                         $(".slds-button[loadItemId]").show();
-                        $('#noTaskFound').hide();
+                        // $('#noTaskFound').hide();
                         $(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
                     }else{
                         $(".slds-button[loadItemId]").hide();
-                        $('#noTaskFound').hide();
+                        // $('#noTaskFound').hide();
                     }
                     hideLoader('#globalLoader');
                }
@@ -227,6 +228,7 @@ function loadMoreTask(isClearSearch){
                     hideLoader('#globalLoader');
                     console.log(response.tasks);
                     if(response.tasks.length>0){
+                        $("#noTaskFound").addClass('slds-hide');
                         /*showGlobalToast('#globalToast', 'success',response.message, 4000);*/
                         response.tasks.forEach(function(task){
                             if(task)
@@ -241,11 +243,11 @@ function loadMoreTask(isClearSearch){
                     let noOfRecord=parseInt($("#offset").text());
                     if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
                         $(".slds-button[loadItemId]").show();
-                        $('#noTaskFound').hide();
+                        // $('#noTaskFound').hide();
                         $(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
                     }else{
                         $(".slds-button[loadItemId]").hide();
-                        $('#noTaskFound').hide();
+                        // $('#noTaskFound').hide();
                     }
                     hideLoader('#globalLoader');
                }
