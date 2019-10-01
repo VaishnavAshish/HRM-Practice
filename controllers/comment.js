@@ -304,8 +304,8 @@ sendConversationThread = (req, res, conversation_thread, commentList,projectReso
                   <table border="0" cellpadding="0" cellspacing="0"  width="100%" bgcolor="#f7f8f9">
                     <tbody>
                         <tr>
-                            <td valign="top" align="center" style="padding-top: 20px;padding-bottom:10px">
-                                <h1  style="padding-top: 25px; padding-bottom:25px;">${req.user.company}</h1>
+                            <td valign="top" align="center">
+                                <h1>${req.user.company}</h1>
                             </td>
                         </tr>
                         <tr>
