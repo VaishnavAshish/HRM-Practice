@@ -81,7 +81,7 @@
         colorMap.set(commentData.email,getRandomColor());
         // colorMap.set(commentData.email,"#DDDDDD");
       }
-      let user_image_data = `<span class="slds-avatar slds-avatar_circle user-name-initials" style="background-color:${colorMap.get(commentData.email)}" title="${commentData.first_name} ${commentData.last_name} By: ${commentData.email}">
+      let user_image_data = `<span class="slds-avatar slds-avatar_circle user-name-initials" style="background-color:${colorMap.get(commentData.email)};color:white;" title="${commentData.first_name} ${commentData.last_name} By: ${commentData.email} ">
                                   ${commentData.first_name.substring(0,1).toUpperCase()}${commentData.last_name?commentData.last_name.substring(0,1).toUpperCase():''}
                                 </span>`;
       if(commentData.user_img){
