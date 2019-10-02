@@ -105,7 +105,7 @@ exports.changeQuickbookAccount = (req,res) => {
                       //  handleResponse.handleError(res, err, ' Error in updating account');
                       res.redirect('/integration-dashboard');
                      } else {
-                        client.query('UPDATE SETTING set quickbook_token=$1,quickbook_enabled=$2,invoice_timesheet_item_id=$3,invoice_other_item_id=$3,invoice_fixedfee_item_id=$3,invoice_expense_item_id=$3 where company_id=$4 RETURNING id',[JSON.parse(req.body.newCompanyData) ,true,null,req.user.company_id], function(err, updatedSetting) {
+                        client.query('UPDATE SETTING set quickbook_token=$1,quickbook_enabled=$2,invoice_timesheet_item_id=$3,invoice_other_item_id=$3,invoice_fixedfee_item_id=$3,invoice_expense_item_id=$3,last_integration_time=$4 where company_id=$5 RETURNING id',[JSON.parse(req.body.newCompanyData) ,true,null,'now()',req.user.company_id], function(err, updatedSetting) {
                           if (err){
                             handleResponse.shouldAbort(err, client, done);
                             res.redirect('/integration-dashboard');
