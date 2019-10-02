@@ -94,7 +94,7 @@
                           </div>
                         </div> -->
                         <div class="slds-modal__content slds-p-around_medium">
-                            <p> The connection with quickbook is done at : <%= (last_integration_time) ? last_integration_time : '' %> </p>
+                            <p> The connection with quickbook was done at : <%= (user.company_info.last_integration_time) ? user.company_info.last_integration_time : '' %> </p>
                         </div>
                         <footer class="slds-modal__footer">
                           <button class="slds-button slds-button_neutral" onclick="closeModal('#modalQuickbookSetting');">Cancel</button>

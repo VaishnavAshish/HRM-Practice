@@ -239,7 +239,7 @@
             url : '/addComment',
             contentType: 'application/json',
             dataType: 'json',
-            data:JSON.stringify({"sendemail":email,"newCommentTitle":$("#addNewComment",`#${conversation_id}`).val(),"conversation_id":conversation_id,"project_id":<%= project.id %>}),
+            data:JSON.stringify({"sendemail":email,"newCommentTitle":$("#addNewComment",`#${conversation_id}`).val(),"conversation_id":$(`#${conversation_id}`).attr('conversation_id'),"project_id":<%= project.id %>}),
             success : function(response){
               if(response.success){
                 hideLoader('#globalLoader');

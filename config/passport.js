@@ -220,7 +220,7 @@ passport.use('user', new LocalStrategy({ usernameField: 'email',passReqToCallbac
   let domain=req.body.domain;
 
   pool.connect((err, client, poolDone) => {
-    client.query("select * from company INNER JOIN (SELECT company_id,stripe_customer_id,stripe_subscription_id,quickbook_enabled,xero_enabled FROM setting) setting ON company.id = setting.company_id AND company.domain ilike $1 AND company.archived=$2", [domain,false], function(err, company) {
+    client.query("select * from company INNER JOIN (SELECT company_id,stripe_customer_id,stripe_subscription_id,quickbook_enabled,xero_enabled,last_integration_time FROM setting) setting ON company.id = setting.company_id AND company.domain ilike $1 AND company.archived=$2", [domain,false], function(err, company) {
     // client.query("select * from company where domain=$1 AND archived=$2", [domain,false], function(err, company) {
       if (err) {
         // console.log('err-----------' + JSON.stringify(err));
@@ -874,7 +874,7 @@ exports.isAuthenticated = (req, res, next) => {
           console.log('company id inside isauthenticated');
           console.log(req.user.company_id);
           // console.log(req.session.cookie);
-          client.query("select * from company INNER JOIN (SELECT company_id,stripe_customer_id,stripe_subscription_id,quickbook_enabled,xero_enabled FROM setting) setting ON company.id = setting.company_id AND company.id=$1 AND company.archived=$2", [req.user.company_id,false], function(err, company) {
+          client.query("select * from company INNER JOIN (SELECT company_id,stripe_customer_id,stripe_subscription_id,quickbook_enabled,xero_enabled,last_integration_time FROM setting) setting ON company.id = setting.company_id AND company.id=$1 AND company.archived=$2", [req.user.company_id,false], function(err, company) {
             if (err) {
               handleResponse.shouldAbort(err, client, done);
               // handleResponse.handleError(res, err, ' Error in finding company data');
