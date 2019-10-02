@@ -1056,7 +1056,7 @@
                                   <% if(projectConversationThread.length > 0) { %>
                                       <% projectConversationThread.forEach(function(conversationData,index) { %>
                                         <!-- conversation thread start -->
-                                        <div class="slds-card slds-p-around_medium conver-accord-title bmr-15" id="<%= conversationData.id%>">
+                                        <div class="slds-card slds-p-around_medium conver-accord-title bmr-15" id="conversation<%= conversationData.id%>" conversation_id = "<%= conversationData.id%>">
                                           <div class="slds-grid slds-wrap">
                                             <div class="slds-size_1-of-1 slds-medium-size_8-of-12">
                                               <div class="slds-grid expandDiv" onclick="toggleConversation('#converWrapper', this);">
@@ -1207,10 +1207,10 @@
                                                                 </div>
                                                             </div>
                                                             <div class="text-right">
-                                                                <button class="slds-button slds-button_brand" id="addCommentBtnAndEmail" onclick="addNewComment('<%= conversationData.id %>',true)">
+                                                                <button class="slds-button slds-button_brand" id="addCommentBtnAndEmail" onclick="addNewComment('conversation<%= conversationData.id %>',true)">
                                                                     Add & Email
                                                                 </button>
-                                                                <button class="slds-button slds-button_brand" id="addCommentBtn" onclick="addNewComment('<%= conversationData.id %>',false)">
+                                                                <button class="slds-button slds-button_brand" id="addCommentBtn" onclick="addNewComment('conversation<%= conversationData.id %>',false)">
                                                                     Add
                                                                 </button>
                                                             </div>

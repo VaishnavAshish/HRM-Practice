@@ -17,7 +17,9 @@
         })
     }
     function loadRelatedComment(ele,cb) {
-        let conversation_id = $(ele).closest('.conver-accord-title').attr('id');
+        // let conversation_id = $(ele).closest('.conver-accord-title').attr('id');
+        let conversation_id = $(ele).closest('.conver-accord-title').attr('conversation_id');
+        
         showLoader('#globalLoader');
         $.ajax({
           type: 'POST',
