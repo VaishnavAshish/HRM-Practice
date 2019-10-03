@@ -411,7 +411,7 @@ function getUserBRandCR(req, res, client, err, done, userId, projectId, userRole
     } else {
         // console.log('-----userData.rows--');
         // console.log(userData.rows);
-        if(userData.rowsCount > 0 || userRole == undefined) {
+        if(userData.rowCount > 0 || userRole == undefined) {
             // console.log('inside userData length greater than 0')
             return result(userData.rows[0]);
         } else {
@@ -2618,7 +2618,7 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
                                                                 <strong>From</trong>
                                                             </td>
                                                             <td class="">
-                                                                <div>
+                                                                <div style="margin-left:18px;">
                                                                     ${comapny_address}
                                                                 </div>
                                                             </td>
