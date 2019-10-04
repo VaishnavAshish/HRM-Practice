@@ -1,4 +1,8 @@
 <script>
+var lastSearchText;
+    $(function(){
+        lastSearchText = $("#searchTaskName").val();
+    })
 
     function addNewTask(modalId, formId, accountId) {
         var taskData = createJSONForFormData(formId);
@@ -264,6 +268,10 @@ function loadMoreTask(isClearSearch){
 
 }
 function findTaskByName(){
+        if($("#searchTaskName").val()==lastSearchText){
+            return 0;
+        }
+        lastSearchText=$("#searchTaskName").val();
         $("#offset").text("0");
         $("#taskSortWrapper").html('')
         loadMoreTask(true);
