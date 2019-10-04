@@ -164,7 +164,7 @@
                                     </li>
 
                                     <li data-navigation="activity" class="slds-tabs_default__item" onclick="openTab(this, 'task-forums')">
-                                        <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="0">
+                                        <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="0" id="conversationCount">
                                             Activity (<%= projectConversationThread.length %>)
                                         </a>
                                     </li>
@@ -1070,7 +1070,7 @@
                                                   </div>
                                                   <div class="slds-has-flexi-truncate">
                                                       <div class="">
-                                                          <a href="javascript:void(0);" class="text-size-16">
+                                                          <a href="javascript:void(0);" class="text-size-16" id="conversation<%= conversationData.id%>_message">
                                                               <% conversationData.message.split('\n').forEach(conversationline => { %>
                                                                   <%= conversationline %><BR>
                                                               <% }) %>
@@ -1078,7 +1078,7 @@
                                                       </div>
 
                                                       <div>
-                                                          <span class="text-dull text-size-11 ">
+                                                          <span class="text-dull text-size-11 " id="conversation<%= conversationData.id%>_modifiedOn">
                                                               Last Modify: <%= conversationData.modified_date %>
                                                           </span>
                                                           <span class="text-dull text-size-11 ">
@@ -1096,7 +1096,7 @@
                                                           Response
                                                       </div>
                                                       <div>
-                                                         <span class="slds-badge"><%= conversationData.responsecount %></span>
+                                                         <span class="slds-badge" id="conversation<%= conversationData.id%>_response"> <%= conversationData.responsecount %></span>
                                                       </div>
                                                   </div>
                                                 </div>
@@ -1404,7 +1404,6 @@
         //       }); */
         // });
     </script>
-
 </body>
 
 </html>

@@ -36,7 +36,7 @@ exports.postAddConversation = (req, res) => {
                 handleResponse.shouldAbort(err, client, done);
                 handleResponse.handleError(res, err, ' error in connecting to database');
               } else {
-                client.query('INSERT INTO PROJECT_COMMENT (type,message,created_date,modified_date,company_id,project_id,resource_id) values ($1,$2,$3,$4,$5,$6,$7) RETURNING id', ['Conversation',req.body.newConversationTitle,'now()','now()',req.user.company_id,req.body.project_id,req.user.id], function (err, insertedProjectConversation) {
+                client.query('INSERT INTO PROJECT_COMMENT (type,message,created_date,modified_date,company_id,project_id,resource_id) values ($1,$2,$3,$4,$5,$6,$7) RETURNING id,created_date,modified_date,message', ['Conversation',req.body.newConversationTitle,'now()','now()',req.user.company_id,req.body.project_id,req.user.id], function (err, insertedProjectConversation) {
                   if (err) {
                     handleResponse.shouldAbort(err, client, done);
                     handleResponse.handleError(res, err, ' Error in adding project conversation to the database');
@@ -47,8 +47,12 @@ exports.postAddConversation = (req, res) => {
                         handleResponse.shouldAbort(err, client, done);
                         handleResponse.handleError(res, err, ' Error in committing transaction');
                       } else {
+                        if(insertedProjectConversation.rows){
+                          insertedProjectConversation.rows[0].modified_date = moment.tz(insertedProjectConversation.rows[0].modified_date, companyDefaultTimezone).format('MM-DD-YYYY hh:mm:ss');
+                          insertedProjectConversation.rows[0].created_date = moment.tz(insertedProjectConversation.rows[0].created_date, companyDefaultTimezone).format('MM-DD-YYYY hh:mm:ss');
+                        }
                         done();
-                        handleResponse.sendSuccess(res,'Project Conversation added successfully',{});
+                        handleResponse.sendSuccess(res,'Project Conversation added successfully',{"insertedProjectConversation":insertedProjectConversation.rows[0]});
                       }
                     })
                   }
@@ -78,7 +82,7 @@ exports.postEditConversation = (req, res) => {
                  handleResponse.shouldAbort(err, client, done);
                  handleResponse.handleError(res, err, ' Error in finding project conversation in the database');
                } else {
-                 client.query('UPDATE PROJECT_COMMENT SET message=$1 , modified_date=$2 where id = $3', [req.body.conversation_message,'now()',req.body.conversation_id], function (err, updatedProjectConversation) {
+                 client.query('UPDATE PROJECT_COMMENT SET message=$1 , modified_date=$2 where id = $3 returning id,message,modified_date', [req.body.conversation_message,'now()',req.body.conversation_id], function (err, updatedProjectConversation) {
                    if (err) {
                      handleResponse.shouldAbort(err, client, done);
                      handleResponse.handleError(res, err, ' Error in updating project conversation in the database');
@@ -89,8 +93,11 @@ exports.postEditConversation = (req, res) => {
                            handleResponse.shouldAbort(err, client, done);
                            handleResponse.handleError(res, err, ' Error in committing transaction');
                          } else {
+                           if(updatedProjectConversation.rows){
+                            updatedProjectConversation.rows[0].modified_date = moment.tz(updatedProjectConversation.rows[0].modified_date, companyDefaultTimezone).format('MM-DD-YYYY hh:mm:ss');
+                           }
                            done();
-                           handleResponse.sendSuccess(res,'Project Conversation updated successfully',{});
+                           handleResponse.sendSuccess(res,'Project Conversation updated successfully',{"updatedProjectConversation":updatedProjectConversation.rows[0]});
                          }
                        })
                    }
@@ -182,6 +189,7 @@ exports.postAddComment = (req, res) => {
                             handleResponse.shouldAbort(err, client, done);
                             handleResponse.handleError(res, err, ' Error in committing transaction');
                           } else {
+                            updatedProjectConversation.rows[0].modified_date = moment.tz(updatedProjectConversation.rows[0].modified_date, companyDefaultTimezone).format('MM-DD-YYYY hh:mm:ss');
                             if(req.body.sendemail == true){
                               client.query('SELECT user_id FROM PROJECT_ASSIGNMENT where project_id =$1', [req.body.project_id],function (err, projectResourceIdList) {
                                 if (err) {
@@ -220,7 +228,6 @@ exports.postAddComment = (req, res) => {
                                                 // console.log('updatedProjectConversation.rows[0]');
                                                 // console.log(updatedProjectConversation.rows[0]);
                                                 // console.log(selectedProjectComment.rows);
-                                                updatedProjectConversation.rows[0].modified_date = moment.tz(updatedProjectConversation.rows[0].modified_date, companyDefaultTimezone).format('MM-DD-YYYY hh:mm:ss');
                                                 selectedProjectComment.rows.forEach(data=>{
                                                     data.modified_date = moment.tz(data.modified_date, companyDefaultTimezone).format('MM-DD-YYYY hh:mm:ss');
                                                 })
@@ -231,7 +238,7 @@ exports.postAddComment = (req, res) => {
 
                                                 sendConversationThread(req,res,updatedProjectConversation.rows[0],selectedProjectComment.rows,projectResourceEmailList,projectData.rows[0],function(){
                                                   done();
-                                                  handleResponse.sendSuccess(res,'Project Comment added successfully',{});
+                                                  handleResponse.sendSuccess(res,'Project Comment added successfully',{"updatedProjectConversation":updatedProjectConversation.rows[0]});
                                                 });
                                               }
                                             })
@@ -243,7 +250,7 @@ exports.postAddComment = (req, res) => {
                               })
                             }else{
                                 done();
-                                handleResponse.sendSuccess(res,'Project Comment added successfully',{});
+                                handleResponse.sendSuccess(res,'Project Comment added successfully',{"updatedProjectConversation":updatedProjectConversation.rows[0]});
                             }
                           }
                         })
@@ -436,7 +443,7 @@ exports.deleteComment = (req, res) => {
               handleResponse.shouldAbort(err, client, done);
               handleResponse.handleError(res, err, ' Error in deleting project comment in the database');
             } else {
-              client.query('UPDATE PROJECT_COMMENT SET modified_date = $1 WHERE id = $2', ['now()',req.body.conversation_id], function (err, updatedProjectConversation) {
+              client.query('UPDATE PROJECT_COMMENT SET modified_date = $1 WHERE id = $2 returning modified_date', ['now()',req.body.conversation_id], function (err, updatedProjectConversation) {
                 if (err) {
                   handleResponse.shouldAbort(err, client, done);
                   handleResponse.handleError(res, err, ' Error in adding project conversation to the database');
@@ -447,8 +454,11 @@ exports.deleteComment = (req, res) => {
                       handleResponse.shouldAbort(err, client, done);
                       handleResponse.handleError(res, err, ' Error in committing transaction');
                     } else {
+                      updatedProjectConversation.rows.forEach(data => {
+                        data.modified_date = moment.tz(data.modified_date, companyDefaultTimezone).format('MM-DD-YYYY hh:mm:ss');
+                      })
                       done();
-                      handleResponse.sendSuccess(res,'Project Comment deleted successfully',{});
+                      handleResponse.sendSuccess(res,'Project Comment deleted successfully',{"updatedProjectConversation":updatedProjectConversation.rows[0]});
                     }
                   })
                 }
@@ -479,7 +489,7 @@ exports.postEditComment = (req, res) => {
                    handleResponse.shouldAbort(err, client, done);
                    handleResponse.handleError(res, err, ' Error in updating project comment in the database');
                  } else {
-                   client.query('UPDATE PROJECT_COMMENT SET modified_date = $1 WHERE id = $2', ['now()',req.body.conversation_id], function (err, updatedProjectConversation) {
+                   client.query('UPDATE PROJECT_COMMENT SET modified_date = $1 WHERE id = $2 returning modified_date', ['now()',req.body.conversation_id], function (err, updatedProjectConversation) {
                      if (err) {
                        handleResponse.shouldAbort(err, client, done);
                        handleResponse.handleError(res, err, ' Error in updating project conversation to the database');
@@ -490,8 +500,11 @@ exports.postEditComment = (req, res) => {
                            handleResponse.shouldAbort(err, client, done);
                            handleResponse.handleError(res, err, ' Error in committing transaction');
                          } else {
+                           updatedProjectConversation.rows.forEach(data => {
+                             data.modified_date = moment.tz(data.modified_date, companyDefaultTimezone).format('MM-DD-YYYY hh:mm:ss');
+                           })
                            done();
-                           handleResponse.sendSuccess(res,'Project Comment updated successfully',{});
+                           handleResponse.sendSuccess(res,'Project Comment updated successfully',{"updatedProjectConversation":updatedProjectConversation.rows[0]});
                          }
                        })
                      }

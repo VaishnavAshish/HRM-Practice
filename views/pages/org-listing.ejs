@@ -147,7 +147,7 @@
                                         <div class="sm-slds-grow">
                                             <div class="slds-form-element">
                                                 <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
-                                                    <input type="text" class="slds-input" placeholder="Search company by name" id="searchCompName" searchFunc="findCompanyByName()" onkeypress="handle(event,this);">
+                                                    <input type="text" class="slds-input" placeholder="Search company by name" id="searchCompName" searchFunc="findCompanyByName()" onkeypress="handle(event,this);" autocomplete="off">
                                                     <div class="slds-input__icon-group slds-input__icon-group_right">
                                                         <button class="slds-input__icon slds-input__icon_right slds-button slds-button_icon" title="Clear" onclick="clearSearchBox(this);findCompanyByName();">
                                                         <i class="fa fa-times-circle"></i>
@@ -259,7 +259,7 @@
                                                                         <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="activateBeforeConfirm('#globalAlert', 'activate(\'<%= comp.id %>\',\'company\')')">
                                                                             <span class="slds-truncate sf-text-red" title="">
                                                                                 <i class="fa fa-check-circle text-green"></i> &nbsp;
-                                                                                Restore
+                                                                                Activate
                                                                             </span>
                                                                         </a>
                                                                       </li>
@@ -270,7 +270,7 @@
                                                                         <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteCompany(\'<%= comp.id %>\')','Are you sure you want to delete <%= comp.name %> company.It will delete selected company and users from database and you will loose all information/data for company')">
                                                                                 <span class="slds-truncate sf-text-red" title="">
                                                                                     <i class="fa fa-trash text-red"></i> &nbsp;
-                                                                                    Delete
+                                                                                    Deactivate
                                                                                 </span>
                                                                             </a>
                                                                           </li>
@@ -341,7 +341,7 @@
                                                                                 <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="activateBeforeConfirm('#globalAlert', 'activate(\'<%= comp.id %>\',\'company\')')">
                                                                                     <span class="slds-truncate sf-text-red" title="">
                                                                                         <i class="fa fa-check-circle text-green"></i> &nbsp;
-                                                                                        Restore
+                                                                                        Activate
                                                                                     </span>
                                                                                 </a>
                                                                               </li>
@@ -352,7 +352,7 @@
                                                                                 <a href="javascript:void(0);" role="menuitem" tabindex="-1" onclick="deleteBeforeConfirm('#globalAlert', 'deleteCompany(\'<%= comp.id %>\')','Are you sure you want to delete <%= comp.name %> company.It will delete selected company and users from database and you will loose all information/data for company')">
                                                                                         <span class="slds-truncate sf-text-red" title="">
                                                                                             <i class="fa fa-trash text-red"></i> &nbsp;
-                                                                                            Delete
+                                                                                            Deactivate
                                                                                         </span>
                                                                                     </a>
                                                                                   </li>

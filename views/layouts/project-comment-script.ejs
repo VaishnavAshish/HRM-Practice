@@ -20,7 +20,7 @@
         // let conversation_id = $(ele).closest('.conver-accord-title').attr('id');
         let conversation_id = $(ele).closest('.conver-accord-title').attr('conversation_id');
         
-        showLoader('#globalLoader');
+        // showLoader('#globalLoader');
         $.ajax({
           type: 'POST',
           url : '/getAllRelatedComment',
@@ -29,7 +29,7 @@
           data:JSON.stringify({"conversation_id":conversation_id,"project_id":<%= project.id %>}),
           success : function(response){
             if(response.success) {
-              hideLoader('#globalLoader');
+              // hideLoader('#globalLoader');
               //showGlobalToast('#globalToast', 'success', response.message, 4000);
               let commentList = response.relatedCommentList;
               if(commentList.length>0){
@@ -40,6 +40,7 @@
                     return cb();
                   }
                 })
+                $('#conversation'+conversation_id+'_response').html(commentList.length);
               }else{
                 return cb();
               }
@@ -92,7 +93,7 @@
                         </span>`
       }
 
-      let commentHTML = `<section class="line-top tmr-20 tpd-10">
+      let commentHTML = `<section class="line-top tmr-20 tpd-10" id="comment${commentData.id}">
                             <div class="slds-grid">
                                 <div class="slds-no-flex slds-p-right_small">
                                     ${user_image_data}
@@ -122,12 +123,15 @@
       $("#editConversationDataHeading").text('Edit Conversation');
       $("#editConversationDataTitle").val(`${conversation_message}`);
       $("#editConversationDataTitle").focus();
-      $("#postEditConversationData").on('click',{"conversation_id":conversation_id,"type":"conversation"},updateConversationData);
+      let attr=`updateConversationData(${conversation_id},"conversation")`;
+      $('#postEditConversationData').attr('onclick',attr);
+      // $("#postEditConversationData").on('click',{"conversation_id":conversation_id,"type":"conversation"},updateConversationData);
       openModal('#modalEditConversation');
+      // rerenderConversation('conversation'+conversation_id);
     }
 
     function deleteConversationData(conversation_id){
-      showLoader('#globalLoader');
+      // showLoader('#globalLoader');
       $.ajax({
         type: 'POST',
         url : '/deleteConversation',
@@ -136,9 +140,11 @@
         data:JSON.stringify({"conversation_id":conversation_id}),
         success : function(response){
           if(response.success){
-            hideLoader('#globalLoader');
+            // hideLoader('#globalLoader');
             showGlobalToast('#globalToast', 'success', response.message, 4000);
-            location.reload();
+            $('#conversation'+conversation_id).remove();
+            $('#conversationCount').html('ACTIVITY ('+$('div[conversation_id]').length+')');
+            // location.reload();
           }
         },
         error: function(response){
@@ -150,7 +156,7 @@
     }
 
     function deleteCommentData(comment_id,conversation_id){
-      showLoader('#globalLoader');
+      // showLoader('#globalLoader');
       $.ajax({
         type: 'POST',
         url : '/deleteComment',
@@ -159,9 +165,12 @@
         data:JSON.stringify({"comment_id":comment_id,"conversation_id":conversation_id}),
         success : function(response){
           if(response.success){
-            hideLoader('#globalLoader');
+            // hideLoader('#globalLoader');
             showGlobalToast('#globalToast', 'success', response.message, 4000);
-            location.reload();
+            $('#comment'+comment_id).remove();
+            $('#conversation'+conversation_id+'_response').html('ACTIVITY ('+$('#commentList > section').length+')');
+            $('#conversation'+conversation_id+'_modifiedOn').html('Last Modify: '+response.updatedProjectConversation.modified_date);
+            // location.reload();
           }
         },
         error: function(response){
@@ -172,11 +181,12 @@
       });
     }
 
-    function updateConversationData(event){
-      showLoader('#globalLoader');
+    function updateConversationData(conver_id,typ,comment_id){
+      // showLoader('#globalLoader');
+      closeModal('#modalEditConversation');
       clearError('#editConversationDataTitle')
-      let conversation_id = event.data.conversation_id;
-      let type = event.data.type;
+      let conversation_id = conver_id;
+      let type = typ;
       let message = $("#editConversationDataTitle").val();
       if(message == '' || message == undefined ||message == null){
           hideLoader('#globalLoader');
@@ -190,7 +200,7 @@
             updatedData.conversation_message = message;
           }else{
             url = '/editComment';
-            updatedData.comment_id = event.data.comment_id;
+            updatedData.comment_id = comment_id;
             updatedData.comment_message = message;
             updatedData.conversation_id = conversation_id;
           }
@@ -202,9 +212,14 @@
             data:JSON.stringify(updatedData),
             success : function(response){
               if(response.success){
-                hideLoader('#globalLoader');
+                // hideLoader('#globalLoader');
                 showGlobalToast('#globalToast', 'success', response.message, 4000);
-                location.reload();
+                rerenderConversation("conversation"+conversation_id);
+                if (type == 'conversation') {
+                  $('#conversation' + conversation_id + '_message').html(response.updatedProjectConversation.message);
+                }
+                $('#conversation' + conversation_id + '_modifiedOn').html('Last Modify :' + response.updatedProjectConversation.modified_date);
+                // location.reload();
               }
             },
             error: function(response){
@@ -221,12 +236,15 @@
       $("#editConversationDataHeading").text('Edit Comment')
       $("#editConversationDataTitle").val(`${comment_message}`);
       $("#editConversationDataTitle").focus();
-      $("#postEditConversationData").on('click',{"comment_id":comment_id,"conversation_id":conversation_id,"type":"comment"},updateConversationData);
+      let attr=`updateConversationData(${conversation_id},"comment",${comment_id})`;
+      $('#postEditConversationData').attr('onclick',attr);
+      // $("#postEditConversationData").on('click',{"comment_id":comment_id,"conversation_id":conversation_id,"type":"comment"},updateConversationData);
       openModal('#modalEditConversation');
     }
 
     function addNewComment(conversation_id,email){
-      showLoader('#globalLoader');
+      if(email)
+        showLoader('#globalLoader');
       let commentParent = $("#addNewComment",`#${conversation_id}`)
       clearError(commentParent);
       let commentMessage = $("#addNewComment",`#${conversation_id}`).val();
@@ -244,12 +262,14 @@
               if(response.success){
                 hideLoader('#globalLoader');
                 showGlobalToast('#globalToast', 'success', response.message, 4000);
-                location.reload();
+                // location.reload();
+                rerenderConversation(conversation_id);
+                $('#'+conversation_id+'_modifiedOn').html('Last Modify: '+response.updatedProjectConversation.modified_date)
               }
             },
             error: function(response){
               console.log('error is : '+JSON.stringify(response));
-              hideLoader('#globalLoader');
+              // hideLoader('#globalLoader');
               showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
             }
           });
@@ -259,8 +279,124 @@
 
     }
 
+    function rerenderConversation(conversation_id){
+      $('#'+conversation_id).prependTo('#converWrapper');
+      toggleConversation('#converWrapper', document.getElementById(conversation_id));
+      toggleConversation('#converWrapper', document.getElementById(conversation_id));
+      $('#addNewComment').val('');
+    }
+
+    function renderNewConversationThread(insertedProjectConversation){
+      let conversationLine='';
+      insertedProjectConversation.message.split('\n').forEach(conver_line => {
+        conversationLine+=conver_line+"<br>"
+      });
+      let conversationId=insertedProjectConversation.id;
+
+     let htm=`<!-- conversation thread start -->
+                                        <div class="slds-card slds-p-around_medium conver-accord-title bmr-15" id="conversation${conversationId}" conversation_id = "${conversationId}">
+                                            <div class="slds-grid slds-wrap">
+                                              <div class="slds-size_1-of-1 slds-medium-size_8-of-12">
+                                                <div class="slds-grid expandDiv" onclick="toggleConversation('#converWrapper', this);">
+                                                    <div class="slds-no-flex slds-p-right_small ">
+                                                        <div class="conver-icon-close">
+                                                            <i class="fa fa-plus-circle fa-2x text-blue"></i>
+                                                        </div>
+                                                        <div class="conver-icon-open">
+                                                            <i class="fa fa-minus-circle fa-2x text-dull"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-has-flexi-truncate">
+                                                        <div class="">
+                                                            <a href="javascript:void(0);" class="text-size-16" id="conversation${conversationId}_message">
+                                                              ${conversationLine}
+                                                            </a>
+                                                        </div>
+  
+                                                        <div>
+                                                            <span class="text-dull text-size-11 " id="conversation${conversationId}_modifiedOn">
+                                                                Last Modify: ${insertedProjectConversation.modified_date}
+                                                            </span>
+                                                            <span class="text-dull text-size-11 ">
+                                                                 / By: <%= user.first_name %> <%= user.last_name %> <%= user.email %>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                  </div>
+                                              </div>
+                                              <div class="slds-size_1-of-1 slds-medium-size_4-of-12">
+                                                <div class="slds-grid">
+                                                  <div class="slds-has-flexi-truncate">
+                                                    <div class="sm-tpd-15">
+                                                        <div class="slds-truncate  text-dull slds-p-bottom_xx-small text-size-11 sm-hide">
+                                                            Response
+                                                        </div>
+                                                        <div>
+                                                           <span class="slds-badge" id="conversation${conversationId}_response"> 0 </span>
+                                                        </div>
+                                                    </div>
+                                                  </div>
+                                                  <div class="slds-no-flex">
+                                                      <a href="javascript:void(0)" onclick="editConversationData('${conversationId}', '${insertedProjectConversation.message}')" title="edit conversation">
+                                                           <i class="fa fa-edit"></i>
+                                                       </a>
+                                                       <a href="javascript:void(0)" class="lpd-10" onclick="deleteBeforeConfirm('#globalAlert', 'deleteConversationData(\'${conversationId}\')','Are you sure you want to remove this conversation ? All the comment related to this conversation will also be removed . Press confirm to delete this conversation.');" title="delete conversation">
+                                                           <i class="fa fa-trash text-red"></i>
+                                                       </a>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                              <div class="conver-accord-content line-top tpd-10 tmr-10">
+                                                  <!-- comment form start -->
+                                                  <div>
+                                                      <div class="slds-grid">
+                                                          <div class="slds-no-flex slds-p-right_small">
+                                                            <% function getRandomColor() {
+                                                                 return "#"+((1<<24)*Math.random()|0).toString(16);
+                                                             } %>
+                                                             <% if(!user.user_img){ %>
+                                                                <span class="slds-avatar slds-avatar_circle user-name-initials" style="background-color:<%= getRandomColor() %>;color:white;" title="<%= user.first_name%> <%=user.last_name%> By: <%=user.email%>">
+                                                                  <%= user.first_name.substring(0,1).toUpperCase()%><%= user.last_name?user.last_name.substring(0,1).toUpperCase():'' %>
+                                                                </span>
+                                                              <% } else { %>
+                                                                <span class="slds-avatar slds-avatar_circle" >
+                                                                    <img alt="Person name" src="/getUserPicture/<%= user.id %>" title = "<%= user.first_name %>  <%= user.last_name %>  By:<%= user.email %>" >
+                                                                </span>
+                                                              <% } %>
+                                                          </div>
+                                                          <div class="slds-has-flexi-truncate">
+                                                              <div class="slds-form-element ">
+                                                                  <div class="slds-form-element__control">
+                                                                      <textarea id="addNewComment" class="slds-textarea" required = "" placeholder="Write a comment" rows="3"></textarea>
+                                                                      <div class="slds-text-color_error text-size-12 slds-p-top_xx-small">
+  
+                                                                      </div>
+                                                                  </div>
+                                                              </div>
+                                                              <div class="text-right">
+                                                                  <button class="slds-button slds-button_brand" id="addCommentBtnAndEmail" onclick="addNewComment('conversation${conversationId}',true)">
+                                                                      Add & Email
+                                                                  </button>
+                                                                  <button class="slds-button slds-button_brand" id="addCommentBtn" onclick="addNewComment('conversation${conversationId}',false)">
+                                                                      Add
+                                                                  </button>
+                                                              </div>
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                                  <!-- comment form end -->
+                                                  <div id="commentList">
+                                                  </div>
+                                              </div>
+                                          </div>  `;
+                                          $('#converWrapper').prepend(htm);
+                                          toggleConversation('#converWrapper', document.getElementById('conversation'+conversationId));                                          
+                                          $('#conversationCount').html('ACTIVITY ('+$('div[conversation_id]').length+')');
+    }
+
     function createNewConversationThread(){
-      showLoader('#globalLoader');
+      // showLoader('#globalLoader');
       $("#newConversationSection").removeClass('has-error');
       clearError("#newConversationTitle");
       checkFormValidation("#newConversationSection");
@@ -273,9 +409,12 @@
 		      data:JSON.stringify({"newConversationTitle":$("#newConversationTitle").val(),"project_id":<%= project.id %>}),
 		       success : function(response){
 				   if(response.success){
-    						hideLoader('#globalLoader');
+                // hideLoader('#globalLoader');
+                if(response.insertedProjectConversation){
+                  renderNewConversationThread(response.insertedProjectConversation);
+                }
     						showGlobalToast('#globalToast', 'success', response.message, 4000);
-    					   	location.reload();
+    					   	// location.reload();
     				   }
 		       },
 		       error: function(response){
@@ -287,6 +426,10 @@
 			}else{
 				hideLoader('#globalLoader');
 			}
+    }
+
+    function createConversationThreadHTML(){
+      let conThreadHTML=``;
     }
 
 </script>
