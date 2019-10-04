@@ -2615,7 +2615,7 @@ function generatePdf (req, res, invoiceDetails,lineItems,accountDetails,companyS
                                                     <tbody>
                                                         <tr>
                                                             <td class="" valign="top" width="20%">
-                                                                <strong>From</trong>
+                                                                <strong>From</strong>
                                                             </td>
                                                             <td class="">
                                                                 <div style="margin-left:18px;">
