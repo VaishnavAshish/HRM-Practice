@@ -20,7 +20,7 @@
         // let conversation_id = $(ele).closest('.conver-accord-title').attr('id');
         let conversation_id = $(ele).closest('.conver-accord-title').attr('conversation_id');
         
-        // showLoader('#globalLoader');
+        showLoader('#globalLoader');
         $.ajax({
           type: 'POST',
           url : '/getAllRelatedComment',
@@ -28,8 +28,8 @@
           dataType: 'json',
           data:JSON.stringify({"conversation_id":conversation_id,"project_id":<%= project.id %>}),
           success : function(response){
+            hideLoader('#globalLoader');
             if(response.success) {
-              // hideLoader('#globalLoader');
               //showGlobalToast('#globalToast', 'success', response.message, 4000);
               let commentList = response.relatedCommentList;
               if(commentList.length>0){
@@ -131,7 +131,7 @@
     }
 
     function deleteConversationData(conversation_id){
-      // showLoader('#globalLoader');
+      showLoader('#globalLoader');
       $.ajax({
         type: 'POST',
         url : '/deleteConversation',
@@ -140,7 +140,7 @@
         data:JSON.stringify({"conversation_id":conversation_id}),
         success : function(response){
           if(response.success){
-            // hideLoader('#globalLoader');
+            hideLoader('#globalLoader');
             showGlobalToast('#globalToast', 'success', response.message, 4000);
             $('#conversation'+conversation_id).remove();
             $('#conversationCount').html('ACTIVITY ('+$('div[conversation_id]').length+')');
@@ -156,7 +156,7 @@
     }
 
     function deleteCommentData(comment_id,conversation_id){
-      // showLoader('#globalLoader');
+      showLoader('#globalLoader');
       $.ajax({
         type: 'POST',
         url : '/deleteComment',
@@ -165,7 +165,7 @@
         data:JSON.stringify({"comment_id":comment_id,"conversation_id":conversation_id}),
         success : function(response){
           if(response.success){
-            // hideLoader('#globalLoader');
+            hideLoader('#globalLoader');
             showGlobalToast('#globalToast', 'success', response.message, 4000);
             $('#comment'+comment_id).remove();
             $('#conversation'+conversation_id+'_response').html('ACTIVITY ('+$('#commentList > section').length+')');
@@ -182,7 +182,7 @@
     }
 
     function updateConversationData(conver_id,typ,comment_id){
-      // showLoader('#globalLoader');
+      showLoader('#globalLoader');
       closeModal('#modalEditConversation');
       clearError('#editConversationDataTitle')
       let conversation_id = conver_id;
@@ -212,7 +212,7 @@
             data:JSON.stringify(updatedData),
             success : function(response){
               if(response.success){
-                // hideLoader('#globalLoader');
+                hideLoader('#globalLoader');
                 showGlobalToast('#globalToast', 'success', response.message, 4000);
                 rerenderConversation("conversation"+conversation_id);
                 if (type == 'conversation') {
@@ -243,8 +243,8 @@
     }
 
     function addNewComment(conversation_id,email){
-      if(email)
         showLoader('#globalLoader');
+      // if(email)
       let commentParent = $("#addNewComment",`#${conversation_id}`)
       clearError(commentParent);
       let commentMessage = $("#addNewComment",`#${conversation_id}`).val();
@@ -269,7 +269,7 @@
             },
             error: function(response){
               console.log('error is : '+JSON.stringify(response));
-              // hideLoader('#globalLoader');
+              hideLoader('#globalLoader');
               showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
             }
           });
@@ -396,7 +396,7 @@
     }
 
     function createNewConversationThread(){
-      // showLoader('#globalLoader');
+      showLoader('#globalLoader');
       $("#newConversationSection").removeClass('has-error');
       clearError("#newConversationTitle");
       checkFormValidation("#newConversationSection");
@@ -409,7 +409,7 @@
 		      data:JSON.stringify({"newConversationTitle":$("#newConversationTitle").val(),"project_id":<%= project.id %>}),
 		       success : function(response){
 				   if(response.success){
-                // hideLoader('#globalLoader');
+                hideLoader('#globalLoader');
                 if(response.insertedProjectConversation){
                   renderNewConversationThread(response.insertedProjectConversation);
                 }
@@ -428,8 +428,8 @@
 			}
     }
 
-    function createConversationThreadHTML(){
-      let conThreadHTML=``;
-    }
+    // function createConversationThreadHTML(){
+    //   let conThreadHTML=``;
+    // }
 
 </script>
