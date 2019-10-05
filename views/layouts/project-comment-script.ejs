@@ -170,6 +170,7 @@
             $('#comment'+comment_id).remove();
             $('#conversation'+conversation_id+'_response').html('ACTIVITY ('+$('#commentList > section').length+')');
             $('#conversation'+conversation_id+'_modifiedOn').html('Last Modify: '+response.updatedProjectConversation.modified_date);
+            rerenderConversation('conversation'+conversation_id);
             // location.reload();
           }
         },
