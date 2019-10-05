@@ -128,9 +128,20 @@
                                                 </span>
                                             </button>
                                         </div> -->
-
-                                       
                                         <div class="sm-slds-grow">
+                                            <div class="slds-form-element">
+                                                <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
+                                                    <input type="text" class="slds-input" placeholder="Search account by name" id="searchAccountName" searchFunc="findAccountByName()" onkeypress="handle(event,this);">
+                                                    <div class="slds-input__icon-group slds-input__icon-group_right">
+                                                        <button class="slds-input__icon slds-input__icon_right slds-button slds-button_icon" title="Clear" onclick="clearSearchBox(this);findAccountByName();" >
+                                                        <i class="fa fa-times-circle"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                       
+                                        <!-- <div class="sm-slds-grow">
                                             <div class="slds-form-element">
                                                 <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
                                                     <input type="text" value="" class="slds-input" placeholder="Search company by name" id="searchCompName" searchFunc="findCompanyByName()" onkeypress="handle(event,this);" readonly onfocus="this.removeAttribute('readonly');">
@@ -141,7 +152,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> -->
                                         <div class="slds-no-flex slds-p-left_small">
                                             <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top" title="Search" onclick="findCompanyByName();">
                                             <span class="slds-button__icon">
