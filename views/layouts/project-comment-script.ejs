@@ -341,7 +341,7 @@
                                                       <a href="javascript:void(0)" onclick="editConversationData('${conversationId}', '${insertedProjectConversation.message}')" title="edit conversation">
                                                            <i class="fa fa-edit"></i>
                                                        </a>
-                                                       <a href="javascript:void(0)" class="lpd-10" onclick="deleteBeforeConfirm('#globalAlert', 'deleteConversationData(\'${conversationId}\')','Are you sure you want to remove this conversation ? All the comment related to this conversation will also be removed . Press confirm to delete this conversation.');" title="delete conversation">
+                                                       <a href="javascript:void(0)" class="lpd-10" onclick="deleteBeforeConfirm('#globalAlert', 'deleteConversationData(${conversationId})','Are you sure you want to remove this conversation ? All the comment related to this conversation will also be removed . Press confirm to delete this conversation.');" title="delete conversation">
                                                            <i class="fa fa-trash text-red"></i>
                                                        </a>
                                                   </div>
@@ -413,6 +413,7 @@
                 hideLoader('#globalLoader');
                 if(response.insertedProjectConversation){
                   renderNewConversationThread(response.insertedProjectConversation);
+                  $('#newConversationTitle').val('');
                 }
     						showGlobalToast('#globalToast', 'success', response.message, 4000);
     					   	// location.reload();

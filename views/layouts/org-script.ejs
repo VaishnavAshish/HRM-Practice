@@ -1,4 +1,5 @@
 <script>
+	var lastSearchText;
 $(document).ready(function(){
 
 	$("#offset").text(parseInt($("#pageRecordNo").text()));
@@ -23,7 +24,9 @@ $(document).ready(function(){
 	}else{
 		$(".slds-button[loadItemId]").hide();
 	}
+	lastSearchText=$('#searchCompName').val();
 })
+
 function loadMoreData(){
 	let offset=$("#offset").text();
 	let searchText=$("#searchCompName").val();
@@ -146,6 +149,10 @@ function searchCompany(filter,obj){
 	    });
 }
 function findCompanyByName(){
+	if(lastSearchText==$('#searchCompName').val()){
+		return 0;
+	}
+	lastSearchText=$('#searchCompName').val();
 	$("div[title=noCompanyFound]").addClass('slds-hide');
 	showLoader('#globalLoader');
 
