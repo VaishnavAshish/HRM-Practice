@@ -162,7 +162,7 @@ exports.disableStripe = (req, res) => {
                                           handleResponse.handleError(res, err, ' Error in committing transaction');
                                         } else {
                                           done();
-                                          handleResponse.sendSuccess(res,'Success! Your account has been downgrade to free version.Now you cannot integrate with other softwares.',{});
+                                          handleResponse.sendSuccess(res,'Success! Your account has been downgrade to free version.',{});
                                         }
                                       })
                                     }
