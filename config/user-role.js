@@ -1,5 +1,5 @@
 let role={
-	"super_admin":["org-listing","org-details","resource-details","generateUserCSV"],
+	"super_admin":["org-listing","org-details","resource-details"],
 	"admin":["accounts-listing","account-details","resources-listing","resource-details","org-settings","org-settings-userrole","org-settings-invoice","org-settings-expense","org-settings-export","org-settings-tax","integration-dashboard"],
 	"user":[]
 };
@@ -96,9 +96,6 @@ assigned = (req, res, done) => {
   		// console.log('permission'+permissions[i]+' page'+page);
   		// console.log(assignment[permissions[i]]);
   		/*if(page.indexOf(timesheet)>0){
-  			page='timesheet';
-  		}*/
-  		// console.log(permissions[i] in assignment);
   		/* // console.log(assignment[permissions[i]].includes(page)); */
   		if((permissions[i] in assignment)&&(assignment[permissions[i]].includes(page))){
   			// console.log('inside true condition');
@@ -130,8 +127,8 @@ assigned = (req, res, done) => {
   	}
 
   	if (req.user && req.user.permissions && isAssigned(req.user.permissions,page)){
-    	  console.log('Inside user checked assignement'+req.user.permissions);
-	     return done(true);
+  	  console.log('Inside user checked assignement'+req.user.permissions);
+     return done(true);
     }
     else {
 		   console.log('Inside user unchecked assignement');

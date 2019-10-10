@@ -37,6 +37,14 @@
                   <% } %>
                 </div>
               <% } %>
+              <% if(user.user_role.includes('SUPER_ADMIN')) { %>
+                <% console.log('user.user_role '+user.user_role) %>
+                  <div class="slds-no-flex">
+                      <button class="slds-button slds-button_neutral slds-align-top" type="button" onclick="exportToCsv('generateUserCSV')">
+                          Export Users
+                      </button>
+                  </div>
+                <% } %>
 
             <div class="slds-no-flex slds-p-horizontal_large">
                 <div class="slds-grid slds-grid_vertical-align-center">

@@ -1098,21 +1098,20 @@ exports.generateUserDetailsCsv = (req, res) => {
       console.log('companyDefaultTimezone');
       // console.log(companyDefaultTimezone);
       pool.connect((err, client, done) => {
-        let qry = `select u.email,u.username,u.designation,u.first_name,u.last_name,u.created_date,u.modified_date,u.phone, u.mobile,u.add_status,u.bill_rate,u.cost_rate,u.role,u.record_id,
-        c.name as company_name,c.domain as company_domain
-        from users u 
-        inner join company c on u.company_id = c.id 
-        where u.archived = false
-        `;
+        let qry = `select u.first_name,u.last_name,u.email,u.created_date,u.phone, u.mobile,u.add_status,u.bill_rate,u.cost_rate,
+                    c.name as company_name,c.domain as company_domain
+                    from users u
+                    inner join company c on u.company_id = c.id
+                    where u.archived = false`;
         client.query(qry, [], (err, userDetails) => {
           if (err) {
             handleResponse.shouldAbort(err, client, done);
-            handleResponse.handleError(res, err, ' Error in finding project data');
+            handleResponse.handleError(res, err, ' Error in finding user data');
           } else {
             userDetails.rows.forEach(userData => {
               userData.created_date = userData.created_date ? moment.tz(userData.created_date, companyDefaultTimezone).format('MM-DD-YYYY') : '';
-              userData.modified_date = userData.modified_date ? moment.tz(userData.modified_date, companyDefaultTimezone).format('MM-DD-YYYY') : '';
-              })
+              // userData.modified_date = userData.modified_date ? moment.tz(userData.modified_date, companyDefaultTimezone).format('MM-DD-YYYY') : '';
+            })
             jsonexport(userDetails.rows, function (err, csv) {
               if (err) {
                 console.log('err');
