@@ -385,6 +385,8 @@ module.exports = function(app) {
     app.post('/getProjectList', passportConfig.isAuthenticated, projectController.getProjectList);
     app.get('/getProjectListForCompany', passportConfig.isAuthenticated, projectController.getProjectListForCompany);
 
+    app.post('/resendInvitationEmail',passportConfig.isAuthenticated, resourceController.postResendActivation);
+    app.get('/generateUserCSV', passportConfig.isAuthenticated, adminController.generateUserDetailsCsv);
     app.get('*',function(req, res) {
         res.redirect('/domain');
     });
