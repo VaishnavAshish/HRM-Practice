@@ -8,16 +8,16 @@
                     <i class="fa fa-bars text-size-21"></i>
                 </a>
             </div>
-            <div class="slds-has-flexi-truncate slds-p-left_small">
+            <div class="slds-has-flexi-truncate slds-p-left_small sm-hide">
                 <div class="">
-                    <h1 class="slds-text-heading_medium slds-truncate max-w-500 sm-text-size-14">
+                    <h1 class="slds-text-heading_medium slds-truncate max-w-500">
                         <!-- <i class="fas fa-warehouse text-green"></i> &nbsp; -->
                         <%=user.company %>
 
                     </h1>
                 </div>
-            </div>
-            <% if(user.user_role.includes('ADMIN')) { %>
+            </div>            
+              <% if(user.user_role.includes('ADMIN')) { %>
                 <div class="slds-no-flex">
                   <% console.log('user.company_info.stripe_customer_id '+user.company_info.stripe_customer_id) %>
                   <% if(user.company_info.stripe_customer_id){ %>
