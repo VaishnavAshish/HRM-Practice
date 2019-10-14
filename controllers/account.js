@@ -181,7 +181,7 @@ exports.getAccount = (req, res) => {
                     }
                     // console.log(account.rows);
                     done();
-                    handleResponse.responseToPage(res,'pages/accounts-listing',{accounts:accList, totalCount:totalCount,activeCount:activeCount, archivedCount:(totalCount-activeCount) ,user:req.user,stripeCustomerId:result.stripe_customer_id},"success","Successfully rendered");
+                    handleResponse.responseToPage(res,'pages/accounts-listing',{accounts:accList, totalCount:totalCount,activeCount:activeCount, archivedCount:(totalCount-activeCount) ,user:req.user,stripeCustomerId:result.stripe_customer_id,companyDefaultCurrency:result.currency},"success","Successfully rendered");
 
               }
             });

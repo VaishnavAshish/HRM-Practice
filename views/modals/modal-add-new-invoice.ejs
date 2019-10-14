@@ -24,7 +24,7 @@
                                     <% if(accounts.length >0) {%>
                                         <option value=""> </option>
                                         <% accounts.forEach(function(account) { %>
-                                            <option ac_id="<%= account.id %>" value="<%= account.name %>"><%= account.name %></option>
+                                            <option ac_id="<%= account.id %>" value="<%= account.name %>" ac_currency="<%= account.currency %>" ><%= account.name %></option>
                                         <% }); %>
                                     <% } else { %>
                                         <option value=""> </option>

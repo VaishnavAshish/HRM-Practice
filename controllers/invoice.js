@@ -192,7 +192,7 @@ exports.getInvoice = (req, res) => {
             // console.log('companyDefaultCurrency');
             // console.log(companyDefaultCurrency);
             pool.connect((err, client, done) => {
-                client.query('SELECT id, name FROM ACCOUNT WHERE company_id=$1 AND archived=$2', [req.user.company_id, false], function (err, accountList) {
+                client.query('SELECT id, name, currency FROM ACCOUNT WHERE company_id=$1 AND archived=$2', [req.user.company_id, false], function (err, accountList) {
                     if (err) {
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);
@@ -266,7 +266,7 @@ exports.postAddInvoice = (req, res) => {
                     else {
                         let companySetting=defaultCompanySetting.rows[0];
                         // let createdDate=moment.tz(new Date(), companyDefaultTimezone).format();
-                        client.query('INSERT INTO INVOICE ( account_id, company_id, created_by, created_date, due_date,updated_date, account_name, start_date, currency, description) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING id', [req.body.accountId, req.user.company_id, req.user.id, 'now()', 'now()' , 'now()', req.body.accountName, 'now()', companySetting.currency,companySetting.invoice_note], function (err, invoiceId) {
+                        client.query('INSERT INTO INVOICE ( account_id, company_id, created_by, created_date, due_date,updated_date, account_name, start_date, currency, description) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING id', [req.body.accountId, req.user.company_id, req.user.id, 'now()', 'now()' , 'now()', req.body.accountName, 'now()', req.body.accountCurrency,companySetting.invoice_note], function (err, invoiceId) {
                             if (err) {
                                 console.error(err);
                                 handleResponse.shouldAbort(err, client, done);

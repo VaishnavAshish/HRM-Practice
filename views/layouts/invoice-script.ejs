@@ -53,6 +53,7 @@ function createInvoice(modalId) {
             /*clearError('#invoice-project', '#err-msg-project')*/
             var accounId = $('#invoice-account option:selected').attr('ac_id');
             var accountName = $('#invoice-account option:selected').val();
+            var accountCurrency = $('#invoice-account option:selected').attr('ac_currency');
             /*var projectId = $('#invoice-project option:selected').attr('pr_id');
             var projectName = $('#invoice-project option:selected').val();*/
             $.ajax({
@@ -60,7 +61,7 @@ function createInvoice(modalId) {
                 url : '/addInvoice',
                 contentType: 'application/json',
                 dataType: 'json',
-                data : JSON.stringify({"accountId":accounId, "accountName":accountName}),
+                data : JSON.stringify({"accountId":accounId, "accountName":accountName,"accountCurrency":accountCurrency}),
                 success : function(response){
                     console.log(response);
                     if(response.success == true) {

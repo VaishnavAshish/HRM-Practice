@@ -2254,10 +2254,14 @@ function submitWeeklyTimesheet(submitBtn){
      dataType: 'json',
      data: JSON.stringify({weekStartDate:weekStartDate,weekEndDate:weekEndDate}),
      success: function (response) {
-         hideLoader('#globalLoader');
          if(response.success == true) {
-             location.reload();
+           showGlobalToast('#globalToast', 'success', response.message, 4000);
+           setTimeout(() => {
+               hideLoader('#globalLoader');
+               location.reload();
+           }, 4000);
          }else{
+           hideLoader('#globalLoader');
            showGlobalToast('#globalToast', 'error', response.message, 4000);
          }
      },

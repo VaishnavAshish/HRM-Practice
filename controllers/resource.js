@@ -694,7 +694,7 @@ exports.updateResource = (req, res) => {
                     // console.log('------------------req.body.bill_rate---------');
                     req.body.bill_rate=(req.body.bill_rate==undefined||req.body.bill_rate==null||req.body.bill_rate=='')?selectedUser.rows[0].bill_rate:req.body.bill_rate;
                     req.body.cost_rate=(req.body.cost_rate==undefined||req.body.cost_rate==null||req.body.cost_rate=='')?selectedUser.rows[0].cost_rate:req.body.cost_rate;
-                    client.query('UPDATE users set email=$1,first_name=$2,last_name=$3,phone=$4,mobile=$5,modified_date=$6,bill_rate=$7,cost_rate=$8,permissions=$9,role=$10 where id=$11  RETURNING *', [req.body.email, req.body.first_name, req.body.last_name, req.body.phone, req.body.mobile, 'now()',req.body.bill_rate,req.body.cost_rate,permissions,req.body.user_role, req.body.id], function (err, resource) {
+                    client.query('UPDATE users set first_name=$1,last_name=$2,phone=$3,mobile=$4,modified_date=$5,bill_rate=$6,cost_rate=$7,permissions=$8,role=$9 where id=$10  RETURNING *', [req.body.first_name, req.body.last_name, req.body.phone, req.body.mobile, 'now()',req.body.bill_rate,req.body.cost_rate,permissions,req.body.user_role, req.body.id], function (err, resource) {
                       if (err) {
                         handleResponse.shouldAbort(err, client, done);
                         handleResponse.handleError(res, err, ' Error in updating resource data');
