@@ -4,6 +4,63 @@ var lastSearchText;
         lastSearchText = $("#searchTaskName").val();
     })
 
+    function addNewSubtask(modalId, formId, accountId, parent_id) {
+        var taskData = createJSONForFormData(formId);
+        console.log(projectName);
+        let taskUserEmail=$("#assigned_user option:selected").text();
+
+        let userData={ userEmail:'',billRate:'0.00',costRate:'0.00',user_role:'',assignment_id:null}
+        if(taskUserEmail!=''&&taskUserEmail!=undefined&&taskUserEmail!=null){
+             userData.userEmail= $("#assigned_user option:selected").attr('email_id');
+             userData.assignment_id = $('#assigned_user2 option:selected').attr('pr_as_id');
+             userData.billRate=$("#assigned_user option:selected").attr('billRate');
+             userData.costRate=$("#assigned_user option:selected").attr('costRate');
+             taskData.user_role=$("#assigned_user option:selected").attr('role');
+        }
+        taskData.billable='<%= taskDetails.billable %>';
+        clearError("#task_name");
+        if(taskData.task_name) {
+          checkFormValidation("#addTaskForm");
+          if(!parent_id){
+              return console.log('no parent id');
+          }
+          if (taskData.due_date!='' && taskData.start_date > taskData.due_date) {
+            addError("#tsk_due_date", "Please enter end date greater than start date");
+          } else if(!$("#addTaskForm").hasClass('has-error')) {
+            showLoader('#globalLoader');
+            $.ajax({
+                type: 'POST',
+                url : '/addSubtask',
+                contentType: 'application/json',
+                dataType: 'json',
+                data : JSON.stringify({"accountId":accountId, "taskData":taskData, "projectId": '<%= taskDetails.project_id %>',"projectName": '<%= taskDetails.project_name %>',"userData":userData,"parent_id":parent_id}),
+                success : function(response){
+                    console.log(response);
+                    if(response.success == true) {
+                        hideLoader('#globalLoader');
+                        closeModal(modalId);
+                        showGlobalToast('#globalToast', 'success', response.message, 4000);
+                        location.reload();
+                    } else {
+                        hideLoader('#globalLoader');
+                        closeModal(modalId);
+                        showGlobalToast('#globalToast', 'error', response.message, 4000);
+                    }
+                },
+                error: function(response){
+                        console.log(response);
+                        hideLoader('#globalLoader');
+                        closeModal(modalId);
+                        showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+                }
+            });
+          }
+        } else {
+            addError("#task_name", 'Please enter task title');
+        }
+        // taskData.task_desc = $('#taskDescription').summernote('code');
+    }
+
     function addNewTask(modalId, formId, accountId) {
         var taskData = createJSONForFormData(formId);
         console.log(projectName);
@@ -57,6 +114,8 @@ var lastSearchText;
         }
         // taskData.task_desc = $('#taskDescription').summernote('code');
     }
+
+
 
     function updateTaskDetails(taskId, formId, projectId) {
 

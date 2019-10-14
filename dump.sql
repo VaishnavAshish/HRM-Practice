@@ -1227,3 +1227,6 @@ UPDATE setting set tax_category = '{GST}';
 --2019-09-26
 ALTER TABLE project add column task_sort_order character varying(65525);
 UPDATE Project p set task_sort_order = (select string_agg(CAST(id as varchar), ',') from task t where project_id= p.id AND archived = false)
+
+--2019-10-14
+ALTER TABLE task add column subtask_sort_order character varying(65525);
