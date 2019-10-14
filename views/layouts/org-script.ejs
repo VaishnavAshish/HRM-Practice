@@ -198,6 +198,7 @@ function findCompanyByName(){
 						let searchFilter=$("#selectedFilter").text();
 						let noOfRecord=parseInt($("#offset").text());
 						if(parseInt($("#totalRecordCount").text())>parseInt($("#offset").text())){
+							$(".slds-button[loadItemId]").show();
 							$(".slds-button[loadItemId]").text('Load More ('+noOfRecord+'/'+$("#totalRecordCount").text()+')');
 						}else{
 							$(".slds-button[loadItemId]").hide();
@@ -206,6 +207,7 @@ function findCompanyByName(){
 
 					}else{
 						$("div[title=noCompanyFound]").removeClass('slds-hide').text('No company found with this search crieteria');
+						$(".slds-button[loadItemId]").hide();
 						/*showGlobalToast('#globalToast', 'error','No company found with this search crieteria', 4000);*/
 					}
 			   }
