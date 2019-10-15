@@ -499,7 +499,7 @@ function createSubtaskRecord(req, client, err, done, assigned_user_id, res, call
       handleResponse.shouldAbort(err, client, done);
       handleResponse.handleError(res, err, ' Error in adding task to the database');
     } else {
-      client.query('UPDATE Task t SET subtask_sort_order = (CASE WHEN subtask_sort_order IS NULL THEN $1 ELSE t.subtask_sort_order || $2 END) WHERE id=$3',[insertedTask.rows[0].id,','+insertedTask.rows[0].id,req.body.projectId], function (err, updatedProjectWithSortOrder) {
+      client.query('UPDATE Task SET subtask_sort_order = (CASE WHEN subtask_sort_order IS NULL THEN $1 ELSE subtask_sort_order || $2 END) WHERE id=$3',[insertedTask.rows[0].id,','+insertedTask.rows[0].id,req.body.parent_id], function (err, updatedProjectWithSortOrder) {
         if(err) {
           handleResponse.shouldAbort(err, client, done);
           handleResponse.handleError(res, err, ' Error in adding updating subtask sort order to the database');
@@ -658,7 +658,7 @@ exports.getTaskDetails = (req, res) => {
                                               handleResponse.shouldAbort(err, client, done);
                                               handleResponse.responseToPage(res, 'pages/task-details', { taskDetails: {}, userList: [], user: req.user, error: err }, "error", " Error in finding Subtasks");
                                             } else{
-                                              handleResponse.responseToPage(res, 'pages/task-details', { user: req.user, taskDetails: taskDetail.rows[0], userList: userListCombined, stripeCustomerId: result.stripe_customer_id, subtaskTotalCount: totalSubtasksCount, subtasks: subtasks, resUsers:userListCombined , userRoleList : [] }, "success", "Successfully rendered");
+                                              handleResponse.responseToPage(res, 'pages/task-details', { user: req.user, taskDetails: taskDetail.rows[0], userList: userListCombined, stripeCustomerId: result.stripe_customer_id, subtaskTotalCount: totalSubtasksCount, subtasks: subtasks.rows, resUsers:userListCombined , userRoleList : [],project : {} }, "success", "Successfully rendered");
                                             }
                                           })
                                         } else {

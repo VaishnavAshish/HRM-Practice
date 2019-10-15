@@ -4,7 +4,7 @@ var lastSearchText;
         lastSearchText = $("#searchTaskName").val();
     })
 
-    function addNewSubtask(modalId, formId, accountId, parent_id) {
+    function addNewSubtask(modalId, formId, accountId, parent_id, project_id,project_name, billable) {
         var taskData = createJSONForFormData(formId);
         console.log(projectName);
         let taskUserEmail=$("#assigned_user option:selected").text();
@@ -17,7 +17,7 @@ var lastSearchText;
              userData.costRate=$("#assigned_user option:selected").attr('costRate');
              taskData.user_role=$("#assigned_user option:selected").attr('role');
         }
-        taskData.billable='<%= taskDetails.billable %>';
+        taskData.billable=billable;
         clearError("#task_name");
         if(taskData.task_name) {
           checkFormValidation("#addTaskForm");
@@ -33,7 +33,7 @@ var lastSearchText;
                 url : '/addSubtask',
                 contentType: 'application/json',
                 dataType: 'json',
-                data : JSON.stringify({"accountId":accountId, "taskData":taskData, "projectId": '<%= taskDetails.project_id %>',"projectName": '<%= taskDetails.project_name %>',"userData":userData,"parent_id":parent_id}),
+                data : JSON.stringify({"accountId":accountId, "taskData":taskData, "projectId": project_id,"projectName": project_name,"userData":userData,"parent_id":parent_id}),
                 success : function(response){
                     console.log(response);
                     if(response.success == true) {
