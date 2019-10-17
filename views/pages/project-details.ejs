@@ -168,6 +168,11 @@
                                             Activity (<%= projectConversationThread.length %>)
                                         </a>
                                     </li>
+                                    <!-- <li data-navigation="activity" class="slds-tabs_default__item" onclick="openTab(this, 'timeline')">
+                                        <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="0" id="projectGanttChart">
+                                            Timeline
+                                        </a>
+                                    </li> -->
                                     <!-- <li class="slds-tabs_default__item" onclick="openTab(this, 'project-files')">
                                         <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="-1">
                                             Files (3)
@@ -1327,6 +1332,14 @@
                             <% } %>
                             </div>
                             <!-- task-forums tab end -->
+
+                            <!-- gantt tab start -->
+                            <!-- <div class="slds-tabs_default__content hide" target-tab="timeline">
+                                <% if(user.company_info.stripe_customer_id){ %>
+                                      <% include ../layouts/gantt-chart %>
+                                <% } %>
+                            </div> -->
+                            <!-- gantt tab end -->
 
                         </div>
 

@@ -40,11 +40,14 @@ const ngrok =  (process.env.NGROK_ENABLED==="true") ? require('ngrok'):null;
  * API keys and Passport configuration.
  */
 const passportConfig = require('./config/passport');
+const helmet = require('helmet')
+// const csrf = require('csurf')
+
 
 /**
  * Create Express server.
  */
-
+// var csrfProtection = csrf({ cookie: true })
 const app = express();
 
 /**
@@ -81,6 +84,27 @@ const app = express();
         console.log(await ipify({useIPv6: false}));
         //=> '82.142.31.236'
     })();*/
+    app.use(helmet())
+    app.disable('x-powered-by')
+    app.use(helmet.permittedCrossDomainPolicies())
+    app.use(helmet.featurePolicy({
+      features: {
+        fullscreen: ["'self'"],
+        vibrate: ["'none'"],
+        payment: ['example.com'],
+        syncXhr: ["'none'"]
+      }
+    }))
+    app.use(helmet.frameguard({ action: 'sameorigin' }))
+    app.use(helmet.referrerPolicy({ policy: 'same-origin' }))
+    // app.use(helmet.contentSecurityPolicy({
+    //   directives: {
+    //     defaultSrc: ["'self'"],
+    //     styleSrc: ["'self'", 'maxcdn.bootstrapcdn.com']
+    //   },
+    //   browserSniff: false,
+    //   setAllHeaders: true
+    // }))
     app.use(fileUpload());
     app.set('host', process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0');
     app.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080);
@@ -106,7 +130,10 @@ const app = express();
       secret:'jW8aor76jpPX',
       resave: false,
       saveUninitialized: true,
-      cookie: { maxAge: 2592000000 }, // two weeks in milliseconds
+      cookie: {
+        httpOnly:true,
+        sameSite:true,
+        maxAge: 2592000000 }, // two weeks in milliseconds
       secure : true
     }));
     app.use(passport.initialize());
