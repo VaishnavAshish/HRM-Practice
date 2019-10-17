@@ -79,11 +79,11 @@
                                         </label>
                                         <div class="slds-form-element__control">
                                             <div class="slds-select_container">
-                                                <select class="slds-select" name="assigned_user2" getFormData id="assigned_user2" onchange="updateAssignRole(this);setBillCostRate(this, 'task')" reset='value'>
+                                                <select class="slds-select" name="assigned_user_in_modal" getFormData id="assigned_user_in_modal" onchange="updateAssignRole(this);setBillCostRate(this, 'task')" reset='value'>
                                                     <option value="" billRate="0.00" costRate="0.00"></option>
                                                     <% if(userList.length > 0) { %>
                                                         <% userList.forEach(function(resource) { %>
-                                                           <option value="<%= resource.id %>" role="<%= resource.user_role %>" billrate="<%= resource.bill_rate %>" costrate="<%= resource.cost_rate %>" email_id = "<%= resource.email %>" pr_as_id="<%= resource.assignment_id %>"> <%= resource.first_name %> <%= resource.last_name?resource.last_name:'' %> (<%= resource.user_role %>)</option>
+                                                           <option value="<%= resource.id %>" role="<%= resource.user_role %>" billrate="<%= resource.bill_rate %>" costrate="<%= resource.cost_rate %>" email_id = "<%= resource.email %>" pr_as_id="<%= resource.id %>"> <%= resource.first_name %> <%= resource.last_name?resource.last_name:'' %> (<%= resource.user_role %>)</option>
                                                         <% }); %>
                                                     <% } %>
                                                 </select>
@@ -115,7 +115,7 @@
                         </div>
                         <footer class="slds-modal__footer">
                             <button class="slds-button slds-button_neutral" onclick="closeModal('#modalAddNewSubtask');">Cancel</button>
-                            <button class="slds-button slds-button_brand" onclick="addNewSubtask('#modalAddNewSubtask', '#add-new-task-form', '<%= taskDetails.account_id %>','<%= taskDetails.id %>','<%= taskDetails.project_id %>','<%= taskDetails.project_name %>','<%= taskDetails.billable %>')">Add and Setup</button>
+                            <button class="slds-button slds-button_brand" onclick="addNewTask('#modalAddNewSubtask', '#add-new-task-form', '<%= taskDetails.account_id %>',true,'<%= taskDetails.id %>','<%= taskDetails.project_id %>','<%= taskDetails.project_name %>','<%= taskDetails.billable %>')">Add and Setup</button>
                         </footer>
                     </div>
                 </section>

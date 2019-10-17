@@ -9,6 +9,9 @@
     <% include ../layouts/sideNav %>
     <main class="main-body-space tpd-60 bpd-100">
         <div>
+            <div id="pageRecordNo" style="display:none;"><%= process.env.PAGE_RECORD_NO %></div>
+            <div id="totalRecordCount" style="display:none;"></div>
+            <div id="offset" style="display:none;">0</div>
             <div class="slds-p-around_small">
                 <!-- breadcrumb start -->
                 <div class="slds-p-bottom_small">
@@ -16,6 +19,13 @@
                         <ol class="slds-breadcrumb slds-list_horizontal slds-wrap">
                             <li class="slds-breadcrumb__item "><a href="/projects-listing">Projects</a></li>
                             <li class="slds-breadcrumb__item "><a href="/project-details?projectId=<%= taskDetails.project_id %>#tasks"><%= taskDetails.project_name %></a></li>
+                            <% if(hierarchyData.length > 0) { %>
+                                <% hierarchyData.forEach(function(parent,index) { %>
+                                    <% if(index!=hierarchyData.length-1) {%>
+                                        <li class="slds-breadcrumb__item "><a href="/task-details?taskId=<%= parent.id %>#tasks"><%= parent.name %></a></li>
+                                    <% } %>
+                                <% }) %>
+                            <% } %>
                             <li class="slds-breadcrumb__item "><a href="javascript:void(0);"><%= taskDetails.name %></a></li>
                         </ol>
                     </nav>
@@ -57,7 +67,11 @@
 
                                 <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
                                     <div class="text-right sm-tpd-15">
-                                        <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteSubtask(\'<%= taskDetails.id %>\', \'<%= taskDetails.project_id %>\')','Are you sure you want to delete this task?');">
+                                        <% if(hierarchyData.length == 1) { %>
+                                            <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteTask(\'<%= taskDetails.id %>\', \'<%= taskDetails.project_id %>\')','Are you sure you want to delete this task?');">
+                                        <% } else if(hierarchyData.length > 1){ %>
+                                            <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteTask(\'<%= taskDetails.id %>\', \'<%= taskDetails.project_id %>\',true)','Are you sure you want to delete this task?');">
+                                        <% } %>
                                             Delete
                                         </button>
                                     </div>
@@ -74,7 +88,7 @@
                                 </li>
                                 <li data-navigation="subtasks" class="slds-tabs_default__item" onclick="openTab(this, 'task-subtasks')">
                                     <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="0">
-                                        Subtasks (<%= subtaskTotalCount %>)
+                                        Subtasks (<%= taskTotalCount %>)
                                     </a>
                                 </li>
                             </ul>
@@ -364,12 +378,12 @@
                                                         <div class="slds-form-element">
                                                             <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
                                                                 <input type="text" class="slds-input" placeholder="Search subtask by name"
-                                                                    id="searchSubtaskName" searchFunc="findSubtaskByName()"
+                                                                    id="searchTaskName" searchFunc="findTaskByName(true,'<%= taskDetails.project_id %>')"
                                                                     onkeypress="handle(event,this);">
                                                                 <div class="slds-input__icon-group slds-input__icon-group_right">
                                                                     <button
                                                                         class="slds-input__icon slds-input__icon_right slds-button slds-button_icon"
-                                                                        title="Clear" onclick="clearSearchBox(this);findSubtaskByName();">
+                                                                        title="Clear" onclick="clearSearchBox(this);findTaskByName(true,'<%= taskDetails.project_id %>');">
                                                                         <i class="fa fa-times-circle"></i>
                                                                     </button>
                                                                 </div>
@@ -378,7 +392,7 @@
                                                     </div>
                                                     <div class="slds-no-flex slds-p-left_small">
                                                         <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-align-top"
-                                                            title="Search" onclick="findSubtaskByName();">
+                                                            title="Search" onclick="findTaskByName(true,'<%= taskDetails.project_id %>');">
                                                             <span class="slds-button__icon">
                                                                 <i class=" fa fa-search" aria-hidden="true"></i>
                                                             </span>
@@ -421,7 +435,7 @@
                                                                 </span>
                                                             </div>
                                                             <div class="sm-bpd-15">
-                                                                <a href="/task-details?subtaskId=<%= subtask.id %>#details">
+                                                                <a href="/task-details?taskId=<%= subtask.id %>#details">
                                                                     <%= subtask.name %>
                                                                 </a>
                                                             </div>
@@ -474,17 +488,17 @@
                                                                                 Assigned
                                                                             </div>
                                                                             <div>
-                                                                                <% if(subtask.user_id) { %>
+                                                                                <% if(subtask.assigned_user_id) { %>
                                                                                 <span
                                                                                     class="slds-avatar slds-avatar_small slds-avatar_circle cursor-pointer">
-                                                                                    <img alt="Person name" src="/getUserPicture/<%= subtask.user_id %>"
+                                                                                    <img alt="Person name" src="/getUserPicture/<%= subtask.assigned_user_id %>"
                                                                                         title="<%= subtask.user_first_name %> <%= subtask.user_last_name?subtask.user_last_name:'' %> (<%= subtask.user_role %>)">
                                                                                 </span>
                                                                                 <% } %>
                                                                             </div>
                                                                         </div>
                                                                         <div class="slds-col--bump-left slds-p-left_x-small">
-                                                                            <a href="/task-details?subtaskId=<%= subtask.id %>"
+                                                                            <a href="/task-details?taskId=<%= subtask.id %>"
                                                                                 class="slds-button slds-button_icon" title="Edit">
                                                                                 <i class="fa fa-edit text-blue fs-lg text-size-18"></i>
                                                                             </a>
@@ -502,7 +516,7 @@
                                         </ul>
                                     </div>
                                     <div class="slds-text-align_center slds-p-vertical_medium">
-                                        <button class="slds-button" loadItemId="loadMoreBtn" onclick="loadMoreSubtask()">&nbsp;</button>
+                                        <button class="slds-button" loadItemId="loadMoreBtn" onclick="loadMoreTask(false,true,'<%= taskDetails.project_id %>')">&nbsp;</button>
                                     </div>
                                     <% if(subtasks.length <= 0) { %>
                                     <div class="slds-p-around_small text-center" title="" id="noSubtaskFound">
@@ -530,13 +544,10 @@
         <% include ../layouts/footer %>
     </main>
 
-
-
-
     <% include ../modals/modal-add-new-subtask %>
     <% include ../layouts/scripts %>
     <% include ../layouts/task-script %>
-    <% include ../layouts/project-detail-script %>
+    <% include ../layouts/task-listing-script %>
     <script>
             $(document).ready(function(){
                 $('#status').val('<%= taskDetails.status %>');

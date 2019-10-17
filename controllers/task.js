@@ -97,16 +97,30 @@ exports.loadMoreTasks = (req,res) => {
     }else{
       companyDefaultTimezone=result.timezone;
     pool.connect((err, client, done) => {
-      client.query('select task_sort_order from project where id = $1', [req.body.project_id], (err, task_sort_order) => {
+      var fetch_sort_order_qry=fetch_sort_order_param=obj_name='';
+      if(req.body.isSubtask){
+        fetch_sort_order_qry = 'select subtask_sort_order as task_sort_order from task where id = $1';
+        fetch_sort_order_param = [req.body.parentId];
+        obj_name = 'Subtask';
+      }else{
+        fetch_sort_order_qry = 'select task_sort_order from project where id = $1';
+        fetch_sort_order_param = [req.body.project_id];
+        obj_name = 'Task';
+      }
+      client.query(fetch_sort_order_qry, fetch_sort_order_param, (err, task_sort_order) => {
         if (err) {
           handleResponse.shouldAbort(err, client, done);
           handleResponse.handleError(res, err, ' Error in finding task sort order');
         } else {
+          if(task_sort_order.rows[0].task_sort_order==null){
+            handleResponse.shouldAbort(err, client, done);
+            handleResponse.handleError(res, err, ' Error in finding task sort order');
+          }
           let en = parseInt(req.body.offset)+parseInt(process.env.PAGE_RECORD_NO);
           let splitt = task_sort_order.rows[0].task_sort_order.split(',',en);
           var filtered = splitt.filter(function(value, index, arr){
             return index > (parseInt(req.body.offset)-1);
-        });
+          });
           let requiredIDs = filtered.join(',');
 
           client.query('SELECT distinct on (task_id) task_id, user_email, updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date FROM TASK_ASSIGNMENT WHERE project_id=$1 AND company_id=$2 order by task_id, updated_date desc', [req.body.project_id, req.user.company_id], function (err, taskAssList) {
@@ -143,12 +157,12 @@ exports.loadMoreTasks = (req,res) => {
                         // console.log("tasks.rows");
                         // console.log(tasks.rows);
                         done();
-                        handleResponse.sendSuccess(res,'Tasks searched successfully',{tasks: tasks.rows,count:task_sort_order.rows[0].task_sort_order.split(',').length});
+                        handleResponse.sendSuccess(res,obj_name+' searched successfully',{tasks: tasks.rows,count:task_sort_order.rows[0].task_sort_order.split(',').length});
                       }
                     });
                   } else {
                     done();
-                    handleResponse.sendSuccess(res,'Tasks searched successfully',{tasks: tasks.rows,count:task_sort_order.rows[0].task_sort_order.split(',').length});
+                    handleResponse.sendSuccess(res,obj_name+' searched successfully',{tasks: tasks.rows,count:task_sort_order.rows[0].task_sort_order.split(',').length});
                   }
                 }
               })
@@ -161,6 +175,8 @@ exports.loadMoreTasks = (req,res) => {
   }
 })
 }
+
+
 
 exports.findTaskByName = (req, res) => {
   // console.log("findAccountByName----------------------------------"+req.body.searchText);
@@ -176,13 +192,22 @@ exports.findTaskByName = (req, res) => {
         // console.log(companyDefaultTimezone);
       pool.connect((err, client, done) => {
           let offset=0;
+          let queryToExec,queryParam;
           if(req.body.offset){
             offset=req.body.offset;
           }
-          let queryToExec='SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,t.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,t.archived ,t.project_name ,t.record_id,(SELECT count(*) FROM TASK WHERE '+req.body.searchField+' ilike $1 AND company_id=$2 AND project_id=$3 AND archived=false) as searchcount FROM task t WHERE '+req.body.searchField+
-          ' ilike $1 AND company_id=$2 AND project_id=$3 AND archived=false ORDER BY id,project_id,start_date DESC,name OFFSET '+offset+' LIMIT '+process.env.PAGE_RECORD_NO;
+          if(req.body.isSubtask && req.body.isSubtask==true){
+            queryToExec='SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,t.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,t.archived ,t.project_name ,t.record_id,(SELECT count(*) FROM TASK WHERE '+req.body.searchField+' ilike $1 AND company_id=$2 AND project_id=$3 AND parent_id=$4 AND archived=false) as searchcount FROM task t WHERE '+req.body.searchField+
+            ' ilike $1 AND company_id=$2 AND project_id=$3 AND parent_id=$4 AND archived=false ORDER BY id,project_id,start_date DESC,name OFFSET '+offset+' LIMIT '+process.env.PAGE_RECORD_NO;
+            queryParam=['%'+req.body.searchText+'%',req.user.company_id,req.body.project_id,req.body.parentId];
+          }else{
+            queryToExec='SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,t.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,t.archived ,t.project_name ,t.record_id,(SELECT count(*) FROM TASK WHERE '+req.body.searchField+' ilike $1 AND company_id=$2 AND project_id=$3 AND archived=false) as searchcount FROM task t WHERE '+req.body.searchField+
+            ' ilike $1 AND company_id=$2 AND project_id=$3 AND archived=false ORDER BY id,project_id,start_date DESC,name OFFSET '+offset+' LIMIT '+process.env.PAGE_RECORD_NO;
+            queryParam=['%'+req.body.searchText+'%',req.user.company_id,req.body.project_id];
+          }
+          
           // console.log('queryToExec '+queryToExec+' '+'%'+req.body.searchText+'%'+' '+req.user.company_id+' '+req.body.project_id);
-          client.query(queryToExec,['%'+req.body.searchText+'%',req.user.company_id,req.body.project_id], function (err, tasks) {
+          client.query(queryToExec,queryParam, function (err, tasks) {
             if (err) {
               handleResponse.shouldAbort(err, client, done);
               handleResponse.handleError(res, err, ' Error in finding task data');
@@ -290,17 +315,14 @@ exports.postAddTask = (req, res) => {
                   handleResponse.handleError(res,"Task with same name already exist","Task with same name already exist");
                 } else {
                   let reqData = {};
-                  reqData.assigned_user_id = req.body.userData.assignment_id;
-                  console.log('------req.body.userData.assignment_id');
-                  console.log(req.body.userData.assignment_id)
-                  createTaskRecord(req, client, err, done, reqData, res, function (result) {
+                  createTaskRecord(req, client, err, done, req.body.isSubtask,req.body.userData.assignment_id, res, function (result) {
                     var reqData = req.body.taskData;
                     reqData.project_id = req.body.projectId;
                     console.log('req.body.taskData.assigned_user')
                     console.log(req.body.taskData.assigned_user)
 
                     if(req.body.taskData.assigned_user) {
-                      commonController.createTaskAssignment(req, client, err, done, result, req.body.taskData.res_bill_rate, req.body.taskData.res_cost_rate, reqData, res, function (result2) {
+                      commonController.createTaskAssignment(req, client, err, done, result, req.body.userData.billRate, req.body.userData.costRate, reqData,res, function (result2) {
                          if(result2) {
                            client.query('COMMIT', (err) => {
                              if (err) {
@@ -383,104 +405,31 @@ exports.postAddTask = (req, res) => {
   });
 };
 
-exports.postAddSubtask = (req, res) => {
-
-  setting.getCompanySetting(req, res ,(err,result)=>{
-     if(err==true){
-       handleResponse.handleError(res, err, ' Error in finding company setting');
-       /*handleResponse.handleError(res, err, ' error in finding company setting');*/
-     } else {
-       companyDefaultTimezone=result.timezone;
-       console.log('req.body.taskData.start_date');
-       console.log('req.body.taskData.end_date');
-       console.log(typeof req.body.taskData.start_date);
-       console.log(req.body.taskData.start_date!=' ');
-       if (req.body.taskData.start_date!=null && req.body.taskData.start_date!='') {
-         req.body.taskData.start_date = moment.tz(req.body.taskData.start_date.split('T')[0], companyDefaultTimezone).format();
-       }else{
-         req.body.taskData.start_date=null;
-       }
-       if (req.body.taskData.due_date!=null && req.body.taskData.due_date!='') {
-         req.body.taskData.due_date = moment.tz(req.body.taskData.due_date.split('T')[0], companyDefaultTimezone).format();
-       }else{
-         req.body.taskData.due_date=null;
-       }
-       console.log(req.body.taskData.start_date);
-       pool.connect((err, client, done) => {
-         client.query('BEGIN', (err) => {
-           if (err){
-             handleResponse.shouldAbort(err, client, done);
-             handleResponse.handleError(res, err, ' error in connecting to database');
-           } else {
-             client.query('SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,t.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,t.archived ,t.project_name ,t.record_id FROM TASK t where name=$1 AND company_id=$2 AND project_id=$3', [req.body.taskData.task_name, req.user.company_id, req.body.projectId], function (err, taskList) {
-               if (err) {
-                 console.error(err);
-                 handleResponse.shouldAbort(err, client, done);
-                 handleResponse.handleError(res, err, ' Error in finding task data');
-               } else {
-                 if (taskList.rows.length > 0) {
-                   done();
-                   handleResponse.handleError(res,"Task with same name already exist","Task with same name already exist");
-                 } else {
-                   var reqData = {};
-                   reqData.assigned_user_id = req.body.userData.assignment_id;
-                   console.log('------req.body.userData.assignment_id');
-                   console.log(req.body.userData.assignment_id)
-                   createSubtaskRecord(req, client, err, done, req.body.userData.assignment_id, res, function (result) {
-                     var reqData = req.body.taskData;
-                     reqData.project_id = req.body.projectId;
-                     console.log('req.body.taskData.assigned_user')
-                     console.log(req.body.taskData.assigned_user2)
- 
-                     if(req.body.taskData.assigned_user2) {
-                       commonController.createTaskAssignment(req, client, err, done, result, req.body.taskData.res_bill_rate, req.body.taskData.res_cost_rate, reqData, res, function (result2) {
-                          if(result2) {
-                            client.query('COMMIT', (err) => {
-                              if (err) {
-                                // console.log('Error committing transaction', err.stack)
-                                handleResponse.shouldAbort(err, client, done);
-                                handleResponse.handleError(res, err, ' Error in committing transaction');
-                              } else {
-                                 done();
-                                 handleResponse.sendSuccess(res,'Task added successfully',{});
-                              }
-                            })
-                            // done();
-                            // handleResponse.sendSuccess(res,'Task added successfully',{});
-                          }
-                        });
-                     } else {
-                       client.query('COMMIT', (err) => {
-                         if (err) {
-                           // console.log('Error committing transaction', err.stack)
-                           handleResponse.shouldAbort(err, client, done);
-                           handleResponse.handleError(res, err, ' Error in committing transaction');
-                         } else {
-                            done();
-                            handleResponse.sendSuccess(res,'Task added successfully',{});
-                         }
-                       })
-                     }
-                   });
-                 }
-               }
-             });
-           }
-         })
-       });
-     }
-   });
- };
 
 
-function createTaskRecord(req, client, err, done, taskData, res, callback) {
-
-  client.query('Insert INTO TASK (project_id, name, start_date, end_date, estimated_hours, description, company_id, percent_completed, status, billable,project_name, assigned_user_id) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING id', [req.body.projectId, req.body.taskData.task_name, req.body.taskData.start_date, req.body.taskData.due_date, req.body.taskData.estimate_hours, req.body.taskData.task_desc, req.user.company_id, 0, 'Not Started', req.body.taskData.billable, req.body.projectName,taskData.assigned_user_id], function (err, insertedTask) {
+function createTaskRecord(req, client, err, done, isSubtask,assigned_user_id, res, callback) {
+  let insertQry = insertQryParam ='';
+  if(isSubtask){
+    insertQry = 'Insert INTO TASK (project_id, name, start_date, end_date, estimated_hours, description, company_id, percent_completed, status, billable,project_name, assigned_user_id, parent_id) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING id';
+    insertQryParam = [req.body.projectId, req.body.taskData.task_name, req.body.taskData.start_date, req.body.taskData.due_date, req.body.taskData.estimate_hours, req.body.taskData.task_desc, req.user.company_id, 0, 'Not Started', req.body.taskData.billable, req.body.projectName,assigned_user_id,req.body.parent_id];
+  }else{
+    insertQry ='Insert INTO TASK (project_id, name, start_date, end_date, estimated_hours, description, company_id, percent_completed, status, billable,project_name, assigned_user_id) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING id';
+    insertQryParam = [req.body.projectId, req.body.taskData.task_name, req.body.taskData.start_date, req.body.taskData.due_date, req.body.taskData.estimate_hours, req.body.taskData.task_desc, req.user.company_id, 0, 'Not Started', req.body.taskData.billable, req.body.projectName,assigned_user_id];
+  }
+  client.query(insertQry,insertQryParam , function (err, insertedTask) {
     if(err) {
       handleResponse.shouldAbort(err, client, done);
       handleResponse.handleError(res, err, ' Error in adding task to the database');
     } else {
-      client.query('UPDATE Project p SET task_sort_order = (CASE WHEN task_sort_order IS NULL THEN $1 ELSE p.task_sort_order || $2 END) WHERE id=$3',[insertedTask.rows[0].id,','+insertedTask.rows[0].id,req.body.projectId], function (err, updatedProjectWithSortOrder) {
+      let taskSortQry = taskSortParam = '';
+      if(isSubtask){
+        taskSortQry = 'UPDATE Task SET subtask_sort_order = (CASE WHEN subtask_sort_order IS NULL THEN $1 ELSE subtask_sort_order || $2 END) WHERE id=$3';
+        taskSortParam = [insertedTask.rows[0].id,','+insertedTask.rows[0].id,req.body.parent_id];
+      }else{
+        taskSortQry = 'UPDATE Project p SET task_sort_order = (CASE WHEN task_sort_order IS NULL THEN $1 ELSE p.task_sort_order || $2 END) WHERE id=$3';
+        taskSortParam = [insertedTask.rows[0].id,','+insertedTask.rows[0].id,req.body.projectId];
+      }
+      client.query(taskSortQry,taskSortParam, function (err, updatedProjectWithSortOrder) {
         if(err) {
           handleResponse.shouldAbort(err, client, done);
           handleResponse.handleError(res, err, ' Error in adding updating task sort order to the database');
@@ -493,24 +442,6 @@ function createTaskRecord(req, client, err, done, taskData, res, callback) {
   });
 }
 
-function createSubtaskRecord(req, client, err, done, assigned_user_id, res, callback) {
-  client.query('Insert INTO TASK (project_id, name, start_date, end_date, estimated_hours, description, company_id, percent_completed, status, billable,project_name, assigned_user_id, parent_id) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING id', [req.body.projectId, req.body.taskData.task_name, req.body.taskData.start_date, req.body.taskData.due_date, req.body.taskData.estimate_hours, req.body.taskData.task_desc, req.user.company_id, 0, 'Not Started', req.body.taskData.billable, req.body.projectName,assigned_user_id,req.body.parent_id], function (err, insertedTask) {
-    if(err) {
-      handleResponse.shouldAbort(err, client, done);
-      handleResponse.handleError(res, err, ' Error in adding task to the database');
-    } else {
-      client.query('UPDATE Task SET subtask_sort_order = (CASE WHEN subtask_sort_order IS NULL THEN $1 ELSE subtask_sort_order || $2 END) WHERE id=$3',[insertedTask.rows[0].id,','+insertedTask.rows[0].id,req.body.parent_id], function (err, updatedProjectWithSortOrder) {
-        if(err) {
-          handleResponse.shouldAbort(err, client, done);
-          handleResponse.handleError(res, err, ' Error in adding updating subtask sort order to the database');
-        } else {
-          return callback(insertedTask.rows[0].id);
-        }
-      });
-      //return callback(insertedTask.rows[0].id);
-    }
-  });
-}
 
 function updateTaskRecord(req, client, err, done, res, taskData, callback) {
   // let newDate=moment.tz(new Date(), companyDefaultTimezone).format();
@@ -571,7 +502,7 @@ exports.getTaskDetails = (req, res) => {
       if(err==true){
         // console.log('error in setting');
         // console.log(err);
-        handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.user, error:err},"error"," error in finding company setting");
+        handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.user, error:err,hierarchyData:[]},"error"," error in finding company setting");
         /*handleResponse.handleError(res, err, ' error in finding company setting');*/
       }else{
 
@@ -584,7 +515,7 @@ exports.getTaskDetails = (req, res) => {
                 if (err) {
                   console.error(err);
                   handleResponse.shouldAbort(err, client, done);
-                  handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.user, error:err},"error"," Error in finding task data");
+                  handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.user, error:err,hierarchyData:[]},"error"," Error in finding task data");
                   /*handleResponse.handleError(res, err, ' Error in finding task data');*/
                 } else {
 
@@ -594,20 +525,20 @@ exports.getTaskDetails = (req, res) => {
                       if (err) {
                         console.error(err);
                         handleResponse.shouldAbort(err, client, done);
-                        handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.user, error:err},"error"," Error in finding task data");
+                        handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.user, error:err,hierarchyData:[]},"error"," Error in finding task data");
                         /*handleResponse.handleError(res, err, ' Error in finding task data');*/
                       } else {
                           client.query('SELECT id,email,bill_rate,cost_rate, role as user_role,first_name,last_name FROM USERS WHERE id NOT IN (SELECT user_id FROM PROJECT_ASSIGNMENT WHERE project_id=$1) AND company_id=$2 AND archived=$3', [taskDetail.rows[0].project_id,req.user.company_id,false], function (err, userList) {
                             if (err) {
                               console.error(err);
                               handleResponse.shouldAbort(err, client, done);
-                              handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.user, error:err},"error"," Error in finding users data");
+                              handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.user, error:err,project : {},taskTotalCount:taskDetail.rows[0].totalsubtaskscount,hierarchyData:[]},"error"," Error in finding users data");
                             } else {
                               client.query('SELECT u.id, u.email,u.first_name, u.last_name, pa.bill_rate, pa.cost_rate, pa.user_role, pa.id as assignment_id from PROJECT_ASSIGNMENT pa INNER JOIN users u ON pa.user_id = u.id AND pa.company_id = u.company_id AND u.archived = $1 AND pa.project_id = $2', [false, taskDetail.rows[0].project_id], function (err, resList) {
                                 if (err) {
                                   console.error(err);
                                   handleResponse.shouldAbort(err, client, done);
-                                  handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.user, error:err},"error"," Error in finding users data");
+                                  handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.user, error:err,project : {},taskTotalCount:taskDetail.rows[0].totalsubtaskscount,hierarchyData:[]},"error"," Error in finding users data");
                                 } else {
                                     // console.log("taskDetail");
                                     // console.log(taskDetail);
@@ -644,26 +575,45 @@ exports.getTaskDetails = (req, res) => {
                                     /*taskDetail.rows[0]["project_name"] = req.query.project;*/
                                     // console.log('>>>>>>>>>>>>>>>>>> Task List <<<<<<<<<<<<<<<<<<');
                                     // console.log(userListCombined);
-                                        let requiredSubtasks = null;
-                                        if (taskDetail.rows[0].subtask_sort_order) {
-                                          let totalSubtasksCount = taskDetail.rows[0].subtask_sort_order.split(',', process.env.PAGE_RECORD_NO).length;
-                                          requiredSubtasks = taskDetail.rows[0].subtask_sort_order.substring(0, taskDetail.rows[0].subtask_sort_order.split(',', process.env.PAGE_RECORD_NO).join(',').length);
-                                          let qry = `SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone '${companyDefaultTimezone}' as start_date ,t.end_date at time zone '${companyDefaultTimezone}' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone '${companyDefaultTimezone}' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date ,t.updated_date ,t.archived ,t.project_name ,t.record_id
-                                          FROM TASK t
-                                          where id in (${requiredSubtasks})
-                                          ORDER BY position(id::text in '${requiredSubtasks}')`;
-                                          client.query(qry, [], (err, subtasks) => {
-                                            if (err) {
-                                              console.error(err);
-                                              handleResponse.shouldAbort(err, client, done);
-                                              handleResponse.responseToPage(res, 'pages/task-details', { taskDetails: {}, userList: [], user: req.user, error: err }, "error", " Error in finding Subtasks");
-                                            } else{
-                                              handleResponse.responseToPage(res, 'pages/task-details', { user: req.user, taskDetails: taskDetail.rows[0], userList: userListCombined, stripeCustomerId: result.stripe_customer_id, subtaskTotalCount: totalSubtasksCount, subtasks: subtasks.rows, resUsers:userListCombined , userRoleList : [],project : {} }, "success", "Successfully rendered");
-                                            }
-                                          })
-                                        } else {
-                                          handleResponse.responseToPage(res, 'pages/task-details', { user: req.user, taskDetails: taskDetail.rows[0], userList: userListCombined, stripeCustomerId: result.stripe_customer_id, subtaskTotalCount: 0, subtasks: [], resUsers : userListCombined, userRoleList :[],project : {} }, "success", "Successfully rendered");
-                                        }
+
+                                    let hierarchyQry=`with recursive getParent as (
+                                      select * from task where id = ${req.query.taskId} union all select task.* from task 
+                                        join getParent on getParent.parent_id = task.id
+                                      )
+                                      select * from getParent order by id`;
+
+                                  client.query(hierarchyQry, [], (err, hierarchyData) => {
+                                    if (err) {
+                                      console.error(err);
+                                      handleResponse.shouldAbort(err, client, done);
+                                      handleResponse.responseToPage(res, 'pages/task-details', { taskDetails: {}, userList: [], user: req.user, error: err ,hierarchyData:[]}, "error", " Error in finding Subtasks");
+                                    } else {
+                                      
+                                      let requiredSubtasks = null;
+                                      if (taskDetail.rows[0].subtask_sort_order) {
+                                        requiredSubtasks = taskDetail.rows[0].subtask_sort_order.substring(0, taskDetail.rows[0].subtask_sort_order.split(',', process.env.PAGE_RECORD_NO).join(',').length);
+                                        let qry = `SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone '${companyDefaultTimezone}' as start_date ,t.end_date at time zone '${companyDefaultTimezone}' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone '${companyDefaultTimezone}' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date ,t.updated_date ,t.archived ,t.project_name ,t.record_id,(select first_name from users where id=t.assigned_user_id) as user_first_name, (select last_name from users where id=t.assigned_user_id) as user_last_name, (select role from users where id=t.assigned_user_id) as user_role
+                                        FROM TASK t
+                                        where id in (${requiredSubtasks})
+                                        ORDER BY position(id::text in '${requiredSubtasks}')`;
+                                        client.query(qry, [], (err, subtasks) => {
+                                          if (err) {
+                                            console.error(err);
+                                            handleResponse.shouldAbort(err, client, done);
+                                            handleResponse.responseToPage(res, 'pages/task-details', { taskDetails: {}, userList: [], user: req.user, error: err ,hierarchyData:[]}, "error", " Error in finding Subtasks");
+                                          } else{
+                                            subtasks.rows.forEach((subtask)=>{
+                                              subtask.startDateFormatted = (subtask.start_date==null)?'':moment.tz(subtask.start_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                              subtask.endDateFormatted = (subtask.end_date==null)?'':moment.tz(subtask.end_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                                            })
+                                            handleResponse.responseToPage(res, 'pages/task-details', {taskDetails: taskDetail.rows[0], userList: userListCombined,  user: req.user, stripeCustomerId: result.stripe_customer_id, subtasks: subtasks.rows, resUsers:userListCombined , userRoleList : [],project : {},taskTotalCount:taskDetail.rows[0].totalsubtaskscount,hierarchyData:hierarchyData.rows }, "success", "Successfully rendered");
+                                          }
+                                        })
+                                      } else {
+                                        handleResponse.responseToPage(res, 'pages/task-details', { user: req.user, taskDetails: taskDetail.rows[0], userList: userListCombined, stripeCustomerId: result.stripe_customer_id, subtasks: [], resUsers : userListCombined, userRoleList :[],project : {},taskTotalCount:taskDetail.rows[0].totalsubtaskscount ,hierarchyData:hierarchyData.rows}, "success", "Successfully rendered");
+                                      }
+                                    }
+                                  })
 
                                 /*res.render('pages/task-details', { user: req.user, taskDetails: taskDetail.rows[0] });*/
                                 }
@@ -673,17 +623,14 @@ exports.getTaskDetails = (req, res) => {
                       }
                     });
                   }else{
-                      handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.user, error:err,userRoleList :[]},"error"," Error in finding task data");
+                      handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.user, error:err,userRoleList :[],project : {},taskTotalCount:taskDetail.rows[0].totalsubtaskscount},"error"," Error in finding task data");
                   }
-
-
-
                 }
               });
 
             });
           } else {
-            handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.user, error:err,userRoleList : []},"error"," Error in finding task data");
+            handleResponse.responseToPage(res,'pages/task-details',{taskDetails: {},userList:[],user:req.user, error:err,userRoleList : [],project : {},taskTotalCount:0,subtasks:[]},"error"," Error in finding task data");
           }
       }
     });
@@ -888,7 +835,13 @@ exports.deleteTask = (req, res) => {
                   handleResponse.handleError(res, err, ' error in connecting to database');
                 } else {
                   // console.log('>>>>>>>>>>>>>>>>>> Inside Task Details Update Pool Connection <<<<<<<<<<<<<<<<<<');
-                  client.query('SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date at time zone \''+companyDefaultTimezone+'\' as created_date,t.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,t.archived ,t.project_name ,t.record_id,(SELECT task_sort_order FROM project where id = t.project_id ) as projectTaskSortOrder FROM TASK t where id=$1 AND company_id=$2', [req.body.taskId, req.user.company_id], function (err, taskDetail) {
+                  var sortOrderQryStr=updateSortOrderQryStr=updateSortOrderQryParam=findAllChildQry='';
+                  if(req.body.isSubtask && req.body.isSubtask==true){
+                    sortOrderQryStr='(SELECT subtask_sort_order FROM task where id = t.parent_id ) as projectTaskSortOrder';
+                  }else{
+                    sortOrderQryStr='(SELECT task_sort_order FROM project where id = t.project_id ) as projectTaskSortOrder';
+                  }
+                  client.query('SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date at time zone \''+companyDefaultTimezone+'\' as created_date,t.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,t.archived ,t.project_name ,t.record_id,'+sortOrderQryStr+' FROM TASK t where id=$1 AND company_id=$2', [req.body.taskId, req.user.company_id], function (err, taskDetail) {
                     // console.log('>>>>>>>>>>>>>>>>>> Inside Task Details Update After Query <<<<<<<<<<<<<<<<<<');
                     if (err) {
                       console.error(err);
@@ -913,25 +866,77 @@ exports.deleteTask = (req, res) => {
                               })
                             console.log(updatedSortOrder.join(','));
                             updatedSortOrder = updatedSortOrder.join(',');
-                            client.query('UPDATE PROJECT SET task_sort_order = $1 WHERE id=$2 AND company_id=$3', [updatedSortOrder, taskDetail.rows[0].project_id, req.user.company_id], function (err, archivedTask) {
+                            if(req.body.isSubtask && req.body.isSubtask==true){
+                              updateSortOrderQryStr='UPDATE TASK SET subtask_sort_order = $1 WHERE id=$2 AND company_id=$3';
+                              updateSortOrderQryParam=[updatedSortOrder, taskDetail.rows[0].parent_id, req.user.company_id];
+                            }else{
+                              updateSortOrderQryStr='UPDATE PROJECT SET task_sort_order = $1 WHERE id=$2 AND company_id=$3';
+                              updateSortOrderQryParam=[updatedSortOrder, taskDetail.rows[0].project_id, req.user.company_id];
+                            }
+                            client.query(updateSortOrderQryStr, updateSortOrderQryParam, function (err, archivedTask) {
                               if (err) {
                                 console.error(err);
                                 handleResponse.shouldAbort(err, client, done);
                                 handleResponse.handleError(res, err, ' Error in deleting task');
                               } else {
-                                client.query('COMMIT', (err) => {
-                                  if (err) {
-                                    // console.log('Error committing transaction', err.stack)
-                                    handleResponse.shouldAbort(err, client, done);
-                                    handleResponse.handleError(res, err, ' Error in committing transaction');
-                                  } else {
-                                      console.error('Affected ID>>>>>>>>>>>>>');
-                                      // console.log(archivedTask.rows);
-                                      done();
-                                      handleResponse.sendSuccess(res,'Task deleted successfully',{});
-                                      /*res.status(200).json({ "success": true ,"message":"success"});*/
-                                  }
-                                })
+                                
+                                if(req.body.isSubtask && req.body.isSubtask==true){
+                                  let findAllChildQry = `WITH RECURSIVE rec_tree(parent_id,id) AS (
+                                    SELECT t.parent_id, t.id
+                                    FROM task t where id = ${req.body.taskId}
+                                  UNION ALL
+                                    SELECT t.parent_id,t.id
+                                    FROM task t, rec_tree rt
+                                    WHERE t.parent_id = rt.id
+                                  )
+                                  SELECT string_agg(id::text , ',') as allChildren FROM rec_tree`;
+                                  client.query(findAllChildQry, [], function (err, allChildren) {
+                                    if (err) {
+                                      console.error(err);
+                                      handleResponse.shouldAbort(err, client, done);
+                                      handleResponse.handleError(res, err, ' Error in deleting task');
+                                    } else {
+                                      if(allChildren.rows[0].allchildren){
+                                        let deleteQry = `update task set archived = true where id in (${allChildren.rows[0].allchildren})`;
+                                        client.query(findAllChildQry, [], function (err, allChildren) {
+                                          if (err) {
+                                            console.error(err);
+                                            handleResponse.shouldAbort(err, client, done);
+                                            handleResponse.handleError(res, err, ' Error in deleting task');
+                                          } else {
+                                            client.query('COMMIT', (err) => {
+                                              if (err) {
+                                                // console.log('Error committing transaction', err.stack)
+                                                handleResponse.shouldAbort(err, client, done);
+                                                handleResponse.handleError(res, err, ' Error in committing transaction');
+                                              } else {
+                                                  console.error('Affected ID>>>>>>>>>>>>>');
+                                                  // console.log(archivedTask.rows);
+                                                  done();
+                                                  handleResponse.sendSuccess(res,'Task deleted successfully',{});
+                                                  /*res.status(200).json({ "success": true ,"message":"success"});*/
+                                              }
+                                            })
+                                          }
+                                        })
+                                      }
+                                    }
+                                  })
+                                }else{
+                                  client.query('COMMIT', (err) => {
+                                    if (err) {
+                                      // console.log('Error committing transaction', err.stack)
+                                      handleResponse.shouldAbort(err, client, done);
+                                      handleResponse.handleError(res, err, ' Error in committing transaction');
+                                    } else {
+                                        console.error('Affected ID>>>>>>>>>>>>>');
+                                        // console.log(archivedTask.rows);
+                                        done();
+                                        handleResponse.sendSuccess(res,'Task deleted successfully',{});
+                                        /*res.status(200).json({ "success": true ,"message":"success"});*/
+                                    }
+                                  })
+                                }
                               }
                             })
                           }

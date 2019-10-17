@@ -13,99 +13,13 @@
         $('#project_type').val(type);
         $('#account').val('<%= project.account_id %>');
         console.log(status+' '+projectName);
-        bindTaskDragEventListner("#taskSortWrapper");
+        
     });
 
-    function bindTaskDragEventListner(element) {
-        $(element).sortable({
-            handle: '.kw-drag-handle',
-            onDrop: function ($item, container, _super) {
-                _super($item, container);
-                let droppedTaskId = $item[0].id;
-                let targetContainer = $($item).next('li')
-                let targetContainerId = null
-                if (targetContainer.length > 0) {
-                    targetContainerId = targetContainer[0].id
-                }
-                //prevSortOrder: "<%= project.task_sort_order %>"
-                indexToPushItemWithNullTarget = parseInt($("#offset").text());
-                if(parseInt($("#totalRecordCount").text()) <= parseInt($("#offset").text())){
-                    indexToPushItemWithNullTarget = null;
-                }
-                $.ajax({
-                    type: 'POST',
-                    url: '/updateTaskSortOrder',
-                    contentType: 'application/json',
-                    dataType: 'json',
-                    data: JSON.stringify({ project_id: "<%= project.id %>", dropTaskId: droppedTaskId, targetContainerId: targetContainerId , indexToPushItemWithNullTarget : indexToPushItemWithNullTarget  }),
-                    success: function (response) {
-                        if (response.success) {
-                            hideLoader('#globalLoader');
-                            //closeModal(modalId);
-                            showGlobalToast('#globalToast', 'success', response.message, 4000);
-                            //location.reload(true);
-                            //setTimeout(location.reload(),5000);
-                        }
-                    },
-                    error: function (response) {
-                        console.log('error is : ' + JSON.stringify(response));
-                        hideLoader('#globalLoader');
-                        //closeModal(modalId);
-                        showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
-                    }
-                });
-            }
-        });
-    }
 
-    function setBillCostRate(ele, fromModal){
-        var billRate = 0.0;
-        var costRate = 0.0;
-        if(fromModal == "task") {
-            billRate = $("option:selected", ele).attr('billrate');
-            costRate = $("option:selected", ele).attr('costrate');
-        } else {
-            let selectedResource=$("#project_user option:selected").val();
-            let userList=<%- JSON.stringify(userList) %>;
-            let selectedRes= userList.filter(resource=>resource.id==selectedResource);
-            if(selectedRes.length>0){
-                billRate = selectedRes[0].bill_rate;
-                costRate = selectedRes[0].cost_rate;
-            }
-        }
 
-        $(ele).closest('div[modal-div]').find('input[bill-rate]').val(billRate);
-        $(ele).closest('div[modal-div]').find('input[cost-rate]').val(costRate);
-    }
 
-    function updateAssignRole(ele) {
-        var defaultRole = $("option:selected", ele).attr('role');
-        var userId = $("option:selected" ,ele).val();
-        console.log(defaultRole);
-        var projectAssginmentUser =  <%- JSON.stringify(resUsers) %>
-        var assginedUserWithRole=projectAssginmentUser.filter(assignedUser=>{
-             return ((assignedUser.id==userId)&&(assignedUser.role==defaultRole));
-        });
-        console.log(assginedUserWithRole);
-        if(assginedUserWithRole.length>0){
-            $(ele).closest('div[modal-div]').find('select[name="user_role"]').val('');
-        }else{
-            $(ele).closest('div[modal-div]').find('select[name="user_role"]').val(defaultRole);
-        }
-        checkProjectAssignment($("#project_user_role"));
-    }
-    function checkProjectAssignment(ele){
-        var userRole=$("option:selected", ele).val();
-        var userId=$("#project_user option:selected").val();
-        var projectAssginmentUser =  <%- JSON.stringify(resUsers) %>
-        var assginedUserWithRole=projectAssginmentUser.filter(assignedUser=>{
-            return ((assignedUser.id==userId)&&(assignedUser.role.trim()==userRole.trim()));
-        });
-        console.log(assginedUserWithRole);
-        if(assginedUserWithRole.length>0){
-            $(ele).val('');
-        }
-    }
+
     function updateProjectDetails(projectId, formId) {
         var projectData = createJSONForFormData(formId);
         console.log(projectData);

@@ -210,11 +210,10 @@ module.exports = function(app) {
     app.post('/deleteResource', passportConfig.isAuthenticated, resourceController.deleteResource);
     app.post('/updateResource', passportConfig.isAuthenticated, resourceController.updateResource);
     app.post('/updateResourcePassword', passportConfig.isAuthenticated, resourceController.updateResourcePassword);
-
     // app.get('/task', passportConfig.isAuthenticated, taskController.getTask);
     app.post('/deleteTask', passportConfig.isAuthenticated, taskController.deleteTask);
     app.post('/addTask', passportConfig.isAuthenticated, taskController.postAddTask);
-    app.post('/addSubtask', passportConfig.isAuthenticated, taskController.postAddSubtask);
+    
     // app.get('/editTask/:taskId', passportConfig.isAuthenticated, taskController.getEditTask);
     app.post('/editTask', passportConfig.isAuthenticated, taskController.postEditTask);
     app.get('/generateTaskCsv/:projectId', passportConfig.isAuthenticated, taskController.generateTaskCsv);

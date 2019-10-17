@@ -2,92 +2,152 @@
 var lastSearchText;
     $(function(){
         lastSearchText = $("#searchTaskName").val();
+        bindTaskDragEventListner("#taskSortWrapper");
     })
 
-    function addNewSubtask(modalId, formId, accountId, parent_id, project_id,project_name, billable) {
-        var taskData = createJSONForFormData(formId);
-        console.log(projectName);
-        let taskUserEmail=$("#assigned_user option:selected").text();
+    function setBillCostRate(ele, fromModal){
+        var billRate = 0.0;
+        var costRate = 0.0;
+        if(fromModal == "task") {
+            billRate = $("option:selected", ele).attr('billrate');
+            costRate = $("option:selected", ele).attr('costrate');
+        } else {
+            let selectedResource=$("#project_user option:selected").val();
+            let userList=<%- JSON.stringify(userList) %>;
+            let selectedRes= userList.filter(resource=>resource.id==selectedResource);
+            if(selectedRes.length>0){
+                billRate = selectedRes[0].bill_rate;
+                costRate = selectedRes[0].cost_rate;
+            }
+        }
 
-        let userData={ userEmail:'',billRate:'0.00',costRate:'0.00',user_role:'',assignment_id:null}
+        $(ele).closest('div[modal-div]').find('input[bill-rate]').val(billRate);
+        $(ele).closest('div[modal-div]').find('input[cost-rate]').val(costRate);
+    }
+
+
+    function updateAssignRole(ele) {
+        var defaultRole = $("option:selected", ele).attr('role');
+        var userId = $("option:selected" ,ele).val();
+        console.log(defaultRole);
+        var projectAssginmentUser =  <%- JSON.stringify(resUsers) %>
+        var assginedUserWithRole=projectAssginmentUser.filter(assignedUser=>{
+             return ((assignedUser.id==userId)&&(assignedUser.role==defaultRole));
+        });
+        console.log(assginedUserWithRole);
+        if(assginedUserWithRole.length>0){
+            $(ele).closest('div[modal-div]').find('select[name="user_role"]').val('');
+        }else{
+            $(ele).closest('div[modal-div]').find('select[name="user_role"]').val(defaultRole);
+        }
+        checkProjectAssignment($("#project_user_role"));
+    }
+    function checkProjectAssignment(ele){
+        var userRole=$("option:selected", ele).val();
+        var userId=$("#project_user option:selected").val();
+        var projectAssginmentUser =  <%- JSON.stringify(resUsers) %>
+        var assginedUserWithRole=projectAssginmentUser.filter(assignedUser=>{
+            return ((assignedUser.id==userId)&&(assignedUser.role.trim()==userRole.trim()));
+        });
+        console.log(assginedUserWithRole);
+        if(assginedUserWithRole.length>0){
+            $(ele).val('');
+        }
+    }
+
+    function bindTaskDragEventListner(element) {
+        $(element).sortable({
+            handle: '.kw-drag-handle',
+            onDrop: function ($item, container, _super) {
+                _super($item, container);
+                let droppedTaskId = $item[0].id;
+                let targetContainer = $($item).next('li')
+                let targetContainerId = null
+                if (targetContainer.length > 0) {
+                    targetContainerId = targetContainer[0].id
+                }
+                //prevSortOrder: "<%= project.task_sort_order %>"
+                indexToPushItemWithNullTarget = parseInt($("#offset").text());
+                if(parseInt($("#totalRecordCount").text()) <= parseInt($("#offset").text())){
+                    indexToPushItemWithNullTarget = null;
+                }
+                let payload,parentId=getURLParameter('taskId');
+                let projectId = <% if(project.id){ %>
+                                    '<%= project.id %>' 
+                                <%}else{%>
+                                    '<%= taskDetails.project_id %>'
+                                <% } %> ; 
+                if(parentId){
+                    payload={ project_id: projectId,"isSubtask":true,"parentId":parentId, dropTaskId: droppedTaskId, targetContainerId: targetContainerId , indexToPushItemWithNullTarget : indexToPushItemWithNullTarget  }
+                }else{
+                    payload={ project_id: projectId, dropTaskId: droppedTaskId, targetContainerId: targetContainerId , indexToPushItemWithNullTarget : indexToPushItemWithNullTarget  };
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/updateTaskSortOrder',
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    data: JSON.stringify(payload),
+                    success: function (response) {
+                        if (response.success) {
+                            hideLoader('#globalLoader');
+                            //closeModal(modalId);
+                            showGlobalToast('#globalToast', 'success', response.message, 4000);
+                            //location.reload(true);
+                            //setTimeout(location.reload(),5000);
+                        }
+                    },
+                    error: function (response) {
+                        console.log('error is : ' + JSON.stringify(response));
+                        hideLoader('#globalLoader');
+                        //closeModal(modalId);
+                        showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
+                    }
+                });
+            }
+        });
+    }
+
+
+    function addNewTask(modalId, formId, accountId, isSubtask, parent_id, project_id,project_name, billable) {
+        let selectedAssignedUser,userData={},payload;
+        if(isSubtask==true){
+            selectedAssignedUser = '#assigned_user_in_modal option:selected';
+        }else{
+            selectedAssignedUser = '#assigned_user option:selected';
+        }
+        var taskData = createJSONForFormData(formId);
+        userData.userId = $(selectedAssignedUser).val();
+        let taskUserEmail=$(selectedAssignedUser).text();
+
+        userData={ userEmail:'',billRate:'0.00',costRate:'0.00',user_role:'',assignment_id:null}
         if(taskUserEmail!=''&&taskUserEmail!=undefined&&taskUserEmail!=null){
-             userData.userEmail= $("#assigned_user option:selected").attr('email_id');
-             userData.assignment_id = $('#assigned_user2 option:selected').attr('pr_as_id');
-             userData.billRate=$("#assigned_user option:selected").attr('billRate');
-             userData.costRate=$("#assigned_user option:selected").attr('costRate');
-             taskData.user_role=$("#assigned_user option:selected").attr('role');
+             userData.userEmail= $(selectedAssignedUser).attr('email_id');
+             userData.assignment_id = $(selectedAssignedUser).attr('pr_as_id');
+             userData.billRate=$(selectedAssignedUser).attr('billRate');
+             userData.costRate=$(selectedAssignedUser).attr('costRate');
+             taskData.user_role=$(selectedAssignedUser).attr('role');
         }
         taskData.billable=billable;
         clearError("#task_name");
         if(taskData.task_name) {
           checkFormValidation("#addTaskForm");
-          if(!parent_id){
-              return console.log('no parent id');
-          }
           if (taskData.due_date!='' && taskData.start_date > taskData.due_date) {
             addError("#tsk_due_date", "Please enter end date greater than start date");
           } else if(!$("#addTaskForm").hasClass('has-error')) {
             showLoader('#globalLoader');
-            $.ajax({
-                type: 'POST',
-                url : '/addSubtask',
-                contentType: 'application/json',
-                dataType: 'json',
-                data : JSON.stringify({"accountId":accountId, "taskData":taskData, "projectId": project_id,"projectName": project_name,"userData":userData,"parent_id":parent_id}),
-                success : function(response){
-                    console.log(response);
-                    if(response.success == true) {
-                        hideLoader('#globalLoader');
-                        closeModal(modalId);
-                        showGlobalToast('#globalToast', 'success', response.message, 4000);
-                        location.reload();
-                    } else {
-                        hideLoader('#globalLoader');
-                        closeModal(modalId);
-                        showGlobalToast('#globalToast', 'error', response.message, 4000);
-                    }
-                },
-                error: function(response){
-                        console.log(response);
-                        hideLoader('#globalLoader');
-                        closeModal(modalId);
-                        showGlobalToast('#globalToast', 'error', response.responseJSON.message, 4000);
-                }
-            });
-          }
-        } else {
-            addError("#task_name", 'Please enter task title');
-        }
-        // taskData.task_desc = $('#taskDescription').summernote('code');
-    }
-
-    function addNewTask(modalId, formId, accountId) {
-        var taskData = createJSONForFormData(formId);
-        console.log(projectName);
-        let taskUserEmail=$("#assigned_user option:selected").text();
-
-        let userData={ userEmail:'',billRate:'0.00',costRate:'0.00',user_role:'',assignment_id:null}
-        if(taskUserEmail!=''&&taskUserEmail!=undefined&&taskUserEmail!=null){
-             userData.userEmail= $("#assigned_user option:selected").attr('email_id');
-             userData.assignment_id = $('#assigned_user option:selected').attr('pr_as_id');
-             userData.billRate=$("#assigned_user option:selected").attr('billRate');
-             userData.costRate=$("#assigned_user option:selected").attr('costRate');
-             taskData.user_role=$("#assigned_user option:selected").attr('role');
-        }
-        taskData.billable=projectBillable;
-        clearError("#task_name");
-        if(taskData.task_name) {
-          checkFormValidation("#addTaskForm");
-          if (taskData.due_date!='' && taskData.start_date > taskData.due_date) {
-            addError("#tsk_due_date", "Please enter end date greater than start date");
-          } else if(!$("#addTaskForm").hasClass('has-error')) {
-            showLoader('#globalLoader');
+            if(isSubtask==true){
+                taskData.assigned_user = taskData.assigned_user_in_modal;
+                payload = {"accountId":accountId, "taskData":taskData, "projectId": project_id,"projectName": project_name,"userData":userData,"parent_id":parent_id,"isSubtask":isSubtask};
+            }else{
+                payload = {"accountId":accountId, "taskData":taskData, "projectId": projectId,"projectName": projectName,"userData":userData,"isSubtask":isSubtask};
+            }
             $.ajax({
                 type: 'POST',
                 url : '/addTask',
                 contentType: 'application/json',
                 dataType: 'json',
-                data : JSON.stringify({"accountId":accountId, "taskData":taskData, "projectId": projectId,"projectName": projectName,"userData":userData}),
+                data : JSON.stringify(payload),
                 success : function(response){
                     console.log(response);
                     if(response.success == true) {
@@ -175,18 +235,24 @@ var lastSearchText;
         }
     }
 
-    function deleteTask(taskId, projectId) {
+    function deleteTask(taskId, projectId,isSubtask) {
         showLoader('#globalLoader');
         if(projectId == undefined && projectId == '') {
             location.reload();
         } else {
-            console.log("deleteProject called");
+            console.log("deleteTask called");
+            let payload={};
+            if(isSubtask){
+                payload={"taskId":taskId,"isSubtask":isSubtask};
+            }else{
+                payload={"taskId":taskId};
+            }
             $.ajax({
                 type: 'POST',
                 url : '/deleteTask',
                 contentType: 'application/json',
 	            dataType: 'json',
-                data : JSON.stringify({"taskId":taskId}),
+                data : JSON.stringify(payload),
                 success : function(response){
                     console.log(response);
                     if(response.success == true) {
@@ -206,7 +272,7 @@ var lastSearchText;
         }
     }
 
-function loadMoreTaskWithSearchCrieteria(){
+function loadMoreTaskWithSearchCrieteria(isSubtask,projectId){
     showLoader('#globalLoader');
 
     let offset=$("#offset").text();
@@ -215,13 +281,20 @@ function loadMoreTaskWithSearchCrieteria(){
 
     let searchText=$("#searchTaskName").val();
     let url = new URL(window.location.href);
-    let projectId=getURLParameter("projectId");
+    let parentId,payload;
+    if(isSubtask){
+        parentId=getURLParameter("taskId");
+        payload={"searchText":searchText,"searchField":"name","project_id":projectId,"offset":offset,"isSubtask":true,"parentId":parentId};
+    }else{
+        projectId=getURLParameter("projectId");
+        payload={"searchText":searchText,"searchField":"name","project_id":projectId,"offset":offset};
+    }
     $.ajax({
           type: 'POST',
           url : '/findTaskByName',
           contentType: 'application/json',
           dataType: 'json',
-          data:JSON.stringify({"searchText":searchText,"searchField":"name","project_id":projectId,"offset":offset}),
+          data:JSON.stringify(payload),
            success : function(response){
                if(response.success){
                     hideLoader('#globalLoader');
@@ -262,10 +335,12 @@ function loadMoreTaskWithSearchCrieteria(){
 
 }
 
-function loadMoreTask(isClearSearch){
+
+
+function loadMoreTask(isClearSearch,isSubtask,projectId){
     let searchText  = $("#searchTaskName").val();
     if(searchText != '' && searchText != null && searchText != undefined){
-        return loadMoreTaskWithSearchCrieteria()
+        return loadMoreTaskWithSearchCrieteria(isSubtask,projectId)
     }
     showLoader('#globalLoader');
     let offset;
@@ -279,13 +354,20 @@ function loadMoreTask(isClearSearch){
     showLoader('#globalLoader');
     //let searchText=$("#searchTaskName").val();
     let url = new URL(window.location.href);
-    let projectId=getURLParameter("projectId");
+    let parentId,payload;
+    if(isSubtask){
+        parentId=getURLParameter("taskId");
+        payload={"searchText":searchText,"searchField":"name","project_id":projectId,"offset":offset,"isSubtask":true,"parentId":parentId};
+    }else{
+        projectId=getURLParameter("projectId");
+        payload={"searchText":searchText,"searchField":"name","project_id":projectId,"offset":offset};
+    }
     $.ajax({
           type: 'POST',
           url : '/loadMoreTasks',
           contentType: 'application/json',
           dataType: 'json',
-          data:JSON.stringify({"searchText":searchText,"searchField":"name","project_id":projectId,"offset":offset}),
+          data:JSON.stringify(payload),
            success : function(response){
                if(response.success){
                     hideLoader('#globalLoader');
@@ -326,14 +408,14 @@ function loadMoreTask(isClearSearch){
 
 
 }
-function findTaskByName(){
+function findTaskByName(isSubtask,projectId){
         if($("#searchTaskName").val()==lastSearchText){
             return 0;
         }
         lastSearchText=$("#searchTaskName").val();
         $("#offset").text("0");
         $("#taskSortWrapper").html('')
-        loadMoreTask(true);
+        loadMoreTask(true,isSubtask,projectId);
         // $("#noTaskFound").addClass('slds-hide');
         // showLoader('#globalLoader');
         //
