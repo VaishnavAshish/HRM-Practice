@@ -177,7 +177,7 @@ var lastSearchText;
 
 
 
-    function updateTaskDetails(taskId, formId, projectId) {
+    function updateTaskDetails(taskId, formId, projectId, parentId) {
 
         checkFormValidation(formId);
         if(taskId == undefined && taskId == '') {
@@ -211,7 +211,7 @@ var lastSearchText;
                     url : '/editTask',
                     contentType: 'application/json',
                     dataType: 'json',
-                    data : JSON.stringify({"taskDetails":taskDetailsData,"userData":userData}),
+                    data : JSON.stringify({"taskDetails":taskDetailsData,"userData":userData,"parentId":parentId}),
                     success : function(response){
                         console.log(response);
                         if(response.success == true) {
