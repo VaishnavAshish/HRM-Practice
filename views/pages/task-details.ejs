@@ -68,9 +68,9 @@
                                 <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
                                     <div class="text-right sm-tpd-15">
                                         <% if(hierarchyData.length == 1) { %>
-                                            <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteTask(\'<%= taskDetails.id %>\', \'<%= taskDetails.project_id %>\')','Are you sure you want to delete this task?');">
+                                            <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteTask(\'<%= taskDetails.id %>\', \'<%= taskDetails.project_id %>\')','Are you sure you want to delete this task? All the related subtasks will be deleted.');">
                                         <% } else if(hierarchyData.length > 1){ %>
-                                            <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteTask(\'<%= taskDetails.id %>\', \'<%= taskDetails.project_id %>\',true)','Are you sure you want to delete this task?');">
+                                            <button class="slds-button slds-button_neutral slds-align-top" onclick="deleteBeforeConfirm('#globalAlert', 'deleteTask(\'<%= taskDetails.id %>\', \'<%= taskDetails.project_id %>\',true,\'<%= taskDetails.parent_id %>\')','Are you sure you want to delete this subtask? All the related subtasks will be deleted.');">
                                         <% } %>
                                             Delete
                                         </button>
@@ -216,7 +216,7 @@
                                                                                 <option value="" billRate="0.00" costRate="0.00"> </option>
                                                                                 <% if(userList.length > 0) { %>
                                                                                     <% userList.forEach(function(resource) { %>
-                                                                                        <option user_role="<%= resource.user_role %>" value="<%= resource.id %>" pr_as_id="<%= resource.assignment_id %>" billRate="<%= resource.bill_rate %>" costRate="<%= resource.cost_rate %>" email_id = "<%= resource.email %>" > <%= resource.first_name %> <%= resource.last_name?resource.last_name:'' %> (<%= resource.user_role %>)</option>
+                                                                                        <option user_role="<%= resource.user_role %>" value="<%= resource.id %>" pr_as_id="<%= resource.assignment_id %>" billRate="<%= resource.bill_rate %>" costRate="<%= resource.cost_rate %>" email_id = "<%= resource.email %>" <% if(resource.id == taskDetails.user_id) { %> selected <% } %> > <%= resource.first_name %> <%= resource.last_name?resource.last_name:'' %> (<%= resource.user_role %>)</option>
                                                                                     <% }); %>
                                                                                 <% } %>
                                                                             </select>
@@ -519,11 +519,11 @@
                                         <button class="slds-button" loadItemId="loadMoreBtn" onclick="loadMoreTask(false,true,'<%= taskDetails.project_id %>')">&nbsp;</button>
                                     </div>
                                     <% if(subtasks.length <= 0) { %>
-                                    <div class="slds-p-around_small text-center" title="" id="noSubtaskFound">
+                                    <div class="slds-p-around_small text-center" title="" id="noTaskFound">
                                         No subtask found.
                                     </div>
                                     <% }  else { %>
-                                    <div class="slds-p-around_small text-center slds-hide" title="" id="noSubtaskFound">
+                                    <div class="slds-p-around_small text-center slds-hide" title="" id="noTaskFound">
                                         No subtask found.
                                     </div>
                                     <% } %>
