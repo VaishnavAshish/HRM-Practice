@@ -95,6 +95,10 @@ const app = express();
         syncXhr: ["'none'"]
       }
     }))
+    app.use(helmet.hpkp({
+      maxAge: 7776000,
+      sha256s: ['jW8aor76jpPX=', '76jpPXjW8aor=']
+    }))
     app.use(helmet.frameguard({ action: 'sameorigin' }))
     app.use(helmet.referrerPolicy({ policy: 'same-origin' }))
     // app.use(helmet.contentSecurityPolicy({
