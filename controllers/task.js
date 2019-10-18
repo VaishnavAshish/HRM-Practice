@@ -202,7 +202,7 @@ exports.findTaskByName = (req, res) => {
             queryParam=['%'+req.body.searchText+'%',req.user.company_id,req.body.project_id,req.body.parentId];
           }else{
             queryToExec='SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,t.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,t.archived ,t.project_name ,t.record_id,(SELECT count(*) FROM TASK WHERE '+req.body.searchField+' ilike $1 AND company_id=$2 AND project_id=$3 AND archived=false) as searchcount FROM task t WHERE '+req.body.searchField+
-            ' ilike $1 AND company_id=$2 AND project_id=$3 AND archived=false AND parent_id isNull ORDER BY id,project_id,start_date DESC,name OFFSET '+offset+' LIMIT '+process.env.PAGE_RECORD_NO;
+            ' ilike $1 AND company_id=$2 AND project_id=$3 AND archived=false AND parent_id is Null ORDER BY id,project_id,start_date DESC,name OFFSET '+offset+' LIMIT '+process.env.PAGE_RECORD_NO;
             queryParam=['%'+req.body.searchText+'%',req.user.company_id,req.body.project_id];
           }
 
@@ -308,7 +308,7 @@ exports.postAddTask = (req, res) => {
             if(req.body.isSubtask && req.body.isSubtask==true){
               parentIdParam='='+req.body.parent_id;
             }else{
-              parentIdParam='isNull';
+              parentIdParam='is Null';
             }
             client.query('SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,t.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,t.archived ,t.project_name ,t.record_id FROM TASK t where name=$1 AND company_id=$2 AND project_id=$3 AND parent_id '+parentIdParam, [req.body.taskData.task_name, req.user.company_id, req.body.projectId], function (err, taskList) {
               if (err) {
@@ -666,7 +666,7 @@ exports.postEditTask = (req, res) => {
                 } else {
                   let parentIdParam;
                   if(req.body.parentId == ''){
-                    parentIdParam='isnull';
+                    parentIdParam='is null';
                   }else{
                     parentIdParam='='+req.body.parentId;
                   }
@@ -677,7 +677,7 @@ exports.postEditTask = (req, res) => {
                       handleResponse.handleError(res, err, ' Error in finding task data for updating');
                     } else {
                           if (taskDetail.rows.length > 0) {
-                            if(taskDetail.rows[0].name != req.body.taskDetails.title && parseInt(taskDetail.rows[0].samenametaskcount) == 0){
+                            if(!(taskDetail.rows[0].name != req.body.taskDetails.title && parseInt(taskDetail.rows[0].samenametaskcount) > 0)){
                             var taskData = {};
                             taskData.assigned_user_id = req.body.taskDetails.assignment_id;
                             console.log('taskData.assigned_user_id')
@@ -972,7 +972,7 @@ exports.getTaskAndAssignmentList = (req, res, callback) => {
       }else{
         companyDefaultTimezone=result.timezone;
         pool.connect((err, client, done) => {
-          client.query('SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date at time zone \''+companyDefaultTimezone+'\' as created_date,t.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,t.archived ,t.project_name ,t.record_id FROM TASK t where project_id=$1 AND company_id=$2', [req.body.projectId, req.user.company_id], function (err, tasks) {
+          client.query('SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date at time zone \''+companyDefaultTimezone+'\' as created_date,t.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,t.archived ,t.project_name ,t.record_id FROM TASK t where project_id=$1 AND company_id=$2 AND parent_id is null', [req.body.projectId, req.user.company_id], function (err, tasks) {
             if (err) {
               console.error(err);
               handleResponse.shouldAbort(err, client, done);

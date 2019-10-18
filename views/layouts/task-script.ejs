@@ -235,17 +235,19 @@ var lastSearchText;
         }
     }
 
-    function deleteTask(taskId, projectId,isSubtask) {
+    function deleteTask(taskId, projectId,isSubtask,parentId) {
         showLoader('#globalLoader');
         if(projectId == undefined && projectId == '') {
             location.reload();
         } else {
             console.log("deleteTask called");
-            let payload={};
+            let payload={},redirectURL='';
             if(isSubtask){
                 payload={"taskId":taskId,"isSubtask":isSubtask};
+                redirectURL='/task-details?taskId='+parentId+'#subtasks';
             }else{
                 payload={"taskId":taskId};
+                redirectURL='/project-details?projectId='+projectId+'#tasks';
             }
             $.ajax({
                 type: 'POST',
@@ -257,7 +259,7 @@ var lastSearchText;
                     console.log(response);
                     if(response.success == true) {
                         hideLoader('#globalLoader');
-                        window.location.href = '/project-details?projectId='+projectId+'#tasks';
+                        window.location.href = redirectURL;
                     } else {
                         hideLoader('#globalLoader');
                         showGlobalToast('#globalToast', 'error', response.message, 4000);
