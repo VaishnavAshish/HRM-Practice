@@ -202,6 +202,11 @@ var lastSearchText;
                 userData.costRate=$("#assigned_user option:selected").attr('costRate');
                 //taskDetailsData.user_role=$("#assigned_user option:selected").attr('role');
             }
+            let per_comple = parseInt(taskDetailsData.task_complete_per);
+            if(per_comple < 0 || per_comple > 100){
+                addError("#task_complete_per", "Please enter a value between 0 and 100");
+                return 0;
+            }
             if (taskDetailsData.end_date && taskDetailsData.start_date > taskDetailsData.end_date) {
               addError("#tskDetail_due_date", "Please enter end date greater than start date");
             } else if(!$(formId).hasClass('has-error')) {
