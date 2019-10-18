@@ -113,8 +113,7 @@ exports.loadMoreTasks = (req,res) => {
           handleResponse.handleError(res, err, ' Error in finding task sort order');
         } else {
           if(task_sort_order.rows[0].task_sort_order==null){
-            handleResponse.shouldAbort(err, client, done);
-            handleResponse.handleError(res, err, ' Error in finding task sort order');
+            handleResponse.sendSuccess(res,obj_name+' searched successfully',{tasks: [],count:0});
           }
           let en = parseInt(req.body.offset)+parseInt(process.env.PAGE_RECORD_NO);
           let splitt = task_sort_order.rows[0].task_sort_order.split(',',en);
@@ -192,20 +191,23 @@ exports.findTaskByName = (req, res) => {
         // console.log(companyDefaultTimezone);
       pool.connect((err, client, done) => {
           let offset=0;
-          let queryToExec,queryParam;
+          let queryToExec,queryParam,parentIdStr;
           if(req.body.offset){
             offset=req.body.offset;
           }
+          queryParam=['%'+req.body.searchText+'%',req.user.company_id,req.body.project_id];
           if(req.body.isSubtask && req.body.isSubtask==true){
-            queryToExec='SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,t.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,t.archived ,t.project_name ,t.record_id,(SELECT count(*) FROM TASK WHERE '+req.body.searchField+' ilike $1 AND company_id=$2 AND project_id=$3 AND parent_id=$4 AND archived=false) as searchcount FROM task t WHERE '+req.body.searchField+
-            ' ilike $1 AND company_id=$2 AND project_id=$3 AND parent_id=$4 AND archived=false ORDER BY id,project_id,start_date DESC,name OFFSET '+offset+' LIMIT '+process.env.PAGE_RECORD_NO;
-            queryParam=['%'+req.body.searchText+'%',req.user.company_id,req.body.project_id,req.body.parentId];
+            parentIdStr='=$4';
+            queryParam.push(req.body.parentId);
           }else{
-            queryToExec='SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,t.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,t.archived ,t.project_name ,t.record_id,(SELECT count(*) FROM TASK WHERE '+req.body.searchField+' ilike $1 AND company_id=$2 AND project_id=$3 AND archived=false) as searchcount FROM task t WHERE '+req.body.searchField+
-            ' ilike $1 AND company_id=$2 AND project_id=$3 AND archived=false AND parent_id is Null ORDER BY id,project_id,start_date DESC,name OFFSET '+offset+' LIMIT '+process.env.PAGE_RECORD_NO;
-            queryParam=['%'+req.body.searchText+'%',req.user.company_id,req.body.project_id];
+            parentIdStr=' IS NULL';
           }
+<<<<<<< HEAD
 
+=======
+          queryToExec='SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,t.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date at time zone \''+companyDefaultTimezone+'\' as created_date ,t.updated_date at time zone \''+companyDefaultTimezone+'\' as updated_date ,t.archived ,t.project_name ,t.record_id,(SELECT count(*) FROM TASK WHERE '+req.body.searchField+' ilike $1 AND company_id=$2 AND project_id=$3 AND parent_id'+parentIdStr+' AND archived=false) as searchcount FROM task t WHERE '+req.body.searchField+
+          ' ilike $1 AND company_id=$2 AND project_id=$3 AND parent_id'+parentIdStr+' AND archived=false ORDER BY id,project_id,start_date DESC,name OFFSET '+offset+' LIMIT '+process.env.PAGE_RECORD_NO;
+>>>>>>> a3b655d327ec389dae51eec846c5f688c8470c12
           // console.log('queryToExec '+queryToExec+' '+'%'+req.body.searchText+'%'+' '+req.user.company_id+' '+req.body.project_id);
           client.query(queryToExec,queryParam, function (err, tasks) {
             if (err) {
@@ -414,27 +416,32 @@ exports.postAddTask = (req, res) => {
 
 
 function createTaskRecord(req, client, err, done, isSubtask,assigned_user_id, res, callback) {
-  let insertQry = insertQryParam ='';
+  let insertQry = insertQryParam =parentId='';
+  insertQryParam = [req.body.projectId, req.body.taskData.task_name, req.body.taskData.start_date, req.body.taskData.due_date, req.body.taskData.estimate_hours, req.body.taskData.task_desc, req.user.company_id, 0, 'Not Started', req.body.taskData.billable, req.body.projectName,assigned_user_id];
   if(isSubtask){
-    insertQry = 'Insert INTO TASK (project_id, name, start_date, end_date, estimated_hours, description, company_id, percent_completed, status, billable,project_name, assigned_user_id, parent_id) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING id';
-    insertQryParam = [req.body.projectId, req.body.taskData.task_name, req.body.taskData.start_date, req.body.taskData.due_date, req.body.taskData.estimate_hours, req.body.taskData.task_desc, req.user.company_id, 0, 'Not Started', req.body.taskData.billable, req.body.projectName,assigned_user_id,req.body.parent_id];
+    parentId = ', $13';
+    insertQryParam.push(req.body.parent_id);
   }else{
-    insertQry ='Insert INTO TASK (project_id, name, start_date, end_date, estimated_hours, description, company_id, percent_completed, status, billable,project_name, assigned_user_id) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING id';
-    insertQryParam = [req.body.projectId, req.body.taskData.task_name, req.body.taskData.start_date, req.body.taskData.due_date, req.body.taskData.estimate_hours, req.body.taskData.task_desc, req.user.company_id, 0, 'Not Started', req.body.taskData.billable, req.body.projectName,assigned_user_id];
+    parentId = ', null';
   }
+  insertQry = 'Insert INTO TASK (project_id, name, start_date, end_date, estimated_hours, description, company_id, percent_completed, status, billable,project_name, assigned_user_id, parent_id) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12'+parentId+') RETURNING id';
   client.query(insertQry,insertQryParam , function (err, insertedTask) {
     if(err) {
       handleResponse.shouldAbort(err, client, done);
       handleResponse.handleError(res, err, ' Error in adding task to the database');
     } else {
       let taskSortQry = taskSortParam = '';
+      taskSortParam = [insertedTask.rows[0].id,','+insertedTask.rows[0].id];
       if(isSubtask){
-        taskSortQry = 'UPDATE Task SET subtask_sort_order = (CASE WHEN subtask_sort_order IS NULL THEN $1 ELSE subtask_sort_order || $2 END) WHERE id=$3';
-        taskSortParam = [insertedTask.rows[0].id,','+insertedTask.rows[0].id,req.body.parent_id];
+        table='Task';
+        column='subtask_sort_order';
+        taskSortParam.push(req.body.parent_id);
       }else{
-        taskSortQry = 'UPDATE Project p SET task_sort_order = (CASE WHEN task_sort_order IS NULL THEN $1 ELSE p.task_sort_order || $2 END) WHERE id=$3';
-        taskSortParam = [insertedTask.rows[0].id,','+insertedTask.rows[0].id,req.body.projectId];
+        table='Project';
+        column='task_sort_order';
+        taskSortParam.push(req.body.projectId);
       }
+      taskSortQry = 'UPDATE '+table+' SET '+column+' = (CASE WHEN '+column+' IS NULL THEN $1 ELSE '+column+' || $2 END) WHERE id=$3';
       client.query(taskSortQry,taskSortParam, function (err, updatedProjectWithSortOrder) {
         if(err) {
           handleResponse.shouldAbort(err, client, done);
@@ -603,7 +610,7 @@ exports.getTaskDetails = (req, res) => {
                                       let requiredSubtasks = null;
                                       if (taskDetail.rows[0].subtask_sort_order) {
                                         requiredSubtasks = taskDetail.rows[0].subtask_sort_order.substring(0, taskDetail.rows[0].subtask_sort_order.split(',', process.env.PAGE_RECORD_NO).join(',').length);
-                                        let qry = `SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone '${companyDefaultTimezone}' as start_date ,t.end_date at time zone '${companyDefaultTimezone}' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone '${companyDefaultTimezone}' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id ,t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date ,t.updated_date ,t.archived ,t.project_name ,t.record_id,(select first_name from users where id=t.assigned_user_id) as user_first_name, (select last_name from users where id=t.assigned_user_id) as user_last_name, (select role from users where id=t.assigned_user_id) as user_role
+                                        let qry = `SELECT t.id ,t.project_id ,t.name ,t.type ,t.start_date at time zone '${companyDefaultTimezone}' as start_date ,t.end_date at time zone '${companyDefaultTimezone}' as end_date ,t.total_hours ,t.billable ,t.completion_date at time zone '${companyDefaultTimezone}' as completion_date ,t.status ,t.include_weekend ,t.description ,t.percent_completed ,t.estimated_hours ,t.completed ,t.assigned_by_name ,t.assigned_user_id, t.billable_hours ,t.milestone ,t.parent_id ,t.company_id ,t.priority ,t.created_date ,t.updated_date ,t.archived ,t.project_name ,t.record_id,(select first_name from users where id=t.assigned_user_id) as user_first_name, (select last_name from users where id=t.assigned_user_id) as user_last_name, (select role from users where id=t.assigned_user_id) as user_role
                                         FROM TASK t
                                         where id in (${requiredSubtasks})
                                         ORDER BY position(id::text in '${requiredSubtasks}')`;
@@ -889,13 +896,18 @@ exports.deleteTask = (req, res) => {
                               })
                             console.log(updatedSortOrder.join(','));
                             updatedSortOrder = updatedSortOrder.join(',');
+                            let table,column;
+                            updateSortOrderQryParam=[updatedSortOrder, req.user.company_id];
                             if(req.body.isSubtask && req.body.isSubtask==true){
-                              updateSortOrderQryStr='UPDATE TASK SET subtask_sort_order = $1 WHERE id=$2 AND company_id=$3';
-                              updateSortOrderQryParam=[updatedSortOrder, taskDetail.rows[0].parent_id, req.user.company_id];
+                              table='Task';
+                              column='subtask_sort_order';
+                              updateSortOrderQryParam.push(taskDetail.rows[0].parent_id);
                             }else{
-                              updateSortOrderQryStr='UPDATE PROJECT SET task_sort_order = $1 WHERE id=$2 AND company_id=$3';
-                              updateSortOrderQryParam=[updatedSortOrder, taskDetail.rows[0].project_id, req.user.company_id];
+                              table='Project';
+                              column='task_sort_order';
+                              updateSortOrderQryParam.push(taskDetail.rows[0].project_id);
                             }
+                            updateSortOrderQryStr='UPDATE '+table+' SET '+column+' = $1 WHERE id=$3 AND company_id=$2';
                             client.query(updateSortOrderQryStr, updateSortOrderQryParam, function (err, archivedTask) {
                               if (err) {
                                 console.error(err);
