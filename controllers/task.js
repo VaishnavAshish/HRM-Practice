@@ -682,7 +682,7 @@ exports.postEditTask = (req, res) => {
                           if (taskDetail.rows.length > 0) {
                             if(!(taskDetail.rows[0].name != req.body.taskDetails.title && parseInt(taskDetail.rows[0].samenametaskcount) > 0)){
                             var taskData = {};
-                            taskData.assigned_user_id = req.body.taskDetails.assignment_id;
+                            taskData.assigned_user_id = req.body.taskDetails.assigned_user;
                             console.log('taskData.assigned_user_id')
                             console.log(taskData.assigned_user_id)
                             updateTaskRecord(req, client, err, done, res, taskData, function (taskId) {
