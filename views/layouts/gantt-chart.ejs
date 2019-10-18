@@ -1,0 +1,92 @@
+<script src="js/gantt_6.1.7_enterprise/codebase/dhtmlxgantt.js"></script>
+<link rel="stylesheet" href="js/gantt_6.1.7_enterprise/codebase/dhtmlxgantt.css">
+<link rel="stylesheet" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css?v=6.1.7">
+<script src="js/gantt_6.1.7_enterprise/codebase/ext/dhtmlxgantt_tooltip.js"></script>
+<script src="js/gantt_6.1.7_enterprise/codebase/ext/dhtmlxgantt_tooltip.js"></script>
+<script src="js/gantt_6.1.7_enterprise/codebase/ext/dhtmlxgantt_critical_path.js"></script>
+<script src="js/gantt_6.1.7_enterprise/codebase/ext/dhtmlxgantt_keyboard_navigation.js"></script>
+<script src="js/gantt_6.1.7_enterprise/codebase/ext/dhtmlxgantt_marker.js"></script>
+<script src="js/gantt_6.1.7_enterprise/codebase/ext/dhtmlxgantt_grouping.js"></script>
+<script src="js/gantt_6.1.7_enterprise/codebase/ext/dhtmlxgantt_multiselect.js"></script>
+<script src="js/gantt_6.1.7_enterprise/codebase/ext/dhtmlxgantt_auto_scheduling.js"></script>
+<script src="js/gantt_6.1.7_enterprise/codebase/ext/dhtmlxgantt_smart_rendering.js"></script>
+<script src="js/gantt_6.1.7_enterprise/codebase/ext/dhtmlxgantt_csp.js"></script>
+<script src="js/gantt_6.1.7_enterprise/codebase/ext/dhtmlxgantt_overlay.js"></script>
+<script src="js/gantt_6.1.7_enterprise/codebase/ext/dhtmlxgantt_fullscreen.js"></script>
+<script src="js/gantt_6.1.7_enterprise/codebase/ext/dhtmlxgantt_undo.js"></script>
+
+<script src="https://export.dhtmlx.com/gantt/api.js?v=6.1.7" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js?v=6.1.6"></script>
+
+<script src="js/notify.js"></script>
+<script src="https://cdn.dhtmlx.com/edge/dhtmlx.js?v=6.1.7"></script>
+
+<!-- <script src="js/TableEdit" ></script> -->
+
+<script src="js/blockui.js" ></script>
+<script src="js/jquery-ui.min.js" ></script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.1.2/handlebars.min.js"></script>
+
+
+<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css?v=6.1.6"> -->
+
+<link rel="stylesheet" href="css/bootstrap.min.css" >
+<link rel="stylesheet" href="css/jquery-ui.css"/>
+
+
+<link rel="stylesheet" href="css/bootstrap-editable.css">
+<script src="js/bootstrap.min.js"></script>
+<script src="js/bootstrap-typeahead.js"></script>
+<script src="js/bootstrap-editable.js"></script>
+<link rel="stylesheet" href="css/jui_docs.css">
+<script>
+  var _restEndpoints = {
+      read_only :'/loadGanttData/<%= project.id %>',
+  //     read_only_all_project :'{!salesforceBaseUrl}{!$Page.GanttDataProvider}?action=READ&allproject=true',
+  //     read_only_expand_all :'{!salesforceBaseUrl}{!$Page.GanttDataProvider}?projectid={!projectId}&action=READ&expandAll=true',
+  //     read_write :'{!salesforceBaseUrl}{!$Page.GanttDataUpdater}?projectid={!projectId}',
+  //     read_task_assignment :'{!salesforceBaseUrl}{!$Page.ReadonlyEndpoint}',
+  //     read_lookup : '{!salesforceBaseUrl}{!$Page.ReadonlyEndpoint}'
+  }
+
+
+</script>
+
+<script>
+  function loadProjectGanttData(){
+    $("#ganttToolbar").addClass('wait-overlay');
+    $('.gantt-operation-progress-ring').removeClass('ct-complete');
+    $('.gantt-operation-progress-ring').addClass('ct-rotating');
+    $('.gantt-operation-progress-ring-slice').attr('stroke-dasharray',"75 25");
+    gantt.load(_restEndpoints.read_only_expand_all,function(){
+        $("#ganttToolbar").removeClass('wait-overlay');
+        $('.gantt-operation-progress-ring').removeClass('ct-rotating');
+        $('.gantt-operation-progress-ring').addClass('ct-complete');
+        $('.gantt-operation-progress-ring-slice').attr('stroke-dasharray',"100 0");
+    });
+
+
+  }
+  function initGantt(){
+      gantt.config.date_format = "%Y-%m-%d %H:%i";
+      $("#d3").html('');
+      gantt.init("d3");
+      gantt.parse({
+        data: [
+          {id: 1, text: "Project #1", start_date: null, duration: null, parent:0, progress: 0, open: true},
+          {id: 2, text: "Task #1", start_date: "2019-08-01 00:00", duration:5, parent:1, progress: 1},
+          {id: 3, text: "Task #2", start_date: "2019-08-06 00:00", duration:2, parent:1, progress: 0.5},
+          {id: 4, text: "Task #3", start_date: null, duration: null, parent:1, progress: 0.8, open: true},
+          {id: 5, text: "Task #3.1", start_date: "2019-08-09 00:00", duration:2, parent:4, progress: 0.2},
+          {id: 6, text: "Task #3.2", start_date: "2019-08-11 00:00", duration:1, parent:4, progress: 0}
+        ],
+        links:[
+          {id:1, source:2, target:3, type:"0"},
+          {id:2, source:3, target:4, type:"0"},
+          {id:3, source:5, target:6, type:"0"}
+        ]
+      });
+  }
+</script>
