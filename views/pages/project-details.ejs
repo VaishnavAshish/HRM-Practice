@@ -168,11 +168,11 @@
                                             Activity (<%= projectConversationThread.length %>)
                                         </a>
                                     </li>
-                                    <!-- <li data-navigation="activity" class="slds-tabs_default__item" onclick="openTab(this, 'timeline')">
+                                    <li data-navigation="timeline" class="slds-tabs_default__item" onclick="openTab(this, 'project-timeline');">
                                         <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="0" id="projectGanttChart">
                                             Timeline
                                         </a>
-                                    </li> -->
+                                    </li>
                                     <!-- <li class="slds-tabs_default__item" onclick="openTab(this, 'project-files')">
                                         <a class="slds-tabs_default__link" href="javascript:void(0);" tabindex="-1">
                                             Files (3)
@@ -811,7 +811,7 @@
                                                                             <img alt="Person name" src="img/avatar1.jpg" title="User avatar">
                                                                         </span>
                                                                     </div>
-                                                                    <div class="slds-has-flexi-truncate">
+                                                            -->        <div class="slds-has-flexi-truncate">
                                                                         <div>
                                                                             User Name
                                                                         </div>
@@ -1334,11 +1334,59 @@
                             <!-- task-forums tab end -->
 
                             <!-- gantt tab start -->
-                            <!-- <div class="slds-tabs_default__content hide" target-tab="timeline">
+                            <div class="slds-tabs_default__content hide" target-tab="project-timeline">
                                 <% if(user.company_info.stripe_customer_id){ %>
-                                      
+                                  <div class=" slds-card bmr-15 slds-p-around_small" style="width:100%; height:1870px;">
+                                    <div id="ganttToolbar">
+
+                                            <div class="slds-builder-toolbar" role="toolbar">
+                                                <div class="slds-builder-toolbar__item-group slds-p-around_xx-small" aria-label="Spinner">
+                                                    <div class="gantt-operation-progress-ring ct-ring-wrapper" >
+                                                        <svg aria-hidden="true" focusable="false"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" width="1.8rem" height="1.8rem" >
+                                                            <circle  cx="50%" cy="50%" fill="transparent" r="15.909091" stroke="#ddd" stroke-width="10"></circle>
+                                                            <circle class="gantt-operation-progress-ring-slice ct-ring-slice" cx="50%" cy="50%" fill="transparent" r="15.909091" stroke="#4bca81" stroke-dasharray="" stroke-width="10" stroke-dashoffset="25">
+                                                            </circle>
+                                                            <circle class="ct-mask" cx="50%" cy="50%" fill="#FFFFFF" r="15"> </circle>
+                                                            <polyline class="ct-check" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" points="13,22 19,28 30,15" stroke-dasharray="100">
+                                                            </polyline>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+
+
+                                                <div class="slds-builder-toolbar__item-group slds-p-around_xx-small slds-grid slds-grid_vertical-align-center" aria-label="Gantt Actions">
+                                                    <div class="slds-radio_button-group in-lightning kw-radio-group-h slds-m-horizontal_x-small">
+                                                          <span class="slds-button slds-radio_button">
+                                                            <input type="radio" name="radio" id="g-grid" value="grid" onclick="toggleGanttChart('grid');"/>
+                                                            <label class="slds-radio_button__label" for="g-grid"><span class="slds-radio_faux">Grid</span></label>
+                                                          </span>
+                                                          <span class="slds-button slds-radio_button">
+                                                            <input type="radio" name="radio" id="g-chart" value="chart" onclick="toggleGanttChart('chart');"/>
+                                                            <label class="slds-radio_button__label" for="g-chart"><span class="slds-radio_faux">Chart</span></label>
+                                                          </span>
+                                                          <span class="slds-button slds-radio_button active">
+                                                            <input type="radio" name="radio" id="g-default" value="default" onclick="toggleGanttChart('default');"/>
+                                                            <label class="slds-radio_button__label" for="g-default"><span class="slds-radio_faux">Default</span></label>
+                                                          </span>
+                                                    </div>
+
+                                                </div>
+                                                <div class="slds-builder-toolbar__item-group slds-p-around_xx-small" aria-label="Project Name">
+                                                    <div class=" slds-button-group slds-has-flexi-truncate slds-p-around_xx-small text-uppercase background-grey">
+                                                            <strong id="filterTag" class="slds-p-around_xx-small" title="<%= project.name %>">
+                                                                <%= project.name %>
+                                                            </strong>
+                                                    </div>
+                                                </div>
+
+
+                                            </div>
+
+                                      </div>
+                                      <div id="d3" style='width:100%; height:95%;'></div>
+                                  </div>
                                 <% } %>
-                            </div> -->
+                            </div>
                             <!-- gantt tab end -->
 
                         </div>
@@ -1364,10 +1412,11 @@
 
     <% include ../layouts/common-project-script %>
     <% include ../layouts/project-comment-script %>
+    <% include ../layouts/gantt-chart %>
 
     <script>
 
-        // $(document).ready(function(){
+        $(document).ready(function(){
         //   $("#taskSortWrapper").sortable({
         //       handle: '.kw-drag-handle',
         //       onDrop: function($item, container, _super) {
@@ -1415,7 +1464,8 @@
         //             //['insert', ['picture', 'link', 'video', 'table', 'hr']],
         //         ]
         //       }); */
-        // });
+        initGantt();
+        });
     </script>
 </body>
 

@@ -84,23 +84,27 @@ const app = express();
         console.log(await ipify({useIPv6: false}));
         //=> '82.142.31.236'
     })();*/
-    app.use(helmet())
-    app.disable('x-powered-by')
-    app.use(helmet.permittedCrossDomainPolicies())
-    app.use(helmet.featurePolicy({
-      features: {
-        fullscreen: ["'self'"],
-        vibrate: ["'none'"],
-        payment: ['example.com'],
-        syncXhr: ["'none'"]
-      }
-    }))
-    app.use(helmet.hpkp({
-      maxAge: 7776000,
-      sha256s: ['jW8aor76jpPX=', '76jpPXjW8aor=']
-    }))
-    app.use(helmet.frameguard({ action: 'sameorigin' }))
-    app.use(helmet.referrerPolicy({ policy: 'same-origin' }))
+    
+    // app.use(helmet())
+    // app.disable('x-powered-by')
+
+    // app.use(helmet.permittedCrossDomainPolicies())
+    // app.use(helmet.featurePolicy({
+    //   features: {
+    //     fullscreen: ["'self'"],
+    //     vibrate: ["'none'"],
+    //     payment: ['example.com'],
+    //     syncXhr: ["'none'"]
+    //   }
+    // }))
+    // app.use(helmet.hpkp({
+    //   maxAge: 7776000,
+    //   sha256s: ['jW8aor76jpPX=', '76jpPXjW8aor=']
+    // }))
+    // app.use(helmet.frameguard({ action: 'sameorigin' }))
+    // app.use(helmet.referrerPolicy({ policy: 'same-origin' }))
+
+
     // app.use(helmet.contentSecurityPolicy({
     //   directives: {
     //     defaultSrc: ["'self'"],

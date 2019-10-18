@@ -24,6 +24,7 @@ const quickbookController = require('./../controllers/quickbook');
 const xeroController = require('./../controllers/xero');
 
 const commentController = require('./../controllers/comment');
+const ganttController = require('./../controllers/gantt');
 
 module.exports = function(app) {
 
@@ -91,6 +92,9 @@ module.exports = function(app) {
     /*app.post('/findUserByEmail', passportConfig.isAuthenticated,resourceController.findUserByEmail);*/
     /*app.post('/findAccountByName', passportConfig.isAuthenticated,accountController.findAccountByName);*/
 
+
+    /* gantt routers */
+    app.get('/loadGanttData/:project_id', passportConfig.isAuthenticated, ganttController.loadGanttData);
 
     /* comment routers */
 
@@ -213,7 +217,7 @@ module.exports = function(app) {
     // app.get('/task', passportConfig.isAuthenticated, taskController.getTask);
     app.post('/deleteTask', passportConfig.isAuthenticated, taskController.deleteTask);
     app.post('/addTask', passportConfig.isAuthenticated, taskController.postAddTask);
-    
+
     // app.get('/editTask/:taskId', passportConfig.isAuthenticated, taskController.getEditTask);
     app.post('/editTask', passportConfig.isAuthenticated, taskController.postEditTask);
     app.get('/generateTaskCsv/:projectId', passportConfig.isAuthenticated, taskController.generateTaskCsv);
@@ -386,7 +390,7 @@ module.exports = function(app) {
     app.get('/getProjectListForCompany', passportConfig.isAuthenticated, projectController.getProjectListForCompany);
 
     app.post('/resendInvitationEmail',passportConfig.isAuthenticated, resourceController.postResendActivation);
-    
+
     app.get('/generateUserCSV', passportConfig.isAuthenticated, adminController.generateUserDetailsCsv);
 
     app.get('*',function(req, res) {
