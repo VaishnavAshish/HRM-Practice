@@ -205,7 +205,7 @@ exports.findTaskByName = (req, res) => {
             ' ilike $1 AND company_id=$2 AND project_id=$3 AND archived=false AND parent_id isNull ORDER BY id,project_id,start_date DESC,name OFFSET '+offset+' LIMIT '+process.env.PAGE_RECORD_NO;
             queryParam=['%'+req.body.searchText+'%',req.user.company_id,req.body.project_id];
           }
-          
+
           // console.log('queryToExec '+queryToExec+' '+'%'+req.body.searchText+'%'+' '+req.user.company_id+' '+req.body.project_id);
           client.query(queryToExec,queryParam, function (err, tasks) {
             if (err) {
@@ -587,7 +587,7 @@ exports.getTaskDetails = (req, res) => {
                                     // console.log(userListCombined);
 
                                     let hierarchyQry=`with recursive getParent as (
-                                      select * from task where id = ${req.query.taskId} union all select task.* from task 
+                                      select * from task where id = ${req.query.taskId} union all select task.* from task
                                         join getParent on getParent.parent_id = task.id
                                       )
                                       select * from getParent order by id`;
@@ -599,7 +599,7 @@ exports.getTaskDetails = (req, res) => {
                                       responseObjects.error=err;
                                       handleResponse.responseToPage(res, 'pages/task-details', responseObjects, "error", " Error in finding Subtasks");
                                     } else {
-                                      
+
                                       let requiredSubtasks = null;
                                       if (taskDetail.rows[0].subtask_sort_order) {
                                         requiredSubtasks = taskDetail.rows[0].subtask_sort_order.substring(0, taskDetail.rows[0].subtask_sort_order.split(',', process.env.PAGE_RECORD_NO).join(',').length);
