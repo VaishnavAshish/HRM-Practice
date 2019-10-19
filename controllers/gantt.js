@@ -18,7 +18,7 @@ exports.loadGanttData = (req, res) => {
           companyDefaultTimezone=result.timezone;
 
           pool.connect((err, client, done) => {
-            client.query('SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.percent_completed ,p.company_id FROM PROJECT p where id=$1 AND company_id=$2', [req.params.project_id, req.user.company_id], function (err, project) {
+            client.query('SELECT p.id ,p.name as text ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.percent_completed as progress,p.company_id FROM PROJECT p where id=$1 AND company_id=$2', [req.params.project_id, req.user.company_id], function (err, project) {
               if (err) {
                 console.error(err);
                 handleResponse.shouldAbort(err, client, done);
@@ -86,13 +86,18 @@ exports.loadGanttData = (req, res) => {
                       if(project.rows[0].start_date != null) {
                         // startDateFormatted = dateFormat(moment.tz(project.rows[0].start_date, companyDefaultTimezone).format());
                         startDateFormatted = dateFormat(project.rows[0].start_date);
+                      }else{
+                        startDateFormatted = moment.tz(new Date(), companyDefaultTimezone).format()
                       }
                       if(project.rows[0].end_date != null) {
                         // endDateFormatted = dateFormat(moment.tz(project.rows[0].end_date, companyDefaultTimezone).format());
                         endDateFormatted = dateFormat(project.rows[0].end_date);
+                      }else{
+                        endDateFormatted = moment.tz(new Date(), companyDefaultTimezone).format()
                       }
                       project.rows[0]["start_date"] = startDateFormatted;
                       project.rows[0]["end_date"] = endDateFormatted;
+                      // project.rows[0]["progress"] = project.rows[0]["percent_completed"]
 
                       // project.rows[0]["total_hours"] = minuteToHours(project.rows[0]["total_hours"]);
                       // project.rows[0]["total_invoice_time"] = minuteToHours(project.rows[0]["total_invoice_time"]);
@@ -107,16 +112,24 @@ exports.loadGanttData = (req, res) => {
                             if(data.start_date != null) {
                               startDateFormatted = moment.tz(data.start_date, companyDefaultTimezone).format('MM-DD-YYYY');
                               // startDateFormatted = dateFormat(data.start_date);
+                            }else{
+                              startDateFormatted = moment.tz(new Date(), companyDefaultTimezone).format()
                             }
                             if(data.end_date != null) {
                               endDateFormatted = moment.tz(data.end_date, companyDefaultTimezone).format('MM-DD-YYYY');
                               // endDateFormatted = dateFormat(data.end_date);
+                            }else{
+                              startDateFormatted = moment.tz(new Date(), companyDefaultTimezone).format()
                             }
                             data["start_date"] = startDateFormatted;
                             data["end_date"] = endDateFormatted;
                             if(!data.parent_id){
-                              data["parent_id"] = project.rows[0].id;
+                              data["parent"] = project.rows[0].id;
+                            }else{
+                              data["parent"] = data["parent_id"]
                             }
+                            data["text"] = data["name"]
+                            data["progress"] = data["percent_completed"]
                             // console.log('task assignment detail')
                             // console.log(data.id)
                             // console.log(data.assigned_user_id)
