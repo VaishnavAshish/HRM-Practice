@@ -87,13 +87,13 @@ exports.loadGanttData = (req, res) => {
                         // startDateFormatted = dateFormat(moment.tz(project.rows[0].start_date, companyDefaultTimezone).format());
                         startDateFormatted = dateFormat(project.rows[0].start_date);
                       }else{
-                        startDateFormatted = dateFormat(moment.tz(new Date(), companyDefaultTimezone).format())
+                        startDateFormatted = moment.tz(new Date(), companyDefaultTimezone).format('YYYY-MM-DD hh:mm:ss')
                       }
                       if(project.rows[0].end_date != null) {
                         // endDateFormatted = dateFormat(moment.tz(project.rows[0].end_date, companyDefaultTimezone).format());
                         endDateFormatted = dateFormat(project.rows[0].end_date);
                       }else{
-                        endDateFormatted = dateFormat(moment.tz(new Date(), companyDefaultTimezone).format())
+                        endDateFormatted = moment.tz(new Date(), companyDefaultTimezone).format('YYYY-MM-DD hh:mm:ss')
                       }
                       project.rows[0]["start_date"] = startDateFormatted;
                       project.rows[0]["end_date"] = endDateFormatted;
@@ -110,16 +110,16 @@ exports.loadGanttData = (req, res) => {
                             let startDateFormatted = '';
                             let endDateFormatted = '';
                             if(data.start_date != null) {
-                              startDateFormatted = moment.tz(data.start_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                              startDateFormatted = moment.tz(data.start_date, companyDefaultTimezone).format('YYYY-MM-DD hh:mm:ss');
                               // startDateFormatted = dateFormat(data.start_date);
                             }else{
-                              startDateFormatted = dateFormat(moment.tz(new Date(), companyDefaultTimezone).format())
+                              startDateFormatted = moment.tz(new Date(), companyDefaultTimezone).format('YYYY-MM-DD hh:mm:ss')
                             }
                             if(data.end_date != null) {
-                              endDateFormatted = moment.tz(data.end_date, companyDefaultTimezone).format('MM-DD-YYYY');
+                              endDateFormatted = moment.tz(data.end_date, companyDefaultTimezone).format('YYYY-MM-DD hh:mm:ss');
                               // endDateFormatted = dateFormat(data.end_date);
                             }else{
-                              startDateFormatted = dateFormat(moment.tz(new Date(), companyDefaultTimezone).format())
+                              startDateFormatted = moment.tz(new Date(), companyDefaultTimezone).format('YYYY-MM-DD hh:mm:ss')
                             }
                             data["start_date"] = startDateFormatted;
                             data["end_date"] = endDateFormatted;
