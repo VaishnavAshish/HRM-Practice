@@ -18,7 +18,7 @@ exports.loadGanttData = (req, res) => {
           companyDefaultTimezone=result.timezone;
 
           pool.connect((err, client, done) => {
-            client.query('SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.percent_completed ,p.company_id FROM PROJECT p where id=$1 AND company_id=$2', [req.params.project_id, req.user.company_id], function (err, projectDetail) {
+            client.query('SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.percent_completed ,p.company_id FROM PROJECT p where id=$1 AND company_id=$2', [req.params.project_id, req.user.company_id], function (err, project) {
               if (err) {
                 console.error(err);
                 handleResponse.shouldAbort(err, client, done);
