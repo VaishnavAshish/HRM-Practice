@@ -6,7 +6,7 @@ const setting = require('./company-setting');
 let companyDefaultTimezone;
 
 function dateFormat(gDate) {
-  return(gDate.split(' ')[0]);
+  return(gDate.split(' ')[0].split('T')[0]);
 }
 
 
