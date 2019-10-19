@@ -97,6 +97,7 @@ exports.loadGanttData = (req, res) => {
                       }
                       project.rows[0]["start_date"] = startDateFormatted;
                       project.rows[0]["end_date"] = endDateFormatted;
+                      project.rows[0]["open"] = true;
                       // project.rows[0]["progress"] = project.rows[0]["percent_completed"]
 
                       // project.rows[0]["total_hours"] = minuteToHours(project.rows[0]["total_hours"]);
@@ -130,6 +131,7 @@ exports.loadGanttData = (req, res) => {
                             }
                             data["text"] = data["name"]
                             data["progress"] = data["percent_completed"]
+                            data["open"] = true;
                             // console.log('task assignment detail')
                             // console.log(data.id)
                             // console.log(data.assigned_user_id)
