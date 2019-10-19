@@ -41,18 +41,24 @@ exports.loadGanttData = (req, res) => {
                           		parent_id,
                           		project_id,
                                   name,
+                                  start_date at time zone '${companyDefaultTimezone}' as start_date,
+                                  end_date at time zone '${companyDefaultTimezone}' as end_date,
+                                  percent_completed,
                           		subtask_sort_order,
-                          		position(id::text in '55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76') as sortorder
+                          		position(id::text in (select task_sort_order from project where id = project_id)) as sortorder
                               FROM
                                   task
                               WHERE
-                                  project_id = 41 AND parent_id is null
+                                  project_id = $1 AND parent_id is null
                               UNION ALL
                               SELECT
                                   task.id,
                                   task.parent_id,
-                          		task.project_id,
+                          		    task.project_id,
                                   task.name,
+                                  task.start_date at time zone '${companyDefaultTimezone}' as start_date,
+                                  task.end_date at time zone '${companyDefaultTimezone}' as end_date,
+                                  task.percent_completed,
                           		task.subtask_sort_order,
                           		position(task.id::text in taskTree.subtask_sort_order) as sortorder
                               FROM
@@ -62,10 +68,9 @@ exports.loadGanttData = (req, res) => {
                           SELECT
                               *
                           FROM
-                              taskTree
-                          `;
+                              taskTree`;
 
-                    client.query(qry, [], function (err, taskList) {
+                    client.query(qry, [req.params.project_id], function (err, taskList) {
                     if (err) {
 
                       console.error(err);
@@ -86,15 +91,15 @@ exports.loadGanttData = (req, res) => {
                         // endDateFormatted = dateFormat(moment.tz(project.rows[0].end_date, companyDefaultTimezone).format());
                         endDateFormatted = dateFormat(project.rows[0].end_date);
                       }
-                      project.rows[0]["startDateFormatted"] = startDateFormatted;
-                      project.rows[0]["endDateFormatted"] = endDateFormatted;
+                      project.rows[0]["start_date"] = startDateFormatted;
+                      project.rows[0]["end_date"] = endDateFormatted;
 
-                      project.rows[0]["total_hours"] = minuteToHours(project.rows[0]["total_hours"]);
-                      project.rows[0]["total_invoice_time"] = minuteToHours(project.rows[0]["total_invoice_time"]);
+                      // project.rows[0]["total_hours"] = minuteToHours(project.rows[0]["total_hours"]);
+                      // project.rows[0]["total_invoice_time"] = minuteToHours(project.rows[0]["total_invoice_time"]);
 
                       //let taskTotalCount=0;
                       //let projectTaskSortOrder = project.rows[0].task_sort_order?project.rows[0].task_sort_order.split(','):[];
-                      let taskSortedArr = [];
+                      //let taskSortedArr = [];
                       if(taskList.rows.length>0){
                           taskList.rows.forEach(function (data,index) {
                             let startDateFormatted = '';
@@ -107,57 +112,67 @@ exports.loadGanttData = (req, res) => {
                               endDateFormatted = moment.tz(data.end_date, companyDefaultTimezone).format('MM-DD-YYYY');
                               // endDateFormatted = dateFormat(data.end_date);
                             }
-                            data["startDateFormatted"] = startDateFormatted;
-                            data["endDateFormatted"] = endDateFormatted;
+                            data["start_date"] = startDateFormatted;
+                            data["end_date"] = endDateFormatted;
+                            if(!data.parent_id){
+                              data["parent_id"] = project.rows[0].id;
+                            }
                             // console.log('task assignment detail')
                             // console.log(data.id)
                             // console.log(data.assigned_user_id)
-                            data["user_id"]='';
-                            data["user_role"]='';
-                            data["user_email"]='';
-                            if(data.assigned_user_id){
-                              client.query('SELECT user_id,user_email,user_role FROM TASK_ASSIGNMENT where task_id=$1', [data.id], function (err, taskAssignResourceId) {
-                                if (err) {
-                                  console.error(err);
-                                  handleResponse.shouldAbort(err, client, done);
-                                  handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [], user:req.user, error:err},"error"," Error in finding task assignment data");
-                                  return false;
-                                } else {
-                                  if(taskAssignResourceId.rows.length>0){
-                                    client.query('SELECT id, first_name, last_name, email FROM users WHERE id=$1', [taskAssignResourceId.rows[0].user_id], function (err, taskAssignResourceDetail) {
-                                      if (err) {
-                                        handleResponse.shouldAbort(err, client, done);
-                                        handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [], user:req.user, error:err},"error"," Error in finding user data");
+                            // data["user_id"]='';
+                            // data["user_role"]='';
+                            // data["user_email"]='';
+                            // if(data.assigned_user_id){
+                            //   client.query('SELECT user_id,user_email,user_role FROM TASK_ASSIGNMENT where task_id=$1', [data.id], function (err, taskAssignResourceId) {
+                            //     if (err) {
+                            //       console.error(err);
+                            //       handleResponse.shouldAbort(err, client, done);
+                            //       handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [], user:req.user, error:err},"error"," Error in finding task assignment data");
+                            //       return false;
+                            //     } else {
+                            //       if(taskAssignResourceId.rows.length>0){
+                            //         client.query('SELECT id, first_name, last_name, email FROM users WHERE id=$1', [taskAssignResourceId.rows[0].user_id], function (err, taskAssignResourceDetail) {
+                            //           if (err) {
+                            //             handleResponse.shouldAbort(err, client, done);
+                            //             handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [], user:req.user, error:err},"error"," Error in finding user data");
 
-                                      } else {
-                                          console.log('taskAssignResourceId.rows')
-                                          console.log(taskAssignResourceId.rows[0]);
-                                          data["user_id"] = taskAssignResourceId.rows[0].user_id;
-                                          data["user_role"] = taskAssignResourceId.rows[0].user_role;
-                                          data["user_first_name"] = taskAssignResourceDetail.rows[0].first_name;
-                                          data["user_last_name"] = taskAssignResourceDetail.rows[0].last_name;
-                                          data["user_email"] = taskAssignResourceDetail.rows[0].email;
-                                          //data["user_email"]=taskAssignResourceId.rows[0].user_email.substring(0,taskAssignResourceId.rows[0].user_email.indexOf('('));
-                                      }
-                                    })
-                                  }
-                                }
-                              })
-                            }
-                            taskSortedArr.push(data);
+                            //           } else {
+                            //               console.log('taskAssignResourceId.rows')
+                            //               console.log(taskAssignResourceId.rows[0]);
+                            //               data["user_id"] = taskAssignResourceId.rows[0].user_id;
+                            //               data["user_role"] = taskAssignResourceId.rows[0].user_role;
+                            //               data["user_first_name"] = taskAssignResourceDetail.rows[0].first_name;
+                            //               data["user_last_name"] = taskAssignResourceDetail.rows[0].last_name;
+                            //               data["user_email"] = taskAssignResourceDetail.rows[0].email;
+                            //               //data["user_email"]=taskAssignResourceId.rows[0].user_email.substring(0,taskAssignResourceId.rows[0].user_email.indexOf('('));
+                            //           }
+                            //         })
+                            //       }
+                            //     }
+                            //   })
+                            // }
+                            //taskSortedArr.push(data);
                           });
 
-                          if(project.rows[0].total_task_count){
-                            taskTotalCount=project.rows[0].total_task_count;
-                          }
-                          console.log('taskTotalCount')
-                          console.log(taskTotalCount)
+                          // if(project.rows[0].total_task_count){
+                          //   taskTotalCount=project.rows[0].total_task_count;
+                          // }
+                          // console.log('taskTotalCount')
+                          // console.log(taskTotalCount)
 
                       }
-                      console.log('sorted task array')
-                      console.log(taskSortedArr);
+                      // console.log('sorted task array')
+                      // console.log(taskSortedArr);
+                      let responseData = {
+                        data: [project.rows[0]].concat(taskList.rows),
+                        link:[]
+                      }
+                      console.log('responseData')
+                      console.log(responseData)
                       done();
-                      handleResponse.responseToPage(res,'pages/project-details',{ project: project.rows[0], userRoleList:userRole ,tasks: taskSortedArr, accounts: accountList.rows, userList: userList.rows, user: req.user, resUsers: resUsers.rows ,taskTotalCount:taskTotalCount,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD'),stripeCustomerId:result.stripe_customer_id,"projectConversationThread":projectConversationThread.rows },"success","Successfully rendered");
+                      handleResponse.sendSuccess(res,'Project data fetched successfully.',{responseData});
+                      //handleResponse.responseToPage(res,'pages/project-details',{ project: project.rows[0], userRoleList:userRole ,tasks: taskSortedArr, accounts: accountList.rows, userList: userList.rows, user: req.user, resUsers: resUsers.rows ,taskTotalCount:taskTotalCount,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD'),stripeCustomerId:result.stripe_customer_id,"projectConversationThread":projectConversationThread.rows },"success","Successfully rendered");
                     }
                   })
                 }
