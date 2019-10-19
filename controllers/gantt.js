@@ -171,7 +171,8 @@ exports.loadGanttData = (req, res) => {
                       console.log('responseData')
                       console.log(responseData)
                       done();
-                      handleResponse.sendSuccess(res,'Project data fetched successfully.',{responseData});
+                      //handleResponse.sendSuccess(res,'Project data fetched successfully.',{responseData});
+                      res.status(200).json(responseData);
                       //handleResponse.responseToPage(res,'pages/project-details',{ project: project.rows[0], userRoleList:userRole ,tasks: taskSortedArr, accounts: accountList.rows, userList: userList.rows, user: req.user, resUsers: resUsers.rows ,taskTotalCount:taskTotalCount,currentdate:moment.tz(result.currentdate, companyDefaultTimezone).format('YYYY-MM-DD'),stripeCustomerId:result.stripe_customer_id,"projectConversationThread":projectConversationThread.rows },"success","Successfully rendered");
                     }
                   })
