@@ -95,7 +95,7 @@ module.exports = function(app) {
 
     /* gantt routers */
     app.get('/loadGanttData/:project_id', passportConfig.isAuthenticated, ganttController.loadGanttData);
-
+    app.post('/ganttTaskCRUD', passportConfig.isAuthenticated, ganttController.ganttTaskCRUD);
     /* comment routers */
 
     app.post('/addConversation', passportConfig.isAuthenticated, commentController.postAddConversation);
