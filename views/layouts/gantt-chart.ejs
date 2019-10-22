@@ -46,15 +46,374 @@
       read_only :'/loadGanttData/<%= project.id %>',
   //     read_only_all_project :'{!salesforceBaseUrl}{!$Page.GanttDataProvider}?action=READ&allproject=true',
   //     read_only_expand_all :'{!salesforceBaseUrl}{!$Page.GanttDataProvider}?projectid={!projectId}&action=READ&expandAll=true',
-  //     read_write :'{!salesforceBaseUrl}{!$Page.GanttDataUpdater}?projectid={!projectId}',
+       read_write :'/ganttTaskCRUD',
   //     read_task_assignment :'{!salesforceBaseUrl}{!$Page.ReadonlyEndpoint}',
   //     read_lookup : '{!salesforceBaseUrl}{!$Page.ReadonlyEndpoint}'
   }
 
+  var DEFAULT_SERVER_DATE_FORMAT = "%Y-%m-%d";
+  var pendingUpdatesMap = new Array();
+  var ganttProjectId = <%= project.id %>;
+  var timer;
 
 </script>
+<style>
 
+  .task-color {
+      background-color: #2A94d6;
+  }
+
+  .task-color .gantt_task_progress {
+      background: #2a7fd6;
+  }
+  .task-color.gantt_critical_task{
+      background-color: #e63030;
+  }
+
+  .selected-filter {
+      background-color:#ecebea;
+  }
+  .ui-autocomplete{
+      z-index:9999 !important;
+  }
+  .wait-overlay:after {
+      content: '';
+      position: absolute;
+      background: white;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      opacity: .5;
+  }
+
+  .wait-overlay {
+      position: relative;
+  }
+  .notifyjs-corner{
+        z-index: 10000;
+   }
+  .dhtmlxcalendar_dhx_terrace.dhtmlxcalendar_in_input{
+      z-index:10000 !important;
+   }
+  .slds-scope .slds-input[readonly]{
+      padding-left: 0.75rem !important;
+      border-color: rgb(221, 219, 218) !important;
+  }
+
+ .gantt_link_delete_btn div{
+      background:red;
+  }
+
+  .customLookup{
+      border-radius: 0;
+      display: table-cell;
+      position: relative;
+      z-index: 2;
+      float: left;
+      width: 100%;
+      margin-bottom: 0;
+      padding: 4px 12px;
+      font-size: 14px;
+      line-height: 1.42857143;
+      color: #555;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      height:30px;
+      border-radius: 0px 4px 4px 0px;
+      -webkit-box-sizing:border-box;
+      -moz-box-sizing:border-box;
+      box-sizing:border-box;
+  }
+  .ui-autocomplete{
+      z-index:9999 !important;
+  }
+  .scheduleTabResource {
+          margin-left: -30px;
+          padding-left: 10px;
+  }
+  @media only screen and (max-width: 1366px) {
+      .scheduleTabResource {
+          margin-left: 0px;
+          padding-left: 2px;
+      }
+  }
+
+  .fa-times {color: red;}
+  .bs, .fc-title, #displayBox, .gantt_container {
+      font-family: "Salesforce Sans", Arial, sans-serif !important;
+  }
+  .project-phase {
+      position: absolute;
+      height: 10px;
+      color: #ffffff;
+  }
+  .project-phase div {
+      position: absolute;
+  }
+  .phase-left {
+      left: 0px;
+      border-width: 0px 0px 8px 7px;
+      border-top-color: transparent;
+      border-right-color: transparent !important;
+      border-bottom-color: transparent !important;
+  }
+  .phase-left, .phase-right {
+      top: 10px;
+      background-color: transparent;
+      border-style: solid;
+      width: 0px;
+      height: 0px;
+  }
+  .phase-right {
+      right: 0px;
+      border-width: 0px 7px 8px 0px;
+      border-top-color: transparent;
+      border-bottom-color: transparent !important;
+      border-left-color: transparent;
+  }
+  .slack {
+      position: absolute;
+      border-radius: 0;
+      opacity: 0.7;
+
+      border: none;
+      border-right: 1px solid #b6b6b6;
+      margin-left: -2px;
+      background: #b6b6b6;
+      background: repeating-linear-gradient(
+              45deg, #FFFFFF,
+              #FFFFFF 5px,
+              #b6b6b6 5px,
+              #b6b6b6 10px
+      );
+  }
+  .rotate-180 svg{
+     transform: rotate(180deg);
+ }
+ .baseline {
+  position: absolute;
+  border-radius: 2px;
+  opacity: 0.6;
+  margin-top: -7px;
+  height: 5px;
+  background: #ffd180;
+  border: 1px solid rgb(255, 153, 0);
+}
+ /*
+  .baseline {
+      position: absolute;
+      border-radius: 2px;
+      opacity: 0.6;
+      margin-top: -12px;
+      height: 3px;
+      background: #ffd180;
+      border: 1px solid rgb(255,153,0);
+  }
+  */
+  .parent_project .gantt_last_cell .gantt_tree_content .gantt_grid_edit {
+      visibility: hidden !important;
+
+  }
+
+  .dhx_modal_cover {
+      display:none !important;
+  }
+
+  .text-uppercase {
+      text-transform: uppercase;
+  }
+
+  #filterTag {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100px;
+      float: left;
+      line-height: 15px;
+  }
+  .background-grey {
+      background-color: #777;
+      color: #fff;
+      border-radius: .25em;
+  }
+
+
+  /* -----------ring style----------------- */
+  .ct-ring-wrapper{
+    display: inline-block;
+      width:1.8rem;
+      height:1.8rem;
+  }
+  .ct-check{
+      opacity: 0;
+  }
+  .ct-complete .ct-mask{
+      fill: #4bca81;
+  }
+  .ct-complete .ct-check{
+      opacity: 1;
+  }
+
+  .ct-rotating {
+    -webkit-animation: rotating 1s linear infinite;
+    -moz-animation: rotating 1s linear infinite;
+    -ms-animation: rotating 1s linear infinite;
+    -o-animation: rotating 1s linear infinite;
+    animation: rotating 1s linear infinite;
+  }
+  @-webkit-keyframes rotating /* Safari and Chrome */ {
+    from {
+      -webkit-transform: rotate(0deg);
+      -o-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+    to {
+      -webkit-transform: rotate(360deg);
+      -o-transform: rotate(360deg);
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes rotating {
+    from {
+      -ms-transform: rotate(0deg);
+      -moz-transform: rotate(0deg);
+      -webkit-transform: rotate(0deg);
+      -o-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+    to {
+      -ms-transform: rotate(360deg);
+      -moz-transform: rotate(360deg);
+      -webkit-transform: rotate(360deg);
+      -o-transform: rotate(360deg);
+      transform: rotate(360deg);
+    }
+  }
+
+
+  .slds-scope .in-lightning label {
+  line-height: 1.875rem;
+      margin-right: 0;
+  }
+
+  .slds-scope .gantt_grid_head_cell {
+      cursor: pointer;
+  }
+
+  .slds-scope .gantt_grid_head_add{
+      fill : #0070d2
+  }
+
+  .slds-scope .gantt_grid_head_add{
+      fill : #005fb2
+  }
+
+  .slds-scope .gantt_button_grid{
+      cursor: pointer;
+  }
+
+  .slds-scope .gantt_grid_edit{
+      fill : #4bca81;
+      padding-right : 2.5px;
+
+  }
+
+  .slds-scope .gantt_grid_add{
+      fill : #0070d2;
+      padding-left : 2.5px;
+  }
+
+  .slds-scope .gantt_grid_edit:hover{
+      fill:#04844b
+  }
+
+  .slds-scope .gantt_grid_add:hover{
+      fill : #005fb2
+  }
+
+  .gantt_grid_head_cell.gantt_grid_head_buttons  {
+      text-align : left !important
+  }
+
+  .dhtmlx_popup_button{
+      height : auto !important
+  }
+
+  .dhtmlx_popup_button:first-child{
+      background : #0070d2 !important ;
+      border-color : #0070d2 !important;
+      color : #fff !important;
+  }
+
+  .dhtmlx_popup_button{
+      color : #0070d2 !important;
+      font-weight : 100 !important;
+  }
+
+  .weekend {
+      background: #a6a6a63d;
+  }
+
+  .gantt_selected .weekend {
+      background: #f7eb91;
+  }
+
+  .fa {
+      cursor: pointer;
+      font-size: 14px;
+      text-align: center;
+      opacity: 0.2;
+      padding: 5px;
+  }
+
+  .fa:hover {opacity: 1;}
+
+  .fa-pencil {color: #ffa011;}
+  .fa-edit {color: #ffa011;}
+
+  .fa-plus {color: #328EA0;}
+
+
+</style>
 <script>
+  function clickGridButton(id, action) {
+    switch (action) {
+        case "edit":
+            gantt.showLightbox(id);
+            break;
+        case "add":
+            let taskData = gantt.getTask(id);
+            //if(isDisableCreateTask == "false"){
+                var taskId = gantt.createTask(null,id);
+                gantt.showTask(taskId);
+            //}
+            break;
+        case "delete":
+            gantt.confirm({
+                title: gantt.locale.labels.confirm_deleting_title,
+                text: gantt.locale.labels.confirm_deleting,
+                callback: function (res) {
+                    if (res)
+                        gantt.deleteTask(id);
+                    }
+            });
+            break;
+    }
+  }
+  function ganttLightboxConfig(){
+
+        gantt.showLightbox = function(id) {
+            taskId = id;
+            var task = gantt.getTask(id);
+            if(task.$new){
+                gantt.addTask(task);
+                return false;
+            }else{
+                return true;
+            }
+        };
+    }
   function loadProjectGanttData(){
     $("#ganttToolbar").addClass('wait-overlay');
     $('.gantt-operation-progress-ring').removeClass('ct-complete');
@@ -67,26 +426,576 @@
         $('.gantt-operation-progress-ring-slice').attr('stroke-dasharray',"100 0");
     });
 
+  }
+
+  function clickHeaderAddButton(){
+    //if(isDisableCreateTask == "false"){
+        gantt.createTask();
+    //}
+  }
+  function configGanttColumns(){
+    var colHeader =`<div class="gantt_grid_head_cell gantt_grid_head_add" onclick="gantt.createTask()"></div>`;
+    // `<div class="gantt_grid_head_cell gantt_grid_add" onclick="clickHeaderAddButton();" style="padding-top:20px;padding-left:30px;">
+    //                   <svg class="slds-icon--x-small" aria-hidden="true" >
+    //                       <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#add')}"></use>
+    //                   </svg>
+    //                </div>`,
+
+    colContent = function (task) {
+        return ('<i class="fa gantt_button_grid gantt_grid_edit fa-edit" onclick="clickGridButton(\'' + task.id + '\', \'edit\')"></i>' +
+                '<i class="fa gantt_button_grid gantt_grid_add fa-plus" onclick="clickGridButton(\'' + task.id + '\', \'add\')"></i>');
+
+    };
+    var textEditor = {type: "text", map_to: "text"};
+    var predecessors = {type: "predecessor_editor", map_to: "auto"};
+    var dateEditor = {type: "date"};
+    var durationEditor = {type: "number", map_to: "duration", min:0, max: 100};
+    var picklistEditor = {type:"select", map_to:"priority", options:gantt.serverList("priority")};
+    gantt.config.columns = [
+          {name: "buttons",label: colHeader,width: 75,align: "center",template: colContent},
+          {name : "wbs",label : "WBS",width : 80,resize : true,template: function(task) {
+            var wbs = gantt.getWBSCode(task);
+            if(wbs){
+              value = wbs.substr(2,wbs.length)
+            }
+            return value;
+          }},
+          {name : "text",label : "Task name",width : 200,tree : true, resize : true,editor: textEditor},
+
+          {name : "start_date",label : "Start Date",width : 100,align : "center",resize : true, editor: {type: "dateEditor", map_to: "start_date"}},
+          {name : "end_date",label : "Due Date",width : 100,align : "center",resize : true, editor: {type: "dateEditor", map_to: "end_date"},
+              template: function(task){
+                //var formatFunc = gantt.date.date_to_str("%m/%d/%Y");
+                // var formatFunc = gantt.date.date_to_str(GANTT_DATE_FORMAT);
+                // var formatGanttDate = gantt.date.str_to_date(DEFAULT_SERVER_DATE_FORMAT);
+                // if(typeof task.end_date == 'string'){
+                //   task.end_date = formatGanttDate(task.end_date);
+                // }
+                //let date = new Date(task.end_date.valueOf() - 1);
+                //let date = gantt.date.add(task.end_date, 1, 'day');
+                let date = task.end_date
+                if(date <= task.start_date){
+                  date = task.end_date = gantt.date.add(task.end_date, 1, 'day');
+                  //return formatFunc(task.start_date)
+                }
+                return gantt.date.add(date, -1, 'day');
+              }
+            },
+            {name : "duration",label : "Duration",width : 80,align : "center",resize : true, editor: durationEditor,
+              template: function(task){
+                task.duration = gantt.calculateDuration(task);
+                return task.duration;
+
+              }
+            },
+            // {name : "calendar_id",label : "Calendar Type",width : 85,align : "center",resize : true,editor:{type:"select", map_to:"calendar_id",options:gantt.serverList("calendar_type")},
+            //   template: function (task) {
+            //     return gantt.getTaskCalendar(task).id == "custom" ? "Fullweek" : "Workweek";
+            //   }
+            // },
+            //
+            // {name : "status",label : "Status",width : 50,align : "center",resize : true,hide:(gantt_columns['status'] !== undefined ? false : true) ,editor:{type:"select", map_to:"status",options:gantt.serverList("status")},
+            // template: function (task) {
+            //   return (task.status!=null&&task.status!=undefined)?task.status:'';
+            // }
+            // },
+            {name : "progress",label : "% Complete",width : 60,align : "center",resize : true,
+                template: function (task) {
+                  if(task.progress>1){
+                    return task.progress;
+                  }else if(task.progress<=1){
+                    return (task.progress*100).toFixed(0);
+                  }
+                  return task.progress;
+                }
+            },
+      ];
 
   }
+
+
+  function ganttInitialConfig(){
+    gantt.templates.task_text=function(start,end,task){
+        return "<b>Text:</b> "+task.text;
+    };
+
+    //gantt.config.sort = true;
+    //gantt.config.readonly = readOnlyGantt==='true'? true : false;
+    gantt.config.keyboard_navigation = true;
+    gantt.config.keyboard_navigation_cells = true;
+    gantt.config.cascade_delete = false;
+    gantt.config.auto_scheduling = true;
+    gantt.config.auto_scheduling_strict = true;
+    gantt.config.auto_scheduling_initial = false;
+
+    gantt.config.smart_scales = true;
+
+    gantt.config.schedule_from_end = false;
+    //var formatGanttDate = gantt.date.str_to_date(DEFAULT_SERVER_DATE_FORMAT);
+    //gantt.config.project_start = new Date();
+    //ganttProjectStartDate
+
+    // you can switch back to pre-6.1 auto scheduling by disabling constraints using the following line
+    gantt.config.auto_scheduling_compatibility = false;
+
+    gantt.config.row_height = 40;
+    gantt.config.task_height = 16;
+    gantt.config.show_errors = false;
+    gantt.config.fit_tasks = true;
+    gantt.config.show_unscheduled = true;
+    //if(isDisableCreateTask == "false"){
+        gantt.config.placeholder_task = true;
+    //}
+    /*if(isDisplayAssignedTasksOnly == true){
+        gantt.config.placeholder_task = false;
+        isDisableCreateTask = "True"
+    }*/
+
+
+    gantt.config.auto_types = true;
+
+    gantt.config.order_branch = "marker";
+    gantt.config.order_branch_free = true;
+
+    //Project-Level Work Calendars
+    gantt.config.inherit_calendar = true;
+
+    gantt.config.xml_date = DEFAULT_SERVER_DATE_FORMAT;
+    gantt.config.date_grid = DEFAULT_SERVER_DATE_FORMAT;
+
+
+
+    gantt.config.work_time = true;
+    //gantt.config.correct_work_time = true;
+    gantt.config.scale_unit = "day";
+    gantt.config.date_scale = "%D, %d";
+    gantt.config.min_Humn_width = 60;
+    gantt.config.duration_unit = "day";
+    gantt.config.scale_height = 20 * 3;
+    gantt.config.row_height = 30;
+
+    var weekScaleTemplate = function (date) {
+        var dateToStr = gantt.date.date_to_str("%d %M");
+        var weekNum = gantt.date.date_to_str("(week %W)");
+        var endDate = gantt.date.add(gantt.date.add(date, 1, "week"), -1, "day");
+        return dateToStr(date) + " - " + dateToStr(endDate) + " " + weekNum(date);
+    };
+
+    gantt.config.subscales = [
+        {unit: "month", step: 1, date: "%F, %Y"},
+        {unit: "week", step: 1, template: weekScaleTemplate}
+
+    ];
+
+    gantt.templates.scale_cell_class = function (date) {
+        if (date.getDay() == 0 || date.getDay() == 6) {
+            return "weekend";
+        }
+    };
+
+    gantt.config.grid_width = 400;
+    gantt.config.grid_resize = true;
+    gantt.config.keep_grid_width = false;
+    gantt.config.initial_scroll = true;
+
+    gantt.config.multiselect = true;
+    gantt.config.min_duration = 24*60*60*1000;
+
+    gantt.config.autoscroll = true;
+    gantt.config.autoscroll_speed = 50;
+
+    gantt.config.branch_loading = true;
+    gantt.config.branch_loading_property = "$has_child";
+    gantt.config.static_background = true;
+
+    gantt.attachEvent("onError", function(errorMessage){
+        gantt.message({
+            text:"Error: " + errorMessage
+        });
+        return true;
+    });
+
+
+
+    gantt.templates.task_class = gantt.templates.grid_row_class = gantt.templates.task_row_class = function (start, end, task) {
+        if (gantt.isSelectedTask(task.id))
+            return "gantt_selected";
+    };
+
+    gantt.templates.task_class = function (start, end, task) {
+        switch (task.type) {
+            case "task":
+                return "task-color";
+                break;
+        }
+    };
+
+
+    gantt.attachEvent("onDataRender", function(){
+        gantt.scrollTo(0, 0);
+    });
+
+
+    function keep_placeholder_at_bottom(){
+      gantt.eachTask(function(task){
+        if (task.type == gantt.config.types.placeholder){
+          gantt.moveTask(task.id, -1);
+        }
+      })
+    }
+
+    gantt.attachEvent("onAfterSort",function(field, direction, parent){
+      keep_placeholder_at_bottom()
+    });
+
+
+    gantt.attachEvent("onRowDragStart", function(id, target, e) {
+      if (gantt.getTask(id).type == gantt.config.types.placeholder) return false;
+      return true;
+    });
+
+    gantt.attachEvent("onAfterTaskMove", function(id, parent, tindex){
+        let movedTaskData = gantt.getTask(id);
+        if(movedTaskData.parent){
+            var parentTaskLinks = gantt.getTask(movedTaskData.parent).$source.concat(gantt.getTask(movedTaskData.parent).$target);
+            if(parentTaskLinks!==undefined && parentTaskLinks.length>0){
+                for(let i=0; i<parentTaskLinks.length; i++){
+                    gantt.deleteLink(parentTaskLinks[i]);
+                }
+            }
+        }
+    });
+
+    gantt.attachEvent("onBeforeTaskUpdate", function(id,new_item){
+       let oldTaskData = gantt.getTask(id);
+       if(oldTaskData.$wbs){
+           new_item.oldwbs = oldTaskData.$wbs;
+       }
+
+       new_item.oldparent = oldTaskData.parent;
+
+
+    });
+
+    gantt.attachEvent("onBeforeRowDragMove", function(id, parent, tindex){
+
+        let oldTaskData = gantt.getTask(id);
+        if(oldTaskData.$wbs){
+           oldTaskData.oldwbs = oldTaskData.$wbs;
+        }
+        oldTaskData.oldparent = oldTaskData.parent;
+        return true;
+    });
+
+    gantt.attachEvent("onTaskDrag", function(id, mode, task, original){
+     var state = gantt.getState();
+     var minDate = state.min_date,
+         maxDate = state.max_date;
+
+     var scaleStep=gantt.date.add(new Date(),state.scale_step,state.scale_unit)-new Date();
+
+     var showDate,
+      repaint = false;
+      if(mode == "resize" || mode == "move"){
+        if(Math.abs(task.start_date - minDate) < scaleStep){
+          showDate = task.start_date;
+          repaint = true;
+
+        }else if(Math.abs(task.end_date - maxDate) < scaleStep){
+          showDate = task.end_date;
+          repaint = true;
+        }
+
+        if(repaint){
+          gantt.render();
+          gantt.showDate(showDate);
+        }
+      }
+    });
+
+
+    gantt.eachSuccessor = function(callback, root){
+          if(!this.isTaskExists(root))
+            return;
+
+          // remember tasks we've already iterated in order to avoid infinite loops
+          var traversedTasks = arguments[2] || {};
+          if(traversedTasks[root])
+            return;
+          traversedTasks[root] = true;
+
+          var rootTask = this.getTask(root);
+          var links = rootTask.$source;
+          if(links){
+            for(var i=0; i < links.length; i++){
+              var link = this.getLink(links[i]);
+              if(this.isTaskExists(link.target) && !traversedTasks[link.target]){
+                callback.call(this, this.getTask(link.target));
+
+                // iterate the whole branch, not only first-level dependencies
+                this.eachSuccessor(callback, link.target, traversedTasks);
+              }
+            }
+          }
+        };
+
+    gantt.attachEvent("onBeforeTaskDrag", function(id, mode, e){
+        var modes = gantt.config.drag_mode;
+        if(mode == modes.move){
+            gantt.config.auto_scheduling = false;
+        }
+        return true;
+    });
+
+
+
+    var drag_id = null;
+    gantt.attachEvent("onRowDragStart", function(id, target, e) {
+        drag_id = id;
+        return true;
+    });
+    gantt.attachEvent("onRowDragEnd", function(id, target) {
+        drag_id = null;
+        gantt.render();
+    });
+
+
+    gantt.templates.grid_row_class = function(start, end, task){
+        if(drag_id && task.id != drag_id){
+            if(task.$level != gantt.getTask(drag_id).$level)
+                return "cant-drop";
+        }
+        if ( task.$level < 1 ){
+            return "parent_project"
+        }
+        return "";
+    };
+
+  }
+
+  function delayedCall(action){
+    var result = pendingUpdatesMap.findIndex( findIndex => findIndex.id === action.id );
+    if(result !== -1){
+        pendingUpdatesMap[result] = action;
+    }else{
+       pendingUpdatesMap.push(action);
+    }
+
+   clearTimeout(timer);
+   timer = setTimeout(function(){
+    var reqData = pendingUpdatesMap;
+    pendingUpdatesMap = new Array();
+    if(reqData.length>0){
+            $('.gantt-operation-progress-ring').removeClass('ct-complete');
+            $('.gantt-operation-progress-ring').addClass('ct-rotating');
+            $('.gantt-operation-progress-ring-slice').attr('stroke-dasharray',"75 25");
+
+            $(".gantt-operation-progress-ring").notify(
+              `${reqData.length} related tasks/links are updating, Please wait to complete.`,
+              { position:"bottom", clickToHide: true, autoHide: false, hideDuration: 10000, className: 'notify',
+               }
+            );
+
+           $.ajax({
+               url: _restEndpoints.read_write,
+               data: {'data':JSON.stringify(Array.from(reqData)),'projectId':'<%= project.id %>'},
+               type: 'POST',
+           }).done(function(response) {
+               unBlockUI("task-field-template");
+                setTimeout(function(){
+                  $(".notifyjs-container").trigger('notify-hide');
+                },5000);
+
+            $("#ganttToolbar").removeClass('wait-overlay');
+            $('.gantt-operation-progress-ring').removeClass('ct-rotating');
+            $('.gantt-operation-progress-ring').addClass('ct-complete');
+            $('.gantt-operation-progress-ring-slice').attr('stroke-dasharray',"100 0");
+            if(typeof response == 'object'){
+                if(response.status !== undefined && response.status === "fail"){
+                    $.notify('failed to save changes Error ' + response.message, {
+                     position : 'top left',
+                     style : 'bootstrap',
+                     className : 'error'
+                 });
+                 undoGanttChanges();
+                }else{
+
+                    for (var key in response){
+
+                        if(response[key] !== 'deleted' && response[key] !== 'updated'){
+                            if(gantt.getLink(key) !== undefined){
+                                var newLinkKey = response[key];
+                                gantt.changeLinkId(key, newLinkKey);
+                                gantt.refreshLink(newLinkKey);
+                            }else if(gantt.getTask(key) !== undefined){
+                                var newTaskData = response[key];
+                                var oldTaskData = gantt.getTask(key);
+
+                                // if(key.length<15){
+                                //     gantt.changeTaskId(key, newTaskData.id);
+                                //     oldTaskData.$new = false;
+                                //     //gantt.showTask(newTaskData.id);
+                                //     //gantt.selectTask(newTaskData.id);
+                                // }
+
+                                for(key in newTaskData){
+                                   oldTaskData[key] = newTaskData[key];
+                                }
+                                var formatToGanttDate = gantt.date.str_to_date(DEFAULT_SERVER_DATE_FORMAT);
+                                oldTaskData.start_date = formatToGanttDate(newTaskData['start_date']);
+                                oldTaskData.end_date = gantt.calculateEndDate(oldTaskData);
+
+                                gantt.refreshTask(newTaskData.id);
+                                // if(gantt.getTask(gantt.getTask(newTaskData.id).parent).duration == 0){
+                                //     let parentTaskData = gantt.getTask(gantt.getTask(newTaskData.id).parent);
+                                //     parentTaskData.duration = 1;
+                                //     parentTaskData.end_date = gantt.calculateEndDate(parentTaskData);
+                                //     gantt.refreshTask(parentTaskData.id);
+                                // }
+
+                            }else{
+                                // id deleted, do not exists on gantt.
+                            }
+                        }else{
+                            // IGNORE If link deleted, task deleted and link updated.
+                        }
+                    }
+                }
+            }else{
+                var el = $( '<div></div>' );
+                el.html(response);
+                gantt.alert({
+                    text:'System error occured. ' + $("#bodyCell span",el).eq(1).text(),
+                    title:'Error:' + $("#bodyCell span",el).eq(2).text(),
+                    ok:"Yes",
+                    callback:function(){
+                        undoGanttChanges();
+                    }
+                });
+            }
+           }).fail(function(exceptionData) {
+               unBlockUI("task-field-template");
+                setTimeout(function(){
+                $(".notifyjs-container").trigger('notify-hide');
+                },3000);
+
+
+              $("#ganttToolbar").removeClass('wait-overlay');
+              $('.gantt-operation-progress-ring').removeClass('ct-rotating');
+              $('.gantt-operation-progress-ring').addClass('ct-complete');
+              $('.gantt-operation-progress-ring-slice').attr('stroke-dasharray',"100 0");
+
+               console.log('exceptionData' + exceptionData);
+               undoGanttChanges();
+               $.notify('Failed to save data.', {
+                   position : 'top left',
+                   style : 'bootstrap',
+                   className : 'error'
+               });
+           });
+        }
+   }, 500);
+  }
+
+  function undoGanttChanges(){
+    gantt.undo();
+    //gantt.clearUndoStack();
+  }
   function initGantt(){
-      gantt.config.date_format = "%Y-%m-%d %H:%i";
-      $("#d3").html('');
-      gantt.init("d3");
-      gantt.parse({
-        data: [
-          {id: 1, text: "Project #1", start_date: null, duration: null, parent:0, progress: 0, open: true},
-          {id: 2, text: "Task #1", start_date: "2019-08-01 00:00", duration:5, parent:1, progress: 1},
-          {id: 3, text: "Task #2", start_date: "2019-08-06 00:00", duration:2, parent:1, progress: 0.5},
-          {id: 4, text: "Task #3", start_date: null, duration: null, parent:1, progress: 0.8, open: true},
-          {id: 5, text: "Task #3.1", start_date: "2019-08-09 00:00", duration:2, parent:4, progress: 0.2},
-          {id: 6, text: "Task #3.2", start_date: "2019-08-11 00:00", duration:1, parent:4, progress: 0}
-        ],
-        links:[
-          {id:1, source:2, target:3, type:"0"},
-          {id:2, source:3, target:4, type:"0"},
-          {id:3, source:5, target:6, type:"0"}
-        ]
-      });
+      //gantt.config.date_format = "%Y-%m-%d";
+      ganttInitialConfig();
+      configGanttColumns();
+      ganttLightboxConfig();
+      gantt.init(document.getElementById("d3"));
+      var dp = gantt.createDataProcessor(function(entity, action, data, id){
+          if(('task' == entity ) || 'link' == entity){
+              if('task' == entity && (action == 'create' || action == 'update')){
+                  var ganttTask = gantt.getTask(data.id);
+
+                  data.Name = data.text;
+                  // data[namespacePrefix+"Status__c"] = data.status;
+                  gantt.selectTask(gantt.getTaskByIndex(gantt.getTaskCount()-1))
+
+                  /*if(data.parent !== undefined && data.parent.toString().indexOf(ganttProjectId) == 0){
+                      data[namespacePrefix+"Project__c"] = data.parent;
+                      data[namespacePrefix+"Parent_Task__c"] = null;
+                  }else if (data.parent !== undefined || data.parent != ''){
+                      data[namespacePrefix+"Parent_Task__c"] = data.parent;
+                  }*/
+
+                  // var sdt = gantt.date.parseDate(data.start_date,DEFAULT_SERVER_DATE_FORMAT);
+                  // var formatFunc = gantt.date.date_to_str("%Y-%m-%d");
+
+                  // data.start_date = formatFunc(sdt);
+                  // data.end_date = formatFunc(gantt.calculateEndDate(gantt.getTask(id)));
+                  //data[namespacePrefix+"Start_Date__c"] = data.start_date;
+
+
+
+                  // data[namespacePrefix+"Duration__c"] = data.duration;
+                  data["wbs"] = gantt.getTask(id).$wbs;
+                  data["oldwbs"] = gantt.getTask(id).oldwbs;
+                  data["parent"] = gantt.getTask(id).parent;
+                  data["oldparent"] = gantt.getTask(id).oldparent;
+                  //console.log(">>>>>>>>>>>>>>>>");
+
+                  // if(data[namespacePrefix+"progress"] == ""){
+                  //     data[namespacePrefix+"Percent_Complete__c"] = 0;
+                  // }else{
+                  //     data[namespacePrefix+"Percent_Complete__c"] = data["progress"];
+                  // }
+                  //
+                  // if(data["calendar_id"] == 'custom'){
+                  //     data[namespacePrefix+"Include_Weekends__c"] = true;
+                  // }else{
+                  //     data[namespacePrefix+"Include_Weekends__c"] = false;
+                  // }
+
+              }
+
+              var jsonData = JSON.stringify(data);
+
+              return delayedCall({
+                  entity: entity,
+                  action: action,
+                  id: id,
+                  entityData: jsonData
+              });
+          }
+      })
+      gantt.load(_restEndpoints.read_only);
+  }
+  function unBlockUI(container){
+    if($('#blockPanel').length > 0){
+        $('#blockPanel').hide();
+    }else{
+        container = "#"+container;
+        //$(container).fadeTo("slow", 1);
+        $.unblockUI();
+    }
+  }
+
+  function blockUI(container){
+    try{
+    if($('#blockPanel').length > 0){
+        $('#blockMessageSpan1').html('please wait....');
+        $('#blockPanel').show();
+    }else{
+        container = "#"+container;
+        if($('#displayBox').length == 0){
+            try{
+            $('.bs').after(displayBoxContainer.clone());
+            }catch(e){console.log(e);}
+        }
+        $.blockUI({
+            message: $('#displayBox'),
+            css: {
+                top: ($(window).height()) / 2 + 'px',
+                left: ($(window).width() - 400) / 2 + 'px',
+                width: '400px'
+            }
+        });
+      }
+    }catch(e){console.log(e)}
   }
 </script>

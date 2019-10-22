@@ -1413,7 +1413,9 @@
 
     <% include ../layouts/common-project-script %>
     <% include ../layouts/project-comment-script %>
-    <% include ../layouts/gantt-chart %>
+    <% if(user.company_info.stripe_customer_id){ %>
+      <% include ../layouts/gantt-chart %>
+    <% } %>
 
     <script>
 
