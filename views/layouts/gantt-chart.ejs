@@ -906,7 +906,7 @@
       ganttInitialConfig();
       configGanttColumns();
       ganttLightboxConfig();
-      gantt.init("d3");
+      gantt.init(document.getElementById("d3"));
       var dp = gantt.createDataProcessor(function(entity, action, data, id){
           if(('task' == entity ) || 'link' == entity){
               if('task' == entity && (action == 'create' || action == 'update')){
