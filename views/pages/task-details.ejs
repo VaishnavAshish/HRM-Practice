@@ -8,6 +8,7 @@
     <% include ../layouts/nav %>
     <% include ../layouts/sideNav %>
     <main class="main-body-space tpd-60 bpd-100">
+        <% if(messageType!='error') { %>
         <div>
             <div id="pageRecordNo" style="display:none;"><%= process.env.PAGE_RECORD_NO %></div>
             <div id="totalRecordCount" style="display:none;"></div>
@@ -19,13 +20,11 @@
                         <ol class="slds-breadcrumb slds-list_horizontal slds-wrap">
                             <li class="slds-breadcrumb__item "><a href="/projects-listing">Projects</a></li>
                             <li class="slds-breadcrumb__item "><a href="/project-details?projectId=<%= taskDetails.project_id %>#tasks"><%= taskDetails.project_name %></a></li>
-                            <% if(hierarchyData.length > 0) { %>
                                 <% hierarchyData.forEach(function(parent,index) { %>
                                     <% if(index!=hierarchyData.length-1) {%>
                                         <li class="slds-breadcrumb__item "><a href="/task-details?taskId=<%= parent.id %>#tasks"><%= parent.name %></a></li>
                                     <% } %>
                                 <% }) %>
-                            <% } %>
                             <li class="slds-breadcrumb__item "><a href="javascript:void(0);"><%= taskDetails.name %></a></li>
                         </ol>
                     </nav>
@@ -541,14 +540,15 @@
                 </div>
             </div>
         </div>
+        <% } %>
         <% include ../layouts/footer %>
     </main>
-
     <% include ../modals/modal-add-new-subtask %>
     <% include ../layouts/scripts %>
-    <% include ../layouts/task-script %>
     <% include ../layouts/task-listing-script %>
-    <script>
+    <% if(messageType!='error') { %>
+        <% include ../layouts/task-script  %>
+        <script>
             $(document).ready(function(){
                 $('#status').val('<%= taskDetails.status %>');
                 $('#priority').val('<%= taskDetails.priority %>');
@@ -565,9 +565,8 @@
                     }
                 });
             });
-
         </script>
-
+    <% } %>
 </body>
 
 </html>

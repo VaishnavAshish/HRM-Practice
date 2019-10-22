@@ -5,6 +5,7 @@
     <% include ../layouts/nav %>
     <% include ../layouts/sideNav %>
     <main class="main-body-space tpd-60 bpd-100">
+        <% if(messageType!='error') { %>
         <div>
             <div class="slds-p-around_small">
                 <div class="">
@@ -485,7 +486,7 @@
 
 
 
-
+        <% } %>
         <% include ../layouts/footer %>
     </main>
     <% include ../layouts/scripts %>

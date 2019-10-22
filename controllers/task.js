@@ -473,12 +473,41 @@ function updateTaskRecord(req, client, err, done, res, taskData, callback) {
   }
   console.log('taskData.assigned_user_id')
   console.log(taskData.assigned_user_id)
+  if(taskData.assigned_user_id==''){
+    taskData.assigned_user_id=null;
+  }
   client.query('UPDATE TASK SET name=$1, start_date=$2, end_date=$3, billable=$4, status=$5, description=$6, estimated_hours=$7, priority=$8, updated_date=$9, assigned_user_id=$12 , percent_completed=$13 WHERE id=$10 AND company_id=$11 RETURNING *', [req.body.taskDetails.title, start_date, end_date, req.body.taskDetails.billable, req.body.taskDetails.status, req.body.taskDetails.description, req.body.taskDetails.estimated_hours, req.body.taskDetails.priority, 'now()', req.body.taskDetails.taskId, req.user.company_id, taskData.assigned_user_id, req.body.taskDetails.task_complete_per], function (err, updatedData) {
     if (err) {
       console.error(err);
       handleResponse.shouldAbort(err, client, done);
       handleResponse.handleError(res, err, ' Error in updating task.');
     } else {
+      if(req.body.taskDetails.status !=taskData.status){
+        let completeAllSubtasksQry = `WITH RECURSIVE rec_tree(parent_id,id) AS (
+                                        SELECT t.parent_id, t.id, t.company_id
+                                        FROM task t where id = $1
+                                      UNION ALL
+                                        SELECT t.parent_id,t.id, t.company_id
+                                        FROM task t, rec_tree rt
+                                        WHERE t.parent_id = rt.id and archived = false and t.company_id = rt.company_id
+                                      )
+                                      update task set status = $2 where id in (select id from rec_tree)`;
+        client.query(completeAllSubtasksQry,[req.body.taskDetails.taskId,req.body.taskDetails.status],(err,updatedSubtasks)=>{
+          if(err){
+            console.error(err);
+            handleResponse.shouldAbort(err, client, done);
+            handleResponse.handleError(res, err, ' Error in updating subtask status.');
+          }else{
+            console.log('updated task record')
+            console.log(updatedData.rows[0]);
+            return callback(updatedData.rows[0].id);
+          }
+        })
+      }else{
+        console.log('updated task record')
+        console.log(updatedData.rows[0]);
+        return callback(updatedData.rows[0].id);
+      }
       // client.query('select (SELECT count(id) from task where project_id = $1 AND status = $2) as total_completed_task_count ,(select count(id) from task where project_id=$1) as total_project_task from project where id=$1', [req.body.taskDetails.project_id, "Completed"], (err, taskProjectDetails) => {
       //   if (err) {
       //     console.error(err);
@@ -499,9 +528,6 @@ function updateTaskRecord(req, client, err, done, res, taskData, callback) {
       //     });
       //   }
       // })
-      console.log('updated task record')
-      console.log(updatedData.rows[0]);
-      return callback(updatedData.rows[0].id);
     }
   });
 }
@@ -684,6 +710,7 @@ exports.postEditTask = (req, res) => {
                           if (taskDetail.rows.length > 0) {
                             if(!(taskDetail.rows[0].name != req.body.taskDetails.title && parseInt(taskDetail.rows[0].samenametaskcount) > 0)){
                             var taskData = {};
+                            taskData=taskDetail.rows[0];
                             taskData.assigned_user_id = req.body.taskDetails.assigned_user;
                             console.log('taskData.assigned_user_id')
                             console.log(taskData.assigned_user_id)

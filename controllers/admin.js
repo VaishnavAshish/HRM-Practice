@@ -89,7 +89,13 @@ exports.getResourceDetail = (req, res) => {
       } else {
         // console.log('getResourceDetail-------------' + req.query.userid + ' request user session is ' + req.user.user_role.contains('SUPER_ADMIN'));
         pool.connect((err, client, done) => {
-          client.query('SELECT u.id ,u.email ,u.password ,u.username ,u.company_id ,u.user_role ,u.created_date at time zone \'' + companyDefaultTimezone + '\' as created_date ,u.modified_date at time zone \'' + companyDefaultTimezone + '\' as modified_date ,u.first_name ,u.last_name ,u.phone ,u.mobile ,u.designation ,u.archived ,u.password_reset_token ,u.add_status ,u.bill_rate ,u.cost_rate ,u.permissions ,u.role ,u.record_id FROM users u where u.id=$1', [req.query.userid], function(err, resource) {
+          let superAdminQry='';
+          let usrQryParam=[req.query.userid];
+          if(req.user.role != 'SUPER_ADMIN'){
+            superAdminQry=' and u.company_id = $2 ';
+            usrQryParam.push(req.user.company_id);
+          }
+          client.query('SELECT u.id ,u.email ,u.password ,u.username ,u.company_id ,u.user_role ,u.created_date at time zone \'' + companyDefaultTimezone + '\' as created_date ,u.modified_date at time zone \'' + companyDefaultTimezone + '\' as modified_date ,u.first_name ,u.last_name ,u.phone ,u.mobile ,u.designation ,u.archived ,u.password_reset_token ,u.add_status ,u.bill_rate ,u.cost_rate ,u.permissions ,u.role ,u.record_id FROM users u where u.id=$1 '+superAdminQry,usrQryParam, function(err, resource) {
             if (err) {
               console.error(err);
               handleResponse.shouldAbort(err, client, done);
@@ -103,6 +109,16 @@ exports.getResourceDetail = (req, res) => {
               }, "error", " Error in finding user");
 
             } else {
+              if(resource.rows.length<=0){
+                return handleResponse.responseToPage(res, 'pages/resource-details', {
+                  resource: {},
+                  userRoleList: [],
+                  isSuperAdmin: req.user.user_role.contains('SUPER_ADMIN'),
+                  company: req.query.comp_name,
+                  user: req.user,
+                  error: err
+                }, "error", " User not found");
+              }
               client.query('SELECT user_role FROM SETTING WHERE company_id=$1', [resource.rows[0].company_id], function(err, userRoleList) {
                 if (err) {
                   console.error(err);
@@ -194,6 +210,17 @@ exports.getCompanyDetail = (req, res) => {
                         /*handleResponse.handleError(res, err, ' Error in finding company');*/
                         /*res.render('pages/org-details', { company: companies.rows[0], user: req.user, error: err });*/
                       } else {
+                        if(companies.rows.length<=0){
+                          return handleResponse.responseToPage(res, 'pages/org-details', {
+                            admin: {},
+                            company: {},
+                            resources: [],
+                            count: 0,
+                            userRoleList: [],
+                            user: req.user,
+                            error: err
+                          }, "error", "No company data found");
+                        }
                         console.log('companyDefaultTimezone' + companyDefaultTimezone);
                         client.query('SELECT u.id ,u.email ,u.password ,u.username ,u.company_id ,u.user_role ,u.created_date at time zone \'' + companyDefaultTimezone + '\' as created_date,u.modified_date at time zone \'' + companyDefaultTimezone + '\' as modified_date,u.first_name ,u.last_name ,u.phone ,u.mobile ,u.designation ,u.archived ,u.password_reset_token ,u.add_status ,u.bill_rate ,u.cost_rate ,u.permissions ,u.role ,u.record_id ,(select count(*) from Users where company_id=$1 AND archived=$2) as total FROM Users u where company_id=$1 AND archived=$2 ORDER BY created_date DESC,email OFFSET 0 LIMIT ' + process.env.PAGE_RECORD_NO, [req.query.companyid, false], function(err, resourceList) {
                           if (err) {

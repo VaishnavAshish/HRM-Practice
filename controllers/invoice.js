@@ -1305,6 +1305,9 @@ exports.getInvoiceDetails = (req, res) => {
                                     handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.user, userList:[], error:err},"error"," Error in finding invoice data");
                                     /*handleResponse.handleError(res, err, ' Error in finding invoice data');*/
                                 }  else {
+                                  if(invoiceDetails.rows.length<=0){
+                                    return handleResponse.responseToPage(res,'pages/invoice-details',{projects:[], invoiceDetails: {}, invoiceItems: [], user: req.user, userList:[], error:err},"error"," No invoice data found");
+                                  }
                                     console.log('invoiceDetails')
                                     console.log(invoiceDetails.rows[0])
                                     if(invoiceDetails.rows.length>0){

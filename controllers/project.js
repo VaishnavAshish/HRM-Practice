@@ -793,7 +793,7 @@ exports.getProjectDetail = (req, res) => {
             /*handleResponse.handleError(res, "incorrect project id", " Project id is not correct");*/
           } else {
             pool.connect((err, client, done) => {
-              client.query('SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id,p.total_hours,p.total_invoice_amount,p.total_expense_amount,p.task_sort_order,p.total_invoice_time,p.total_invoice_expense,(SELECT count(id) from task where project_id = $1 AND status = $3 AND parent_id is Null) as total_completed_task_count,(SELECT count(id) from task where project_id = $1 AND company_id = $2 AND archived = $4 AND parent_id is Null) as total_task_count FROM PROJECT p where id=$1 AND company_id=$2', [req.query.projectId, req.user.company_id,"Completed",false], function (err, project) {
+              client.query('SELECT p.id ,p.name ,p.type ,p.start_date at time zone \''+companyDefaultTimezone+'\' as start_date ,p.end_date at time zone \''+companyDefaultTimezone+'\' as end_date ,p.total_hours ,p.billable ,p.completion_date at time zone \''+companyDefaultTimezone+'\' as completion_date ,p.status ,p.include_weekend ,p.description ,p.percent_completed ,p.estimated_hours ,p.global_project ,p.completed ,p.company_id ,p.archived ,p.account_id ,p.isglobal ,p.project_cost ,p.record_id,p.total_hours,p.total_invoice_amount,p.total_expense_amount,p.task_sort_order,p.total_invoice_time,p.total_invoice_expense,(SELECT count(id) from task where project_id = $1 AND status = $3 AND parent_id is Null AND archived=false) as total_completed_task_count,(SELECT count(id) from task where project_id = $1 AND company_id = $2 AND archived = $4 AND parent_id is Null) as total_task_count FROM PROJECT p where id=$1 AND company_id=$2', [req.query.projectId, req.user.company_id,"Completed",false], function (err, project) {
                 if (err) {
                   console.error(err);
                   handleResponse.shouldAbort(err, client, done);
@@ -987,6 +987,8 @@ exports.getProjectDetail = (req, res) => {
                         });
                       }
                     })
+                  }else{
+                    return handleResponse.responseToPage(res,'pages/project-details',{project: {}, userRoleList:[] ,tasks: [], accounts: [], userList: [], resUsers: [],user:req.user, error:err},"error"," No project found");
                   }
                 }
               })
@@ -1041,11 +1043,12 @@ exports.postEditProject = (req, res) => {
               // console.log(project.rows[0]);
               var projectStatus = req.body.projectData.project_status;
               var projectPer = req.body.projectData.project_complete_per?req.body.projectData.project_complete_per:0;
-              if('Completed' === projectStatus){
-                projectPer = 100;
-              } else if(projectPer >= 100) {
-                projectPer = 100;
-                projectStatus = 'Completed';
+              if(project.rows[0].status != req.body.projectData.project_status){
+                if('Completed' === projectStatus){
+                  projectPer = 100;
+                }else{
+                  projectPer = 0;
+                }
               }
               let start_date = null;
               let end_date = null;
@@ -1070,19 +1073,43 @@ exports.postEditProject = (req, res) => {
                   handleResponse.shouldAbort(err, client, done);
                   handleResponse.handleError(res, err, ' Error in updating project data');
                 } else {
-                  client.query('COMMIT', (err) => {
-                    if (err) {
-                      // console.log('Error committing transaction', err.stack)
-                      handleResponse.shouldAbort(err, client, done);
-                      handleResponse.handleError(res, err, ' Error in committing transaction');
-                    } else {
-                      done();
-                      // console.log('Updated project >>>>>>>>>>>>>');
-                      // console.log(updatedData);
-                      handleResponse.sendSuccess(res,'Project updated successfully.',{});
-                      /*res.status(200).json({ "success": true, "message": "success" });*/
-                    }
-                  })
+                  if(project.rows[0].status != req.body.projectData.project_status){
+                    client.query(`update task set status=$2 where id in (select id from task where project_id = $1 and archived = false)`,[req.body.projectId,req.body.projectData.project_status],(err,updatedTasks)=>{
+                      if(err){
+                        console.error(err);
+                        handleResponse.shouldAbort(err, client, done);
+                        handleResponse.handleError(res, err, ' Error in updating project tasks status');
+                      }else{
+                        client.query('COMMIT', (err) => {
+                          if (err) {
+                            // console.log('Error committing transaction', err.stack)
+                            handleResponse.shouldAbort(err, client, done);
+                            handleResponse.handleError(res, err, ' Error in committing transaction');
+                          } else {
+                            done();
+                            // console.log('Updated project >>>>>>>>>>>>>');
+                            // console.log(updatedData);
+                            handleResponse.sendSuccess(res,'Project updated successfully.',{});
+                            /*res.status(200).json({ "success": true, "message": "success" });*/
+                          }
+                        })
+                      }
+                    })
+                  }else{
+                    client.query('COMMIT', (err) => {
+                      if (err) {
+                        // console.log('Error committing transaction', err.stack)
+                        handleResponse.shouldAbort(err, client, done);
+                        handleResponse.handleError(res, err, ' Error in committing transaction');
+                      } else {
+                        done();
+                        // console.log('Updated project >>>>>>>>>>>>>');
+                        // console.log(updatedData);
+                        handleResponse.sendSuccess(res,'Project updated successfully.',{});
+                        /*res.status(200).json({ "success": true, "message": "success" });*/
+                      }
+                    })
+                  }
                 }
               });
             }

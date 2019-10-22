@@ -251,7 +251,7 @@ function loadMoreResource(){
 	let offset=$("#offset").text();
 	showLoader('#globalLoader');
 	let searchField=[];
-	let searchText=$("#searchUserEmail").val();
+	let searchText=resourceSearchText;
 	companyId=getURLParameter("companyid");
 	// let url = new URL(window.location.href);
   //   let companyId=url.searchParams.get("companyid");

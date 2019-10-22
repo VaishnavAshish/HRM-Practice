@@ -83,7 +83,13 @@ exports.permit = (req, res,next) => {
           // console.log('inside true condition')
     			return next();
     		}else{
-		     	res.redirect('/home');
+				console.log('req.params.userId in user role')
+				console.log(req.params.userId)
+				if(req.user.role == 'SUPER_ADMIN'){
+					res.redirect('/org-listing');
+				}else{
+					res.redirect('/timesheet');
+				}
     		}
     	})
     }

@@ -183,7 +183,7 @@ function loadMoreExpense(){
 
     let offset=$("#offset").text();
 
-    let searchText=$("#searchExpenseForAccount").val();
+    let searchText=expenseSearchText;
     let requestBody={"searchText":searchText,"searchField":"account_id"};
     let filterCriteria=$("#selectedFilter").text();
     if(filterCriteria=="Draft"){

@@ -13,6 +13,7 @@
         <%- include('../layouts/nav', {user:user}); %>
         <%- include('../layouts/sideNav',{user:user }); %>
         <main class="main-body-space tpd-60 bpd-100">
+            <% if(messageType!='error') { %>
             <div>
                 <div class=" slds-p-around_small">
                     <div class="">
@@ -1039,9 +1040,10 @@
             <% include ../modals/modal-edit-timesheet-day %>
             <% include ../modals/modal-add-new-timesheet-week %>
             <% include ../modals/modal-edit-tsheet-week-time %>
+            <% include ../layouts/timesheet-script %>
+            <% } %>
             <% include ../layouts/footer %>
         </main>
         <% include ../layouts/scripts %>
-        <% include ../layouts/timesheet-script %>
     </body>
 </html>

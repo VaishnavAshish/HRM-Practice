@@ -225,6 +225,7 @@ var lastSearchText;
                                 hideLoader('#globalLoader');
                                 showGlobalToast('#globalToast', 'success', "Task details updated successfully", 4000);
                             }, 2000);
+                            location.reload();
                         } else {
                             hideLoader('#globalLoader');
                             showGlobalToast('#globalToast', 'error', response.message, 4000);
@@ -286,7 +287,7 @@ function loadMoreTaskWithSearchCrieteria(isSubtask,projectId){
 
     showLoader('#globalLoader');
 
-    let searchText=$("#searchTaskName").val();
+    let searchText=lastSearchText;
     let url = new URL(window.location.href);
     let parentId,payload;
     if(isSubtask){
@@ -346,7 +347,7 @@ function loadMoreTaskWithSearchCrieteria(isSubtask,projectId){
 
 function loadMoreTask(isClearSearch,isSubtask,projectId){
     let searchText  = $("#searchTaskName").val();
-    if(searchText != '' && searchText != null && searchText != undefined){
+    if(lastSearchText != '' && lastSearchText != null && lastSearchText != undefined){
         return loadMoreTaskWithSearchCrieteria(isSubtask,projectId)
     }
     showLoader('#globalLoader');

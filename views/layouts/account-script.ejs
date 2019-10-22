@@ -503,7 +503,7 @@ function loadMoreAccount(){
 	let offset=$("#offset").text();
 	showLoader('#globalLoader');
 	let searchField=[];
-	let searchText=$("#searchAccountName").val();
+	let searchText=accountSearchText;
 	let filterCriteria=$("#selectedFilter").text();
 	if(searchText!=""){
 		let searchCriteria={"fieldName":"name ilike ","fieldValue":'%'+searchText+'%'};

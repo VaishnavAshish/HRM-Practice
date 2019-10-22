@@ -392,6 +392,16 @@ exports.getExpenseDetail = (req, res) => {
                         }, "error", " Error in finding expense data");
                         /*handleResponse.handleError(res, err, ' Error in finding expense data');*/
                     } else {
+                      if(expense.rows.length<=0){
+                        return handleResponse.responseToPage(res, 'pages/expense-details', {
+                          expense: {},
+                          accounts: [],
+                          projects: [],
+                          expCatList:[],
+                          user: req.user,
+                          error: err
+                      }, "error", " No expense data found");
+                      }
                         console.error('getExpense>>>>>>>>>>>>>');
                         // console.log(expense.rows[0]);
                         client.query('SELECT id,name,currency FROM ACCOUNT WHERE company_id=$1 AND archived=$2', [req.user.company_id, false], function(err, account) {

@@ -321,7 +321,7 @@ function loadMoreInvoice(){
 
     let offset=$("#offset").text();
 
-    let searchText=$("#searchInvoiceForAccount").val();
+    let searchText=invoiceSearchText;
 
     let requestBody={"searchText":searchText,"searchField":"account_id"};
     let filterCriteria=$("#selectedFilter").text();

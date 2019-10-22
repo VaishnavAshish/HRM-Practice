@@ -29,7 +29,7 @@ $(document).ready(function(){
 
 function loadMoreData(){
 	let offset=$("#offset").text();
-	let searchText=$("#searchCompName").val();
+	let searchText=lastSearchText;
 	showLoader('#globalLoader');
 	let searchField=[];
 	let filterCriteria=$("#selectedFilter").text();
