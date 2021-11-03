@@ -88,7 +88,7 @@
     "twilio": "^3.22.0",
     "twit": "^2.2.11",
     "util": "0.11.0",
-    "validator": "^10.8.0",
+    "validator": "^13.7.0",
     "xero-node": "^3.0.21"
   },
   "devDependencies": {
